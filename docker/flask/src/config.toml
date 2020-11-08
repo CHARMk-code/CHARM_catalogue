@@ -1,0 +1,14 @@
+# Configuration of the service
+
+[flask]
+secret_key = "9OLWxND4o83j4K4iuopO"
+upload_folder = "/uploads"
+
+[database]
+# The user and the db need to be created beforehandc (add it in the docker-compose)
+user = "anyass"
+pass = "password"
+db = "anyass"
+
+server = "db"
+port = "3306"

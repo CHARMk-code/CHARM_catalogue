@@ -1,0 +1,33 @@
+View:
+    Frame:
+        * Match https://www.charm.chalmers.se/ as close as possible
+    Search view:
+        * Searchable multiple dropdown
+        * Link form to script
+        * Render results
+        * Add wieght on results based on scoring of tag_company
+    Tag overview
+        * See and Search existing tags
+        * Toggle crowd_source
+        * Button to create new tags
+    Add Tag:
+        * Form for name and Search dropdown to select parent_tag
+        * script to send to api
+    Tag per company split on crowd sourced
+        * Show tag for the company
+        * Button to add additional tags
+        * Add like/dislike function for tags
+    Add Tag to company
+        * Search dropdown
+        * Button to create new tag
+    Display for digital catalog
+        * ? 
+
+backend:
+    Add support it ignore crowd_source tags
+    Dockerize Vue
+    Split db into different container
+    Extend company with link to digital catalog and logo
+    Add scored to tag_company to track if people agree
+    Look in to AWS (LATER)
+
