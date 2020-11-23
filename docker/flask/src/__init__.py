@@ -13,14 +13,13 @@ config = toml.load("config.toml")
 
 def create_app():
     app = Flask(__name__)
-    # enable CORS
-    CORS(app, resources={r'/*': {'origins': '*'}})
+    # # enable CORS
 
 
     Mobility(app)
 
     app.config['SECRET_KEY'] = config['flask']['secret_key']
-    app.config['UPLOAD_FOLDER'] = config['flask']['upload_folder']
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' \
         + config['database']['user'] + ':' \
         + config['database']['pass'] + '@' \
@@ -40,6 +39,7 @@ def create_app():
     # adds all routes from the routes folder to the app
     # from .routes import register_all_blueprints
     # register_all_blueprints(app)
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
 
     return app
 
