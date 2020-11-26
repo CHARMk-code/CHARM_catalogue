@@ -5,43 +5,96 @@ import sys
 
 api = Blueprint('api', __name__,url_prefix='/api')
 
+# Tag
+@api.route("/tag/create")
+def tag_add():
+    tag = request.args.get("tag")
+    parent_tag = request.args.get("parent_tag")
+    print(parent_tag, file=sys.stderr)
+    if not Tag.query.filter_by(name = tag).first():
+        new_tag = Tag(
+            name=tag,
+            parent_tag=parent_tag,
+            crowd_soured=True
+        )
+        db.session.add(new_tag)
+        db.session.commit()
 
-@api.route("/tag/add/<company>/<tag>",methods =["POST"])
-def tag_add(company,tag):
-    new_tag_company = Tag_company(
-        tag=tag,
-        company=company,
-        crowd_soured=True
-    )
-    db.session.add(new_tag_company)
+@api.route("/tag/add/")
+def tag_company_add():
+    tag = int(request.args.get("tag"))
+    company = int(request.args.get("company"))
+    print("{} {}".format(tag,company), file=sys.stderr)
+    tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
+    if not tag_company: # Create new 
+        new_tag_company = Tag_company(
+            tag=tag,
+            company=company,
+            crowd_soured=True,
+            score = 1,
+            votes = 1
+        )
+        db.session.add(new_tag_company)
+    else:
+        tag_company.votes +=1
+        vote = request.args.get("vote")
+        if vote == "up":
+            tag_company.score +=1
+
     db.session.commit()
+
 
 @api.route("/tag/match")
 def tag_match():
     select_tags = request.args.get("tags")
+    crowd = 0
+    if request.args.get("crowd"):
+        crowd = int(request.args.get("crowd"))
+        if crowd > 2:
+            return
     select_tags =select_tags.translate({ord('['): None})
     select_tags= select_tags.translate({ord(']'): None})
     select_tags =select_tags.split(',')
+    select_tags = filter(lambda a: a != '', select_tags)
     select_tags = list(map(int,select_tags))
-    companies = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags)).with_entities(Tag_company.company).all()
+    if crowd == 0:
+        companies = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags)).with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
+    else:
+        crowd = (1==crowd)
+        companies = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags)).filter_by(crowd_soured = crowd).with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
     return jsonify(companies)
 
 @api.route("/tag/get")
 def tags_get():
     company_filter = request.args.get("company_filter")
+    crowd = 0
+    if request.args.get("crowd"):
+        crowd = int(request.args.get("crowd"))
+        if crowd > 2:
+            return
     if company_filter:
-        Tag_query = Tag.query.filter_by(company = company_filter)
+        t = db.session.query(
+            Tag_company.tag,
+        ).filter(Tag_company.company == int(company_filter)).group_by(Tag_company.tag).subquery('t')
+
+        Tag_query = Tag.query.filter(
+            Tag.id == t.c.tag
+        )
     else:
         Tag_query = Tag.query
+    if crowd != 0:        
+        crowd = (1==crowd)
+        Tag_query = Tag_query.filter_by(crowd_soured = crowd)
     tags = Tag_query.all()
     return jsonify([tag.serialize for tag in tags])
-    
+
+# Company
 @api.route("/company/get")
 def companies_get():
     companies = Company.query.filter_by(active = True).all()
     return jsonify([company.serialize for company in companies])
     
-
+# Misc
 @api.route("/load")
 def load():
     with open("tags.csv","r") as csv_file:
@@ -55,7 +108,8 @@ def load():
             if not tag:
                 new_tag = Tag(
                     name = row[next_col],
-                    parent_tag = parent_tag
+                    parent_tag = parent_tag,
+                    crowd_soured = False
                 )
                 db.session.add(new_tag)
                 db.session.commit()
@@ -112,7 +166,9 @@ def load():
                         new_link = Tag_company(
                             tag = tags[j],
                             company = comp_id,
-                            crowd_soured = False
+                            crowd_soured = False,
+                            score = 1,
+                            votes = 1
                         )
                         db.session.add(new_link)
                         db.session.commit()

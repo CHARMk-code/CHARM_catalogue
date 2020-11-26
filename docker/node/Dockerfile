@@ -1,13 +1,7 @@
-# build stage
-FROM node:lts-alpine as build-stage
-WORKDIR /client
-COPY package.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+FROM archlinux/base
 
-# production stage
-# FROM nginx:stable-alpine as production-stage
-# COPY --from=build-stage /app/dist /usr/share/nginx/html
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
+RUN pacman -Sy base-devel libpng yarn --noconfirm
+
+WORKDIR client
+RUN yarn install
+CMD ["yarn","serve"]
