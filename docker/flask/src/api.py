@@ -57,12 +57,19 @@ def tag_match():
     select_tags =select_tags.split(',')
     select_tags = filter(lambda a: a != '', select_tags)
     select_tags = list(map(int,select_tags))
+    company_query = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags))
     if crowd == 0:
-        companies = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags)).with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
+        companies = company_query.with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
     else:
         crowd = (1==crowd)
-        companies = db.session.query(Tag_company).filter(Tag_company.tag.in_(select_tags)).filter_by(crowd_soured = crowd).with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
-    return jsonify(companies)
+        companies = company_query.filter_by(crowd_soured = crowd).with_entities(Tag_company.company, Tag_company.votes, Tag_company.score).all()
+    result = []
+    with db.session.no_autoflush:
+        for company in companies:
+            print(company[0],file=sys.stderr)
+            if Company.query.filter_by(id = company[0], active = True).first():
+                result.append(company)
+    return jsonify(result)
 
 @api.route("/tag/get")
 def tags_get():
@@ -98,6 +105,8 @@ def companies_get():
 @api.route("/load")
 def load():
     with open("tags.csv","r") as csv_file:
+        Company.query.update({Company.active:False})
+        db.session.commit()
         reader = list(csv.reader(csv_file, delimiter=';', quotechar='|'))
         row_length = len(reader[0])
         next_col = 0
@@ -158,8 +167,10 @@ def load():
                 )
                 db.session.add(new_comp)
                 db.session.commit()
-            comp_id = Company.query.filter_by(name=reader[i+1][0]).first().id
-
+            comp = Company.query.filter_by(name=reader[i+1][0]).first()
+            comp.active = True
+            db.session.commit()
+            comp_id = comp.id
             for j in range(row_length-1):
                 if reader[i+1][j+1] == "TRUE":
                     if not Tag_company.query.filter_by( tag = tags[j],  company = comp_id).first():
