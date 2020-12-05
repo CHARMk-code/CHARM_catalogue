@@ -18,6 +18,9 @@ class User(UserMixin, db.Model):
         }
 
 class Company(db.Model):
+    """
+    Reps a company
+    """ 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     active = db.Column(db.Boolean)
@@ -32,6 +35,10 @@ class Company(db.Model):
 
 
 class Tag(db.Model):
+    """
+    Tag represents a buzzword, program, or talent.
+    These can be crowd sourced.
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     parent_tag = db.Column(db.Integer)
@@ -47,6 +54,10 @@ class Tag(db.Model):
         }
 
 class Tag_company(db.Model):
+    """
+    These are the reletion between a company and tag.
+    These can be crowd source, it supports voting to improve the accuracy of the relation.
+    """
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.Integer)
     company = db.Column(db.Integer)

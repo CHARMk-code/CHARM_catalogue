@@ -1,6 +1,9 @@
 ## Description
 TODO
 
+## Documation
+Dokumation kan generas genom att kör doxygen doxygen_conf i doc/
+
 ## Setup
 Systemet använder docker och för att starta det skriver du
 ```

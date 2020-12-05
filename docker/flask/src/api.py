@@ -11,9 +11,18 @@ CORS(api,origins="*", resources=r'*', allow_headers=[
 # Tag
 @api.route("/tag/create")
 def tag_add():
+    """
+    POST endpoint /api/tag/create
+
+    Args:
+        tag - the name of the new tag
+        parent_tag - id of the parent 
+    """
     tag = request.args.get("tag")
     parent_tag = request.args.get("parent_tag")
-    print(parent_tag, file=sys.stderr)
+    if not parent_tag:
+        # if there is no parent_tag, we will create a new top level tag
+        parent_tag = None
     if not Tag.query.filter_by(name = tag).first():
         new_tag = Tag(
             name=tag,
@@ -26,6 +35,16 @@ def tag_add():
 
 @api.route("/tag/add")
 def tag_company_add():
+    """
+    POST endpoint /api/tag/add
+
+    If relation doesn't exist, it's creates. If the relation exist it's handle as a vote, if no vote args is supplied then it's ignored.
+
+    Args:
+        tag - id of the tag
+        company -  id of the company
+        optional vote - [up, down] used to cast vote, base if the user agree with the relation.
+    """
     tag = int(request.args.get("tag"))
     company = int(request.args.get("company"))
     tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
@@ -39,10 +58,12 @@ def tag_company_add():
         )
         db.session.add(new_tag_company)
     else:
-        tag_company.votes +=1
         vote = request.args.get("vote")
         if vote == "up":
             tag_company.score +=1
+            tag_company.votes +=1
+        elif vote == "down":
+            tag_company.votes +=1
 
     db.session.commit()
     return "success"
@@ -50,6 +71,20 @@ def tag_company_add():
 
 @api.route("/tag/match")
 def tag_match():
+    """
+    Get endpoint /api/tag/match
+    
+    Args:
+        select_tags - list of id of all selected tags
+        optional crowd - int 0 - 2 specifing crowd sourcing option. Key:
+        0 - all tags
+        1 - Only crowd sourced tags
+        2 - Only non crowd sourced tags
+
+    Return:
+        List (company id, votes, score) 
+
+    """
     select_tags = request.args.get("tags")
     crowd = 0
     if request.args.get("crowd"):
@@ -70,13 +105,25 @@ def tag_match():
     result = []
     with db.session.no_autoflush:
         for company in companies:
-            print(company[0],file=sys.stderr)
             if Company.query.filter_by(id = company[0], active = True).first():
                 result.append(company)
     return jsonify(result)
 
 @api.route("/tag/get")
 def tags_get():
+    """
+    Get endpoint /api/tag/get
+
+    args:
+        optional company_filter - id of a company, will only return tag relation to said company
+        optional crowd - int 0 - 2 specifing crowd sourcing option. Key:
+        0 - all tags
+        1 - Only crowd sourced tags
+        2 - Only non crowd sourced tags
+
+    return:
+        List Tags - A json list of all tags that match the optional args.
+    """
     company_filter = request.args.get("company_filter")
     crowd = 0
     if request.args.get("crowd"):
@@ -102,12 +149,25 @@ def tags_get():
 # Company
 @api.route("/company/get")
 def companies_get():
+    """
+    Get endpoint api/company/get
+ 
+    Return:
+        List Companys - A json list of all active companies.
+    """
     companies = Company.query.filter_by(active = True).all()
     return jsonify([company.serialize for company in companies])
     
 # Misc
 @api.route("/load")
 def load():
+    """
+    GET endpoint /api/load
+
+    This such be moved to behind authentication.
+
+    When called fills company, tag, tag_company from docker/flask/src/tags.csv & docker/flask/src/data.csv.
+    """
     with open("tags.csv","r") as csv_file:
         Company.query.update({Company.active:False})
         db.session.commit()

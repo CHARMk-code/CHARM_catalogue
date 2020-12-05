@@ -12,6 +12,9 @@ db = SQLAlchemy()
 config = toml.load("config.toml")
 
 def create_app():
+    """
+    Entry point for api server 
+    """
     app = Flask(__name__)
     # # enable CORS
 
