@@ -1,11 +1,10 @@
 Frontend:
     Store values on the frontend
+    Make shit look good
     Views:
         Frame:
             * Match https://www.charm.chalmers.se/ as close as possible
         Search view:
-            * Searchable multiple dropdown
-            * Link form to script
             * Render results
         Tag overview
             * See and Search existing tags
@@ -27,8 +26,7 @@ Frontend:
 
 
 backend:
-    Dockerize Vue
     Split db into different container
     Extend company with link to digital catalog and logo
     Look in to AWS (LATER)
-
+    Replace hacked get post for add_tag & create_tag
