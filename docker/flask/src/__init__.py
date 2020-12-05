@@ -39,7 +39,8 @@ def create_app():
     # adds all routes from the routes folder to the app
     # from .routes import register_all_blueprints
     # register_all_blueprints(app)
-    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    # CORS(app, origins="*", allow_headers=[
+    # "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
     return app
 

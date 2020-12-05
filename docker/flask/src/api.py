@@ -2,8 +2,11 @@ from flask import Blueprint, request, jsonify
 from .models import *
 import csv
 import sys
+from flask_cors import CORS
 
 api = Blueprint('api', __name__,url_prefix='/api')
+CORS(api,origins="*", resources=r'*', allow_headers=[
+    "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 # Tag
 @api.route("/tag/create")
@@ -19,12 +22,12 @@ def tag_add():
         )
         db.session.add(new_tag)
         db.session.commit()
+    return "success"
 
-@api.route("/tag/add/")
+@api.route("/tag/add")
 def tag_company_add():
     tag = int(request.args.get("tag"))
     company = int(request.args.get("company"))
-    print("{} {}".format(tag,company), file=sys.stderr)
     tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
     if not tag_company: # Create new 
         new_tag_company = Tag_company(
@@ -42,6 +45,7 @@ def tag_company_add():
             tag_company.score +=1
 
     db.session.commit()
+    return "success"
 
 
 @api.route("/tag/match")
