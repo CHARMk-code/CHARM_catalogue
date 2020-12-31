@@ -57,7 +57,6 @@ export default {
     get_init() {
       axios.get('http://localhost:5000/api/company/get')
         .then((res) => {
-          console.log(res.data);
           this.company = res.data;
         })
         .catch((error) => {

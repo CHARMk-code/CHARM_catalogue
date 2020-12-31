@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="container">
+      <div class = "row">
+        <input type="text" v-model="tag">
+      </div>
       <div class="row">
         <multiselect v-model="parent_tag" tag-placeholder="Add this as new tag"
         placeholder="Search Tag" label="name" track-by="id"
@@ -42,9 +45,7 @@ export default {
         });
     },
         create(){
-        const tag = "name";
-        const parent_tag = "1";
-        axios.get('http://localhost:5000/api/tag/create?tag=' + tag + "&parent_tag=" + parent_tag)
+        axios.get('http://localhost:5000/api/tag/create?tag=' + this.tag + "&parent_tag=" + this.parent_tag.id)
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
