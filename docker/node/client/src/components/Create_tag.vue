@@ -27,22 +27,34 @@ export default {
   },
   data() {
     return {
-      options: [
-      ],
+      options: [],
       parent_tag: null,
       tags: [],
+      tag: "",
     };
   },
   methods: {
     get_init() {
-      axios.get('http://localhost:5000/api/tag/get')
-        .then((res) => {
-          this.tags = res.data;
+      // Check timestamp and update if newer
+      axios.get('http://localhost:5000/api/tag/get?timestamp=True')
+        .then((timestamp) => {
+          if ((timestamp.data > localStorage.last_update_tag) || (localStorage.getItem("last_update_tag") == null))
+          {
+            axios.get('http://localhost:5000/api/tag/get')
+            .then((res) => {
+              res.data.forEach((tag)=>
+              {
+                this.options.push({name: tag.name, id: tag.id});
+              })
+              this.tag = res.data;
+              localStorage.setItem("tag",JSON.stringify(res.data));
+              localStorage.setItem("tag_options", JSON.stringify(this.options));
+              localStorage.last_update_tag = timestamp.data;
+            })       
+          }else{
+              this.tags = JSON.parse(localStorage.getItem("tag"));
+          }
         })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error);
-        });
     },
         create(){
         axios.get('http://localhost:5000/api/tag/create?tag=' + this.tag + "&parent_tag=" + this.parent_tag.id)

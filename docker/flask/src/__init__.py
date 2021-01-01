@@ -17,7 +17,8 @@ def create_app():
     """
     app = Flask(__name__)
     # # enable CORS
-
+    CORS(app, origins="*")
+    
 
     Mobility(app)
 

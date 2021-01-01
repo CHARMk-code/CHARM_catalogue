@@ -3,6 +3,11 @@ from .models import *
 import csv
 import sys
 from flask_cors import CORS
+from math import ceil
+from time import time
+
+last_update_company = ceil(time())
+last_update_tag = ceil(time())
 
 api = Blueprint('api', __name__,url_prefix='/api')
 CORS(api,origins="*", resources=r'*', allow_headers=[
@@ -11,6 +16,8 @@ CORS(api,origins="*", resources=r'*', allow_headers=[
 # Tag
 @api.route("/tag/create")
 def tag_add():
+    global last_update_tag
+    last_update_tag = ceil(time())
     """
     POST endpoint /api/tag/create
 
@@ -35,6 +42,8 @@ def tag_add():
 
 @api.route("/tag/add")
 def tag_company_add():
+    global last_update_tag
+    last_update_tag = ceil(time())
     """
     POST endpoint /api/tag/add
 
@@ -86,6 +95,7 @@ def tag_match():
 
     """
     select_tags = request.args.get("tags")
+    
     crowd = 0
     if request.args.get("crowd"):
         crowd = int(request.args.get("crowd"))
@@ -111,6 +121,7 @@ def tag_match():
 
 @api.route("/tag/get")
 def tags_get():
+    global last_update_tag
     """
     Get endpoint /api/tag/get
 
@@ -120,16 +131,20 @@ def tags_get():
         0 - all tags
         1 - Only crowd sourced tags
         2 - Only non crowd sourced tags
+        optional timestamp - if not None will return the timestamp when the data was updated
 
     return:
         List Tags - A json list of all tags that match the optional args.
     """
     company_filter = request.args.get("company_filter")
-    crowd = 0
+    timestamp = request.args.get("timestamp")
+    if timestamp:
+        return jsonify(last_update_tag)
     if request.args.get("crowd"):
         crowd = int(request.args.get("crowd"))
         if crowd > 2:
             return
+    crowd = 0
     if company_filter:
         t = db.session.query(
             Tag_company.tag,
@@ -149,18 +164,25 @@ def tags_get():
 # Company
 @api.route("/company/get")
 def companies_get():
+    global last_update_company
     """
     Get endpoint api/company/get
  
     Return:
         List Companys - A json list of all active companies.
     """
+    timestamp = request.args.get("timestamp")
+    if timestamp:
+        return jsonify(last_update_tag)
     companies = Company.query.filter_by(active = True).all()
     return jsonify([company.serialize for company in companies])
     
 # Misc
 @api.route("/load")
 def load():
+    global last_update_tag, last_update_company
+    last_update_company = ceil(time())
+    last_update_tag = ceil(time())
     """
     GET endpoint /api/load
 
