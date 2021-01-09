@@ -11,7 +11,8 @@ def register_all_blueprints(app):
     for f in modules:
         if f.endswith('__init__.py') or not isfile(f):
             continue
-        routes.append(dirname(f)[len(basedir)+1:].replace('/','.') + "." +basename(f)[:3])
+
+        routes.append(dirname(f)[len(basedir)+1:].replace('/','.') + "." +basename(f)[:-3])
     
     for route in routes:
         route_module = import_module('anyass.routes.' + route)
