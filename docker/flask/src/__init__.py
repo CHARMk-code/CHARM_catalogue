@@ -32,10 +32,11 @@ def create_app():
         + config['database']['db']
 
     db.init_app(app)
-    from .api import api as api_blueprint
-    app.register_blueprint(api_blueprint)
 
-   
+    # adds all routes from the routes folder to the app
+    from .routes import register_all_blueprints
+    register_all_blueprints(app)
+    
     # blueprint for non-auth parts of app
     # from .main import main as main_blueprint
     # app.register_blueprint(main_blueprint)

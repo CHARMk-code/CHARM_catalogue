@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import *
+from ...models import *
 import csv
 import sys
 from flask_cors import CORS
@@ -9,12 +9,12 @@ from time import time
 last_update_company = ceil(time())
 last_update_tag = ceil(time())
 
-api = Blueprint('api', __name__,url_prefix='/api')
-CORS(api,origins="*", resources=r'*', allow_headers=[
+blueprint = Blueprint('api', __name__, url_prefix='/api') 
+CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 # Tag
-@api.route("/tag/create")
+@blueprint.route("/tag/create")
 def tag_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -40,7 +40,7 @@ def tag_add():
         db.session.commit()
     return "success"
 
-@api.route("/tag/add")
+@blueprint.route("/tag/add")
 def tag_company_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -78,7 +78,7 @@ def tag_company_add():
     return "success"
 
 
-@api.route("/tag/match")
+@blueprint.route("/tag/match")
 def tag_match():
     """
     Get endpoint /api/tag/match
@@ -119,7 +119,7 @@ def tag_match():
                 result.append(company)
     return jsonify(result)
 
-@api.route("/tag/get")
+@blueprint.route("/tag/get")
 def tags_get():
     global last_update_tag
     """
@@ -162,7 +162,7 @@ def tags_get():
     return jsonify([tag.serialize for tag in tags])
 
 # Company
-@api.route("/company/get")
+@blueprint.route("/company/get")
 def companies_get():
     global last_update_company
     """
@@ -178,7 +178,7 @@ def companies_get():
     return jsonify([company.serialize for company in companies])
     
 # Misc
-@api.route("/load")
+@blueprint.route("/load")
 def load():
     global last_update_tag, last_update_company
     last_update_company = ceil(time())
