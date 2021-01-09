@@ -33,6 +33,7 @@ class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     active = db.Column(db.Boolean)
+    page = db.Column(db.Integer)
 
     @property
     def serialize(self):
@@ -40,6 +41,7 @@ class Company(db.Model):
             'id': self.id,
             'name': self.name,
             'active': self.active,
+            'page': self.page
         }
 
 
