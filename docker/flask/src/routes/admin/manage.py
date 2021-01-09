@@ -11,11 +11,63 @@ from flask_api import status
 from math import ceil
 from time import time
 from ... import db
+from ..user.api import last_update_company,last_update_tag
+from ...helper_functions import *
 
-blueprint = Blueprint('management', __name__, url_prefix='/management') 
+
+blueprint = Blueprint('manage', __name__, url_prefix='/manage') 
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
+@blueprint.route("/tag/update", methods=["POST"])
+# @login_required
+def tag_update():
+    id = request.form.get("id")
+    tag = request.form.get("tag")
+    company = request.form.get("company")
+    votes = request.form.get("votes")
+    score = request.form.get("score")
+    crowd_soured = request.form.get("crowd_soured")
+    delete_option = request.form.get("delete")
+
+    success = False
+    if delete_option:
+        success = tag_company_delete(id)
+    else:
+        success = tag_company_update(id, tag, company,votes, score, crowd_soured)
+    return send_status(success)
+
+@blueprint.route("/tag_company/update", methods=["POST"])
+# @login_required
+def tag_company_update():
+    id = request.form.get("id")
+    name = request.form.get("name")
+    parent_tag = request.form.get("parent_tag")
+    delete_option = request.form.get("delete")
+
+    success = False
+    if delete_option:
+        success = tag_delete(id)
+    else:
+        success = tag_update(id, name, parent_tag)
+    return send_status(success)
+
+
+@blueprint.route("/company/update", methods=["POST"])
+# @login_required
+def company_update():
+    id = request.form.get("id")
+    name = request.form.get("name")
+    active = request.form.get("active")
+    page = request.form.get("page")
+    delete_option = request.form.get("delete")
+    
+    success = False
+    if delete_option:
+        success = company_delete(id)
+    else:
+        success = company_update(id,name,active,page)
+    return send_status(success)
 
 @blueprint.route("/load", methods=["POST"])
 # @login_required
