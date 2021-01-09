@@ -19,54 +19,71 @@ blueprint = Blueprint('manage', __name__, url_prefix='/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/tag/update", methods=["POST"])
+@blueprint.route("/tag_company/update", methods=["POST"])
 # @login_required
-def tag_update():
-    id = request.form.get("id")
-    tag = request.form.get("tag")
-    company = request.form.get("company")
-    votes = request.form.get("votes")
-    score = request.form.get("score")
-    crowd_soured = request.form.get("crowd_soured")
+def tag_company_update():
+    id = try_int(request.form.get("id"))
+    tag = try_int(request.form.get("tag"))
+    company = try_int(request.form.get("company"))
+    votes = try_int(request.form.get("votes"))
+    score = try_int(request.form.get("score"))
+    crowd_soured = try_bool(request.form.get("crowd_soured"))
     delete_option = request.form.get("delete")
+
+    if not id:
+        return send_status(tag_company_create(tag,company,votes,score,crowd_soured))
+
 
     success = False
     if delete_option:
         success = tag_company_delete(id)
     else:
-        success = tag_company_update(id, tag, company,votes, score, crowd_soured)
+        success = tag_company_update_helper(id, tag, company,votes, score, crowd_soured)
     return send_status(success)
 
-@blueprint.route("/tag_company/update", methods=["POST"])
+
+
+@blueprint.route("/tag/update", methods=["POST"])
 # @login_required
-def tag_company_update():
-    id = request.form.get("id")
+def tag_update():
+    id = try_int(request.form.get("id"))
     name = request.form.get("name")
-    parent_tag = request.form.get("parent_tag")
+    parent_tag = try_int(request.form.get("parent_tag"))
+    crowd_soured = try_bool(request.form.get("crowd_soured"))
     delete_option = request.form.get("delete")
+
+    if not id:
+        return send_status(tag_create(name,parent_tag,crowd_soured))
+
+
 
     success = False
     if delete_option:
         success = tag_delete(id)
     else:
-        success = tag_update(id, name, parent_tag)
+        success = tag_update_helper(id, name, parent_tag, crowd_soured)
     return send_status(success)
 
 
 @blueprint.route("/company/update", methods=["POST"])
 # @login_required
 def company_update():
-    id = request.form.get("id")
+    id = try_int(request.form.get("id"))
     name = request.form.get("name")
-    active = request.form.get("active")
-    page = request.form.get("page")
+    active = try_bool(request.form.get("active"))
+    page = try_int(request.form.get("page"))
     delete_option = request.form.get("delete")
     
+    if not id:
+        return send_status(company_create(name,active,page))
+
+
+
     success = False
     if delete_option:
         success = company_delete(id)
     else:
-        success = company_update(id,name,active,page)
+        success = company_update_helper(id,name,active,page)
     return send_status(success)
 
 @blueprint.route("/load", methods=["POST"])

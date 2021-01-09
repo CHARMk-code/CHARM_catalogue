@@ -1,4 +1,4 @@
-from . import db, config
+from . import db
 from .models import *
 from werkzeug.security import generate_password_hash
 import csv
@@ -14,22 +14,49 @@ def send_status(success):
     else:
         return "Failed", status.HTTP_500_INTERNAL_SERVER_ERROR
 
+def try_int(value):
+    try:
+        return int(value)
+    except:
+        return None
+
+def try_bool(value):
+    return value == "True"
     
 def create_user(email,name,password,number,privilege):
-    # create new user with the form data. Hash the password so plaintext version isn't saved.
-    new_user = User(
-        email=email,
-        name=name,
-        password=generate_password_hash(password, method='sha256'),
-        number=number,
-        privilege=privilege,
-    )
+    try:
+        # create new user with the form data. Hash the password so plaintext version isn't saved.
+        new_user = User(
+            email=email,
+            name=name,
+            password=generate_password_hash(password, method='sha256'),
+            number=number,
+            privilege=privilege,
+        )
 
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
+        # add the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+    except:
+        return False
+    return True
 
-def tag_update(id, name, parent_tag, crowd_soured):
+def tag_create(name, parent_tag, crowd_soured):
+    try:
+        if Tag.query.filter_by(name=name).first():
+            return False
+        new_tag = Tag(
+            name=name,
+            parent_tag=parent_tag,
+            crowd_soured=crowd_soured,
+        )
+        db.session.add(new_tag)
+        db.session.commit()
+    except:
+        return False
+    return True
+
+def tag_update_helper(id, name, parent_tag, crowd_soured):
     tag = Tag.query.get(id)
 
     if tag:
@@ -51,7 +78,25 @@ def tag_delete(id):
 
     return True
 
-def tag_company_update(id, tag, company, votes, score, crowd_soured):
+def tag_company_create(tag, company, votes, score, crowd_soured):
+    try:
+        if Tag_company.query.filter_by(tag=tag,company=company).first():
+            return False
+        new_tag_company = Tag_company(
+            tag=tag,
+            company=company,
+            votes=votes,
+            score=score,
+            crowd_soured=crowd_soured
+        )
+
+        db.session.add(new_tag_company)
+        db.session.commit()
+    except:
+        return False
+    return True
+
+def tag_company_update_helper(id, tag, company, votes, score, crowd_soured):
     tag_company = Tag_company.query.get(id)
 
     if tag_company:
@@ -75,7 +120,24 @@ def tag_company_delete(id):
 
     return True
 
-def company_update(id, name, active, page):
+
+def company_create(name, active, page):
+    try:
+        if Company.query.filter_by(name=name).first():
+            return False
+        new_company = Company(
+            name=name,
+            active=active,
+            page=page
+        )
+
+        db.session.add(new_company)
+        db.session.commit()
+    except:
+        return False
+    return True
+
+def company_update_helper(id, name, active, page):
     company = Company.query.get(id)
 
     if company:
