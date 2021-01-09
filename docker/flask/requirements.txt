@@ -7,3 +7,4 @@ cryptography
 Flask-Mobility
 pyopenssl
 flask-cors
+flask_api
