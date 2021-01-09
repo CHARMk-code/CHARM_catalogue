@@ -6,14 +6,23 @@ from flask_login import UserMixin
 # 1 - Only crowd sourced
 # 2 - Only manual added
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
+    number = db.Column(db.String(20))
     privilege = db.Column(db.Integer)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
+            'email': self.email,
+            'password': self.password,
+            'name': self.name,
+            'number': self.number,
             'privilege': self.privilege,
         }
 
