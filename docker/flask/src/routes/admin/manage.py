@@ -22,8 +22,8 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 # @login_required
 def load():
     global last_update_tag, last_update_company
-    last_update_company = ceil(time())
-    last_update_tag = ceil(time())
+    # last_update_company = ceil(time())
+    # last_update_tag = ceil(time())
     
     """
     GET endpoint /management/load
@@ -43,13 +43,7 @@ def load():
             row = reader[i]
             tag = Tag.query.filter_by(name=row[next_col]).first()
             if not tag:
-                new_tag = Tag(
-                    name = row[next_col],
-                    parent_tag = parent_tag,
-                    crowd_soured = False
-                )
-                db.session.add(new_tag)
-                db.session.commit()
+                tag_create(row[next_col],parent_tag,1,1,False)
                 parent_tag = Tag.query.filter_by(name=row[next_col]).first().id
             else:
                 parent_tag = tag.id

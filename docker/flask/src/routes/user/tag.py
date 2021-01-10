@@ -13,7 +13,7 @@ blueprint = Blueprint('tag', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/create")
+@blueprint.route("/create", methods=["POST"])
 def tag_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -24,13 +24,22 @@ def tag_add():
         tag - the name of the new tag
         parent_tag - id of the parent 
     """
-    tag = request.args.get("tag")
-    parent_tag = try_int(request.args.get("parent_tag"))
-    if not Tag.query.filter_by(name = tag).first():
-        tag_create(tag, parent_tag, True)
+    tag = request.form.get("tag")
+    tag_obj = Tag.query.filter_by(name = tag).first()
+    parent_tag = try_int(request.form.get("parent_tag"))
+    if not tag_obj:
+        tag_create(tag, parent_tag, 1, 1,True)
+    else:
+        vote = request.form.get("vote")
+        if vote == "up":
+            tag_obj.score +=1
+            tag_obj.votes +=1
+        elif vote == "down":
+            tag_obj.votes +=1
+        db.session.commit()
     return "success", status.HTTP_200_OK
 
-@blueprint.route("/add")
+@blueprint.route("/add", methods=["POST"])
 def tag_company_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -44,13 +53,13 @@ def tag_company_add():
         company -  id of the company
         optional vote - [up, down] used to cast vote, base if the user agree with the relation.
     """
-    tag = try_int(request.args.get("tag"))
-    company = try_int(request.args.get("company"))
+    tag = try_int(request.form.get("tag"))
+    company = try_int(request.form.get("company"))
     tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
     if not tag_company: # Create new 
         tag_company_create(tag,company,1,1,True)
     else:
-        vote = request.args.get("vote")
+        vote = request.form.get("vote")
         if vote == "up":
             tag_company.score +=1
             tag_company.votes +=1
@@ -77,11 +86,11 @@ def tag_match():
         List (company id, votes, score) 
 
     """
-    select_tags = request.args.get("tags")
+    select_tags = request.form.get("tags")
     
     crowd = 0
-    if request.args.get("crowd"):
-        crowd = try_int(request.args.get("crowd"))
+    if request.form.get("crowd"):
+        crowd = try_int(request.form.get("crowd"))
         if crowd > 2:
             return status.HTTP_400_BAD_REQUEST
     select_tags =select_tags.translate({ord('['): None})
@@ -119,12 +128,12 @@ def tags_get():
     return:
         List Tags - A json list of all tags that match the optional args.
     """
-    company_filter = request.args.get("company_filter")
-    timestamp = request.args.get("timestamp")
+    company_filter = request.form.get("company_filter")
+    timestamp = request.form.get("timestamp")
     if timestamp:
         return jsonify(last_update_tag)
-    if request.args.get("crowd"):
-        crowd = try_int(request.args.get("crowd"))
+    if request.form.get("crowd"):
+        crowd = try_int(request.form.get("crowd"))
         if crowd > 2:
             return status.HTTP_401_UNAUTHORIZED
     crowd = 0

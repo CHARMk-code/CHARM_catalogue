@@ -42,13 +42,15 @@ def create_user(email,name,password,number,privilege):
         return False
     return True
 
-def tag_create(name, parent_tag, crowd_soured):
+def tag_create(name, parent_tag,votes, score, crowd_soured):
     try:
         if Tag.query.filter_by(name=name).first():
             return False
         new_tag = Tag(
             name=name,
             parent_tag=parent_tag,
+            votes=votes,
+            score=score,
             crowd_soured=crowd_soured,
         )
         db.session.add(new_tag)
@@ -57,12 +59,14 @@ def tag_create(name, parent_tag, crowd_soured):
         return False
     return True
 
-def tag_update_helper(id, name, parent_tag, crowd_soured):
+def tag_update_helper(id, name, parent_tag, votes, score, crowd_soured):
     tag = Tag.query.get(id)
 
     if tag:
         tag.name = name
         tag.parent_tag = parent_tag
+        tag.votes = votes
+        tag.score = score
         tag.crowd_soured = crowd_soured
         db.session.commit()
         return True
