@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 from ... import config
 from flask_api import status
 
-blueprint = Blueprint('auth', __name__)
+blueprint = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @blueprint.route('/login', methods=['POST'])
 def login_post():
