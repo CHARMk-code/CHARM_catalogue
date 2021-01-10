@@ -13,12 +13,12 @@ config = toml.load("config.toml")
 
 def create_app():
     """
-    Entry point for api server 
+    Entry point for api server
     """
     app = Flask(__name__)
     # # enable CORS
     CORS(app, origins="*")
-    
+
 
     Mobility(app)
 
@@ -36,7 +36,7 @@ def create_app():
     # adds all routes from the routes folder to the app
     from .routes import register_all_blueprints
     register_all_blueprints(app)
-    
+
     # blueprint for non-auth parts of app
     # from .main import main as main_blueprint
     # app.register_blueprint(main_blueprint)
@@ -52,4 +52,3 @@ def create_app():
 with create_app().app_context():
     db.create_all()
     db.session.commit()
-

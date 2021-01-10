@@ -15,7 +15,7 @@ from ..user.api import last_update_company,last_update_tag
 from ...helper_functions import *
 
 
-blueprint = Blueprint('manage', __name__, url_prefix='/manage') 
+blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
@@ -73,7 +73,7 @@ def company_update():
     active = try_bool(request.form.get("active"))
     page = try_int(request.form.get("page"))
     delete_option = request.form.get("delete")
-    
+
     if not id:
         return send_status(company_create(name,active,page))
 
@@ -86,12 +86,14 @@ def company_update():
         success = company_update_helper(id,name,active,page)
     return send_status(success)
 
-@blueprint.route("/load", methods=["POST"])
+@blueprint.route("/load", methods=["POST", "GET"])
 # @login_required
 def load():
+    """
     global last_update_tag, last_update_company
     last_update_company = ceil(time())
     last_update_tag = ceil(time())
+    """
     """
     GET endpoint /management/load
 
@@ -131,16 +133,16 @@ def load():
                 if (reader[i+1][next_col+1]!=''):
                     next_col += 1
                     continue
-        
+
             for j in range(row_length):
                 if reader[i+1][j] != '':
                     if (j==0):
                         parent_tag = None
-                    next_col = j 
+                    next_col = j
                     break
-                
-                
-            
+
+
+
 
     with open("data.csv","r") as csv_file:
         reader = list(csv.reader(csv_file, delimiter=';', quotechar='|'))
@@ -153,7 +155,7 @@ def load():
         with db.session.no_autoflush:
             for i in range(2,row_length):
                 tags.append(Tag.query.filter_by(name = tag_row[i]).first().id)
-        
+
         for i in range(1,len(reader)):
             if not Company.query.filter_by(name=reader[i][0]).first():
                 new_comp = Company(
