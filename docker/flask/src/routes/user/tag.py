@@ -70,7 +70,7 @@ def tag_company_add():
     return "success", status.HTTP_200_OK
 
 
-@blueprint.route("/match")
+@blueprint.route("/match", methods=["GET"])
 def tag_match():
     """
     Get endpoint /api/tag/match
@@ -111,7 +111,7 @@ def tag_match():
                 result.append(company)
     return jsonify(result), status.HTTP_200_OK
 
-@blueprint.route("/get")
+@blueprint.route("/get", methods=["GET"])
 def tags_get():
     global last_update_tag
     """
