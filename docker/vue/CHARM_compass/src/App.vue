@@ -9,6 +9,7 @@
 
 <script>
 import Header from '@/components/Header'
+import {mapActions} from 'vuex'
 
 export default {
   name: 'App',
@@ -26,10 +27,20 @@ export default {
       }
     }
   },
+  created () {
+    this.retrieveCompanies()
+    this.retrieveTags()
+  },
   data () {
     return {
       search_disabled: false
     }
+  },
+  methods: {
+    ...mapActions([
+      'retrieveCompanies',
+      'retrieveTags'
+    ])
   }
 }
 </script>

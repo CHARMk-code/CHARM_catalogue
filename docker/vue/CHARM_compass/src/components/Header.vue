@@ -7,7 +7,7 @@
 
       <v-btn
         v-for="link in links"
-        :key="link"
+        :key="link.name"
         text
         >
         <router-link :to="link.route" >{{ link.name }}</router-link>
@@ -15,7 +15,7 @@
 
         <v-spacer></v-spacer>
 
-        <SearchBar v-if="!search_disabled"/>
+        <SearchBar :goto_bool="true" search_resource="companies" v-if="!search_disabled"/>
 
     </v-container>
   </v-app-bar>

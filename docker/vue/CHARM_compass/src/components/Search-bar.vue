@@ -15,35 +15,34 @@
 </template>
 
 <script>
-import {mapActions as mapSearchActions, mapGetters as mapSearchGetters, getterTypes, actionTypes} from 'vuex-search'
+import {mapActions as mapSearchActions, actionTypes} from 'vuex-search'
 
 export default {
   name: 'Search-bar',
+  prop: {
+    search_resource: String,
+    goto_bool: {type: Boolean, default: true}
+  },
   data () {
     return {
       search_text: ''
     }
   },
-  computed: {
-    ...mapSearchGetters('companies', {
-      resultIds: getterTypes.result,
-      isLoading: getterTypes.isSearching
-    })
-
-  },
-  created () {
-    this.$store.dispatch('retrieveCompanies')
-  },
   methods: {
     goto_search () {
-      this.$router.push({name: 'Search', params: {search: this.search_text}})
+      if (this.$attrs.goto_bool) {
+        this.$router.push({name: 'Search', params: {search: this.search_text}})
+      }
     },
     update_search () {
-      console.log(this.search_text)
       this.searchCompanies(this.search_text)
+      this.searchTags(this.search_text)
     },
     ...mapSearchActions('companies', {
       searchCompanies: actionTypes.search
+    }),
+    ...mapSearchActions('tags', {
+      searchTags: actionTypes.search
     })
   }
 }

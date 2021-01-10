@@ -1,7 +1,6 @@
 <template>
   <v-container>
     <v-row>
-      <v-spacer></v-spacer>
       <v-col>
         <v-sheet
           min-height="70vh"
@@ -28,33 +27,8 @@
 
       <!-- Used for tags later on -->
       <v-col>
-        <v-sheet rounded="lg">
-          <v-list color="transparent">
-            <v-list-item
-              v-for="n in 5"
-              :key="n"
-              link
-              >
-              <v-list-item-content>
-                <v-list-item-title>
-                  List Item {{ n }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-divider class="my-2"></v-divider>
-
-            <v-list-item
-              link
-              color="grey lighten-4"
-              >
-              <v-list-item-content>
-                <v-list-item-title>
-                  Refresh
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+        <v-sheet max-width="500" rounded="lg">
+          <Tags :companyId="this.company.id"/>
         </v-sheet>
       </v-col>
 
@@ -63,19 +37,32 @@
 </template>
 
 <script>
+import Tags from '@/components/Tags'
 export default {
   name: 'Company',
+  components: {
+    Tags
+  },
   data () {
     return {
     }
   },
   computed: {
     company () {
-      const companyId = this.$route.params.company
-      console.log(companyId)
-      const res = this.$store.getters.getCompanyById(companyId)
-      console.log(res)
-      return res
+      return this.getCompany(this.$route.params.company)
+    }
+  },
+  methods: {
+    getCompany (id) {
+      let company = this.$store.getters.getCompanyById(id)
+
+      if (typeof company === 'undefined') {
+        company = this.$store.dispatch('retrieveCompanies')
+          .then(() => {
+            return this.$store.getters.getCompanyById(id)
+          })
+      }
+      return company
     }
   }
 }

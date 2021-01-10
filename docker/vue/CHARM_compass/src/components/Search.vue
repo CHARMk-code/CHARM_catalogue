@@ -5,7 +5,7 @@
         <v-sheet rounded class="pa-6">
           <v-row>
             <v-col cols="9" >
-              <SearchBar :search='search_text'/>
+              <SearchBar search_resource="tags" :search='search_text'/>
             </v-col>
             <v-col cols="1">
               <v-btn>Search
