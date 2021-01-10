@@ -30,7 +30,7 @@ const store = new Vuex.Store({
   },
   getters: {
     getCompanyById: state => id => {
-      return state.companies.find(company => company.id === id)
+      return state.companies.find(company => company.id === parseFloat(id))
     }
   },
   plugins: [

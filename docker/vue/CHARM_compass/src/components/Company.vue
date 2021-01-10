@@ -10,19 +10,19 @@
           style="position:relative;"
           >
 
-          <router-link class='prev navigation' :to="'/company/' + (parseFloat(this.company) - 1)">
+          <router-link class='prev navigation' :to="'/company/' + (parseFloat(this.company.page) - 1)">
             <v-chip x-large>
               <v-icon x-large>mdi-arrow-left</v-icon>
             </v-chip>
           </router-link>
 
-          <router-link class='next navigation' :to="'/company/' + (parseFloat(this.company) + 1)">
+          <router-link class='next navigation' :to="'/company/' + (parseFloat(this.company.page) + 1)">
             <v-chip x-large>
               <v-icon x-large>mdi-arrow-right</v-icon>
             </v-chip>
           </router-link>
 
-          <img center class='company-page' v-bind:src="require('@/assets/companies/' + this.company + '.png')"/>
+          <img center class='company-page' v-bind:src="require('@/assets/companies/' + this.company.page + '.png')"/>
         </v-sheet>
       </v-col>
 
@@ -67,22 +67,15 @@ export default {
   name: 'Company',
   data () {
     return {
-      company: undefined
     }
   },
-  watch: {
-    $route (to, from) {
-      console.log(to)
-      this.getCompany(to.params.company)
-    }
-  },
-  created () {
-    this.getCompany(this.$route.params.company)
-    this.$forceUpdate()
-  },
-  methods: {
-    getCompany (company) {
-      this.company = company
+  computed: {
+    company () {
+      const companyId = this.$route.params.company
+      console.log(companyId)
+      const res = this.$store.getters.getCompanyById(companyId)
+      console.log(res)
+      return res
     }
   }
 }
