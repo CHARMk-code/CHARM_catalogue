@@ -7,6 +7,7 @@ import sys
 from flask import render_template
 from flask_sqlalchemy import *
 from flask_api import status
+from .shared_data import last_update_company, last_update_tag
 
 def send_status(success):
     if success:

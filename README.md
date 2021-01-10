@@ -11,6 +11,31 @@ docker-compose up
 ```
 NOTE: Detta kräver att du har [docker](https://www.docker.com/) installerat på din dator allt annat löser den själv
 
+## Api endpoints
+Below is a map of the endpoints provide by the api.
+Keys:
+A - Requires user to be logged in, all endpoints of this type is placed under directory admin.
+```
+api-|-tag-----|-crete
+    |         |-add
+    |         |-match
+    |         |-get
+    |         |-update(A)
+    |         |-comapany-update(A)
+    |
+    |-company-|-get
+    |         |-update(A)
+    |
+    |-manage--|-load(A)
+    |
+    |-auth----|-login
+              |-logout(A)
+              |-signout(A)
+              |-change_password(A)
+```
+
+
+
 ## Data formatting of csv files
 tags.csv is structure in a tree structure, where indentions indicates a sublevel. The structure always infinitely many sublevels but the file must be valid csv. That means that every row needs to have the same number of : and can't have tailing newlines. Empty cells such med totally empty aka '' and no value such have unnecessary white. 
 
