@@ -129,6 +129,7 @@ def tags_get():
         List Tags - A json list of all tags that match the optional args.
     """
     company_filter = request.form.get("company_filter")
+    only_ids = request.form.get("only_ids")
     timestamp = request.form.get("timestamp")
     if timestamp:
         return jsonify(last_update_tag)
@@ -151,4 +152,7 @@ def tags_get():
         crowd = (1==crowd)
         Tag_query = Tag_query.filter_by(crowd_soured = crowd)
     tags = Tag_query.all()
-    return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK
+    if only_ids:
+        return jsonify([tag.id for tag in tags]), status.HTTP_200_OK
+    else:
+        return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK
