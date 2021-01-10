@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 297.64 420.94" style="enable-background:new 0 0 297.64 420.94;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;}
+	.st1{display:inline;fill:none;}
+	.st2{display:inline;}
+	.st3{font-family:'OpenSans';}
+	.st4{font-size:90px;}
+	.st5{fill:#FFFFFF;stroke:#000000;stroke-width:9;stroke-miterlimit:10;}
+	.st6{fill:none;stroke:#000000;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<g id="Layer_1" class="st0">
+	<rect x="109.2" y="108.85" class="st1" width="99.05" height="91"/>
+	<text transform="matrix(1 0 0 1 109.2041 172.7524)" class="st2 st3 st4">∑</text>
+</g>
+<g id="Layer_2">
+	
+		<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -109.8774 167.883)" class="st5" cx="147.71" cy="216.58" rx="139.42" ry="139.42"/>
+	<g>
+		<g>
+			<line class="st6" x1="93.24" y1="142.38" x2="186.72" y2="142.38"/>
+			<line class="st6" x1="93.24" y1="142.38" x2="153.33" y2="213.99"/>
+		</g>
+		<g>
+			<line class="st6" x1="93.24" y1="285.6" x2="186.72" y2="285.6"/>
+			<line class="st6" x1="93.24" y1="285.6" x2="153.33" y2="213.99"/>
+		</g>
+		<line class="st6" x1="186.72" y1="142.95" x2="186.72" y2="159.32"/>
+		<line class="st6" x1="186.72" y1="285.03" x2="186.72" y2="268.66"/>
+	</g>
+</g>
+</svg>
