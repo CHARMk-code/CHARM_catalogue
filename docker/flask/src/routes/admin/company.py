@@ -1,3 +1,6 @@
+"""
+This file contians all auth api call that handles company datatype
+"""
 from flask import Blueprint, request, jsonify
 from ...models import Company
 import sys
@@ -14,6 +17,19 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 @blueprint.route("/update", methods=["POST"])
 # @login_required
 def company_update():
+    """
+    POST endpoint api/company/update
+
+    Args:
+        id - Id of target company, if not provided a new object is created .
+        name - New name of the company (if not provided the value will be set to None)
+        active - New statue of the company (if not provided the value will be set to None)
+        page - New page of the company (if not provided the value will be set to None)
+        delete_option - If set the give id will be deleted       
+    return:
+        200_ok - If ok
+        500_internal_server_error - otherwise
+    """
     id = try_int(request.form.get("id"))
     name = request.form.get("name")
     active = try_bool(request.form.get("active"))

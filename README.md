@@ -1,5 +1,17 @@
-## Description
-TODO
+## Goal
+Detta project syftar till konstrukera en digital katalog för CHARM. Interfacet ska tillhanda hålla:
+* Vy för företags katalog sidan
+* Sökfunktion för företag
+* Sökfunktion på taggar, för att hitta relevanta företag
+* Vy för att användar att ge företag taggar
+* Vy för att skapa nya taggar
+* Vy för administör att modderar systemet:
+  * Skapa/redisera/ta bort taggar/företag/taggar på företag
+
+## Plan
+Vi räknar med 5000 simultan användare, därför lägger syftar vi till att lägga så mycket beräkningare på användare. Vi tillhanda håller en database ochen lightweight api. För att möljigöra skaling så bygger vi projektet som microserivces.
+
+If extra performance is need the backend might be rewriten in a higher performance lang such as rust.
 
 ## Documation
 Dokumation kan generas genom att kör doxygen doxygen_conf i doc/
@@ -16,7 +28,7 @@ Below is a map of the endpoints provide by the api.
 Keys:
 A - Requires user to be logged in, all endpoints of this type is placed under directory admin.
 ```
-api-|-tag-----|-crete
+api-|-tag-----|-create
     |         |-add
     |         |-match
     |         |-get

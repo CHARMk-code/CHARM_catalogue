@@ -9,6 +9,24 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 @blueprint.route("/update", methods=["POST"])
 # @login_required
 def tag_update():
+    """
+    POST endpoint /api/tag/update
+
+    Arg:
+        id(int) - Id of the tag, if no id provided creates new object
+        name(string) - Name of the tag (if not provided the value will be set to None)
+        parent_tag(int) - Id of parent tag (if not provided the value will be set to None)
+        votes(int) - Total number of votes cast on this tag. Must be greater than 1. 
+        score(int) - Total number of upvotes.
+        crowd_sourced(bool) - Set if the tag, was created by an non authed user. 
+        delete_option(bool) - If set, deletes tag_company with the given id
+    Return:
+        200_ok
+        500_internal_server_error
+
+    Design choose, I choose to combine create/update/delete
+    to one endpoint to make it more lean and I'm lazy
+    """
     id = try_int(request.form.get("id"))
     name = request.form.get("name")
     parent_tag = try_int(request.form.get("parent_tag"))
@@ -30,6 +48,24 @@ def tag_update():
 @blueprint.route("/company/update", methods=["POST"])
 # @login_required
 def tag_company_update():
+     """
+    POST endpoint /api/tag/company/update
+
+    Arg:
+        id(int) - Id of the tag_company, if no id provided creates new object
+        tag(int) - Id of tag
+        company(int) - Id of company
+        votes(int) - Total number of votes cast on this tag. Must be greater than 1. 
+        score(int) - Total number of upvotes.
+        crowd_sourced(bool) - Set if the tag, was created by an non authed user. 
+        delete_option(bool) - If set, deletes tag_company with the given id
+    Return:
+        200_ok
+        500_internal_server_error
+
+    Design choose, I choose to combine create/update/delete
+    to one endpoint to make it more lean and I'm lazy
+    """
     id = try_int(request.form.get("id"))
     tag = try_int(request.form.get("tag"))
     company = try_int(request.form.get("company"))

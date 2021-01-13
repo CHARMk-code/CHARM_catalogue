@@ -118,13 +118,13 @@ def tags_get():
     Get endpoint /api/tag/get
 
     args:
-        optional company_filter - id of a company, will only return tag relation to said company
-        optional crowd - int 0 - 2 specifing crowd sourcing option. Key:
+        optional company_filter(int) - id of a company, will only return tag relation to said company
+        optional crowd(int) - 0 - 2 specifing crowd sourcing option. Key:
         0 - all tags
         1 - Only crowd sourced tags
         2 - Only non crowd sourced tags
-        optional timestamp - if not None will return the timestamp when the data was updated
-
+        optional timestamp - if not set will return the timestamp when the data was updated
+        optional only_ids - if set only returns ids of tags
     return:
         List Tags - A json list of all tags that match the optional args.
     """
