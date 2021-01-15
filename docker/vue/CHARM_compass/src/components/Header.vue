@@ -1,22 +1,48 @@
 <template>
-  <header>
-    <div class='header-inner'>
-      <div class='header-left'>
-        <img class='logo' src="@/assets/CHARM_logo.png">
-      </div>
-      <div class='header-middle'>
-        <p>Catalogue</p>
-      </div>
-      <div class='header-right'>
-      </div>
-    </div>
-  </header>
+  <v-app-bar app flat>
+    <v-container class="py-0 fill-height">
+      <img class='logo' src="@/assets/CHARM_logo.png">
 
+      <v-spacer></v-spacer>
+
+      <v-btn
+        v-for="link in links"
+        :key="link.name"
+        text
+        >
+        <router-link :to="link.route" >{{ link.name }}</router-link>
+      </v-btn>
+
+        <v-spacer></v-spacer>
+
+        <SearchBar :goto_bool="true" search_resource="companies" v-if="!search_disabled"/>
+
+    </v-container>
+  </v-app-bar>
 </template>
 
 <script>
+import SearchBar from '@/components/Search-bar'
+
 export default {
-  name: 'Header'
+  name: 'Header',
+  components: {
+    SearchBar
+  },
+  props: {
+    search_disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return {
+      links: [
+        {name: 'Home page', route: '/'},
+        {name: 'Catalogue', route: '/company/1'}
+      ]
+    }
+  }
 }
 </script>
 
