@@ -1,37 +1,61 @@
 <template>
-  <v-container>
+  <v-container style="margin: auto;">
     <v-row>
       <v-col>
         <v-sheet
-          min-height="70vh"
+          style="margin: auto;"
+          max-width="890"
           rounded="lg"
-          class="d-flex"
-          style="position:relative;"
           >
-
-          <router-link class='prev navigation' :to="'/company/' + (parseFloat(this.company.page) - 1)">
-            <v-chip x-large>
-              <v-icon x-large>mdi-arrow-left</v-icon>
-            </v-chip>
-          </router-link>
-
-          <router-link class='next navigation' :to="'/company/' + (parseFloat(this.company.page) + 1)">
-            <v-chip x-large>
-              <v-icon x-large>mdi-arrow-right</v-icon>
-            </v-chip>
-          </router-link>
-
-          <img center class='company-page' v-bind:src="require('@/assets/companies/' + this.company.page + '.png')"/>
+          <v-img
+            contain
+            class='page'
+            v-bind:src="require('@/assets/pages/' + this.page + '.png')"/>
         </v-sheet>
-      </v-col>
-
-      <!-- Used for tags later on -->
+          </v-col>
+    </v-row>
+    <v-row>
+      <v-container
+          style="margin: auto;"
+          max-width="890"
+          rounded="lg"
+        >
       <v-col>
-        <v-sheet max-width="500" rounded="lg">
-          <Tags :companyId="this.company.id"/>
-        </v-sheet>
-      </v-col>
+        <v-responsive max-width="890" style="margin: auto;">
+          <v-row>
+            <v-col>
+              <v-btn
+                height="64"
+                v-if="this.prev > 0">
+                <router-link
+                  style="text-decoration: none; color: inherit;"
+                  :to="'/' + this.prev">
+                  <v-icon x-large>mdi-arrow-left</v-icon>
+                  Previous
+                </router-link>
+              </v-btn>
+            </v-col>
 
+            <v-spacer/>
+
+              <v-col>
+                <v-btn
+                  height="64"
+                  style="float: right;"
+                  v-if="this.next <= this.max">
+                  <router-link
+                    style="text-decoration: none; color: inherit;"
+                    :to="'/' + this.next">
+                    Next
+                    <v-icon x-large>mdi-arrow-right</v-icon>
+                  </router-link>
+                </v-btn>
+              </v-col>
+
+          </v-row>
+        </v-responsive>
+      </v-col>
+      </v-container>
     </v-row>
   </v-container>
 </template>
@@ -45,11 +69,24 @@ export default {
   },
   data () {
     return {
+      max: 53
     }
   },
   computed: {
-    company () {
-      return this.getCompany(this.$route.params.company)
+    page () {
+      const param = this.$route.params
+
+      if (typeof param === 'undefined') {
+        return 1
+      } else {
+        return param.page
+      }
+    },
+    next () {
+      return parseFloat(this.page) + 1
+    },
+    prev () {
+      return parseFloat(this.page) - 1
     }
   },
   methods: {

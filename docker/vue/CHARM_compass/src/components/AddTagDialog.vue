@@ -17,39 +17,38 @@
       </v-card-title>
       <v-card-text class="pa-6">
         <SearchBar goto="false" search_resource="tags"/>
-        <v-list>
+        <v-data-table
+          :headers="tag_headers"
+          :items="matching_tags"
+          :items-per-page="10"
+          >
+          <template v-slot:item.actions="{ item }">
+            <v-btn
+              v-bind:disabled="hasVoted[item.id] === 1"
+              color="green"
+              @click="upvote(item)"
+              >
+              <v-icon>mdi-thumb-up-outline</v-icon>
+            </v-btn>
 
-          <!-- Show the ability to create new tags if none is found -->
-          <v-list-item
-            v-if="matching_tags.length === 0"
-            >
-            <v-input placeholder="Create a new tag..."></v-input>
-          </v-list-item>
-          <v-list-item
-            v-for="tag in matching_tags"
-            :key="tag.id">
-            <v-list-item-content>
-              <v-list-item-title>
-            {{ tag.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
+            <v-btn
+              v-bind:disabled="hasVoted[item.id] === -1"
+              color="red"
+              @click="downvote(item)"
+              >
+              <v-icon>mdi-thumb-down-outline</v-icon>
+            </v-btn>
+          </template>
+        </v-data-table>
 
-        </v-list>
       </v-card-text>
+      <v-spacer></v-spacer>
       <v-card-actions>
-        <v-spacer></v-spacer>
         <v-btn
           color="primary"
           text
           @click="dialog = false"
-          > Add tag </v-btn>
-
-        <v-btn
-          color="primary"
-          text
-          @click="dialog = false"
-          > Cancel </v-btn>
+          > Close </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -58,15 +57,44 @@
 <script>
 import SearchBar from '@/components/Search-bar'
 import {mapGetters as mapSearchGetters, getterTypes} from 'vuex-search'
+import {HTTP} from '@/plugins/http-common.js'
 
 export default {
   name: 'AddTagDialog',
   components: {
     SearchBar
   },
+  props: [
+    'companyId'
+  ],
   data () {
     return {
-      dialog: false
+      dialog: false,
+      hasVoted: {},
+      tag_headers: [
+        {
+          text: 'Tag',
+          align: 'start',
+          sortable: false,
+          value: 'id'
+        },
+        {
+          text: 'Upvotes',
+          value: 'upvotes'
+        },
+        {
+          text: 'Downvotes',
+          value: 'downvotes'
+        },
+        {
+          text: 'Rating',
+          value: 'rating'
+        },
+        {
+          text: 'Voting',
+          value: 'actions'
+        }
+      ]
     }
   },
   computed: {
@@ -84,6 +112,20 @@ export default {
     }
   },
   methods: {
+    upvote (tag) {
+      HTTP.post('/company/vote', { company: this.company, tag: tag.id, vote: 1 })
+        .then(() => {
+          this.hasVoted[tag.id] = 1
+        })
+      this.hasVoted[tag.id] = 1
+    },
+    downvote (tag) {
+      HTTP.post('/company/vote', { company: this.company, tag: tag.id, vote: -1 })
+        .then(() => {
+          this.hasVoted[tag.id] = -1
+        })
+      this.hasVoted[tag.id] = -1
+    }
   }
 }
 </script>

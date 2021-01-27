@@ -15,7 +15,9 @@ const store = new Vuex.Store({
   state: {
     companies: [],
     tags: [],
-    companyTags: {}
+    companyTags: {},
+    tagCompanies: {},
+    filteredCompanies: {}
   },
   mutations: {
     addCompany: (state, company) => {
@@ -30,16 +32,32 @@ const store = new Vuex.Store({
     setTags: (state, tags) => {
       state.tags = tags
     },
+    defaultFilteredCompanies: (state) => {
+      state.filteredCompanies = state.companies
+    },
+    setFilteredCompanies: (state, companies) => {
+      state.filteredCompanies = companies
+    },
     addTagstoCompany: (state, {companyId, tags}) => {
       state.companyTags[companyId] = tags
+    },
+    addCompanytoTag: (state, {companyId, tagId}) => {
+      if (typeof state.tagCompanies[tagId] === 'undefined') {
+        state.tagCompanies[tagId] = [companyId]
+      } else {
+        state.tagCompanies[tagId].push(companyId)
+      }
     }
   },
   actions: {
-    retrieveCompanies ({commit}) {
+    retrieveCompanies ({commit, dispatch}) {
       return new Promise((resolve, reject) => {
         HTTP.get('company/get')
           .then(resp => {
             commit('setCompanies', resp.data)
+            commit('defaultFilteredCompanies')
+
+            resp.data.forEach((company) => { dispatch('retrieveTagsForCompany', company.id) })
           })
         resolve()
       })
@@ -58,6 +76,9 @@ const store = new Vuex.Store({
         HTTP.get('tag/get?company_filter=' + companyId)
           .then(resp => {
             commit('addTagstoCompany', {companyId, tags: resp.data})
+            resp.data.forEach(value => {
+              commit('addCompanytoTag', {companyId, tagId: value.id})
+            })
           })
         resolve()
       })
@@ -71,7 +92,10 @@ const store = new Vuex.Store({
       return state.tags.find(tag => tag.id === parseFloat(id))
     },
     getTagsByCompanyId: state => id => {
-      return state.tags[id]
+      return state.companyTags[id]
+    },
+    getCompaniesWithTagId: state => id => {
+      return state.tagCompanies[id]
     }
   },
   plugins: [
@@ -79,12 +103,7 @@ const store = new Vuex.Store({
       resources: {
         companies: {
           index: ['name'],
-          getter: state => state.companies,
-          watch: {delay: 500}
-        },
-        tags: {
-          index: ['name'],
-          getter: state => state.tags,
+          getter: state => state.filteredCompanies,
           watch: {delay: 500}
         }
       }

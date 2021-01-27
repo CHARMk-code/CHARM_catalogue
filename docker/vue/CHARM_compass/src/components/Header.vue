@@ -1,23 +1,28 @@
 <template>
   <v-app-bar app flat>
-    <v-container class="py-0 fill-height">
-      <img class='logo' src="@/assets/CHARM_logo.png">
+    <v-responsive max-width="850" style="margin: auto;">
+      <v-row>
+      <v-col class="pa-0 pt-2 pl-6">
+      <router-link to="/1">
+        <img class='logo' src="@/assets/CHARM_logo.png"/>
+      </router-link>
+      </v-col>
+      <v-spacer/>
 
-      <v-spacer></v-spacer>
-
-      <v-btn
-        v-for="link in links"
-        :key="link.name"
-        text
-        >
-        <router-link :to="link.route" >{{ link.name }}</router-link>
-      </v-btn>
-
-        <v-spacer></v-spacer>
-
-        <SearchBar :goto_bool="true" search_resource="companies" v-if="!search_disabled"/>
-
-    </v-container>
+      <v-col class="pa-0 pt-3 pr-6">
+        <router-link
+          style="text-decoration: none; color: inherit; float: right;"
+          v-for="link in links"
+          :key="link.name"
+          :to="link.route"
+          >
+          <v-btn icon>
+            <v-icon large>{{ link.icon }}</v-icon>
+          </v-btn>
+        </router-link>
+      </v-col>
+      </v-row>
+    </v-responsive>
   </v-app-bar>
 </template>
 
@@ -38,8 +43,7 @@ export default {
   data () {
     return {
       links: [
-        {name: 'Home page', route: '/'},
-        {name: 'Catalogue', route: '/company/1'}
+        {name: 'Search', route: '/search', icon: 'mdi-magnify'}
       ]
     }
   }

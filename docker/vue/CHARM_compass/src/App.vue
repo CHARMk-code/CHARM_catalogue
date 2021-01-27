@@ -20,10 +20,8 @@ export default {
     $route (to, from) {
       if (to.name === 'Search') {
         this.search_disabled = true
-        console.log('true')
       } else {
         this.search_disabled = false
-        console.log('false')
       }
     }
   },
@@ -49,6 +47,11 @@ export default {
 * {
   font-family: Open Sans Condensed;
 }
+
+a {
+  text-style: none;
+}
+
 body {
   margin: 0px;
 }
