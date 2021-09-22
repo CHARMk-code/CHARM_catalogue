@@ -6,9 +6,9 @@ upload_folder = "/uploads"
 
 [database]
 # The user and the db need to be created beforehandc (add it in the docker-compose)
-user = "anyass"
+user = "catalogue"
 pass = "password"
-db = "anyass"
+db = "catalogue"
 
 server = "db"
 port = "3306"

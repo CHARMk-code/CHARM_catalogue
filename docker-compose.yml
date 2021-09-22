@@ -3,34 +3,33 @@ services:
   flask:
     build: ./docker/flask
     ports:
-      - "5000:5000"
+      - "5008:5000"
     depends_on:
       - db
     links:
       - db
     volumes:
-      - ./docker/flask/src:/anyass
+      - ./docker/flask/src:/catalogue
     environment:
       FLASK_ENV: development
       FLASK_APP: .
-
-  node:
-    build: ./docker/node
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    links:
-      - db
-    volumes:
-      - ./docker/node/client:/client
+#  node:
+#    build: ./docker/node
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+#    links:
+#      - db
+#    volumes:
+#      - ./docker/node/client:/client
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_DATABASE: anyass
-      MYSQL_USER: anyass
+      MYSQL_DATABASE: catalogue 
+      MYSQL_USER: catalogue 
       MYSQL_PASSWORD: password
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
 
