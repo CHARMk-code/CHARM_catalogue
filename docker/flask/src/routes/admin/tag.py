@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_api import status
 from flask_cors import CORS
 from ...helper_functions import *
-blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag') 
+blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
@@ -16,9 +16,9 @@ def tag_update():
         id(int) - Id of the tag, if no id provided creates new object
         name(string) - Name of the tag (if not provided the value will be set to None)
         parent_tag(int) - Id of parent tag (if not provided the value will be set to None)
-        votes(int) - Total number of votes cast on this tag. Must be greater than 1. 
+        votes(int) - Total number of votes cast on this tag. Must be greater than 1.
         score(int) - Total number of upvotes.
-        crowd_sourced(bool) - Set if the tag, was created by an non authed user. 
+        crowd_sourced(bool) - Set if the tag, was created by an non authed user.
         delete_option(bool) - If set, deletes tag_company with the given id
     Return:
         200_ok
@@ -46,18 +46,17 @@ def tag_update():
     return send_status(success)
 
 @blueprint.route("/company/update", methods=["POST"])
-# @login_required
 def tag_company_update():
-     """
+    """
     POST endpoint /api/tag/company/update
 
     Arg:
         id(int) - Id of the tag_company, if no id provided creates new object
         tag(int) - Id of tag
         company(int) - Id of company
-        votes(int) - Total number of votes cast on this tag. Must be greater than 1. 
+        votes(int) - Total number of votes cast on this tag. Must be greater than 1.
         score(int) - Total number of upvotes.
-        crowd_sourced(bool) - Set if the tag, was created by an non authed user. 
+        crowd_sourced(bool) - Set if the tag, was created by an non authed user.
         delete_option(bool) - If set, deletes tag_company with the given id
     Return:
         200_ok
