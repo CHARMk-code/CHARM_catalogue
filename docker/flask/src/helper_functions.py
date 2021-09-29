@@ -23,24 +23,12 @@ def try_int(value):
 
 def try_bool(value):
     return value == "True"
-    
-def create_user(email,name,password,number,privilege):
-    try:
-        # create new user with the form data. Hash the password so plaintext version isn't saved.
-        new_user = User(
-            email=email,
-            name=name,
-            password=generate_password_hash(password, method='sha256'),
-            number=number,
-            privilege=privilege,
-        )
 
-        # add the new user to the database
-        db.session.add(new_user)
-        db.session.commit()
+def get_if_exist(data,key):
+    try:
+        return data[key]
     except:
-        return False
-    return True
+        return None
 
 def tag_create(name, parent_tag,votes, score, crowd_soured):
     try:

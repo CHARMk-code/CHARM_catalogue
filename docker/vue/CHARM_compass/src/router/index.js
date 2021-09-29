@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Company from '@/components/Company'
 import Search from '@/components/Search'
 import Home from '@/components/Home'
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -23,6 +24,11 @@ export default new Router({
       path: '/company/:company',
       name: 'Company',
       component: Company
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
     }
   ]
 })
