@@ -39,6 +39,7 @@ def auth_token(request):
         return (False, ('None, token supplied.', status.HTTP_401_UNAUTHORIZED))
     try:
         payload = jwt.decode(auth_token, config['creds']['secret'],'HS256')
+        return (True, '')
     except jwt.ExpiredSignatureError:
         return (False,('Signature expired. Please log in again.', status.HTTP_401_UNAUTHORIZED))
     except jwt.InvalidTokenError:
