@@ -1,4 +1,4 @@
-from . import db
+from . import db, config
 from .models import *
 from werkzeug.security import generate_password_hash
 import csv
@@ -8,6 +8,7 @@ from flask import render_template
 from flask_sqlalchemy import *
 from flask_api import status
 from .shared_data import last_update_company, last_update_tag
+import jwt
 
 def send_status(success):
     if success:
@@ -29,6 +30,21 @@ def get_if_exist(data,key):
         return data[key]
     except:
         return None
+
+def auth_token(request):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        return (False, ('None, token supplied.', status.HTTP_401_UNAUTHORIZED))
+    try:
+        payload = jwt.decode(auth_token, config['creds']['secret'],'HS256')
+    except jwt.ExpiredSignatureError:
+        return (False,('Signature expired. Please log in again.', status.HTTP_401_UNAUTHORIZED))
+    except jwt.InvalidTokenError:
+        return (False, ('Invalid token. Please log in again.', status.HTTP_401_UNAUTHORIZED))
+
+
 
 def tag_create(name, parent_tag,votes, score, crowd_soured):
     try:
