@@ -54,11 +54,11 @@
 </template>
 
 <script>
-import Tags from "@/components/Tags";
+//import Tags from "@/components/Tags";
 export default {
   name: "Company",
   components: {
-    Tags,
+    //Tags,
   },
   data() {
     return {
