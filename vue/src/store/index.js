@@ -100,7 +100,7 @@ export default new Vuex.Store({
     },
     retrieveCompanies({ commit }) {
       return new Promise((resolve) => {
-        this.$axios.get("company/get").then((resp) => {
+        HTTP.get("company/get").then((resp) => {
           commit("setCompanies", resp.data);
         });
         resolve();
@@ -108,7 +108,7 @@ export default new Vuex.Store({
     },
     retrieveTags({ commit }) {
       return new Promise((resolve) => {
-        this.$axios.get("tag/get").then((resp) => {
+        HTTP.get("tag/get").then((resp) => {
           commit("setTags", resp.data);
         });
         resolve();
