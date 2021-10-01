@@ -1,21 +1,19 @@
 from flask import Blueprint, request, jsonify
-from ...models import Tag, Tag_company, Company
-import sys
+from flask_api import status
 from flask_cors import CORS
 from math import ceil
 from time import time
 from ... import db
-from flask_api import status
+from ...models import Tag, Tag_company, Company
+import sys
+from ...shared_data import last_update_company, last_update_tag
+from ...helper_functions import tag_create, tag_company_create, try_int
 
-last_update_company = ceil(time())
-last_update_tag = ceil(time())
-
-blueprint = Blueprint('api', __name__, url_prefix='/api') 
+blueprint = Blueprint('tag', __name__, url_prefix='/api/tag') 
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-# Tag
-@blueprint.route("/tag/create")
+@blueprint.route("/create", methods=["POST"])
 def tag_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -26,22 +24,22 @@ def tag_add():
         tag - the name of the new tag
         parent_tag - id of the parent 
     """
-    tag = request.args.get("tag")
-    parent_tag = request.args.get("parent_tag")
-    if not parent_tag:
-        # if there is no parent_tag, we will create a new top level tag
-        parent_tag = None
-    if not Tag.query.filter_by(name = tag).first():
-        new_tag = Tag(
-            name=tag,
-            parent_tag=parent_tag,
-            crowd_soured=True
-        )
-        db.session.add(new_tag)
+    tag = request.form.get("tag")
+    tag_obj = Tag.query.filter_by(name = tag).first()
+    parent_tag = try_int(request.form.get("parent_tag"))
+    if not tag_obj:
+        tag_create(tag, parent_tag, 1, 1,True)
+    else:
+        vote = request.form.get("vote")
+        if vote == "up":
+            tag_obj.score +=1
+            tag_obj.votes +=1
+        elif vote == "down":
+            tag_obj.votes +=1
         db.session.commit()
     return "success", status.HTTP_200_OK
 
-@blueprint.route("/tag/add")
+@blueprint.route("/add", methods=["POST"])
 def tag_company_add():
     global last_update_tag
     last_update_tag = ceil(time())
@@ -55,20 +53,13 @@ def tag_company_add():
         company -  id of the company
         optional vote - [up, down] used to cast vote, base if the user agree with the relation.
     """
-    tag = int(request.args.get("tag"))
-    company = int(request.args.get("company"))
+    tag = try_int(request.form.get("tag"))
+    company = try_int(request.form.get("company"))
     tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
     if not tag_company: # Create new 
-        new_tag_company = Tag_company(
-            tag=tag,
-            company=company,
-            crowd_soured=True,
-            score = 1,
-            votes = 1
-        )
-        db.session.add(new_tag_company)
+        tag_company_create(tag,company,1,1,True)
     else:
-        vote = request.args.get("vote")
+        vote = request.form.get("vote")
         if vote == "up":
             tag_company.score +=1
             tag_company.votes +=1
@@ -79,7 +70,7 @@ def tag_company_add():
     return "success", status.HTTP_200_OK
 
 
-@blueprint.route("/tag/match")
+@blueprint.route("/match", methods=["GET"])
 def tag_match():
     """
     Get endpoint /api/tag/match
@@ -95,11 +86,11 @@ def tag_match():
         List (company id, votes, score) 
 
     """
-    select_tags = request.args.get("tags")
+    select_tags = request.form.get("tags")
     
     crowd = 0
-    if request.args.get("crowd"):
-        crowd = int(request.args.get("crowd"))
+    if request.form.get("crowd"):
+        crowd = try_int(request.form.get("crowd"))
         if crowd > 2:
             return status.HTTP_400_BAD_REQUEST
     select_tags =select_tags.translate({ord('['): None})
@@ -120,29 +111,30 @@ def tag_match():
                 result.append(company)
     return jsonify(result), status.HTTP_200_OK
 
-@blueprint.route("/tag/get")
+@blueprint.route("/get", methods=["GET"])
 def tags_get():
     global last_update_tag
     """
     Get endpoint /api/tag/get
 
     args:
-        optional company_filter - id of a company, will only return tag relation to said company
-        optional crowd - int 0 - 2 specifing crowd sourcing option. Key:
+        optional company_filter(int) - id of a company, will only return tag relation to said company
+        optional crowd(int) - 0 - 2 specifing crowd sourcing option. Key:
         0 - all tags
         1 - Only crowd sourced tags
         2 - Only non crowd sourced tags
-        optional timestamp - if not None will return the timestamp when the data was updated
-
+        optional timestamp - if not set will return the timestamp when the data was updated
+        optional only_ids - if set only returns ids of tags
     return:
         List Tags - A json list of all tags that match the optional args.
     """
-    company_filter = request.args.get("company_filter")
-    timestamp = request.args.get("timestamp")
+    company_filter = request.form.get("company_filter")
+    only_ids = request.form.get("only_ids")
+    timestamp = request.form.get("timestamp")
     if timestamp:
         return jsonify(last_update_tag)
-    if request.args.get("crowd"):
-        crowd = int(request.args.get("crowd"))
+    if request.form.get("crowd"):
+        crowd = try_int(request.form.get("crowd"))
         if crowd > 2:
             return status.HTTP_401_UNAUTHORIZED
     crowd = 0
@@ -160,20 +152,7 @@ def tags_get():
         crowd = (1==crowd)
         Tag_query = Tag_query.filter_by(crowd_soured = crowd)
     tags = Tag_query.all()
-    return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK
-
-# Company
-@blueprint.route("/company/get")
-def companies_get():
-    global last_update_company
-    """
-    Get endpoint api/company/get
- 
-    Return:
-        List Companys - A json list of all active companies.
-    """
-    timestamp = request.args.get("timestamp")
-    if timestamp:
-        return jsonify(last_update_tag), status.HTTP_200_OK
-    companies = Company.query.filter_by(active = True).all()
-    return jsonify([company.serialize for company in companies]), status.HTTP_200_OK
+    if only_ids:
+        return jsonify([tag.id for tag in tags]), status.HTTP_200_OK
+    else:
+        return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK

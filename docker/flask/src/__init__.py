@@ -6,6 +6,9 @@ import toml
 import os
 from collections import Mapping
 from flask_cors import CORS
+from .shared_data import last_update_company, last_update_tag
+from math import ceil
+from time import time
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
@@ -46,7 +49,12 @@ def create_app():
     # register_all_blueprints(app)
     # CORS(app, origins="*", allow_headers=[
     # "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
+    global last_update_company, last_update_tag
+    # last_update_company = ceil(time())
+    # last_update_tag = ceil(time())
 
+
+    
     return app
 
 with create_app().app_context():

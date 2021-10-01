@@ -1,4 +1,7 @@
 # Configuration of the service
+[creds]
+password = "password"
+secret = "adasdjasofhsgfalsöduas öfoyasl312312"
 
 [flask]
 secret_key = "9OLWxND4o83j4K4iuopO"

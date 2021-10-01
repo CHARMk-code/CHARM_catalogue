@@ -1,4 +1,4 @@
-from . import db
+from . import db, config
 from .models import *
 from werkzeug.security import generate_password_hash
 import csv
@@ -7,6 +7,8 @@ import sys
 from flask import render_template
 from flask_sqlalchemy import *
 from flask_api import status
+from .shared_data import last_update_company, last_update_tag
+import jwt
 
 def send_status(success):
     if success:
@@ -22,32 +24,38 @@ def try_int(value):
 
 def try_bool(value):
     return value == "True"
-    
-def create_user(email,name,password,number,privilege):
+
+def get_if_exist(data,key):
     try:
-        # create new user with the form data. Hash the password so plaintext version isn't saved.
-        new_user = User(
-            email=email,
-            name=name,
-            password=generate_password_hash(password, method='sha256'),
-            number=number,
-            privilege=privilege,
-        )
-
-        # add the new user to the database
-        db.session.add(new_user)
-        db.session.commit()
+        return data[key]
     except:
-        return False
-    return True
+        return None
 
-def tag_create(name, parent_tag, crowd_soured):
+def auth_token(request):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        return (False, ('None, token supplied.', status.HTTP_401_UNAUTHORIZED))
+    try:
+        payload = jwt.decode(auth_token, config['creds']['secret'],'HS256')
+        return (True, '')
+    except jwt.ExpiredSignatureError:
+        return (False,('Signature expired. Please log in again.', status.HTTP_401_UNAUTHORIZED))
+    except jwt.InvalidTokenError:
+        return (False, ('Invalid token. Please log in again.', status.HTTP_401_UNAUTHORIZED))
+
+
+
+def tag_create(name, parent_tag,votes, score, crowd_soured):
     try:
         if Tag.query.filter_by(name=name).first():
             return False
         new_tag = Tag(
             name=name,
             parent_tag=parent_tag,
+            votes=votes,
+            score=score,
             crowd_soured=crowd_soured,
         )
         db.session.add(new_tag)
@@ -56,12 +64,14 @@ def tag_create(name, parent_tag, crowd_soured):
         return False
     return True
 
-def tag_update_helper(id, name, parent_tag, crowd_soured):
+def tag_update_helper(id, name, parent_tag, votes, score, crowd_soured):
     tag = Tag.query.get(id)
 
     if tag:
         tag.name = name
         tag.parent_tag = parent_tag
+        tag.votes = votes
+        tag.score = score
         tag.crowd_soured = crowd_soured
         db.session.commit()
         return True

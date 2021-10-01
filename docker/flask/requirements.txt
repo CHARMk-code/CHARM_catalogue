@@ -8,3 +8,4 @@ Flask-Mobility
 pyopenssl
 flask-cors
 flask_api
+PyJWT
