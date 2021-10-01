@@ -15,5 +15,5 @@ def register_all_blueprints(app):
         routes.append(dirname(f)[len(basedir)+1:].replace('/','.') + "." +basename(f)[:-3])
     
     for route in routes:
-        route_module = import_module('anyass.routes.' + route)
+        route_module = import_module('catalogue.routes.' + route)
         app.register_blueprint(route_module.blueprint)

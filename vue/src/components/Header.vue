@@ -29,8 +29,7 @@
 <script>
 export default {
   name: "Header",
-  components: {
-  },
+  components: {},
   props: {
     search_disabled: {
       type: Boolean,
