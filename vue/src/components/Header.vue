@@ -1,13 +1,11 @@
 <template>
-  <v-app-bar app flat>
-    <v-responsive max-width="850" style="margin: auto">
+  <v-app-bar color="white" app clipped-left>
       <v-row>
         <v-col class="pa-0 pt-2 pl-6">
           <router-link to="/1">
             <img class="logo" src="@/assets/CHARM_logo.png" />
           </router-link>
         </v-col>
-        <v-spacer />
 
         <v-col class="pa-0 pt-3 pr-6">
           <router-link
@@ -22,7 +20,7 @@
           </router-link>
         </v-col>
       </v-row>
-    </v-responsive>
+        <v-spacer />
   </v-app-bar>
 </template>
 

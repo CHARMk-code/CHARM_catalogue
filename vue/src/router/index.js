@@ -3,6 +3,9 @@ import Router from 'vue-router'
 import Company from '@/components/Company'
 //import Search from '@/components/Search'
 import Home from '@/components/Home'
+import Administration from '@/views/Administration'
+import Companies from '@/views/admin/Companies'
+import admin_company from '@/views/admin/Admin_company'
 
 Vue.use(Router)
 
@@ -19,6 +22,47 @@ export default new Router({
 //      name: 'Search',
 //      component: Search
 //    },
+    {
+      path: '/Admin',
+      name: 'Admin',
+      component: Administration,
+      children: [
+        {
+          path: 'prepages'
+        },
+        {
+          path: 'companies',
+          name: 'Admin/Companies',
+          component: Companies
+
+        },
+        {
+          path: 'companies/:name',
+          name: 'Admin/Companies',
+          component: admin_company,
+          props: true
+        },
+        {
+          path: 'maps'
+
+        },
+        {
+          path: 'layout'
+
+        },
+        {
+          path: 'batch'
+
+        },
+        {
+          path: 'account'
+
+        }
+
+
+
+      ]
+    }, 
     {
       path: '/company/:company',
       name: 'Company',
