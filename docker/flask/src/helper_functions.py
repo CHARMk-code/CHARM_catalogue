@@ -23,7 +23,9 @@ def try_int(value):
         return None
 
 def try_bool(value):
-    return (value.lower() == "true") or value
+    return (type(value) == str and (value.lower() == "true")) or \
+           (type(value) == bool and value) or \
+           (type(value) == int and value != 0)
 
 def get_if_exist(data,key):
     try:

@@ -2,7 +2,7 @@ from flask import Blueprint, request, url_for
 from flask_cors import CORS
 from flask_login import login_required, current_user
 import csv
-import os
+import xlrd
 from datetime import datetime
 from string import punctuation
 from ...models import Company, Tag_company, Tag
@@ -36,84 +36,79 @@ def load():
     Company.query.update({Company.active:False})
     db.session.commit()
 
+    workbook = xlrd.open_workbook("CHARM_CATALOGUE_DATA.xlsx")
+
+
     # Adds tags
-    with open("tags.csv","r") as csv_file:
+    tags_sheet = workbook.sheet_by_name("Tags")
 
-        reader = list(csv.reader(csv_file, delimiter=',', quotechar='|'))
-        row_length = len(reader[0])
-        next_col = 0
-        parent_tag = None
-        for i in range(len(reader)):
-            row = reader[i]
-            tag = Tag.query.filter_by(name=row[next_col]).first()
-            if not tag:
-                Tag.create(row[next_col],parent_tag,1,1,False)
-                parent_tag = Tag.query.filter_by(name=row[next_col]).first().id
-            else:
-                parent_tag = tag.id
+    next_col = 0
+    parent_tag = None
+    for i in range(tags_sheet.nrows):
+        row = tags_sheet.row(i)
+        tag = Tag.query.filter_by(name=row[next_col].value).first()
+        if not tag:
+            Tag.create(row[next_col].value,parent_tag,1,1,False)
+            parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
+        else:
+            parent_tag = tag.id
 
-            if (i+1 >= len(reader)):
-                break
-            if (reader[i+1][next_col]!=''):
-                if (next_col==0):
-                    parent_tag = None
+        if (i+1 >= tags_sheet.nrows):
+            break
+        if (tags_sheet.cell_value(i+1,next_col)!=''):
+            if (next_col==0):
+                parent_tag = None
+            continue
+        elif (next_col+1 < tags_sheet.ncols):
+            if (tags_sheet.cell_value(i+1,next_col+1)!=''):
+                next_col += 1
                 continue
-            elif (next_col+1 < row_length):
-                if (reader[i+1][next_col+1]!=''):
-                    next_col += 1
-                    continue
 
-            for j in range(row_length):
-                if reader[i+1][j] != '':
-                    if (j==0):
-                        parent_tag = None
-                    next_col = j
-                    break
+        for j in range(tags_sheet.ncols):
+            if tags_sheet.cell_value(i+1,j) != '':
+                if (j==0):
+                    parent_tag = None
+                next_col = j
+                break
 
+    companies_sheet = workbook.sheet_by_name("Companies")
+    tags = []
 
-    with open("companies.csv","r") as csv_file:
-        reader = list(csv.reader(csv_file, delimiter=',', quotechar='|'))
-        tags = []
+    # Generats tags
+    tag_row = companies_sheet.row(0)
+    with db.session.no_autoflush:
+        for i in range(9,companies_sheet.ncols):
+            tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
+        for i in range(1,companies_sheet.nrows):
+            if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
+                tags_temp = []
+                for j in range(9,companies_sheet.ncols):
+                    if companies_sheet.cell_value(i,j):
+                        tags_temp.append(tags[j-9])
 
-        # Generats tags
-        tag_row = reader[0]
-        row_length = len(tag_row)
-        with db.session.no_autoflush:
-            for i in range(9,row_length):
-                print(tag_row[i],file=sys.stderr)
-                tags.append(Tag.query.filter_by(name = tag_row[i]).first())
+                        # Tempary removed user supplied tag company connection and ratings
+                        #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
+                        #      new_link = Tag_company(
+                        #          tag = tags[j-2],
+                        #          company = comp_id,
+                        #          crowd_soured = False,
+                        #          score = 1,
+                        #          votes = 1
+                        #      )
+                        #      db.session.add(new_link)
+                        #      db.session.commit()
 
-            for i in range(1,len(reader)):
-                if not Company.query.filter_by(name=reader[i][0]).first():
-                    tags_temp = []
-                    for j in range(9,row_length):
-                        if reader[i][j] == "TRUE":
-                            tags_temp.append(tags[j-9])
-
-                            # Tempary removed user supplied tag company connection and ratings
-                            #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
-                            #      new_link = Tag_company(
-                            #          tag = tags[j-2],
-                            #          company = comp_id,
-                            #          crowd_soured = False,
-                            #          score = 1,
-                            #          votes = 1
-                            #      )
-                            #      db.session.add(new_link)
-                            #      db.session.commit()
-
-
-                    Company.create(
-                            reader[i][0], # name
-                            try_bool(reader[i][1]), # Active
-                            reader[i][2], # Description
-                            reader[i][3], # Trivia
-                            try_int(reader[i][4]), # Founded
-                            reader[i][5], # Contacts
-                            try_int(reader[i][6]), # Employs Sweden
-                            try_int(reader[i][7]), # Employs world
-                            reader[i][8], # Website
-                            tags_temp
-                            )
+                Company.create(
+                        companies_sheet.cell_value(i,0), # name
+                        try_bool(companies_sheet.cell_value(i,1)), # Active
+                        companies_sheet.cell_value(i,2), # Description
+                        companies_sheet.cell_value(i,3), # Trivia
+                        try_int(companies_sheet.cell_value(i,4)), # Founded
+                        companies_sheet.cell_value(i,5), # Contacts
+                        try_int(companies_sheet.cell_value(i,6)), # Employs Sweden
+                        try_int(companies_sheet.cell_value(i,7)), # Employs world
+                        companies_sheet.cell_value(i,8), # Website
+                        tags_temp
+                        )
     return "Success", status.HTTP_200_OK
