@@ -23,7 +23,7 @@ def try_int(value):
         return None
 
 def try_bool(value):
-    return value == "True"
+    return (value == "True") or (value == "true") or value
 
 def get_if_exist(data,key):
     try:
@@ -126,45 +126,6 @@ def tag_company_delete(id):
         return False
 
     db.session.delete(tag_company)
-    db.session.commit()
-
-    return True
-
-
-def company_create(name, active, page):
-    try:
-        if Company.query.filter_by(name=name).first():
-            return False
-        new_company = Company(
-            name=name,
-            active=active,
-            page=page
-        )
-
-        db.session.add(new_company)
-        db.session.commit()
-    except:
-        return False
-    return True
-
-def company_update_helper(id, name, active, page):
-    company = Company.query.get(id)
-
-    if company:
-        company.name = name
-        company.active = active
-        company.page = page
-        db.session.commit()
-        return True
-    return False
-
-def company_delete(id):
-    company = Company.query.get(id)
-
-    if not company:
-        return False
-
-    db.session.delete(company)
     db.session.commit()
 
     return True

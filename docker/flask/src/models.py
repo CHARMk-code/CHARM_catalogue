@@ -1,11 +1,22 @@
+from sqlalchemy.sql.schema import Column
+from toml.decoder import TIME_RE
 from . import db
 from flask_login import UserMixin
+import sys
 
 # Crowd:
 # 0 - all
 # 1 - Only crowd sourced
 # 2 - Only manual added
 
+companies_tags = db.Table('companies_tags',
+        #  db.Column('id', db.Integer, primary_key=True),
+    db.Column('company_id', db.Integer, db.ForeignKey(
+        'companies.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey(
+        'tags.id'), primary_key=True),
+    db.PrimaryKeyConstraint('company_id', 'tag_id')
+    )
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,25 +38,97 @@ class User(UserMixin, db.Model):
         }
 
 class Company(db.Model):
+    __tablename__ = "companies"
     """
     Reps a company
-    """ 
+    """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
     active = db.Column(db.Boolean)
-    page = db.Column(db.Integer)
+    name = db.Column(db.String(200))
+    description = db.Column(db.String(1000))
+    founded = db.Column(db.Integer)
+    contacts = db.Column(db.String(300))
+    employs_sweden = db.Column(db.Integer)
+    employs_world = db.Column(db.Integer)
+    trivia = db.Column(db.String(500))
+    website = db.Column(db.String(200))
+    tags = db.relationship(
+        'Tag',
+        secondary=companies_tags,
+        lazy='subquery',
+        backref=db.backref('tags', lazy=True, cascade='all, delete')
+    )
+
+    @staticmethod
+    def create( name, active, description,
+        trivia, founded, contacts, employs_sweden,
+        employs_world, website, tags):
+        try:
+            if Company.query.filter_by(name=name).first():
+                return False
+            new_company = Company(
+                name=name,
+                active=active,
+                description=description,
+                trivia=trivia,
+                founded = founded,
+                contacts = contacts,
+                employs_sweden = employs_sweden,
+                employs_world = employs_world,
+                website = website,
+                tags = tags
+            )
+
+            db.session.add(new_company)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, name, active, description,
+            trivia, founded, contacts, employs_sweden,
+            employs_world, website, tags):
+        self.name = name
+        self.active = active
+        self.description = description
+        self.trivia = trivia
+        self.founded = founded
+        self.contacts = contacts
+        self.employs_sweden = employs_sweden
+        self.employs_world = employs_world
+        self.website = website
+        self.tags = tags
+
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
 
     @property
     def serialize(self):
+        tags = []
+        for tag in self.tags:
+            tags.append(tag.id)
         return {
             'id': self.id,
             'name': self.name,
             'active': self.active,
-            'page': self.page
+            'description': self.description,
+            'trivia': self.trivia,
+            'founded': self.founded,
+            'contacts': self.contacts,
+            'employs_sweden': self.employs_sweden,
+            'employs_world': self.employs_world,
+            'website': self.website,
+            'tags': tags
         }
 
 
 class Tag(db.Model):
+    __tablename__ = "tags"
     """
     Tag represents a buzzword, program, or talent.
     These can be crowd sourced.
