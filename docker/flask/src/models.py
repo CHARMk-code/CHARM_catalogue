@@ -136,9 +136,46 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     parent_tag = db.Column(db.Integer)
-    votes = db.Column(db.Integer)
-    score = db.Column(db.Integer)
-    crowd_soured = db.Column(db.Boolean)
+    up_votes = db.Column(db.Integer)
+    down_votes = db.Column(db.Integer)
+    crowd_sourced = db.Column(db.Boolean)
+
+    @staticmethod
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced):
+        try:
+            if Tag.query.filter_by(name=name).first():
+                return False
+            new_tag = Tag(
+                name=name,
+                parent_tag=parent_tag,
+                up_votes = up_votes,
+                down_votes = down_votes,
+                crowd_sourced=crowd_sourced,
+            )
+            db.session.add(new_tag)
+            db.session.commit()
+        except:
+            return False
+        return True
+
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced):
+        try:
+            self.name = name
+            self.parent_tag = parent_tag
+            self.up_votes = up_votes
+            self.down_votes = down_votes
+            self.crowd_sourced = crowd_sourced
+            db.session.commit()
+            return True
+        except:
+            return False
+
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+        return True
 
     @property
     def serialize(self):
@@ -146,8 +183,8 @@ class Tag(db.Model):
             'id': self.id,
             'name': self.name,
             'parent_tag': self.parent_tag,
-            'votes': self.votes,
-            'score': self.score,
+            'up_votes': self.up_votes,
+            'down_votes': self.down_votes,
             'crowd_soured': self.crowd_soured,
         }
 
@@ -169,7 +206,39 @@ class Tag_company(db.Model):
             'id': self.id,
             'tag': self.tag,
             'company': self.company,
-            'votes': self.votes,
-            'score': self.score,
+            'up_votes': self.up_votes,
+            'down_votes': self.down_votes,
             'crowd_soured': self.crowd_soured,
         }
+
+    @staticmethod
+    def create(tag, company, up_votes, down_votes, crowd_sourced):
+        try:
+            if Tag_company.query.filter_by(tag=tag,company=company).first():
+                return False
+            new_tag_company = Tag_company(
+                tag=tag,
+                company=company,
+                up_votes=up_votes,
+                down_votes=down_votes,
+                crowd_sourced=crowd_sourced
+            )
+
+            db.session.add(new_tag_company)
+            db.session.commit()
+        except:
+            return False
+        return True
+
+    def update_helper(self, tag, company, up_votes, down_votes, crowd_sourced):
+        try:
+            self.tag = tag
+            self.company = company
+            self.up_votes=up_votes
+            self.down_votes=down_votes
+            self.crowd_sourced = crowd_sourced
+            db.session.commit()
+            return True
+        except:
+            return False
+

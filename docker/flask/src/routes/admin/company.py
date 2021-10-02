@@ -1,7 +1,7 @@
 """
 This file contians all auth api call that handles company datatype
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from ...models import Company
 import sys
 from flask_cors import CORS
@@ -29,11 +29,11 @@ def company_update():
         500_internal_server_error - otherwise
     """
     request_data = request.get_json()
-    id = try_int(get_if_exist(request_data,"id"))
-    delete_option = try_bool(get_if_exist(request_data,"delete"))
+    id = get_if_exist(request_data,"id")
+    delete_option = get_if_exist(request_data,"delete")
 
     name = get_if_exist(request_data,"name")
-    active = try_bool(get_if_exist(request_data,"active"))
+    active = get_if_exist(request_data,"active")
     description = get_if_exist(request_data,"description")
     trivia = get_if_exist(request_data,"trivia")
     founded = get_if_exist(request_data,"founded")
@@ -42,8 +42,6 @@ def company_update():
     employs_world = get_if_exist(request_data,"employs_world")
     website = get_if_exist(request_data, "website")
     tags = get_if_exist(request_data, "tags")
-
-    print(active, delete_option,file=sys.stderr)
 
     tag_objs=[]
     if tags:

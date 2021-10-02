@@ -45,49 +45,6 @@ def auth_token(request):
     except jwt.InvalidTokenError:
         return (False, ('Invalid token. Please log in again.', status.HTTP_401_UNAUTHORIZED))
 
-
-
-def tag_create(name, parent_tag,votes, score, crowd_soured):
-    try:
-        if Tag.query.filter_by(name=name).first():
-            return False
-        new_tag = Tag(
-            name=name,
-            parent_tag=parent_tag,
-            votes=votes,
-            score=score,
-            crowd_soured=crowd_soured,
-        )
-        db.session.add(new_tag)
-        db.session.commit()
-    except:
-        return False
-    return True
-
-def tag_update_helper(id, name, parent_tag, votes, score, crowd_soured):
-    tag = Tag.query.get(id)
-
-    if tag:
-        tag.name = name
-        tag.parent_tag = parent_tag
-        tag.votes = votes
-        tag.score = score
-        tag.crowd_soured = crowd_soured
-        db.session.commit()
-        return True
-    return False
-
-def tag_delete(id):
-    tag = Tag.query.get(id)
-
-    if not tag:
-        return False
-
-    db.session.delete(tag)
-    db.session.commit()
-
-    return True
-
 def tag_company_create(tag, company, votes, score, crowd_soured):
     try:
         if Tag_company.query.filter_by(tag=tag,company=company).first():
