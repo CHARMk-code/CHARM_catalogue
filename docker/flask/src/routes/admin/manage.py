@@ -77,15 +77,15 @@ def load():
     # Generats tags
     tag_row = companies_sheet.row(0)
     with db.session.no_autoflush:
-        for i in range(9,companies_sheet.ncols):
+        for i in range(10,companies_sheet.ncols):
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
         for i in range(1,companies_sheet.nrows):
             if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
                 tags_temp = []
-                for j in range(9,companies_sheet.ncols):
+                for j in range(10,companies_sheet.ncols):
                     if companies_sheet.cell_value(i,j):
-                        tags_temp.append(tags[j-9])
+                        tags_temp.append(tags[j-10])
 
                         # Tempary removed user supplied tag company connection and ratings
                         #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
@@ -103,12 +103,13 @@ def load():
                         companies_sheet.cell_value(i,0), # name
                         try_bool(companies_sheet.cell_value(i,1)), # Active
                         companies_sheet.cell_value(i,2), # Description
-                        companies_sheet.cell_value(i,3), # Trivia
-                        try_int(companies_sheet.cell_value(i,4)), # Founded
-                        companies_sheet.cell_value(i,5), # Contacts
-                        try_int(companies_sheet.cell_value(i,6)), # Employs Sweden
-                        try_int(companies_sheet.cell_value(i,7)), # Employs world
-                        companies_sheet.cell_value(i,8), # Website
+                        companies_sheet.cell_value(i,3), # Busniess area
+                        companies_sheet.cell_value(i,4), # Trivia
+                        try_int(companies_sheet.cell_value(i,5)), # Founded
+                        companies_sheet.cell_value(i,6), # Contacts
+                        try_int(companies_sheet.cell_value(i,7)), # Employs Sweden
+                        try_int(companies_sheet.cell_value(i,8)), # Employs world
+                        companies_sheet.cell_value(i,9), # Website
                         tags_temp
                         )
     return "Success", status.HTTP_200_OK
