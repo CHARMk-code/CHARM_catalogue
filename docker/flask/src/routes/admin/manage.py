@@ -24,7 +24,7 @@ def load():
     global last_update_tag, last_update_company
     # last_update_company = ceil(time())
     # last_update_tag = ceil(time())
-    
+
     """
     GET endpoint /management/load
 
@@ -32,10 +32,14 @@ def load():
 
     When called fills company, tag, tag_company from docker/flask/src/tags.csv & docker/flask/src/data.csv.
     """
+    # Inactives company
+    Company.query.update({Company.active:False})
+    db.session.commit()
+
+    # Adds tags
     with open("tags.csv","r") as csv_file:
-        Company.query.update({Company.active:False})
-        db.session.commit()
-        reader = list(csv.reader(csv_file, delimiter=';', quotechar='|'))
+
+        reader = list(csv.reader(csv_file, delimiter=',', quotechar='|'))
         row_length = len(reader[0])
         next_col = 0
         parent_tag = None
@@ -43,7 +47,7 @@ def load():
             row = reader[i]
             tag = Tag.query.filter_by(name=row[next_col]).first()
             if not tag:
-                tag_create(row[next_col],parent_tag,1,1,False)
+                Tag.create(row[next_col],parent_tag,1,1,False)
                 parent_tag = Tag.query.filter_by(name=row[next_col]).first().id
             else:
                 parent_tag = tag.id
@@ -67,10 +71,8 @@ def load():
                     break
 
 
-
-
-    with open("data.csv","r") as csv_file:
-        reader = list(csv.reader(csv_file, delimiter=';', quotechar='|'))
+    with open("companies.csv","r") as csv_file:
+        reader = list(csv.reader(csv_file, delimiter=',', quotechar='|'))
         tags = []
 
 
@@ -78,32 +80,40 @@ def load():
         tag_row = reader[0]
         row_length = len(tag_row)
         with db.session.no_autoflush:
-            for i in range(2,row_length):
-                tags.append(Tag.query.filter_by(name = tag_row[i]).first().id)
+            for i in range(9,row_length):
+                print(tag_row[i],file=sys.stderr)
+                tags.append(Tag.query.filter_by(name = tag_row[i]).first())
 
-        for i in range(1,len(reader)):
-            if not Company.query.filter_by(name=reader[i][0]).first():
-                new_comp = Company(
-                    name = reader[i][0],
-                    active = True,
-                    page = int(reader[i][1])
-                )
-                db.session.add(new_comp)
-                db.session.commit()
-            comp = Company.query.filter_by(name=reader[i][0]).first()
-            comp.active = True
-            db.session.commit()
-            comp_id = comp.id
-            for j in range(2,row_length):
-                if reader[i][j] == "TRUE":
-                    if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
-                        new_link = Tag_company(
-                            tag = tags[j-2],
-                            company = comp_id,
-                            crowd_soured = False,
-                            score = 1,
-                            votes = 1
-                        )
-                        db.session.add(new_link)
-                        db.session.commit()
+            for i in range(1,len(reader)):
+                if not Company.query.filter_by(name=reader[i][0]).first():
+                    tags_temp = []
+                    for j in range(9,row_length):
+                        if reader[i][j] == "TRUE":
+                            tags_temp.append(tags[j-9])
+
+                            # Tempary removed user supplied tag company connection and ratings
+                            #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
+                            #      new_link = Tag_company(
+                            #          tag = tags[j-2],
+                            #          company = comp_id,
+                            #          crowd_soured = False,
+                            #          score = 1,
+                            #          votes = 1
+                            #      )
+                            #      db.session.add(new_link)
+                            #      db.session.commit()
+
+
+                    Company.create(
+                            reader[i][0], # name
+                            try_bool(reader[i][1]), # Active
+                            reader[i][2], # Description
+                            reader[i][3], # Trivia
+                            try_int(reader[i][4]), # Founded
+                            reader[i][5], # Contacts
+                            try_int(reader[i][6]), # Employs Sweden
+                            try_int(reader[i][7]), # Employs world
+                            reader[i][8], # Website
+                            tags_temp
+                            )
     return "Success", status.HTTP_200_OK
