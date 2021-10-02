@@ -5,7 +5,6 @@ import Company from '@/components/Company'
 import Home from '@/components/Home'
 import Administration from '@/views/Administration'
 import Companies from '@/views/admin/Companies'
-import admin_company from '@/views/admin/Admin_company'
 import Login from "@/components/Login";
 
 Vue.use(Router)
@@ -36,12 +35,6 @@ export default new Router({
           name: 'Admin/Companies',
           component: Companies
 
-        },
-        {
-          path: 'companies/:name',
-          name: 'Admin/Companies',
-          component: admin_company,
-          props: true
         },
         {
           path: 'maps'
