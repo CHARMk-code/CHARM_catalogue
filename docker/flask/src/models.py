@@ -1,8 +1,9 @@
-from sqlalchemy.sql.schema import Column
-from toml.decoder import TIME_RE
-from . import db
+from . import db,config
 from flask_login import UserMixin
 import sys
+import jwt
+from werkzeug.security import generate_password_hash,check_password_hash
+import datetime
 
 # Crowd:
 # 0 - all
@@ -20,22 +21,42 @@ companies_tags = db.Table('companies_tags',
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
-    name = db.Column(db.String(1000))
-    number = db.Column(db.String(20))
-    privilege = db.Column(db.Integer)
 
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'email': self.email,
-            'password': self.password,
-            'name': self.name,
-            'number': self.number,
-            'privilege': self.privilege,
+    @staticmethod
+    def create(password):
+        if len(User.query.all()) == 0:
+            new = User(password = generate_password_hash(password,method='sha256'))
+            db.session.add(new)
+            db.session.commit()
+            return new
+
+    def update(self,password):
+        self.password = generate_password_hash(password,method='sha256')
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def gen_token(self):
+        payload = {
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=0),
+            'iat': datetime.datetime.utcnow(),
+            'sub': self.id
         }
+        return jwt.encode(
+            payload,
+            config['creds']['secret'],
+            algorithm='HS256'
+        )
+
+    def authenticate(self, password):
+        return check_password_hash(self.password, password)
+
+
+
 
 class Company(db.Model):
     __tablename__ = "companies"
