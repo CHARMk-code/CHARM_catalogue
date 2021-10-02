@@ -9,3 +9,4 @@ pyopenssl
 flask-cors
 flask_api
 PyJWT
+xlrd==1.2.0
