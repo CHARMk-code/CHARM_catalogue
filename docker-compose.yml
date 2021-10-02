@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   flask:
     build: ./docker/flask
@@ -13,24 +13,12 @@ services:
     environment:
       FLASK_ENV: development
       FLASK_APP: .
-#  node:
-#    build: ./docker/node
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - db
-#    links:
-#      - db
-#    volumes:
-#      - ./docker/node/client:/client
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_DATABASE: catalogue 
-      MYSQL_USER: catalogue 
+      MYSQL_DATABASE: catalogue
+      MYSQL_USER: catalogue
       MYSQL_PASSWORD: password
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-
- 
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"

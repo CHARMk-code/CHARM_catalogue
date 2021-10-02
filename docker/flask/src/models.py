@@ -53,6 +53,8 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     parent_tag = db.Column(db.Integer)
+    votes = db.Column(db.Integer)
+    score = db.Column(db.Integer)
     crowd_soured = db.Column(db.Boolean)
 
     @property
@@ -61,6 +63,8 @@ class Tag(db.Model):
             'id': self.id,
             'name': self.name,
             'parent_tag': self.parent_tag,
+            'votes': self.votes,
+            'score': self.score,
             'crowd_soured': self.crowd_soured,
         }
 
