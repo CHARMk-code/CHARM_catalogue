@@ -1,5 +1,5 @@
-import axios from 'axios'
+import axios from "axios";
 
 export const HTTP = axios.create({
-  baseURL: `https://compass.glimfjord.com/api/`
-})
+  baseURL: `https://catalogue.glimfjord.com/api/`,
+});
