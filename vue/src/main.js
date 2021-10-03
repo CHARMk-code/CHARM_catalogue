@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from "vue";
-import "./plugins/axios";
+import axios from "@/plugins/axios";
 import vuetify from "@/plugins/vuetify";
 import Vuex from "vuex";
 //import searchPlugin from "vuex-search";
@@ -15,6 +15,7 @@ Vue.use(Vuex);
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
+  axios,
   router,
   vuetify,
   store,
