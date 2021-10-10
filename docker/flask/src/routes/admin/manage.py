@@ -1,16 +1,9 @@
-from flask import Blueprint, request, url_for
+from flask import Blueprint
 from flask_cors import CORS
-from flask_login import login_required, current_user
-import csv
 import xlrd
-from datetime import datetime
-from string import punctuation
-from ...models import Company, Tag_company, Tag
+from ...models import Company,  Tag
 from flask_api import status
-from math import ceil
-from time import time
 from ... import db
-from ...shared_data import last_update_company,last_update_tag
 from ...helper_functions import *
 
 
@@ -19,19 +12,24 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 @blueprint.route("/load", methods=["POST", "GET"])
-# @login_required
 def load():
-    global last_update_tag, last_update_company
-    # last_update_company = ceil(time())
-    # last_update_tag = ceil(time())
 
     """
     GET endpoint /management/load
 
     This such be moved to behind authentication.
 
-    When called fills company, tag, tag_company from docker/flask/src/tags.csv & docker/flask/src/data.csv.
+    When called fills company, tag, tag_company from provide xlsx file
     """
+    if "data" in request.files:
+        return "No file named 'data' found",status.HTTP_400_BAD_REQUEST
+
+    file = request.files['file']
+    if not ".xlsx" in file.filename:
+        return "File extions must be xlsx", status.HTTP_400_BAD_REQUEST
+
+    file.save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
