@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_cors import CORS
-import xlrd
+import xlrd,sys
 from ...models import Company,  Tag
 from flask_api import status
 from ... import db
@@ -21,8 +21,9 @@ def load():
 
     When called fills company, tag, tag_company from provide xlsx file
     """
-    if "data" in request.files:
-        return "No file named 'data' found",status.HTTP_400_BAD_REQUEST
+    print(request.files,file=sys.stderr)
+    if "file" not in request.files:
+        return "No file named 'file' found",status.HTTP_400_BAD_REQUEST
 
     file = request.files['file']
     if not ".xlsx" in file.filename:

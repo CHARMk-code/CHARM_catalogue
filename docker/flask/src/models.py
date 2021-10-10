@@ -67,7 +67,7 @@ class Company(db.Model):
     active = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
-    busniess_aera = db.Column(db.String(500))
+    business_area = db.Column(db.String(500))
     founded = db.Column(db.Integer)
     contacts = db.Column(db.String(300))
     employs_sweden = db.Column(db.Integer)
@@ -82,7 +82,7 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, description, busniess_aera,
+    def create( name, active, description, business_area,
         trivia, founded, contacts, employs_sweden,
         employs_world, website, tags):
         try:
@@ -92,7 +92,7 @@ class Company(db.Model):
                 name=name,
                 active=active,
                 description=description,
-                busniess_aera = busniess_aera,
+                business_area = business_area,
                 trivia=trivia,
                 founded = founded,
                 contacts = contacts,
