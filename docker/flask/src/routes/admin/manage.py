@@ -21,7 +21,6 @@ def load():
 
     When called fills company, tag, tag_company from provide xlsx file
     """
-    print(request.files,file=sys.stderr)
     if "file" not in request.files:
         return "No file named 'file' found",status.HTTP_400_BAD_REQUEST
 
