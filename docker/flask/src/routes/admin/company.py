@@ -28,6 +28,10 @@ def company_update():
         200_ok - If ok
         500_internal_server_error - otherwise
     """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
     request_data = request.get_json()
     id = get_if_exist(request_data,"id")
     delete_option = get_if_exist(request_data,"delete")

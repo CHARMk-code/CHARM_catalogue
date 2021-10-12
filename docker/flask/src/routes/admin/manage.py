@@ -21,6 +21,10 @@ def load():
 
     When called fills company, tag, tag_company from provide xlsx file
     """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
     if "file" not in request.files:
         return "No file named 'file' found",status.HTTP_400_BAD_REQUEST
 
