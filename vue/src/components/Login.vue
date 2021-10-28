@@ -65,7 +65,7 @@ export default {
       console.log('Validating')
       this.btn_loader = true
       this.$store
-        .dispatch('login', { password: this.password })
+        .dispatch('auth/login', { password: this.password })
         .then(() => {
           this.btn_loader = false
           this.$router.push('/')
