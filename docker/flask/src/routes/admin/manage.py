@@ -20,13 +20,11 @@ def imageSend(filename):
 
 
 def imageLoad(request):
-    if not request.files:
-        return "No files found",status.HTTP_400_BAD_REQUEST
-
-    for filename in request.files:
-        if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
-            return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-        request.files[filename].save(os.path.join(config['flask']['upload_folder'], secure_filename(filename)))
+    file = request.files["file"]
+    filename = file.filename
+    if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
+        return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
+    file.save(os.path.join(config['flask']['upload_folder'], secure_filename(filename)))
 
     return "All files uploaded", status.HTTP_200_OK
 
@@ -111,27 +109,29 @@ def parseXlsx():
                         companies_sheet.cell_value(i,9), # Website
                         tags_temp
                         )
+    os.remove("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
 
 def unpackAndParse(request):
-    for filename in request.files:
-        file_extension = filename[filename.index("."):]
-        packedPath = os.path.join(config['flask']['upload_folder'], f"tmp{file_extension}" )
-        request.files[filename].save(packedPath)
+    file = request.files["file"]
+    filename = file.filename
+    file_extension = filename[filename.index("."):]
+    packedPath = os.path.join(config['flask']['upload_folder'], f"tmp{file_extension}" )
+    file.save(packedPath)
 
-        unpackedPath = os.path.join(config['flask']['upload_folder'], "tmp")
-        shutil.unpack_archive(packedPath,unpackedPath)
-        os.remove(packedPath)
+    unpackedPath = os.path.join(config['flask']['upload_folder'], "tmp")
+    shutil.unpack_archive(packedPath,unpackedPath)
+    os.remove(packedPath)
 
-        for root, dirs, files in os.walk(unpackedPath):
-            for file in files:
-                path = os.path.join(root,file)
-                if ".xlsx" in file:
-                    os.rename(path, "/catalogue/CHARM_CATALOGUE_DATA.xlsx")
-                    parseXlsx()
-                elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
-                    os.rename(path,os.path.join(config['flask']['upload_folder'],file))
-                print(path, file=sys.stderr)
-        shutil.rmtree(unpackedPath)
+    for root, dirs, files in os.walk(unpackedPath):
+        for file in files:
+            path = os.path.join(root,file)
+            if ".xlsx" in file:
+                os.rename(path, "/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+                parseXlsx()
+            elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
+                os.rename(path,os.path.join(config['flask']['upload_folder'],file))
+            print(path, file=sys.stderr)
+    shutil.rmtree(unpackedPath)
     return "", status.HTTP_200_OK
 
 @blueprint.route("/load", methods=["POST"])
@@ -147,19 +147,20 @@ def load():
     if not result[0]:
         return result[1]
 
-    if not request.files:
-        return "No files found",status.HTTP_400_BAD_REQUEST
+    if "file" not in request.files:
+        return "No file found",status.HTTP_400_BAD_REQUEST
 
-    for filename in request.files:
-        if ".xlsx" in filename: # load data
-            request.files[filename].save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
-            parseXlsx()
-        elif any(map(lambda x: x in filename, ACCEPT_IMAGE_EXTENDS)): # Load single image
-            imageLoad(request)
-        elif any(map(lambda x:x in filename, [".zip", ".tar.gz"])):
-             unpackAndParse(request)
-        else:
-            return f"{filename} unaccepted file", status.HTTP_400_BAD_REQUEST
+    file = request.files["file"]
+
+    if ".xlsx" in file.filename: # load data
+        request.files[file.filename].save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+        parseXlsx()
+    elif any(map(lambda x: x in file.filename, ACCEPT_IMAGE_EXTENDS)): # Load single image
+        imageLoad(request)
+    elif any(map(lambda x:x in file.filename, [".zip", ".tar.gz"])):
+            unpackAndParse(request)
+    else:
+        return f"{file.filename} unaccepted file", status.HTTP_400_BAD_REQUEST
     return "Success", status.HTTP_201_CREATED
 
 
