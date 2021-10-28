@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify
-from flask_api import status
+from flask import Blueprint, request
 from flask_cors import CORS
 from ...helper_functions import *
 blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
@@ -27,22 +26,29 @@ def tag_update():
     Design choose, I choose to combine create/update/delete
     to one endpoint to make it more lean and I'm lazy
     """
-    id = try_int(request.form.get("id"))
-    name = request.form.get("name")
-    parent_tag = try_int(request.form.get("parent_tag"))
-    votes = try_int(request.form.get("votes"))
-    score = try_int(request.form.get("score"))
-    crowd_soured = try_bool(request.form.get("crowd_soured"))
-    delete_option = request.form.get("delete")
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
 
-    if not id:
-        return send_status(tag_create(name,parent_tag,votes,score,crowd_soured))
+    request_data = request.get_json()
+    id = try_int(get_if_exist(request_data,"id"))
+    delete_option = try_bool(get_if_exist(request_data,"delete"))
+
+    name = get_if_exist(request_data, "name")
+    parent_tag = get_if_exist(request_data,"parent_tag")
+    up_votes = get_if_exist(request_data,"up_votes")
+    down_votes = get_if_exist(request_data,"down_votes")
+    crowd_sourced = get_if_exist(request_data, "crowd_sourced")
+
+    tag = Tag.query.get(id)
+    if not tag:
+        return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced))
 
     success = False
     if delete_option:
-        success = tag_delete(id)
+        success = tag.delete()
     else:
-        success = tag_update_helper(id, name, parent_tag, votes, score, crowd_soured)
+        success = tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced)
     return send_status(success)
 
 @blueprint.route("/company/update", methods=["POST"])
@@ -65,6 +71,10 @@ def tag_company_update():
     Design choose, I choose to combine create/update/delete
     to one endpoint to make it more lean and I'm lazy
     """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
     id = try_int(request.form.get("id"))
     tag = try_int(request.form.get("tag"))
     company = try_int(request.form.get("company"))

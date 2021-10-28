@@ -1,14 +1,8 @@
-from sys import stderr
-from flask import Blueprint, request, jsonify
-from werkzeug.security import check_password_hash
-from flask_login import login_user,  logout_user, login_required, current_user
-import datetime
-import jwt
+from flask import Blueprint, request
 from ...models import User
-from werkzeug.security import check_password_hash
 from ... import config
 from flask_api import status
-from ...helper_functions import get_if_exist
+from ...helper_functions import get_if_exist, send_status, auth_token
 
 blueprint = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -20,38 +14,46 @@ def login_post():
     Auths user
 
     Arguments:
-        email - supplied in form
         password - supplied in form
-        remember - supplied in form
-
     Return:
         sesssion cookie
 
     """
+    User.create(config["creds"]["password"])
     request_data = request.get_json()
     password = get_if_exist(request_data,'password')
-    # take the user supplied password, hash it, and compare it to the hashed password in database
-    # Should use hashed password if scaling, this is only acceptable for now.
-    if config["creds"]["password"] != password:
+
+    users = User.query.all()
+    user = None
+    if len(users) > 0:
+        user = users[0]
+    else:
+        return 'No user exists', status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    if not user.authenticate(password):
         return 'Please check your login details and try again.', status.HTTP_401_UNAUTHORIZED
-    # if the above check passes, then we know the user has the right credentials
-    payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=0),
-        'iat': datetime.datetime.utcnow(),
-        'sub': 1
-    }
 
-    return jsonify({"token": jwt.encode(
-            payload,
-            config["creds"]['secret'],
-            algorithm='HS256'
-        )
-})
+    return user.gen_token()
 
+@blueprint.route('/update', methods=['POST'])
+def update_post():
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+    request_data = request.get_json()
+    delete_option = get_if_exist(request_data,"delete")
+    password = get_if_exist(request_data, "password")
 
-@blueprint.route('/logout')
-@login_required
-def logout():
-    """ Logout current user. """
-    logout_user()
-    return "Success", status.HTTP_200_OK
+    users = User.query.all()
+    user = None
+    if len(users) > 0:
+        user = users[0]
+    else:
+        return 'No user exists', status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    success = False
+    if delete_option:
+        success = user.delete()
+    else:
+        success = user.update(password)
+    return send_status(success)

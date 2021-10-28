@@ -7,9 +7,9 @@ from ... import db
 from ...models import Tag, Tag_company, Company
 import sys
 from ...shared_data import last_update_company, last_update_tag
-from ...helper_functions import tag_create, tag_company_create, try_int
+from ...helper_functions import try_int
 
-blueprint = Blueprint('tag', __name__, url_prefix='/api/tag') 
+blueprint = Blueprint('tag', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
@@ -22,20 +22,19 @@ def tag_add():
 
     Args:
         tag - the name of the new tag
-        parent_tag - id of the parent 
+        parent_tag - id of the parent
     """
     tag = request.form.get("tag")
     tag_obj = Tag.query.filter_by(name = tag).first()
     parent_tag = try_int(request.form.get("parent_tag"))
     if not tag_obj:
-        tag_create(tag, parent_tag, 1, 1,True)
+        Tag.create(tag, parent_tag, 1, 1,True)
     else:
         vote = request.form.get("vote")
         if vote == "up":
-            tag_obj.score +=1
-            tag_obj.votes +=1
+            tag_obj.up_votes +=1
         elif vote == "down":
-            tag_obj.votes +=1
+            tag_obj.down_votes +=1
         db.session.commit()
     return "success", status.HTTP_200_OK
 
@@ -56,7 +55,7 @@ def tag_company_add():
     tag = try_int(request.form.get("tag"))
     company = try_int(request.form.get("company"))
     tag_company = Tag_company.query.filter_by(tag=tag, company =company).first()
-    if not tag_company: # Create new 
+    if not tag_company: # Create new
         tag_company_create(tag,company,1,1,True)
     else:
         vote = request.form.get("vote")
@@ -74,7 +73,7 @@ def tag_company_add():
 def tag_match():
     """
     Get endpoint /api/tag/match
-    
+
     Args:
         select_tags - list of id of all selected tags
         optional crowd - int 0 - 2 specifing crowd sourcing option. Key:
@@ -83,11 +82,11 @@ def tag_match():
         2 - Only non crowd sourced tags
 
     Return:
-        List (company id, votes, score) 
+        List (company id, votes, score)
 
     """
     select_tags = request.form.get("tags")
-    
+
     crowd = 0
     if request.form.get("crowd"):
         crowd = try_int(request.form.get("crowd"))
@@ -148,7 +147,7 @@ def tags_get():
         )
     else:
         Tag_query = Tag.query
-    if crowd != 0:        
+    if crowd != 0:
         crowd = (1==crowd)
         Tag_query = Tag_query.filter_by(crowd_soured = crowd)
     tags = Tag_query.all()

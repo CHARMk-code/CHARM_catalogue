@@ -23,7 +23,9 @@ def try_int(value):
         return None
 
 def try_bool(value):
-    return value == "True"
+    return (type(value) == str and (value.lower() == "true")) or \
+           (type(value) == bool and value) or \
+           (type(value) == int and value != 0)
 
 def get_if_exist(data,key):
     try:
@@ -45,126 +47,3 @@ def auth_token(request):
     except jwt.InvalidTokenError:
         return (False, ('Invalid token. Please log in again.', status.HTTP_401_UNAUTHORIZED))
 
-
-
-def tag_create(name, parent_tag,votes, score, crowd_soured):
-    try:
-        if Tag.query.filter_by(name=name).first():
-            return False
-        new_tag = Tag(
-            name=name,
-            parent_tag=parent_tag,
-            votes=votes,
-            score=score,
-            crowd_soured=crowd_soured,
-        )
-        db.session.add(new_tag)
-        db.session.commit()
-    except:
-        return False
-    return True
-
-def tag_update_helper(id, name, parent_tag, votes, score, crowd_soured):
-    tag = Tag.query.get(id)
-
-    if tag:
-        tag.name = name
-        tag.parent_tag = parent_tag
-        tag.votes = votes
-        tag.score = score
-        tag.crowd_soured = crowd_soured
-        db.session.commit()
-        return True
-    return False
-
-def tag_delete(id):
-    tag = Tag.query.get(id)
-
-    if not tag:
-        return False
-
-    db.session.delete(tag)
-    db.session.commit()
-
-    return True
-
-def tag_company_create(tag, company, votes, score, crowd_soured):
-    try:
-        if Tag_company.query.filter_by(tag=tag,company=company).first():
-            return False
-        new_tag_company = Tag_company(
-            tag=tag,
-            company=company,
-            votes=votes,
-            score=score,
-            crowd_soured=crowd_soured
-        )
-
-        db.session.add(new_tag_company)
-        db.session.commit()
-    except:
-        return False
-    return True
-
-def tag_company_update_helper(id, tag, company, votes, score, crowd_soured):
-    tag_company = Tag_company.query.get(id)
-
-    if tag_company:
-        tag_company.tag = tag
-        tag_company.company = company
-        tag_company.votes = votes
-        tag_company.score = score
-        tag_company.crowd_soured = crowd_soured
-        db.session.commit()
-        return True
-    return False
-
-def tag_company_delete(id):
-    tag_company = Tag_company.query.get(id)
-
-    if not tag_company:
-        return False
-
-    db.session.delete(tag_company)
-    db.session.commit()
-
-    return True
-
-
-def company_create(name, active, page):
-    try:
-        if Company.query.filter_by(name=name).first():
-            return False
-        new_company = Company(
-            name=name,
-            active=active,
-            page=page
-        )
-
-        db.session.add(new_company)
-        db.session.commit()
-    except:
-        return False
-    return True
-
-def company_update_helper(id, name, active, page):
-    company = Company.query.get(id)
-
-    if company:
-        company.name = name
-        company.active = active
-        company.page = page
-        db.session.commit()
-        return True
-    return False
-
-def company_delete(id):
-    company = Company.query.get(id)
-
-    if not company:
-        return False
-
-    db.session.delete(company)
-    db.session.commit()
-
-    return True
