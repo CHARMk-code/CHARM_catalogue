@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from ...models import User
 from ... import config
 from flask_api import status
-from ...helper_functions import get_if_exist, send_status
+from ...helper_functions import get_if_exist, send_status, auth_token
 
 blueprint = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -37,6 +37,9 @@ def login_post():
 
 @blueprint.route('/update', methods=['POST'])
 def update_post():
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
     request_data = request.get_json()
     delete_option = get_if_exist(request_data,"delete")
     password = get_if_exist(request_data, "password")

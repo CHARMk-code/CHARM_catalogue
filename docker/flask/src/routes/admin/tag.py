@@ -26,6 +26,9 @@ def tag_update():
     Design choose, I choose to combine create/update/delete
     to one endpoint to make it more lean and I'm lazy
     """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
 
     request_data = request.get_json()
     id = try_int(get_if_exist(request_data,"id"))
@@ -68,6 +71,10 @@ def tag_company_update():
     Design choose, I choose to combine create/update/delete
     to one endpoint to make it more lean and I'm lazy
     """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
     id = try_int(request.form.get("id"))
     tag = try_int(request.form.get("tag"))
     company = try_int(request.form.get("company"))
