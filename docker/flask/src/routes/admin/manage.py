@@ -29,6 +29,8 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
+    NUMBER_OF_METADATA_COLS = 11
+
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -74,15 +76,15 @@ def parseXlsx():
     # Generats tags
     tag_row = companies_sheet.row(0)
     with db.session.no_autoflush:
-        for i in range(10,companies_sheet.ncols):
+        for i in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
         for i in range(1,companies_sheet.nrows):
             if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
                 tags_temp = []
-                for j in range(10,companies_sheet.ncols):
+                for j in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
                     if companies_sheet.cell_value(i,j):
-                        tags_temp.append(tags[j-10])
+                        tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS])
 
                         # Tempary removed user supplied tag company connection and ratings
                         #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
@@ -107,6 +109,7 @@ def parseXlsx():
                         try_int(companies_sheet.cell_value(i,7)), # Employs Sweden
                         try_int(companies_sheet.cell_value(i,8)), # Employs world
                         companies_sheet.cell_value(i,9), # Website
+                        companies_sheet.cell_value(i,10), # logo
                         tags_temp
                         )
     os.remove("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
