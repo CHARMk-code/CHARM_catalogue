@@ -1,9 +1,7 @@
 <template>
   <v-app id="app">
     <Header :search_disabled="search_disabled" />
-    <v-main class="grey lighten-3">
-      <router-view />
-    </v-main>
+    <router-view />
   </v-app>
 </template>
 
