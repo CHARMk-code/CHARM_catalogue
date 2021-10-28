@@ -6,8 +6,9 @@ import Home from '@/components/Home'
 import Administration from '@/views/Administration'
 import Companies from '@/views/admin/Companies'
 import Login from "@/components/Login";
+import Upload from "@/components/Upload";
+Vue.use(Router);
 
-Vue.use(Router)
 
 export default new Router({
   mode: 'history',
@@ -67,6 +68,10 @@ export default new Router({
       name: "Login",
       component: Login,
     },
-  ]
-})
-
+    {
+      path: "/upload",
+      name: "Upload",
+      component: Upload
+    }
+  ],
+});
