@@ -22,11 +22,11 @@ def load():
     When called fills company, tag, tag_company from provide xlsx file
     """
     if "file" not in request.files:
-        return "No file named 'file' found",status.HTTP_400_BAD_REQUEST
+        return "No file received",status.HTTP_400_BAD_REQUEST
 
     file = request.files['file']
     if not ".xlsx" in file.filename:
-        return "File extions must be xlsx", status.HTTP_400_BAD_REQUEST
+        return "File must be a .xlsx", status.HTTP_400_BAD_REQUEST
 
     file.save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
 
