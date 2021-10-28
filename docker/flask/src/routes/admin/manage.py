@@ -1,39 +1,36 @@
-from flask import Blueprint
+from flask import Blueprint, send_from_directory
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,sys
 from ...models import Company,  Tag
 from flask_api import status
-from ... import db
+from ... import db, config
 from ...helper_functions import *
+import shutil
 
 
+ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/load", methods=["POST", "GET"])
-def load():
+@blueprint.route("/image/get/<filename>", methods = ["GET"])
+def imageSend(filename):
+    return send_from_directory(config['flask']['upload_folder'], secure_filename(filename), as_attachment=True)
 
-    """
-    GET endpoint /management/load
 
-    This such be moved to behind authentication.
+def imageLoad(request):
+    if not request.files:
+        return "No files found",status.HTTP_400_BAD_REQUEST
 
-    When called fills company, tag, tag_company from provide xlsx file
-    """
-    result = auth_token(request)
-    if not result[0]:
-        return result[1]
+    for filename in request.files:
+        if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
+            return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
+        request.files[filename].save(os.path.join(config['flask']['upload_folder'], secure_filename(filename)))
 
-    if "file" not in request.files:
-        return "No file received",status.HTTP_400_BAD_REQUEST
+    return "All files uploaded", status.HTTP_200_OK
 
-    file = request.files['file']
-    if not ".xlsx" in file.filename:
-        return "File must be a .xlsx", status.HTTP_400_BAD_REQUEST
-
-    file.save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
-
+def parseXlsx():
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -114,4 +111,55 @@ def load():
                         companies_sheet.cell_value(i,9), # Website
                         tags_temp
                         )
-    return "Success", status.HTTP_200_OK
+
+def unpackAndParse(request):
+    for filename in request.files:
+        file_extension = filename[filename.index("."):]
+        packedPath = os.path.join(config['flask']['upload_folder'], f"tmp{file_extension}" )
+        request.files[filename].save(packedPath)
+
+        unpackedPath = os.path.join(config['flask']['upload_folder'], "tmp")
+        shutil.unpack_archive(packedPath,unpackedPath)
+        os.remove(packedPath)
+
+        for root, dirs, files in os.walk(unpackedPath):
+            for file in files:
+                path = os.path.join(root,file)
+                if ".xlsx" in file:
+                    os.rename(path, "/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+                    parseXlsx()
+                elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
+                    os.rename(path,os.path.join(config['flask']['upload_folder'],file))
+                print(path, file=sys.stderr)
+        shutil.rmtree(unpackedPath)
+    return "", status.HTTP_200_OK
+
+@blueprint.route("/load", methods=["POST"])
+def load():
+    """
+    GET endpoint /management/load
+
+    This such be moved to behind authentication.
+
+    When called fills company, tag, tag_company from provide xlsx file
+    """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
+    if not request.files:
+        return "No files found",status.HTTP_400_BAD_REQUEST
+
+    for filename in request.files:
+        if ".xlsx" in filename: # load data
+            request.files[filename].save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+            parseXlsx()
+        elif any(map(lambda x: x in filename, ACCEPT_IMAGE_EXTENDS)): # Load single image
+            imageLoad(request)
+        elif any(map(lambda x:x in filename, [".zip", ".tar.gz"])):
+             unpackAndParse(request)
+        else:
+            return f"{filename} unaccepted file", status.HTTP_400_BAD_REQUEST
+    return "Success", status.HTTP_201_CREATED
+
+
