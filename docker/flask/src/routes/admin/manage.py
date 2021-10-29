@@ -1,38 +1,35 @@
-from flask import Blueprint
+from flask import Blueprint, send_from_directory
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,sys
 from ...models import Company,  Tag
 from flask_api import status
-from ... import db
+from ... import db, config
 from ...helper_functions import *
+import shutil
 
 
+ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/load", methods=["POST", "GET"])
-def load():
+@blueprint.route("/image/<filename>", methods = ["GET"])
+def imageSend(filename):
+    return send_from_directory(config['flask']['upload_folder'], secure_filename(filename))
 
-    """
-    GET endpoint /management/load
 
-    This such be moved to behind authentication.
+def imageLoad(request):
+    file = request.files["file"]
+    filename = file.filename
+    if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
+        return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
+    file.save(os.path.join(config['flask']['upload_folder'], secure_filename(filename)))
 
-    When called fills company, tag, tag_company from provide xlsx file
-    """
-    result = auth_token(request)
-    if not result[0]:
-        return result[1]
+    return "All files uploaded", status.HTTP_200_OK
 
-    if "file" not in request.files:
-        return "No file received",status.HTTP_400_BAD_REQUEST
-
-    file = request.files['file']
-    if not ".xlsx" in file.filename:
-        return "File must be a .xlsx", status.HTTP_400_BAD_REQUEST
-
-    file.save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+def parseXlsx():
+    NUMBER_OF_METADATA_COLS = 11
 
     # Inactives company
     Company.query.update({Company.active:False})
@@ -79,15 +76,15 @@ def load():
     # Generats tags
     tag_row = companies_sheet.row(0)
     with db.session.no_autoflush:
-        for i in range(10,companies_sheet.ncols):
+        for i in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
         for i in range(1,companies_sheet.nrows):
             if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
                 tags_temp = []
-                for j in range(10,companies_sheet.ncols):
+                for j in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
                     if companies_sheet.cell_value(i,j):
-                        tags_temp.append(tags[j-10])
+                        tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS])
 
                         # Tempary removed user supplied tag company connection and ratings
                         #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
@@ -112,6 +109,58 @@ def load():
                         try_int(companies_sheet.cell_value(i,7)), # Employs Sweden
                         try_int(companies_sheet.cell_value(i,8)), # Employs world
                         companies_sheet.cell_value(i,9), # Website
+                        companies_sheet.cell_value(i,10), # logo
                         tags_temp
                         )
-    return "Success", status.HTTP_200_OK
+    os.remove("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+
+def unpackAndParse(request):
+    file = request.files["file"]
+    filename = file.filename
+    file_extension = filename[filename.index("."):]
+    packedPath = os.path.join(config['flask']['upload_folder'], f"tmp{file_extension}" )
+    file.save(packedPath)
+
+    unpackedPath = os.path.join(config['flask']['upload_folder'], "tmp")
+    shutil.unpack_archive(packedPath,unpackedPath)
+    os.remove(packedPath)
+
+    for root, dirs, files in os.walk(unpackedPath):
+        for file in files:
+            path = os.path.join(root,file)
+            if ".xlsx" in file:
+                os.rename(path, "/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+                parseXlsx()
+            elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
+                os.rename(path,os.path.join(config['flask']['upload_folder'],file))
+    shutil.rmtree(unpackedPath)
+    return "", status.HTTP_200_OK
+
+@blueprint.route("/load", methods=["POST"])
+def load():
+    """
+    POST endpoint api/manage/load
+
+    Allow for for uploading of images and data, see README
+    """
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
+    if "file" not in request.files:
+        return "No file found",status.HTTP_400_BAD_REQUEST
+
+    file = request.files["file"]
+
+    if ".xlsx" in file.filename: # load data
+        request.files[file.filename].save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+        parseXlsx()
+    elif any(map(lambda x: x in file.filename, ACCEPT_IMAGE_EXTENDS)): # Load single image
+        imageLoad(request)
+    elif any(map(lambda x:x in file.filename, [".zip", ".tar.gz"])):
+            unpackAndParse(request)
+    else:
+        return f"{file.filename} unaccepted file", status.HTTP_400_BAD_REQUEST
+    return "Success", status.HTTP_201_CREATED
+
+

@@ -5,7 +5,7 @@ secret = "adasdjasofhsgfalsöduas öfoyasl312312"
 
 [flask]
 secret_key = "9OLWxND4o83j4K4iuopO"
-upload_folder = "/uploads"
+upload_folder = "/catalogue/static"
 
 [database]
 # The user and the db need to be created beforehandc (add it in the docker-compose)

@@ -74,6 +74,7 @@ class Company(db.Model):
     employs_world = db.Column(db.Integer)
     trivia = db.Column(db.String(500))
     website = db.Column(db.String(200))
+    logo = db.Column(db.String(100))
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
@@ -84,7 +85,7 @@ class Company(db.Model):
     @staticmethod
     def create( name, active, description, business_area,
         trivia, founded, contacts, employs_sweden,
-        employs_world, website, tags):
+        employs_world, website,logo, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -99,6 +100,7 @@ class Company(db.Model):
                 employs_sweden = employs_sweden,
                 employs_world = employs_world,
                 website = website,
+                logo = logo,
                 tags = tags
             )
 
@@ -110,7 +112,7 @@ class Company(db.Model):
 
     def update(self, name, active, description, busniess_aera,
             trivia, founded, contacts, employs_sweden,
-            employs_world, website, tags):
+            employs_world, website, logo, tags):
         self.name = name
         self.active = active
         self.description = description
@@ -121,6 +123,7 @@ class Company(db.Model):
         self.employs_sweden = employs_sweden
         self.employs_world = employs_world
         self.website = website
+        self.logo = logo
         self.tags = tags
 
         db.session.commit()
@@ -148,6 +151,7 @@ class Company(db.Model):
             'employs_sweden': self.employs_sweden,
             'employs_world': self.employs_world,
             'website': self.website,
+            'logo': self.logo,
             'tags': tags
         }
 
