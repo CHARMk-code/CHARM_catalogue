@@ -1,11 +1,12 @@
 <template>
   <v-container> 
-    <Table :headers='headers' :data="this.$store.companies"/>
+    <Table name='Companies' :headers='headers' :data="Array.from(this.companies)" :row_meta="row_meta" :editable="true"/>
   </v-container>
 </template>
 
 <script>
 import Table from "@/components/table"
+import {mapGetters} from "vuex"
 
 export default {
   name: "companies_table",
@@ -21,23 +22,26 @@ export default {
         {text: 'Active', value: 'active'},
         {text: 'Actions', value: 'actions', sortable: false },
       ],
-      data: [
-        {
-          id: 0,
-          active: 'true',
-          name: 'Volvo',
-          desc: 'this is quite a long sentence since it is meant to be the whole description for the company. However it is not very descriptive, mostly from a lack of information about the actual company.',
-          founded: '1903',
-          contact: 'person@volvogroup.com',
-          website: 'https://volvogroup.com',
-          employees_sweden: '22450',
-          employees_world: '45000',
-          trivia: 'This is not a true fun fact/trivia',
-          tags: ['a', 'd', 'e', 'f', 'h', 'i','k','m'],
-        }
+      //make sure to get from store instead
+      allTags: ['a', 'b', 'c', 'd', 'e', 'f', 'h', 'i','k','m'], 
+      row_meta: [
+        {type: 'checkbox', model: 'active', on_icon: 'mdi-eye', off_icon: 'mdi-eye-off', label: "Active (required for row to be visible)"},
+        {type: 'text', model: 'name', label: 'Company name'},
+        {type: 'textarea', model: 'description', label: 'Company description'},
+        {type: 'text', model: 'founded', label: 'Founded'},
+        {type: 'text', model: 'Contacts', label: 'Contacts'},
+        {type: 'text', model: 'website', label: 'Website'},
+        {type: 'text', model: 'employees_sweden', label: 'Number of Employees in Sweden'},
+        {type: 'text', model: 'employees_world', label: 'Number of Employees in the whole world'},
+        {type: 'text', model: 'trivia', label: 'Trivia'},
+        {type: 'select', model: 'tags', items: this.allTags, label: "Tags", hint: "Active tags for Company"}
       ]
+    }
+  },
+  computed: {
+    ...mapGetters({companies: 'companies/companies'})
   }
-  }
+  
 }
 </script>
 

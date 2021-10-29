@@ -9,7 +9,7 @@
     >
     <template v-slot:top>
       <v-toolbar flat >
-        <v-toolbar-title>Companies</v-toolbar-title>
+        <v-toolbar-title>{{ name }}</v-toolbar-title>
         <v-spacer/>
           <v-text-field
             v-model="search"
@@ -17,7 +17,7 @@
             class="mx-4"></v-text-field>
           <v-spacer/> 
 
-            <v-dialog persistent 
+            <v-dialog v-if="editable" persistent 
             v-model="dialog"
             max-width="900px">
               <template v-slot:activator="{ on, attrs }">
@@ -28,18 +28,25 @@
                   v-bind="attrs"
                   v-on="on"
                   >
-                  Add company 
+                  Create new  
                 </v-btn>
               </template>
-              <Company_edit_dialog @close_dialog="close_dialog()" :creating="creating" :company="editedCompany"/>
+
+                <tableEditDialog 
+                  @close_dialog="closeDialog()" 
+                  @save_row="saveRow"
+                  :name="name" 
+                  :new="creating" 
+                  :row="editedRow" 
+                  :row_meta="row_meta" />
             </v-dialog>
       </v-toolbar>
     </template>
 
-    <template v-slot:item.actions="{ item }">
+    <template v-if="editable" v-slot:item.actions="{ item }">
       <v-icon
         class="mr-2"
-        @click="editCompany(item)">
+        @click="editRow(item)">
         mdi-pencil
       </v-icon>
     </template>
@@ -56,33 +63,39 @@
 
 
 <script>
-import Company_edit_dialog from "@/components/admin/Company_edit_dialog"
+import tableEditDialog from "@/components/admin/table_edit_dialog"
 
 export default {
   name: 'Table',
   components: {
-    Company_edit_dialog
+    tableEditDialog 
   },
-  props: ['headers', 'data'],
+  props: ['editable', 'name', 'headers', 'data', 'row_meta'],
   data () {
     return {
       search: "",
       expanded: [],
       dialog: false,
       creating: true,
-      editedCompany: {},
+      editedRow: {},
     }
   },
   methods: {
-    editCompany (comp) {
-      this.editedCompany = comp 
-      this.dialog = true
-      this.creating = false
+    editRow(row) {
+      console.log(row)
+      this.editedRow = row;
+      console.log(this.editedRow)
+      this.creating = false;
+      this.dialog = true;
     },
-    close_dialog () {
+    closeDialog () {
       this.dialog = false
       this.creating = true
-      this.editedCompany = {}
+      this.$emit('row_changed', this.editedRow)
+      this.editedRow= {}
+    },
+    saveRow(event, row) {
+      this.$emit("save_edit", row)
     }
   }
 

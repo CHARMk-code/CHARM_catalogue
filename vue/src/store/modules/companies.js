@@ -6,17 +6,19 @@ export default {
     companies: {}
   }),
   mutations: {
-    addCompany(state, { company }){
-      state.companies[company.id] = company
+    addCompany(state, company){
+      if (!state.companies.some((c) => c.id = company.id)) {
+        state.companies.push(company)
+      }
     },
-    setCompanies(state, { companies }){
-      companies.forEach((c) => state.companies[c.id] = c )
+    setCompanies(state, companies){
+      state.companies = companies
     },
-    removeCompany(state, { id }){
-      delete state.companies[id] 
+    removeCompany(state, id){
+      state.companies.splic(state.companies.findIndex((c) => c.id == id))
     },
     removeAllCompanies(state){
-      state.companies = {};
+      state.companies = [];
     }
   },
   actions: {
@@ -25,7 +27,7 @@ export default {
         Vue.prototype.$axios('get', {url: "company/get"})
         .then(resp => {
           const companies = resp.data;
-          if (companies.length != 0) {
+          if (companies.length > 0) {
             commit("setCompanies", companies)
           }
           resolve(resp)
@@ -36,7 +38,6 @@ export default {
       })
     },
     updateCompanies({ commit }) {
-
       return new Promise((resolve,reject) => {
         Vue.prototype.$axios('get', {url: "company/get"})
         .then(resp => {
@@ -52,5 +53,8 @@ export default {
         })
       })
     }
+  },
+  getters: {
+    companies: (state) => { return state.companies }
   }
 }
