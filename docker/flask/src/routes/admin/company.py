@@ -29,9 +29,8 @@ def company_update():
         return result[1]
 
     request_data = request.get_json()
-    id = get_if_exist(request_data,"id")
-    delete_option = get_if_exist(request_data,"delete")
 
+    id = get_if_exist(request_data,"id")
     name = get_if_exist(request_data,"name")
     active = get_if_exist(request_data,"active")
     description = get_if_exist(request_data,"description")
@@ -58,10 +57,18 @@ def company_update():
 
     company = Company.query.get(id)
 
-    success = False
-    if delete_option:
-        success = company.delete()
-    else:
-        success = company.update(name,active, description, business_area, trivia, founded,
-                contacts, employs_sweden, employs_world, website, logo, tag_objs)
-    return send_status(success)
+    return send_status(company.update(name,active, description, business_area, trivia, founded,
+                contacts, employs_sweden, employs_world, website, logo, tag_objs))
+
+
+@blueprint.route("",methods=["DELETE"])
+def company_delete():
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
+    request_data = request.get_json()
+
+    id = get_if_exist(request_data,"id")
+    company = Company.query.get(id)
+    return send_status(company.delete())
