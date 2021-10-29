@@ -4,6 +4,8 @@ import sys
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
+from .helper_functions import test_and_set
+
 
 # Crowd:
 # 0 - all
@@ -70,8 +72,8 @@ class Company(db.Model):
     business_area = db.Column(db.String(500))
     founded = db.Column(db.Integer)
     contacts = db.Column(db.String(300))
-    employs_sweden = db.Column(db.Integer)
-    employs_world = db.Column(db.Integer)
+    employees_sweden = db.Column(db.Integer)
+    employees_world = db.Column(db.Integer)
     trivia = db.Column(db.String(500))
     website = db.Column(db.String(200))
     logo = db.Column(db.String(100))
@@ -84,8 +86,8 @@ class Company(db.Model):
 
     @staticmethod
     def create( name, active, description, business_area,
-        trivia, founded, contacts, employs_sweden,
-        employs_world, website,logo, tags):
+        trivia, founded, contacts, employees_sweden,
+        employees_world, website,logo, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -97,8 +99,8 @@ class Company(db.Model):
                 trivia=trivia,
                 founded = founded,
                 contacts = contacts,
-                employs_sweden = employs_sweden,
-                employs_world = employs_world,
+                employees_sweden = employees_sweden,
+                employees_world = employees_world,
                 website = website,
                 logo = logo,
                 tags = tags
@@ -110,21 +112,21 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, description, busniess_aera,
-            trivia, founded, contacts, employs_sweden,
-            employs_world, website, logo, tags):
-        self.name = name
-        self.active = active
-        self.description = description
-        self.busniess_aera = busniess_aera
-        self.trivia = trivia
-        self.founded = founded
-        self.contacts = contacts
-        self.employs_sweden = employs_sweden
-        self.employs_world = employs_world
-        self.website = website
-        self.logo = logo
-        self.tags = tags
+    def update(self, name, active, description, business_area,
+            trivia, founded, contacts, employees_sweden,
+            employees_world, website, logo, tags):
+        self.name = test_and_set(self.name,name)
+        self.active = test_and_set(self.active,active)
+        self.description = test_and_set(self.description,description)
+        self.business_area = test_and_set(self.business_area,business_area)
+        self.trivia = test_and_set(self.trivia,trivia)
+        self.founded = test_and_set(self.founded,founded)
+        self.contacts = test_and_set(self.contacts,contacts)
+        self.employees_sweden = test_and_set(self.employees_sweden,employees_sweden)
+        self.employees_world = test_and_set(self.employees_world, employees_world)
+        self.website = test_and_set(self.website, website)
+        self.logo = test_and_set(self.logo, logo)
+        self.tags = test_and_set(self.tags, tags)
 
         db.session.commit()
         return True
@@ -144,12 +146,12 @@ class Company(db.Model):
             'name': self.name,
             'active': self.active,
             'description': self.description,
-            'busniess_aera': self.busniess_aera,
+            'business_area': self.business_area,
             'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
-            'employs_sweden': self.employs_sweden,
-            'employs_world': self.employs_world,
+            'employees_sweden': self.employees_sweden,
+            'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,
             'tags': tags
@@ -189,11 +191,11 @@ class Tag(db.Model):
 
     def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced):
         try:
-            self.name = name
-            self.parent_tag = parent_tag
-            self.up_votes = up_votes
-            self.down_votes = down_votes
-            self.crowd_sourced = crowd_sourced
+            self.name = test_and_set(self.name,name)
+            self.parent_tag = test_and_set(self.parent_tag,parent_tag)
+            self.up_votes = test_and_set(self.up_votes,up_votes)
+            self.down_votes = test_and_set(self.down_votes, down_votes)
+            self.crowd_sourced = test_and_set(self.crowd_sourced,crowd_sourced)
             db.session.commit()
             return True
         except:
@@ -214,7 +216,7 @@ class Tag(db.Model):
             'parent_tag': self.parent_tag,
             'up_votes': self.up_votes,
             'down_votes': self.down_votes,
-            'crowd_soured': self.crowd_soured,
+            'crowd_sourced': self.crowd_sourced,
         }
 
 class Tag_company(db.Model):
@@ -227,7 +229,7 @@ class Tag_company(db.Model):
     company = db.Column(db.Integer)
     votes = db.Column(db.Integer)
     score = db.Column(db.Integer)
-    crowd_soured = db.Column(db.Boolean)
+    crowd_sourced = db.Column(db.Boolean)
 
     @property
     def serialize(self):
@@ -237,7 +239,7 @@ class Tag_company(db.Model):
             'company': self.company,
             'up_votes': self.up_votes,
             'down_votes': self.down_votes,
-            'crowd_soured': self.crowd_soured,
+            'crowd_sourced': self.crowd_sourced,
         }
 
     @staticmethod
@@ -259,13 +261,13 @@ class Tag_company(db.Model):
             return False
         return True
 
-    def update_helper(self, tag, company, up_votes, down_votes, crowd_sourced):
+    def update(self, tag, company, up_votes, down_votes, crowd_sourced):
         try:
-            self.tag = tag
-            self.company = company
-            self.up_votes=up_votes
-            self.down_votes=down_votes
-            self.crowd_sourced = crowd_sourced
+            self.tag = test_and_set(self.tag, tag)
+            self.company = test_and_set(self.company,company)
+            self.up_votes= test_and_set(self.up_votes, up_votes)
+            self.down_votes= test_and_set(self.down_votes, down_votes)
+            self.crowd_sourced = test_and_set(self.crowd_sourced, crowd_sourced)
             db.session.commit()
             return True
         except:

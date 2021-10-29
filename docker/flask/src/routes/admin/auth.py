@@ -6,10 +6,10 @@ from ...helper_functions import get_if_exist, send_status, auth_token
 
 blueprint = Blueprint('auth', __name__, url_prefix='/api/auth')
 
-@blueprint.route('/login', methods=['POST'])
+@blueprint.route('', methods=['POST'])
 def login_post():
     """
-    POST endpoint /api/auth/login
+    POST endpoint /api/auth
 
     Auths user
 
@@ -35,7 +35,7 @@ def login_post():
 
     return user.gen_token()
 
-@blueprint.route('/update', methods=['POST'])
+@blueprint.route('', methods=['UPDATE'])
 def update_post():
     result = auth_token(request)
     if not result[0]:
