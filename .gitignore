@@ -3,6 +3,8 @@ node_modules
 /dist
 yarn.lock
 
+# static directory
+docker/flask/src/static/*.*
 
 # local env files
 .env.local
