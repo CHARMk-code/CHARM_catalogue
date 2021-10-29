@@ -70,8 +70,8 @@ class Company(db.Model):
     business_area = db.Column(db.String(500))
     founded = db.Column(db.Integer)
     contacts = db.Column(db.String(300))
-    employs_sweden = db.Column(db.Integer)
-    employs_world = db.Column(db.Integer)
+    employees_sweden = db.Column(db.Integer)
+    employees_world = db.Column(db.Integer)
     trivia = db.Column(db.String(500))
     website = db.Column(db.String(200))
     logo = db.Column(db.String(100))
@@ -84,8 +84,8 @@ class Company(db.Model):
 
     @staticmethod
     def create( name, active, description, business_area,
-        trivia, founded, contacts, employs_sweden,
-        employs_world, website,logo, tags):
+        trivia, founded, contacts, employees_sweden,
+        employees_world, website,logo, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -97,8 +97,8 @@ class Company(db.Model):
                 trivia=trivia,
                 founded = founded,
                 contacts = contacts,
-                employs_sweden = employs_sweden,
-                employs_world = employs_world,
+                employees_sweden = employees_sweden,
+                employees_world = employees_world,
                 website = website,
                 logo = logo,
                 tags = tags
@@ -111,8 +111,8 @@ class Company(db.Model):
         return True
 
     def update(self, name, active, description, business_area,
-            trivia, founded, contacts, employs_sweden,
-            employs_world, website, logo, tags):
+            trivia, founded, contacts, employees_sweden,
+            employees_world, website, logo, tags):
         self.name = name
         self.active = active
         self.description = description
@@ -120,8 +120,8 @@ class Company(db.Model):
         self.trivia = trivia
         self.founded = founded
         self.contacts = contacts
-        self.employs_sweden = employs_sweden
-        self.employs_world = employs_world
+        self.employees_sweden = employees_sweden
+        self.employees_world = employees_world
         self.website = website
         self.logo = logo
         self.tags = tags
@@ -148,8 +148,8 @@ class Company(db.Model):
             'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
-            'employs_sweden': self.employs_sweden,
-            'employs_world': self.employs_world,
+            'employees_sweden': self.employees_sweden,
+            'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,
             'tags': tags
