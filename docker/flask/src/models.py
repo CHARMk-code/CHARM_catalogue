@@ -110,13 +110,13 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, description, busniess_aera,
+    def update(self, name, active, description, business_area,
             trivia, founded, contacts, employs_sweden,
             employs_world, website, logo, tags):
         self.name = name
         self.active = active
         self.description = description
-        self.busniess_aera = busniess_aera
+        self.business_area = business_area
         self.trivia = trivia
         self.founded = founded
         self.contacts = contacts
@@ -144,7 +144,7 @@ class Company(db.Model):
             'name': self.name,
             'active': self.active,
             'description': self.description,
-            'busniess_aera': self.busniess_aera,
+            'business_area': self.business_area,
             'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
