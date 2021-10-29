@@ -5,18 +5,18 @@ blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/update", methods=["POST"])
+@blueprint.route("", methods=["UPDATE"])
 # @login_required
 def tag_update():
     """
-    POST endpoint /api/tag/update
+    POST endpoint /api/tag
 
     Arg:
         id(int) - Id of the tag, if no id provided creates new object
         name(string) - Name of the tag (if not provided the value will be set to None)
         parent_tag(int) - Id of parent tag (if not provided the value will be set to None)
-        votes(int) - Total number of votes cast on this tag. Must be greater than 1.
-        score(int) - Total number of upvotes.
+        upvotes(int) - Total number of upvotes.
+        down_votes(int) - Total number of downvotes.
         crowd_sourced(bool) - Set if the tag, was created by an non authed user.
         delete_option(bool) - If set, deletes tag_company with the given id
     Return:
