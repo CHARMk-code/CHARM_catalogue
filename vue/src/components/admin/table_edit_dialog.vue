@@ -22,6 +22,7 @@
           </template>
         </template>
     </v-form>
+    {{row}}
     </v-card-text>
       <v-card-actions>
         <v-btn color="primary" @click="save()">
@@ -41,7 +42,8 @@ export default {
   props: ['name', 'row', 'row_meta', 'new'],
   methods: {
     save () {
-      this.$emit("save_row", row)
+      console.log("this.row", this.row)
+      this.$emit("save_row", this.row)
       this.close()
     },
     close () {

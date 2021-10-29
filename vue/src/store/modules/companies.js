@@ -6,16 +6,18 @@ export default {
     companies: {}
   }),
   mutations: {
-    addCompany(state, company){
+    modifyCompany(state, company){
       if (!state.companies.some((c) => c.id = company.id)) {
         state.companies.push(company)
+      } else {
+        state.companies[state.companies.findIndex((c) => c.id == id)]
       }
     },
     setCompanies(state, companies){
       state.companies = companies
     },
     removeCompany(state, id){
-      state.companies.splic(state.companies.findIndex((c) => c.id == id))
+      state.companies.splice(state.companies.findIndex((c) => c.id == id))
     },
     removeAllCompanies(state){
       state.companies = [];
@@ -24,8 +26,9 @@ export default {
   actions: {
     getCompanies({ commit }) {
       return new Promise((resolve,reject) => {
-        Vue.prototype.$axios('get', {url: "company/get"})
+        Vue.prototype.$axios.get("/company")
         .then(resp => {
+          commit("removeAllCompanies")
           const companies = resp.data;
           if (companies.length > 0) {
             commit("setCompanies", companies)
@@ -37,15 +40,12 @@ export default {
         })
       })
     },
-    updateCompanies({ commit }) {
-      return new Promise((resolve,reject) => {
-        Vue.prototype.$axios('get', {url: "company/get"})
+    modifyCompany({ commit }, company) {
+      return new Promise((resolve, reject) => {
+        console.log(company)
+        Vue.prototype.$axios.post("/company", company)
         .then(resp => {
-          const companies = resp.data;
-          commit("removeAllCompanies")
-          if (companies.length != 0) {
-            commit("setCompanies", companies)
-          }
+          commit("modifyCompany", company)
           resolve(resp)
         })
         .catch(err => {

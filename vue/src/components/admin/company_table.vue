@@ -1,6 +1,6 @@
 <template>
   <v-container> 
-    <Table name='Companies' :headers='headers' :data="Array.from(this.companies)" :row_meta="row_meta" :editable="true"/>
+    <Table @save_edit="saveCompany" name='Companies' :headers='headers' :data="Array.from(this.companies)" :row_meta="row_meta" :editable="true"/>
   </v-container>
 </template>
 
@@ -40,6 +40,12 @@ export default {
   },
   computed: {
     ...mapGetters({companies: 'companies/companies'})
+  },
+  methods: {
+    saveCompany(company){
+      this.$store.dispatch('companies/modifyCompany', company)      
+
+    }
   }
   
 }

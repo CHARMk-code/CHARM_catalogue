@@ -82,19 +82,16 @@ export default {
   },
   methods: {
     editRow(row) {
-      console.log(row)
       this.editedRow = row;
-      console.log(this.editedRow)
       this.creating = false;
       this.dialog = true;
     },
     closeDialog () {
       this.dialog = false
       this.creating = true
-      this.$emit('row_changed', this.editedRow)
       this.editedRow= {}
     },
-    saveRow(event, row) {
+    saveRow(row) {
       this.$emit("save_edit", row)
     }
   }
