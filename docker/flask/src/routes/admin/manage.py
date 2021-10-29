@@ -1,7 +1,7 @@
-from flask import Blueprint, send_from_directory
+from flask import Blueprint, send_from_directory, request
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import xlrd,sys
+import xlrd,os
 from ...models import Company,  Tag
 from flask_api import status
 from ... import db, config
