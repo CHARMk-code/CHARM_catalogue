@@ -29,7 +29,8 @@ export default {
         commit("auth_request");
         Vue.prototype.$axios("get", { url: "/auth/login", data: user, method: "POST" })
           .then(resp => {
-            const token = resp.data.token;
+            const token = resp.data;
+            console.log(resp)
             localStorage.setItem("token", token);
             Vue.prototype.$axios.defaults.headers.common["Authorization"] = "basic " + token;
             commit("auth_success", { token });

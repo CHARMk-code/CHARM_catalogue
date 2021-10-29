@@ -24,8 +24,7 @@ export default {
     },
   },
   created() {
-    this.retrieveCompanies();
-    this.retrieveTags();
+    this.$axios.defaults.headers.common['Authorization'] = 'Basic ' + this.$store.getters['auth/token']
   },
   data() {
     return {
