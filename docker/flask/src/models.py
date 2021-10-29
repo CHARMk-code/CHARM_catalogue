@@ -4,6 +4,8 @@ import sys
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
+from .helper_functions import test_and_set
+
 
 # Crowd:
 # 0 - all
@@ -113,18 +115,18 @@ class Company(db.Model):
     def update(self, name, active, description, business_area,
             trivia, founded, contacts, employees_sweden,
             employees_world, website, logo, tags):
-        self.name = name
-        self.active = active
-        self.description = description
-        self.business_area = business_area
-        self.trivia = trivia
-        self.founded = founded
-        self.contacts = contacts
-        self.employees_sweden = employees_sweden
-        self.employees_world = employees_world
-        self.website = website
-        self.logo = logo
-        self.tags = tags
+        self.name = test_and_set(self.name,name)
+        self.active = test_and_set(self.active,active)
+        self.description = test_and_set(self.description,description)
+        self.business_area = test_and_set(self.business_area,business_area)
+        self.trivia = test_and_set(self.trivia,trivia)
+        self.founded = test_and_set(self.founded,founded)
+        self.contacts = test_and_set(self.contacts,contacts)
+        self.employees_sweden = test_and_set(self.employees_sweden,employees_sweden)
+        self.employees_world = test_and_set(self.employees_world, employees_world)
+        self.website = test_and_set(self.website, website)
+        self.logo = test_and_set(self.logo, logo)
+        self.tags = test_and_set(self.tags, tags)
 
         db.session.commit()
         return True
@@ -189,11 +191,11 @@ class Tag(db.Model):
 
     def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced):
         try:
-            self.name = name
-            self.parent_tag = parent_tag
-            self.up_votes = up_votes
-            self.down_votes = down_votes
-            self.crowd_sourced = crowd_sourced
+            self.name = test_and_set(self.name,name)
+            self.parent_tag = test_and_set(self.parent_tag,parent_tag)
+            self.up_votes = test_and_set(self.up_votes,up_votes)
+            self.down_votes = test_and_set(self.down_votes, down_votes)
+            self.crowd_sourced = test_and_set(self.crowd_sourced,crowd_sourced)
             db.session.commit()
             return True
         except:
@@ -214,7 +216,7 @@ class Tag(db.Model):
             'parent_tag': self.parent_tag,
             'up_votes': self.up_votes,
             'down_votes': self.down_votes,
-            'crowd_soured': self.crowd_soured,
+            'crowd_sourced': self.crowd_sourced,
         }
 
 class Tag_company(db.Model):
@@ -227,7 +229,7 @@ class Tag_company(db.Model):
     company = db.Column(db.Integer)
     votes = db.Column(db.Integer)
     score = db.Column(db.Integer)
-    crowd_soured = db.Column(db.Boolean)
+    crowd_sourced = db.Column(db.Boolean)
 
     @property
     def serialize(self):
@@ -237,7 +239,7 @@ class Tag_company(db.Model):
             'company': self.company,
             'up_votes': self.up_votes,
             'down_votes': self.down_votes,
-            'crowd_soured': self.crowd_soured,
+            'crowd_sourced': self.crowd_sourced,
         }
 
     @staticmethod
@@ -259,13 +261,13 @@ class Tag_company(db.Model):
             return False
         return True
 
-    def update_helper(self, tag, company, up_votes, down_votes, crowd_sourced):
+    def update(self, tag, company, up_votes, down_votes, crowd_sourced):
         try:
-            self.tag = tag
-            self.company = company
-            self.up_votes=up_votes
-            self.down_votes=down_votes
-            self.crowd_sourced = crowd_sourced
+            self.tag = test_and_set(self.tag, tag)
+            self.company = test_and_set(self.company,company)
+            self.up_votes= test_and_set(self.up_votes, up_votes)
+            self.down_votes= test_and_set(self.down_votes, down_votes)
+            self.crowd_sourced = test_and_set(self.crowd_sourced, crowd_sourced)
             db.session.commit()
             return True
         except:

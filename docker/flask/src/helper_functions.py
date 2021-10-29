@@ -1,13 +1,5 @@
-from . import db, config
-from .models import *
-from werkzeug.security import generate_password_hash
-import csv
-import datetime
-import sys
-from flask import render_template
-from flask_sqlalchemy import *
+from . import config
 from flask_api import status
-from .shared_data import last_update_company, last_update_tag
 import jwt
 
 def send_status(success):
@@ -33,6 +25,14 @@ def get_if_exist(data,key):
     except:
         return None
 
+def test_and_set(field, data):
+    if not data and (data != 0 or data != False):
+        return field
+    else:
+        if data == "None":
+            return None
+        return data
+
 def auth_token(request):
     auth_header = request.headers.get('Authorization')
     if auth_header:
@@ -46,4 +46,3 @@ def auth_token(request):
         return (False,('Signature expired. Please log in again.', status.HTTP_401_UNAUTHORIZED))
     except jwt.InvalidTokenError:
         return (False, ('Invalid token. Please log in again.', status.HTTP_401_UNAUTHORIZED))
-
