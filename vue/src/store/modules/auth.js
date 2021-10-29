@@ -27,7 +27,7 @@ export default {
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
-        Vue.prototype.$axios("get", { url: "/auth/login", data: user, method: "POST" })
+        Vue.prototype.$axios.post("auth", user)
           .then(resp => {
             const token = resp.data;
             console.log(resp)

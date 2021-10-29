@@ -32,7 +32,7 @@ export default {
 
       // sending file to the backend
       this.$axios
-        .post("/manage/load", formData)
+        .post("/manage/upload", formData)
         .then((res) => {
           this.feedback = res.data;
         })

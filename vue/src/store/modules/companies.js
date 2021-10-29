@@ -43,7 +43,7 @@ export default {
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
         console.log(company)
-        Vue.prototype.$axios.post("/company", company)
+        Vue.prototype.$axios.put("/company", company)
         .then(resp => {
           commit("modifyCompany", company)
           resolve(resp)
