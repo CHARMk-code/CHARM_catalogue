@@ -14,9 +14,9 @@ blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("/image/get/<filename>", methods = ["GET"])
+@blueprint.route("/image/<filename>", methods = ["GET"])
 def imageSend(filename):
-    return send_from_directory(config['flask']['upload_folder'], secure_filename(filename), as_attachment=True)
+    return send_from_directory(config['flask']['upload_folder'], secure_filename(filename))
 
 
 def imageLoad(request):
@@ -133,18 +133,15 @@ def unpackAndParse(request):
                 parseXlsx()
             elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
                 os.rename(path,os.path.join(config['flask']['upload_folder'],file))
-            print(path, file=sys.stderr)
     shutil.rmtree(unpackedPath)
     return "", status.HTTP_200_OK
 
 @blueprint.route("/load", methods=["POST"])
 def load():
     """
-    GET endpoint /management/load
+    POST endpoint api/manage/load
 
-    This such be moved to behind authentication.
-
-    When called fills company, tag, tag_company from provide xlsx file
+    Allow for for uploading of images and data, see README
     """
     result = auth_token(request)
     if not result[0]:
