@@ -16,7 +16,7 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 
 @blueprint.route("/image/<filename>", methods = ["GET"])
 def imageSend(filename):
-    return send_from_directory(config['flask']['upload_folder'], secure_filename(filename))
+    return send_from_directory(config['flask']['static_folder'], secure_filename(filename))
 
 
 def imageLoad(request):
@@ -24,7 +24,7 @@ def imageLoad(request):
     filename = file.filename
     if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
         return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-    file.save(os.path.join(config['flask']['upload_folder'], secure_filename(filename)))
+    file.save(os.path.join(config['flask']['static_folder'], secure_filename(filename)))
 
     return "All files uploaded", status.HTTP_200_OK
 
@@ -35,7 +35,7 @@ def parseXlsx():
     Company.query.update({Company.active:False})
     db.session.commit()
 
-    workbook = xlrd.open_workbook("CHARM_CATALOGUE_DATA.xlsx")
+    workbook = xlrd.open_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
 
     # Adds tags
@@ -112,7 +112,7 @@ def parseXlsx():
                         companies_sheet.cell_value(i,10), # logo
                         tags_temp
                         )
-    os.remove("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+    os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
 def unpackAndParse(request):
     file = request.files["file"]
@@ -129,10 +129,10 @@ def unpackAndParse(request):
         for file in files:
             path = os.path.join(root,file)
             if ".xlsx" in file:
-                os.rename(path, "/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+                os.rename(path, os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
                 parseXlsx()
             elif any(map(lambda x: x in file, ACCEPT_IMAGE_EXTENDS)):
-                os.rename(path,os.path.join(config['flask']['upload_folder'],file))
+                shutil.move(path,os.path.join(config['flask']['static_folder'],file))
     shutil.rmtree(unpackedPath)
     return "", status.HTTP_200_OK
 
@@ -146,14 +146,13 @@ def load():
     result = auth_token(request)
     if not result[0]:
         return result[1]
-
     if "file" not in request.files:
         return "No file found",status.HTTP_400_BAD_REQUEST
 
     file = request.files["file"]
 
     if ".xlsx" in file.filename: # load data
-        request.files[file.filename].save("/catalogue/CHARM_CATALOGUE_DATA.xlsx")
+        file.save(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
         parseXlsx()
     elif any(map(lambda x: x in file.filename, ACCEPT_IMAGE_EXTENDS)): # Load single image
         imageLoad(request)
