@@ -5,7 +5,7 @@ export default {
   state: () => ({
     status: "",
     token: localStorage.getItem("token") || "",
-    user: {}
+    user: {},
   }),
   mutations: {
     auth_request(state) {
@@ -21,22 +21,24 @@ export default {
     logout(state) {
       state.status = "";
       state.token = "";
-    }
+    },
   },
   actions: {
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
-        Vue.prototype.$axios.post("auth", user)
-          .then(resp => {
+        Vue.prototype.$axios
+          .post("auth", user)
+          .then((resp) => {
             const token = resp.data;
-            console.log(resp)
+            console.log(resp);
             localStorage.setItem("token", token);
-            Vue.prototype.$axios.defaults.headers.common["Authorization"] = "basic " + token;
+            Vue.prototype.$axios.defaults.headers.common["Authorization"] =
+              "basic " + token;
             commit("auth_success", { token });
             resolve(resp);
           })
-          .catch(err => {
+          .catch((err) => {
             commit("auth_error");
             localStorage.removeItem("token");
             reject(err);
@@ -44,18 +46,18 @@ export default {
       });
     },
     logout({ commit }) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         commit("logout");
         //Should when implemented in backend send the token to the backend for blacklisting
         localStorage.removeItem("token");
         delete Vue.prototype.$axios.defaults.headers.common["Authorization"];
         resolve();
       });
-    }
+    },
   },
   getters: {
-    isLoggedIn: state => !!state.token,
-    authStatus: state => state.status,
-    token: state => state.token
-  }
+    isLoggedIn: (state) => !!state.token,
+    authStatus: (state) => state.status,
+    token: (state) => state.token,
+  },
 };

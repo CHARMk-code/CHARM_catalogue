@@ -45,36 +45,36 @@
 // @ is an alias to /src
 
 export default {
-  name: 'Login',
+  name: "Login",
   components: {},
-  data () {
+  data() {
     return {
       show_pass: false,
       btn_loader: false,
       valid: true,
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       error: false,
       rules: {
-        required: (value) => !!value || 'Required'
-      }
-    }
+        required: (value) => !!value || "Required",
+      },
+    };
   },
   methods: {
-    validate () {
-      console.log('Validating')
-      this.btn_loader = true
+    validate() {
+      console.log("Validating");
+      this.btn_loader = true;
       this.$store
-        .dispatch('auth/login', { password: this.password })
+        .dispatch("auth/login", { password: this.password })
         .then(() => {
-          this.btn_loader = false
-          this.$router.push('/')
+          this.btn_loader = false;
+          this.$router.push("/");
         })
         .catch(() => {
-          this.btn_loader = false
-          this.error = true // "Invalid sign in credentials!";
-        })
-    }
-  }
-}
+          this.btn_loader = false;
+          this.error = true; // "Invalid sign in credentials!";
+        });
+    },
+  },
+};
 </script>

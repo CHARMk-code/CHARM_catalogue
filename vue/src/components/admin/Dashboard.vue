@@ -10,8 +10,8 @@
                   <v-card :key="link.name" :to="routepath + link.name">
                     <v-card-content>
                       <v-list-item-icon>
-                      <v-icon color="primary" v-text="link.icon"></v-icon>
-                    </v-list-item-icon>
+                        <v-icon color="primary" v-text="link.icon"></v-icon>
+                      </v-list-item-icon>
                       <v-list-item-text class="text-capitalize">
                         {{ link.name }}
                       </v-list-item-text>
@@ -37,6 +37,6 @@
 export default {
   name: "Dashboard",
   components: {},
-  props: ["links", "routepath"]
+  props: ["links", "routepath"],
 };
 </script>
