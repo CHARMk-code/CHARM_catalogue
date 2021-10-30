@@ -10,7 +10,7 @@ export default {
       if (!state.companies.some((c) => c.id = company.id)) {
         state.companies.push(company)
       } else {
-        state.companies[state.companies.findIndex((c) => c.id == id)]
+        state.companies[state.companies.findIndex((c) => c.id == company.id)];
       }
     },
     setCompanies(state, companies){
