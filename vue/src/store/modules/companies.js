@@ -60,5 +60,11 @@ export default {
     companies: (state) => {
       return state.companies;
     },
+    companyByName: (state) => (name) => {
+      if (state.companies.length > 0) {
+        return state.companies.filter((c) => c.name == name);
+      }
+      return [];
+    },
   },
 };
