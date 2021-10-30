@@ -11,9 +11,9 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 
-@blueprint.route("", methods=["UPDATE"])
+@blueprint.route("", methods=["PUT"])
 # @login_required
-def company_update():
+def company_put():
     """
 
     Args:

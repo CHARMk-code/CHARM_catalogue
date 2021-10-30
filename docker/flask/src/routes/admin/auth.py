@@ -35,8 +35,8 @@ def login_post():
 
     return user.gen_token()
 
-@blueprint.route('', methods=['UPDATE'])
-def update_post():
+@blueprint.route('', methods=['PUT'])
+def login_put():
     result = auth_token(request)
     if not result[0]:
         return result[1]
