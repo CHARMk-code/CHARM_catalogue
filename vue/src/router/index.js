@@ -1,11 +1,11 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Company from "@/components/Company";
+import Company_view from "@/views/company";
 //import Search from '@/components/Search'
 import Home from "@/components/Home";
 import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
-import Login from "@/components/Login";
+import Login from "@/views/login";
 import Upload from "@/components/Upload";
 Vue.use(Router);
 
@@ -43,6 +43,8 @@ export default new Router({
         },
         {
           path: "batch",
+          name: "batch",
+          component: Upload,
         },
         {
           path: "account",
@@ -50,20 +52,14 @@ export default new Router({
       ],
     },
     {
-      path: "/company/:company",
+      path: "/company/:name",
       name: "Company",
-      component: Company,
+      component: Company_view,
     },
     {
       path: "/login",
       name: "Login",
       component: Login,
     },
-    {
-      path: "/upload",
-      name: "Upload",
-      component: Upload,
-    },
   ],
 });
-
