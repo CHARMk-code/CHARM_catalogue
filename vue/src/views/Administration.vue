@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MenuLeft :links="links" :routepath="routepath"/>
+    <MenuLeft :links="links" :routepath="routepath" />
     <v-main>
       <router-view> </router-view>
     </v-main>
@@ -21,10 +21,10 @@ export default {
         { name: "maps", icon: "mdi-account" },
         { name: "layout", icon: "mdi-ticket" },
         { name: "batch", icon: "mdi-ticket" },
-        { name: "account", icon: "mdi-ticket" }
+        { name: "account", icon: "mdi-ticket" },
       ],
-      routepath: "/admin/"
+      routepath: "/admin/",
     };
-  }
+  },
 };
 </script>

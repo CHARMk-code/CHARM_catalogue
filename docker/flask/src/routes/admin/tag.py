@@ -5,9 +5,9 @@ blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("", methods=["UPDATE"])
+@blueprint.route("", methods=["PUT"])
 # @login_required
-def tag_update():
+def tag_put():
     """
     POST endpoint /api/tag
 

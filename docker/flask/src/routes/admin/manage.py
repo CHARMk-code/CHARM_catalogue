@@ -136,7 +136,7 @@ def unpackAndParse(request):
     shutil.rmtree(unpackedPath)
     return "", status.HTTP_200_OK
 
-@blueprint.route("", methods=["POST"])
+@blueprint.route("/upload", methods=["POST"])
 def load():
     """
     POST endpoint api/manage/load
