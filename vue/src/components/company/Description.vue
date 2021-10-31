@@ -1,14 +1,14 @@
 <template>
   <v-card>
     <v-card-text>
-      {{ Offering }}
+      {{ desc }}
     </v-card-text>
   </v-card>
 </template>
 
 <script>
 export default {
-  name: "Company_Trivia",
-  props: ["sweden", "world"],
+  name: "Company_description",
+  props: ["desc"],
 };
 </script>
