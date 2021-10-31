@@ -49,6 +49,12 @@
         v-model="item.active"
       ></v-simple-checkbox>
     </template>
+
+    <template v-slot:item.icon="{ item }">
+      <v-img
+        :src="headers.filter((x) => x.value == 'icon')[0].base_url + item"
+      />
+    </template>
   </v-data-table>
 </template>
 
