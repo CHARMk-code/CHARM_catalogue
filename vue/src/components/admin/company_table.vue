@@ -31,6 +31,7 @@ export default {
       ],
       //make sure to get from store instead
       allTags: ["a", "b", "c", "d", "e", "f", "h", "i", "k", "m"],
+      // Logo?
       row_meta: [
         {
           type: "checkbox",

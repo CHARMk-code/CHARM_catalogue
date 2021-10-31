@@ -44,6 +44,19 @@
               :hint="col.hint"
             />
           </template>
+
+          <template v-if="col.type == 'file'">
+            <v-container :key="col.model">
+              <template v-if="row.icon != undefined">
+                <v-img :src="tag_icon_base_url + row.icon + '.png'" />
+                Replace
+              </template>
+              <template v-else> Add </template>
+              {{ col.label }}
+
+              <v-file-input v-model="col.model" clearable />
+            </v-container>
+          </template>
         </template>
       </v-form>
       {{ row }}
@@ -60,6 +73,11 @@
 export default {
   name: "table_edit_dialog",
   props: ["name", "row", "row_meta", "new"],
+  data() {
+    return {
+      tag_icon_base_url: "/api/manage/image", //Might be a different URL later
+    };
+  },
   methods: {
     save() {
       console.log("this.row", this.row);
@@ -69,9 +87,6 @@ export default {
     close() {
       this.$emit("close_dialog");
     },
-  },
-  data() {
-    return {};
   },
 };
 </script>

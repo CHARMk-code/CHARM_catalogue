@@ -5,6 +5,7 @@ import Company_view from "@/views/company";
 import Home from "@/components/Home";
 import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
+import Tags from "@/views/admin/Tags";
 import Login from "@/views/login";
 import Upload from "@/components/Upload";
 Vue.use(Router);
@@ -34,6 +35,11 @@ export default new Router({
           path: "companies",
           name: "Admin/Companies",
           component: Companies,
+        },
+        {
+          path: "tags",
+          name: "Admin/Tags",
+          component: Tags,
         },
         {
           path: "maps",

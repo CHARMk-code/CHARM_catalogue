@@ -67,5 +67,8 @@ export default {
       }
       return [];
     },
+    tags: (state) => {
+      return state.tags;
+    },
   },
 };
