@@ -69,7 +69,6 @@ class Company(db.Model):
     active = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
-    business_area = db.Column(db.String(500))
     founded = db.Column(db.Integer)
     contacts = db.Column(db.String(300))
     employees_sweden = db.Column(db.Integer)
@@ -85,7 +84,7 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, description, business_area,
+    def create( name, active, description,
         trivia, founded, contacts, employees_sweden,
         employees_world, website,logo, tags):
         try:
@@ -95,7 +94,6 @@ class Company(db.Model):
                 name=name,
                 active=active,
                 description=description,
-                business_area = business_area,
                 trivia=trivia,
                 founded = founded,
                 contacts = contacts,
@@ -112,13 +110,12 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, description, business_area,
+    def update(self, name, active, description,
             trivia, founded, contacts, employees_sweden,
             employees_world, website, logo, tags):
         self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active,active)
         self.description = test_and_set(self.description,description)
-        self.business_area = test_and_set(self.business_area,business_area)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
         self.contacts = test_and_set(self.contacts,contacts)
@@ -146,7 +143,6 @@ class Company(db.Model):
             'name': self.name,
             'active': self.active,
             'description': self.description,
-            'business_area': self.business_area,
             'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
@@ -170,9 +166,12 @@ class Tag(db.Model):
     up_votes = db.Column(db.Integer)
     down_votes = db.Column(db.Integer)
     crowd_sourced = db.Column(db.Boolean)
+    division = db.Column(db.Boolean)
+    business_area = db.Column(db.Boolean)
+    looking_for = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, division, business_area, looking_for):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -182,6 +181,9 @@ class Tag(db.Model):
                 up_votes = up_votes,
                 down_votes = down_votes,
                 crowd_sourced=crowd_sourced,
+                division = division,
+                business_area = business_area,
+                looking_for = looking_for
             )
             db.session.add(new_tag)
             db.session.commit()
@@ -189,13 +191,16 @@ class Tag(db.Model):
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, division, business_area, looking_for):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
             self.up_votes = test_and_set(self.up_votes,up_votes)
             self.down_votes = test_and_set(self.down_votes, down_votes)
             self.crowd_sourced = test_and_set(self.crowd_sourced,crowd_sourced)
+            self.division = test_and_set(self.division, division)
+            self.business_area = test_and_set(self.business_area, business_area)
+            self.looking_for = test_and_set(self.looking_for, looking_for)
             db.session.commit()
             return True
         except:
@@ -217,6 +222,9 @@ class Tag(db.Model):
             'up_votes': self.up_votes,
             'down_votes': self.down_votes,
             'crowd_sourced': self.crowd_sourced,
+            'division': self.division,
+            'business_area': self.business_area,
+            'looking_for': self.looking_for
         }
 
 class Tag_company(db.Model):

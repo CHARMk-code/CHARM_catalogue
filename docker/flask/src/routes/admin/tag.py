@@ -38,12 +38,15 @@ def tag_put():
     up_votes = get_if_exist(request_data,"up_votes")
     down_votes = get_if_exist(request_data,"down_votes")
     crowd_sourced = get_if_exist(request_data, "crowd_sourced")
+    division = get_if_exist(request_data,"division")
+    business_area = get_if_exist(request_data, "business_area")
+    looking_for = get_if_exist(request_data, "looking_for")
 
     tag = Tag.query.get(id)
     if not tag:
 
-        return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced))
-    return send_status(tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced))
+        return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced, division, business_area, looking_for))
+    return send_status(tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced, division, business_area, looking_for))
 
 @blueprint.route("", methods=["DELETE"])
 def delete():

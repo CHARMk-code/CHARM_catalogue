@@ -86,7 +86,7 @@ A example is available [here](https://drive.google.com/drive/folders/1ARqpngACz8
 
 #### Data formatting of xlsx file
 
-The tags sheet is structure in a tree structure, where indentions indicates a sublevel. In template the tag 'Software' has two subtag 'Open source' and 'AI' The structure always infinitely many sublevels.
+The tags sheet is structure in a tree structure, where indentions indicates a sublevel. In template the tag 'Software' has two subtag 'Open source' and 'AI' The structure always infinitely many sublevels. The first three cols are metadata, which is used for set special properties on the tag, such as it being a student division.
 
 The Companies sheet is structured with columns A-J being metadata metadata, followed by a list of tags. The tag list is structured as if a company_A has tag_A then put TRUE(click the checkbox) cell where tag_A and company_A intersects.
 
