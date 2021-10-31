@@ -43,12 +43,12 @@ export default {
           });
       });
     },
-    modifyTags({ commit }, tags) {
+    modifyTag({ commit }, tags) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/tags", tags)
+          .put("/tag", tags)
           .then((resp) => {
-            commit("modifyCompany", tags);
+            commit("modifyTag", tags);
             resolve(resp);
           })
           .catch((err) => {
