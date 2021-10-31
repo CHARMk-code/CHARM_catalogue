@@ -57,5 +57,15 @@ export default {
       });
     },
   },
-  getters: {},
+  getters: {
+    getTagFromId: (state) => (id) => {
+      if (state.tags.length > 0) {
+        const result = state.tags.filter((t) => t.id == id);
+        if (result.length > 0) {
+          return result[0];
+        }
+      }
+      return [];
+    },
+  },
 };
