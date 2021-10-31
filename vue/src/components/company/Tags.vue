@@ -3,8 +3,25 @@
     <v-card-title> Tags </v-card-title>
     <v-card-content>
       <template v-for="tag in tags_data">
-        <v-btn :key="tag.id" disabled rounded class="ma-1">
-          {{ tag.name }}
+        <v-btn
+          :icon="tag.icon != ''"
+          :key="tag.id"
+          disabled
+          small
+          rounded
+          class="ma-1"
+        >
+          <template v-if="tag.icon == ''">
+            {{ tag.name }}
+          </template>
+          <template>
+            <v-img
+              large
+              class="pa-0"
+              contain
+              :src="'/api/manage/image/' + tag.icon"
+            />
+          </template>
         </v-btn>
       </template>
     </v-card-content>
