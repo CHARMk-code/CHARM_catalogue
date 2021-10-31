@@ -21,6 +21,14 @@
       </v-col>
     </v-row>
     <v-spacer />
+    <v-btn
+      color="primary"
+      class="mt-4"
+      v-on:click="logout"
+      v-if="this.$store.getters['auth/isLoggedIn']"
+    >
+      Logout
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -38,6 +46,12 @@ export default {
     return {
       links: [{ name: "Search", route: "/search", icon: "mdi-magnify" }],
     };
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch("auth/logout");
+      this.$router.push("/");
+    },
   },
 };
 </script>
