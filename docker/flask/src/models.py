@@ -69,7 +69,6 @@ class Company(db.Model):
     active = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
-    business_area = db.Column(db.String(500))
     founded = db.Column(db.Integer)
     contacts = db.Column(db.String(300))
     employees_sweden = db.Column(db.Integer)
@@ -85,7 +84,7 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, description, business_area,
+    def create( name, active, description,
         trivia, founded, contacts, employees_sweden,
         employees_world, website,logo, tags):
         try:
@@ -95,7 +94,6 @@ class Company(db.Model):
                 name=name,
                 active=active,
                 description=description,
-                business_area = business_area,
                 trivia=trivia,
                 founded = founded,
                 contacts = contacts,
@@ -112,13 +110,12 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, description, business_area,
+    def update(self, name, active, description,
             trivia, founded, contacts, employees_sweden,
             employees_world, website, logo, tags):
         self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active,active)
         self.description = test_and_set(self.description,description)
-        self.business_area = test_and_set(self.business_area,business_area)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
         self.contacts = test_and_set(self.contacts,contacts)
@@ -146,7 +143,6 @@ class Company(db.Model):
             'name': self.name,
             'active': self.active,
             'description': self.description,
-            'business_area': self.business_area,
             'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
