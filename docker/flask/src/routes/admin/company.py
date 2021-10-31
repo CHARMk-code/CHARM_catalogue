@@ -2,7 +2,7 @@
 This file contians all auth api call that handles company datatype
 """
 from flask import Blueprint, request
-from ...models import Company
+from ...models import Company, Tag
 from flask_cors import CORS
 from ...helper_functions import *
 

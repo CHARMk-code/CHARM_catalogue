@@ -10,6 +10,8 @@ services:
       - db
     volumes:
       - ./docker/flask/src:/catalogue
+      - /static
+      - /upload
     environment:
       FLASK_ENV: development
       FLASK_APP: .
