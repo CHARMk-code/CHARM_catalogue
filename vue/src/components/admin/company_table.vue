@@ -136,7 +136,7 @@ export default {
           label: "Active (required for row to be visible)",
         },
         { type: "text", model: "name", label: "Company name" },
-        { type: "file", model: "logo", label: "Company Logo" },
+        { type: "image", model: "logo", label: "Company Logo" },
         {
           type: "textarea",
           model: "description",

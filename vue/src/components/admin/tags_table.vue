@@ -19,13 +19,7 @@
       </template>
 
       <template v-slot:item.icon="{ item }">
-        <v-img
-          :src="headers.filter((x) => x.value == 'icon')[0].base_url + item"
-        />
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon class="mr-2" @click="editRow(item)"> mdi-pencil </v-icon>
+        <v-img :src="icon_url + item.icon" />
       </template>
     </Table>
   </v-container>
@@ -42,8 +36,9 @@ export default {
   },
   data() {
     return {
-      icon_url: "/manage/image",
+      icon_url: "/api/manage/image/",
       headers: [
+        { text: "Icon", value: "icon", sortable: false },
         { text: "Name", value: "name" },
         {
           text: "Business Area",
@@ -59,7 +54,6 @@ export default {
           width: 100,
         },
         { text: "Offering", value: "offering", align: "center", width: 120 },
-        //        {text: "Icon", value: "icon", sortable: false},
         {
           text: "Actions",
           value: "actions",
@@ -69,6 +63,7 @@ export default {
         },
       ],
       row_meta: [
+        { type: "image", model: "icon", label: "tag icon" },
         { type: "text", model: "name", label: "Tag name" },
         { type: "checkbox", model: "business_area", label: "Business area" },
         { type: "checkbox", model: "division", label: "division" },

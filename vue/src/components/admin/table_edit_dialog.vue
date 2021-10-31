@@ -45,16 +45,30 @@
             />
           </template>
 
-          <template v-if="col.type == 'file'">
+          <template v-if="col.type == 'image'">
             <v-container :key="col.model">
-              <template v-if="row.icon != undefined">
-                <v-img :src="tag_icon_base_url + row.icon + '.png'" />
-                Replace
-              </template>
-              <template v-else> Add </template>
-              {{ col.label }}
+              <v-row>
+                <v-col>
+                  <v-img
+                    v-if="row[col.model] != undefined"
+                    :src="tag_icon_base_url + row[col.model]"
+                    max-height="100"
+                    max-width="300"
+                    contain
+                  />
+                </v-col>
+                <v-col>
+                  <template v-if="row[col.model] != ''"> Replace </template>
+                  <template v-else> Add </template>
+                  {{ col.label }}
 
-              <v-file-input v-model="files[col.model]" type="file" clearable />
+                  <v-file-input
+                    v-model="files[col.model]"
+                    type="file"
+                    clearable
+                  />
+                </v-col>
+              </v-row>
             </v-container>
           </template>
         </template>
@@ -74,7 +88,7 @@ export default {
   props: ["name", "row", "row_meta", "new"],
   data() {
     return {
-      tag_icon_base_url: "/api/manage/image", //Might be a different URL later
+      tag_icon_base_url: "/api/manage/image/", //Might be a different URL later
       files: {},
       test: [],
     };
