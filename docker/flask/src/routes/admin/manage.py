@@ -30,7 +30,7 @@ def imageLoad(request):
 
 def parseXlsx():
     NUMBER_OF_METADATA_COLS_COMPANY = 10
-    NUMBER_OF_METADATA_COLS_TAG = 3
+    NUMBER_OF_METADATA_COLS_TAG = 4
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -45,43 +45,43 @@ def parseXlsx():
 
     next_col = NUMBER_OF_METADATA_COLS_TAG
     parent_tag = None
-    with db.session.no_autoflush:
-        for i in range(1,tags_sheet.nrows):
-            row = tags_sheet.row(i)
-            tag = Tag.query.filter_by(name=row[next_col].value).first()
-            division = row[0].value
-            business_area = row[1].value
-            looking_for = row[2].value
+    for i in range(1,tags_sheet.nrows):
+        row = tags_sheet.row(i)
+        tag = Tag.query.filter_by(name=row[next_col].value).first()
 
-            if not tag: # No tag exists
-                Tag.create(row[next_col].value,parent_tag,1,1,False,division,business_area,looking_for)
-                parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
-            else:
-                tag.update(row[next_col].value,parent_tag,1,1,False,division,business_area,looking_for)
-                parent_tag = tag.id
+        icon = row[0].value
+        division = row[1].value
+        business_area = row[2].value
+        looking_for = row[3].value
+        if not tag: # No tag exists
+            Tag.create(row[next_col].value,parent_tag,1,1,False,icon,division,business_area,looking_for)
+            parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
+        else:
+            tag.update(row[next_col].value,parent_tag,1,1,False,icon,division,business_area,looking_for)
+            parent_tag = tag.id
 
-            if (i+1 >= tags_sheet.nrows):
-                break
-            if (tags_sheet.cell_value(i+1,next_col)!=''):
-                if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-                    parent_tag = None
+        if (i+1 >= tags_sheet.nrows):
+            break
+        if (tags_sheet.cell_value(i+1,next_col)!=''):
+            if (next_col==NUMBER_OF_METADATA_COLS_TAG):
+                parent_tag = None
+            continue
+        elif (next_col+1 < tags_sheet.ncols):
+            if (tags_sheet.cell_value(i+1,next_col+1)!=''):
+                next_col += 1
                 continue
-            elif (next_col+1 < tags_sheet.ncols):
-                if (tags_sheet.cell_value(i+1,next_col+1)!=''):
-                    next_col += 1
-                    continue
 
-            for j in range(tags_sheet.ncols):
-                if tags_sheet.cell_value(i+1,j) != '':
-                    if (j==NUMBER_OF_METADATA_COLS_TAG):
-                        parent_tag = None
-                    next_col = j
-                    break
+        for j in range(tags_sheet.ncols):
+            if tags_sheet.cell_value(i+1,j) != '':
+                if (j==NUMBER_OF_METADATA_COLS_TAG):
+                    parent_tag = None
+                next_col = j
+                break
 
+    # Generats companies
     companies_sheet = workbook.sheet_by_name("Companies")
     tags = []
 
-    # Generats companies
     tag_row = companies_sheet.row(0)
     with db.session.no_autoflush:
         for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):

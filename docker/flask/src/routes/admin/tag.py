@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from flask_cors import CORS
 from ...helper_functions import *
+from ...models import Tag
 blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
@@ -38,6 +39,7 @@ def tag_put():
     up_votes = get_if_exist(request_data,"up_votes")
     down_votes = get_if_exist(request_data,"down_votes")
     crowd_sourced = get_if_exist(request_data, "crowd_sourced")
+    icon = get_if_exist(request_data,"icon")
     division = get_if_exist(request_data,"division")
     business_area = get_if_exist(request_data, "business_area")
     looking_for = get_if_exist(request_data, "looking_for")
@@ -45,8 +47,8 @@ def tag_put():
     tag = Tag.query.get(id)
     if not tag:
 
-        return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced, division, business_area, looking_for))
-    return send_status(tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced, division, business_area, looking_for))
+        return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced,icon, division, business_area, looking_for))
+    return send_status(tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced, icon,division, business_area, looking_for))
 
 @blueprint.route("", methods=["DELETE"])
 def delete():

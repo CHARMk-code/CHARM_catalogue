@@ -82,11 +82,11 @@ TODO: Write when functionally is available.
 ### Batch creation
 
 Images and company data can be upload via `/api/mange/load` endpoint, this endpoint allows single image, just the data(in a .xlsx file), or any number of image and/or data in a zip or tar.gz file.
-A example is available [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing).
+A example is available [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing). The zip and tar file can have any structure, the system will find all file in the directory and subdirectories.
 
 #### Data formatting of xlsx file
 
-The tags sheet is structure in a tree structure, where indentions indicates a sublevel. In template the tag 'Software' has two subtag 'Open source' and 'AI' The structure always infinitely many sublevels. The first three cols are metadata, which is used for set special properties on the tag, such as it being a student division.
+The tags sheet is structure in a tree structure, where indentions indicates a sublevel. In template the tag 'Software' has two subtag 'Open source' and 'AI' The structure always infinitely many sublevels. The first col gives the name of the icon to use, the following three cols are metadata, which is used for set special properties on the tag, such as it being a student division.
 
 The Companies sheet is structured with columns A-J being metadata metadata, followed by a list of tags. The tag list is structured as if a company_A has tag_A then put TRUE(click the checkbox) cell where tag_A and company_A intersects.
 
