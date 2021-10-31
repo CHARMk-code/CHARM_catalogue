@@ -1,8 +1,8 @@
 from flask import Blueprint, send_from_directory, request
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import xlrd,os
-from ...models import Company,  Tag
+import xlrd,os,sys
+from ...models import Company, Prepage,  Tag
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
@@ -105,20 +105,23 @@ def parseXlsx():
                         #      )
                         #      db.session.add(new_link)
                         #      db.session.commit()
-
+                metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
+                metadata = list(map(lambda x: x.value, metadata))
                 Company.create(
-                        companies_sheet.cell_value(i,0), # name
-                        try_bool(companies_sheet.cell_value(i,1)), # Active
-                        companies_sheet.cell_value(i,2), # Description
-                        companies_sheet.cell_value(i,3), # Trivia
-                        try_int(companies_sheet.cell_value(i,4)), # Founded
-                        companies_sheet.cell_value(i,5), # Contacts
-                        try_int(companies_sheet.cell_value(i,6)), # Employs Sweden
-                        try_int(companies_sheet.cell_value(i,7)), # Employs world
-                        companies_sheet.cell_value(i,8), # Website
-                        companies_sheet.cell_value(i,9), # logo
+                        *metadata,
                         tags_temp
                         )
+    # Prepages
+    prepages_sheet = workbook.sheet_by_name("Prepages")
+    for i in range(1,prepages_sheet.nrows):
+        prepage = Prepage.query.filter_by(image=prepages_sheet.cell_value(i,1)).first()
+
+        data = list(map(lambda x: x.value, prepages_sheet.row(i)))
+        if not prepage:
+            Prepage.create(*data)
+        else:
+            prepage.update(*data)
+
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
 def unpackAndParse(request):

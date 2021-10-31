@@ -4,7 +4,7 @@ import sys
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
-from .helper_functions import test_and_set
+from .helper_functions import auth_token, test_and_set
 
 
 # Crowd:
@@ -285,3 +285,51 @@ class Tag_company(db.Model):
         except:
             return False
 
+
+class Prepage(db.Model):
+    __tablename__ = "prepages"
+    """
+    Reps a prepages
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    image = db.Column(db.String(100))
+    order = db.Column(db.Integer)
+    active = db.Column(db.Boolean)
+
+    @staticmethod
+    def create( active,image, order, ):
+        try:
+            if Prepage.query.filter_by(image=image).first():
+                return False
+            new_prepage = Prepage(
+                image = image,
+                order = order,
+                active = active
+            )
+
+            db.session.add(new_prepage)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self,  active,image, order,):
+        self.active = test_and_set(self.active, active)
+        self.image = test_and_set(self.image, image)
+        self.order = test_and_set(self.order, order)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'image': self.image,
+            'order': self.order,
+            'active': self.active
+        }
