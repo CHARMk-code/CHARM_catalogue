@@ -1,5 +1,8 @@
 <template>
-  <v-card> Contacts: {{ contacts }} </v-card>
+  <v-card>
+    <v-card-title> Contact information </v-card-title>
+    <v-card-text>{{ contacts }} </v-card-text>
+  </v-card>
 </template>
 
 <script>

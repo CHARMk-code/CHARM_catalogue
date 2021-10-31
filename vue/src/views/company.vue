@@ -1,16 +1,42 @@
 <template>
   <v-main>
     <v-sheet v-if="company != undefined">
-      {{ company.name }}
-      <Logo :src="company.logo" />
-      <BusinessAreas :areas="company.business_area" />
-      <Trivia :trivia="company.trivia" />
-      <Founded :year="company.founded" />
-      <Contacts :contacts="company.contacts" />
-      <Employees
-        :sweden="company.employees_sweden"
-        :world="company.employees_world"
-      />
+      <v-container>
+        <v-row>
+          <v-col>
+            <Logo :src="company.logo" />
+          </v-col>
+          <v-spacer />
+          <v-col>
+            <div class="text-h2 font-weight-regular">{{ company.name }}</div>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <Description :desc="company.description" />
+          </v-col>
+          <v-col>
+            <Maps />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <BusinessAreas :areas="company.business_area" />
+          </v-col>
+          <v-col>
+            <Trivia
+              :trivia="company.trivia"
+              :sweden="company.employees_sweden"
+              :world="company.employees_world"
+              :year="company.founded"
+            />
+          </v-col>
+          <v-col>
+            <Contacts class="mb-6" :contacts="company.contacts" />
+            <Website :website="company.website" />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-sheet>
   </v-main>
 </template>
@@ -19,9 +45,10 @@
 import Logo from "@/components/company/Logo";
 import BusinessAreas from "@/components/company/Business_area";
 import Trivia from "@/components/company/Trivia";
-import Founded from "@/components/company/Founded";
 import Contacts from "@/components/company/Contacts";
-import Employees from "@/components/company/Employees";
+import Description from "@/components/company/Description";
+import Website from "@/components/company/Website";
+
 export default {
   name: "Company_View",
   data() {
@@ -32,9 +59,9 @@ export default {
     Logo,
     BusinessAreas, //Tags?
     Trivia, //Did you know...
-    Founded, //year
     Contacts, //name, email, position?
-    Employees, //Sweden worldwide
+    Description, //Company description
+    Website, //Company website
     //Offering, //Master thesis, summer job, Trainee, Oppotunities abroad, Internship, Recruiting events
     //Looking_for, //Bachelor, Master, Phd
     //Programs, // Tags for all programs
