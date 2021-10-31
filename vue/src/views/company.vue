@@ -16,12 +16,13 @@
             <Description :desc="company.description" />
           </v-col>
           <v-col>
-            <Maps />
+            <!--<Maps />-->
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <BusinessAreas :areas="company.business_area" />
+            <BusinessAreas class="mb-6" :areas="company.business_area" />
+            <Tags :tags="company.tags" />
           </v-col>
           <v-col>
             <Trivia
@@ -48,6 +49,7 @@ import Trivia from "@/components/company/Trivia";
 import Contacts from "@/components/company/Contacts";
 import Description from "@/components/company/Description";
 import Website from "@/components/company/Website";
+import Tags from "@/components/company/Tags";
 
 export default {
   name: "Company_View",
@@ -62,9 +64,11 @@ export default {
     Contacts, //name, email, position?
     Description, //Company description
     Website, //Company website
+    Tags, //Tags
     //Offering, //Master thesis, summer job, Trainee, Oppotunities abroad, Internship, Recruiting events
     //Looking_for, //Bachelor, Master, Phd
     //Programs, // Tags for all programs
+    //Maps, //Map view
   },
   computed: {
     company() {
