@@ -29,8 +29,8 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS = 11
-
+    NUMBER_OF_METADATA_COLS_COMPANY = 11
+    NUMBER_OF_METADATA_COLS_TAG = 3
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -41,50 +41,58 @@ def parseXlsx():
     # Adds tags
     tags_sheet = workbook.sheet_by_name("Tags")
 
-    next_col = 0
+
+
+    next_col = NUMBER_OF_METADATA_COLS_TAG
     parent_tag = None
-    for i in range(tags_sheet.nrows):
-        row = tags_sheet.row(i)
-        tag = Tag.query.filter_by(name=row[next_col].value).first()
-        if not tag:
-            Tag.create(row[next_col].value,parent_tag,1,1,False)
-            parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
-        else:
-            parent_tag = tag.id
+    with db.session.no_autoflush:
+        for i in range(1,tags_sheet.nrows):
+            row = tags_sheet.row(i)
+            tag = Tag.query.filter_by(name=row[next_col].value).first()
+            division = row[0].value
+            business_area = row[1].value
+            looking_for = row[2].value
 
-        if (i+1 >= tags_sheet.nrows):
-            break
-        if (tags_sheet.cell_value(i+1,next_col)!=''):
-            if (next_col==0):
-                parent_tag = None
-            continue
-        elif (next_col+1 < tags_sheet.ncols):
-            if (tags_sheet.cell_value(i+1,next_col+1)!=''):
-                next_col += 1
-                continue
+            if not tag: # No tag exists
+                Tag.create(row[next_col].value,parent_tag,1,1,False,division,business_area,looking_for)
+                parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
+            else:
+                tag.update(row[next_col].value,parent_tag,1,1,False,division,business_area,looking_for)
+                parent_tag = tag.id
 
-        for j in range(tags_sheet.ncols):
-            if tags_sheet.cell_value(i+1,j) != '':
-                if (j==0):
-                    parent_tag = None
-                next_col = j
+            if (i+1 >= tags_sheet.nrows):
                 break
+            if (tags_sheet.cell_value(i+1,next_col)!=''):
+                if (next_col==NUMBER_OF_METADATA_COLS_TAG):
+                    parent_tag = None
+                continue
+            elif (next_col+1 < tags_sheet.ncols):
+                if (tags_sheet.cell_value(i+1,next_col+1)!=''):
+                    next_col += 1
+                    continue
+
+            for j in range(tags_sheet.ncols):
+                if tags_sheet.cell_value(i+1,j) != '':
+                    if (j==NUMBER_OF_METADATA_COLS_TAG):
+                        parent_tag = None
+                    next_col = j
+                    break
 
     companies_sheet = workbook.sheet_by_name("Companies")
     tags = []
 
-    # Generats tags
+    # Generats companies
     tag_row = companies_sheet.row(0)
     with db.session.no_autoflush:
-        for i in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
+        for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
         for i in range(1,companies_sheet.nrows):
             if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
                 tags_temp = []
-                for j in range(NUMBER_OF_METADATA_COLS,companies_sheet.ncols):
+                for j in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
                     if companies_sheet.cell_value(i,j):
-                        tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS])
+                        tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
 
                         # Tempary removed user supplied tag company connection and ratings
                         #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
