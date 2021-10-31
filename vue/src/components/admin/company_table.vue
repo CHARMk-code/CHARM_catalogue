@@ -7,7 +7,20 @@
       :data="Array.from(this.companies)"
       :row_meta="row_meta"
       :editable="true"
-    />
+    >
+      <template v-slot:item.active="{ item }">
+        <v-simple-checkbox
+          disabled
+          on-icon="mdi-eye"
+          off-icon="mdi-eye-off"
+          v-model="item.active"
+        ></v-simple-checkbox>
+      </template>
+
+      <template v-slot:extra_actions="{ item }">
+        <v-icon class="mr-2" @click="viewCompany(item)"> mdi-book-open </v-icon>
+      </template>
+    </Table>
   </v-container>
 </template>
 
@@ -26,8 +39,8 @@ export default {
         { text: "Name", value: "name" },
         { text: "Website", value: "website" },
         { text: "Tags", value: "tags" },
-        { text: "Active", value: "active" },
-        { text: "Actions", value: "actions", sortable: false },
+        { text: "Active", value: "active", align: "center" },
+        { text: "Actions", value: "actions", align: "center", sortable: false },
       ],
       //make sure to get from store instead
       allTags: ["a", "b", "c", "d", "e", "f", "h", "i", "k", "m"],
@@ -76,6 +89,9 @@ export default {
   methods: {
     saveCompany(company) {
       this.$store.dispatch("companies/modifyCompany", company);
+    },
+    viewCompany(company) {
+      this.$router.push("/company/" + company.name);
     },
   },
 };
