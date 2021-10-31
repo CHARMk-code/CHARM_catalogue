@@ -3,7 +3,7 @@ import Vue from "vue";
 export default {
   namespaced: true,
   state: () => ({
-    companies: {},
+    companies: [],
   }),
   mutations: {
     modifyCompany(state, company) {
@@ -43,7 +43,6 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
-        console.log(company);
         Vue.prototype.$axios
           .put("/company", company)
           .then((resp) => {
