@@ -29,7 +29,7 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS_COMPANY = 11
+    NUMBER_OF_METADATA_COLS_COMPANY = 10
     NUMBER_OF_METADATA_COLS_TAG = 3
     # Inactives company
     Company.query.update({Company.active:False})
@@ -110,14 +110,13 @@ def parseXlsx():
                         companies_sheet.cell_value(i,0), # name
                         try_bool(companies_sheet.cell_value(i,1)), # Active
                         companies_sheet.cell_value(i,2), # Description
-                        companies_sheet.cell_value(i,3), # Busniess area
-                        companies_sheet.cell_value(i,4), # Trivia
-                        try_int(companies_sheet.cell_value(i,5)), # Founded
-                        companies_sheet.cell_value(i,6), # Contacts
-                        try_int(companies_sheet.cell_value(i,7)), # Employs Sweden
-                        try_int(companies_sheet.cell_value(i,8)), # Employs world
-                        companies_sheet.cell_value(i,9), # Website
-                        companies_sheet.cell_value(i,10), # logo
+                        companies_sheet.cell_value(i,3), # Trivia
+                        try_int(companies_sheet.cell_value(i,4)), # Founded
+                        companies_sheet.cell_value(i,5), # Contacts
+                        try_int(companies_sheet.cell_value(i,6)), # Employs Sweden
+                        try_int(companies_sheet.cell_value(i,7)), # Employs world
+                        companies_sheet.cell_value(i,8), # Website
+                        companies_sheet.cell_value(i,9), # logo
                         tags_temp
                         )
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
