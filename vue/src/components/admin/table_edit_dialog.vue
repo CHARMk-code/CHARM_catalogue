@@ -54,12 +54,11 @@
               <template v-else> Add </template>
               {{ col.label }}
 
-              <v-file-input v-model="col.model" clearable />
+              <v-file-input v-model="files[col.model]" type="file" clearable />
             </v-container>
           </template>
         </template>
       </v-form>
-      {{ row }}
     </v-card-text>
     <v-card-actions>
       <v-btn color="primary" @click="save()"> Save </v-btn>
@@ -76,13 +75,44 @@ export default {
   data() {
     return {
       tag_icon_base_url: "/api/manage/image", //Might be a different URL later
+      files: {},
+      test: [],
     };
   },
   methods: {
     save() {
       console.log("this.row", this.row);
-      this.$emit("save_row", this.row);
-      this.close();
+      console.log("logo", this.files);
+      console.log("logo_info", this.test);
+      this.uploadFiles(this.files).then(() => {
+        this.$emit("save_row", this.row);
+        this.close();
+      });
+    },
+    uploadFiles(files) {
+      const file_models = Object.keys(files);
+
+      return Promise.all(
+        Object.values(files).map((f, index) => {
+          return new Promise((resolve, reject) => {
+            console.log("f", f);
+            console.log("name_model", index);
+            const formData = new FormData();
+            formData.append("file", f);
+            this.$axios
+              .post("/manage/upload", formData)
+              .then((res) => {
+                this.row[file_models[index]] = f.name;
+                console.log(res.data);
+                return resolve(res);
+              })
+              .catch((err) => {
+                console.log(err);
+                return reject(err);
+              });
+          });
+        })
+      );
     },
     close() {
       this.$emit("close_dialog");
