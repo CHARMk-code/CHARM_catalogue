@@ -36,7 +36,11 @@ def test_and_set(field, data):
 def auth_token(request):
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        auth_token = auth_header.split(" ")[1]
+        split_token = auth_header.split(" ")
+        if len(split_token) != 2:
+            return (False, ('None, token supplied.', status.HTTP_401_UNAUTHORIZED))
+        auth_token = split_token[1]
+
     else:
         return (False, ('None, token supplied.', status.HTTP_401_UNAUTHORIZED))
     try:

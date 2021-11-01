@@ -90,6 +90,8 @@ The tags sheet is structure in a tree structure, where indentions indicates a su
 
 The Companies sheet is structured with columns A-J being metadata metadata, followed by a list of tags. The tag list is structured as if a company_A has tag_A then put TRUE(click the checkbox) cell where tag_A and company_A intersects.
 
+The Prepage sheet is very simple it each prepage with it three attributes. The first column specify what to show this page, second specify the image filename, third the order of the pages lower number first.
+
 ## Contribute
 
 In order to keep the improve code quality, all contributions such be peer review via a pull request before being push the master.
