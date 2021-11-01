@@ -17,7 +17,8 @@ export default {
       state.companies = companies;
     },
     removeCompany(state, id) {
-      state.companies.splice(state.companies.findIndex((c) => c.id == id));
+      console.log(state, id);
+      state.companies = state.companies.filter((c) => c.id != id);
     },
     removeAllCompanies(state) {
       state.companies = [];
@@ -43,10 +44,28 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
+        let copy_company = {}; // FIXME: Workaround for tags be undefined, which breaks backend
+        for (let key in company) {
+          copy_company[key] = company[key];
+        }
+        delete copy_company.tags;
         Vue.prototype.$axios
-          .put("/company", company)
+          .put("/company", copy_company)
           .then((resp) => {
             commit("modifyCompany", company);
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+    deleteCompany({ commit }, company) {
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/company/" + company.id)
+          .then((resp) => {
+            commit("removeCompany", company.id);
             resolve(resp);
           })
           .catch((err) => {
