@@ -95,9 +95,6 @@ export default {
   },
   methods: {
     save() {
-      console.log("this.row", this.row);
-      console.log("logo", this.files);
-      console.log("logo_info", this.test);
       this.uploadFiles(this.files).then(() => {
         this.$emit("save_row", this.row);
         this.close();
@@ -109,8 +106,6 @@ export default {
       return Promise.all(
         Object.values(files).map((f, index) => {
           return new Promise((resolve, reject) => {
-            console.log("f", f);
-            console.log("name_model", index);
             const formData = new FormData();
             formData.append("file", f);
             this.$axios
