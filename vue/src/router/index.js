@@ -7,6 +7,7 @@ import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
 import Login from "@/views/login";
 import Upload from "@/components/Upload";
+import Prepage from "@/components/Prepage";
 Vue.use(Router);
 
 export default new Router({
@@ -55,6 +56,11 @@ export default new Router({
       path: "/company/:name",
       name: "Company",
       component: Company_view,
+    },
+    {
+      path: "/prepages/:page",
+      name: "Prepage",
+      component: Prepage,
     },
     {
       path: "/login",
