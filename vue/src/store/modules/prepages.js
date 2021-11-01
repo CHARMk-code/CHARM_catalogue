@@ -58,12 +58,12 @@ export default {
           });
       });
     },
-    modifyPrepages({ commit }, prepages) {
+    modifyPrepage({ commit }, prepages) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/prepages", prepages)
+          .put("/prepage", prepages)
           .then((resp) => {
-            commit("modifyCompany", prepages);
+            commit("modifyPrepages", prepages);
             resolve(resp);
           })
           .catch((err) => {
