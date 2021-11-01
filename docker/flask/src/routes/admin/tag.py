@@ -51,16 +51,16 @@ def tag_put():
         return send_status(Tag.create(name,parent_tag,up_votes,down_votes,crowd_sourced,icon, division, business_area, looking_for))
     return send_status(tag.update(name, parent_tag, up_votes,down_votes, crowd_sourced, icon,division, business_area, looking_for))
 
-@blueprint.route("", methods=["DELETE"])
-def delete():
+@blueprint.route("<id>", methods=["DELETE"])
+def delete(id):
     result = auth_token(request)
     if not result[0]:
         return result[1]
 
-    request_data = request.get_json()
-    id = try_int(get_if_exist(request_data,"id"))
     tag = Tag.query.get(id)
-    return send_status(tag.delete())
+    if tag:
+        return send_status(tag.delete())
+    return "Failed", status.HTTP_400_BAD_REQUEST
 #  NOT USED
 #  @blueprint.route("/company/update", methods=["POST"])
 #  def tag_company_update():
