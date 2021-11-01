@@ -6,7 +6,7 @@ export default {
     prepages: [],
   }),
   mutations: {
-    modifyPrepages(state, prepage) {
+    modifyPrepage(state, prepage) {
       if (!state.prepages.some((p) => (p.id = prepage.id))) {
         state.prepages.push(prepage);
       } else {
@@ -16,8 +16,8 @@ export default {
     setPrepages(state, prepages) {
       state.prepages = prepages;
     },
-    removePrepages(state, id) {
-      state.prepages.splice(state.prepages.findIndex((p) => p.id == id));
+    removePrepage(state, id) {
+      state.prepages.filter((p) => p.id != id);
     },
     removeAllPrepages(state) {
       state.prepages = [];
@@ -41,12 +41,25 @@ export default {
           });
       });
     },
-    modifyPrepages({ commit }, prepages) {
+    modifyPrepage({ commit }, prepage) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/prepages", prepages)
+          .put("/prepages", prepage)
           .then((resp) => {
-            commit("modifyCompany", prepages);
+            commit("modifyPrepage", prepage);
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+    deletePrepage({ commit }, prepage) {
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .put("/prepages/" + prepage.id)
+          .then((resp) => {
+            commit("removePrepage", prepage.id);
             resolve(resp);
           })
           .catch((err) => {
