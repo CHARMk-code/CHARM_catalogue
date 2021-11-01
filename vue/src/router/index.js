@@ -8,6 +8,7 @@ import Companies from "@/views/admin/Companies";
 import Tags from "@/views/admin/Tags";
 import Login from "@/views/login";
 import Upload from "@/components/Upload";
+import Prepage_view from "@/views/admin/Prepage";
 
 Vue.use(Router);
 
@@ -34,6 +35,8 @@ const router = new Router({
       children: [
         {
           path: "prepages",
+          name: "Admin/Prepage",
+          component: Prepage_view,
         },
         {
           path: "companies",
