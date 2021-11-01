@@ -4,7 +4,7 @@ import sys
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
-from .helper_functions import auth_token, test_and_set
+from .helper_functions import test_and_set
 
 
 # Crowd:
