@@ -18,6 +18,7 @@ export default {
       links: [
         { name: "prepages", icon: "mdi-calendar" },
         { name: "companies", icon: "mdi-account-group" },
+        { name: "Tags", icon: "mdi-account-group" },
         { name: "maps", icon: "mdi-account" },
         { name: "layout", icon: "mdi-ticket" },
         { name: "batch", icon: "mdi-ticket" },

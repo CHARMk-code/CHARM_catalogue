@@ -43,12 +43,12 @@ export default {
           });
       });
     },
-    modifyTags({ commit }, tags) {
+    modifyTag({ commit }, tags) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/tags", tags)
+          .put("/tag", tags)
           .then((resp) => {
-            commit("modifyCompany", tags);
+            commit("modifyTag", tags);
             resolve(resp);
           })
           .catch((err) => {
@@ -57,5 +57,18 @@ export default {
       });
     },
   },
-  getters: {},
+  getters: {
+    getTagFromId: (state) => (id) => {
+      if (state.tags.length > 0) {
+        const result = state.tags.filter((t) => t.id == id);
+        if (result.length > 0) {
+          return result[0];
+        }
+      }
+      return [];
+    },
+    tags: (state) => {
+      return state.tags;
+    },
+  },
 };

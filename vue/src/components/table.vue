@@ -6,6 +6,7 @@
     :search="search"
     item-key="id"
     multi-sort
+    fixed-header
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -39,15 +40,14 @@
 
     <template v-if="editable" v-slot:item.actions="{ item }">
       <v-icon class="mr-2" @click="editRow(item)"> mdi-pencil </v-icon>
+      <slot name="extra_actions" :item="item"></slot>
     </template>
 
-    <template v-slot:item.active="{ item }">
-      <v-simple-checkbox
-        disabled
-        on-icon="mdi-eye"
-        off-icon="mdi-eye-off"
-        v-model="item.active"
-      ></v-simple-checkbox>
+    <template
+      v-for="field in Object.keys($scopedSlots)"
+      v-slot:[field]="{ item }"
+    >
+      <slot :name="field" :item="item" />
     </template>
   </v-data-table>
 </template>
