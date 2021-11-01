@@ -2,7 +2,9 @@
   <v-card>
     <v-card-title> Website </v-card-title>
     <v-card-text>
-      {{ website }}
+      <a :href="website">
+        {{ website }}
+      </a>
     </v-card-text>
   </v-card>
 </template>
