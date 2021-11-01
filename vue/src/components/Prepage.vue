@@ -64,6 +64,9 @@ export default {
   },
   beforeMount() {
     this.$store.dispatch("prepages/getPrepages");
+    if (parseInt(this.page) + 1 >= this.prepages.length) {
+      this.$router.push("/company/celllink"); // Replace with first filter company when avalible
+    }
   },
 };
 </script>
