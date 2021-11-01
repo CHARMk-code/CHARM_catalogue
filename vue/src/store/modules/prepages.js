@@ -4,6 +4,7 @@ export default {
   namespaced: true,
   state: () => ({
     prepages: [],
+    active_prepages: [],
   }),
   mutations: {
     modifyPrepage(state, prepage) {
@@ -17,7 +18,10 @@ export default {
       state.prepages = prepages;
     },
     removePrepage(state, id) {
-      state.prepages.filter((p) => p.id != id);
+      state.prepages = state.prepages.filter((p) => p.id != id);
+    },
+    setActive(state, prepages) {
+      state.active_prepages = prepages;
     },
     removeAllPrepages(state) {
       state.prepages = [];
@@ -33,6 +37,19 @@ export default {
             const prepages = resp.data;
             if (prepages.length > 0) {
               commit("setPrepages", prepages);
+              let filtered_prepages = prepages.filter(
+                (page) => page.active && page.image != null
+              );
+              filtered_prepages.sort((a, b) => {
+                if (a.order > b.order) {
+                  return 1;
+                } else if (a.order < b.order) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              });
+              commit("setActive", filtered_prepages);
             }
             resolve(resp);
           })
@@ -44,7 +61,7 @@ export default {
     modifyPrepage({ commit }, prepage) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/prepages", prepage)
+          .put("/prepage", prepage)
           .then((resp) => {
             commit("modifyPrepage", prepage);
             resolve(resp);
@@ -57,7 +74,7 @@ export default {
     deletePrepage({ commit }, prepage) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .put("/prepages/" + prepage.id)
+          .delete("/prepage/" + prepage.id)
           .then((resp) => {
             commit("removePrepage", prepage.id);
             resolve(resp);
@@ -68,5 +85,12 @@ export default {
       });
     },
   },
-  getters: {},
+  getters: {
+    get: (state) => {
+      return state.prepages;
+    },
+    getActive: (state) => {
+      return state.active_prepages;
+    },
+  },
 };
