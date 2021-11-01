@@ -77,6 +77,21 @@ def parseXlsx():
                     parent_tag = None
                 next_col = j
                 break
+            if (tags_sheet.cell_value(i+1,next_col)!=''):
+                if (next_col==NUMBER_OF_METADATA_COLS_TAG):
+                    parent_tag = None
+                continue
+            elif (next_col+1 < tags_sheet.ncols):
+                if (tags_sheet.cell_value(i+1,next_col+1)!=''):
+                    next_col += 1
+                    continue
+
+            for j in range(tags_sheet.ncols):
+                if tags_sheet.cell_value(i+1,j) != '':
+                    if (j==NUMBER_OF_METADATA_COLS_TAG):
+                        parent_tag = None
+                    next_col = j
+                    break
 
     # Generats companies
     companies_sheet = workbook.sheet_by_name("Companies")

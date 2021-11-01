@@ -9,7 +9,7 @@ export default {
   mutations: {
     modifyPrepages(state, prepage) {
       if (!state.prepages.some((p) => (p.id = prepage.id))) {
-        state.tags.push(prepage);
+        state.prepages.push(prepage);
       } else {
         state.prepages[state.prepages.findIndex((p) => p.id == prepage.id)];
       }

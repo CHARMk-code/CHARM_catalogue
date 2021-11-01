@@ -1,14 +1,14 @@
 from flask import Blueprint, request
 from flask_cors import CORS
 from ...helper_functions import *
-from ...models import Prepage, Tag
+from ...models import Prepage
 blueprint = Blueprint('prepage_admin', __name__, url_prefix='/api/prepage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 @blueprint.route("", methods=["PUT"])
 # @login_required
-def tag_put():
+def prepage_put():
     """
     PUT endpoint /api/prepage
 
@@ -34,7 +34,7 @@ def tag_put():
     return send_status(prepage.update(active, image,order))
 
 @blueprint.route("", methods=["DELETE"])
-def delete():
+def prepage_delete():
     result = auth_token(request)
     if not result[0]:
         return result[1]

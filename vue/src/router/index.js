@@ -5,18 +5,23 @@ import Company_view from "@/views/company";
 import Home from "@/components/Home";
 import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
+import Tags from "@/views/admin/Tags";
 import Login from "@/views/login";
 import Upload from "@/components/Upload";
 import Prepage from "@/components/Prepage";
+
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
   routes: [
     {
       path: "/",
       name: "Home",
       component: Home,
+      meta: {
+        noAuth: true,
+      },
     },
     //    {
     //      path: '/Search',
@@ -35,6 +40,11 @@ export default new Router({
           path: "companies",
           name: "Admin/Companies",
           component: Companies,
+        },
+        {
+          path: "tags",
+          name: "Admin/Tags",
+          component: Tags,
         },
         {
           path: "maps",
@@ -56,6 +66,9 @@ export default new Router({
       path: "/company/:name",
       name: "Company",
       component: Company_view,
+      meta: {
+        noAuth: true,
+      },
     },
     {
       path: "/prepages/:page",
@@ -66,6 +79,30 @@ export default new Router({
       path: "/login",
       name: "Login",
       component: Login,
+      meta: {
+        noAuth: true,
+      },
+      beforeEnter: (to, from, next) => {
+        if (router.app.$store.getters["auth/isLoggedIn"]) {
+          next("/");
+        } else {
+          next();
+        }
+      },
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => !record.meta.noAuth)) {
+    if (router.app.$store.getters["auth/isLoggedIn"]) {
+      next();
+      return;
+    }
+    next("/login");
+  } else {
+    next();
+  }
+});
+
+export default router;

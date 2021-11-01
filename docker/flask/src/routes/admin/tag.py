@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from flask_cors import CORS
+from ...models import Tag
 from ...helper_functions import *
 from ...models import Tag
 blueprint = Blueprint('tag_admin', __name__, url_prefix='/api/tag')
