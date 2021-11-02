@@ -2,6 +2,7 @@
   <v-container>
     <Table
       @save_edit="saveCompany"
+      @delete_row="deleteCompany"
       name="Companies"
       :headers="headers"
       :data="modified_companies"
@@ -135,7 +136,12 @@ export default {
           off_icon: "mdi-eye-off",
           label: "Active (required for row to be visible)",
         },
-        { type: "text", model: "name", label: "Company name" },
+        {
+          type: "text",
+          model: "name",
+          label: "Company name",
+          displayname: true,
+        },
         { type: "image", model: "logo", label: "Company Logo" },
         {
           type: "textarea",
@@ -198,6 +204,9 @@ export default {
   methods: {
     saveCompany(company) {
       this.$store.dispatch("companies/modifyCompany", company);
+    },
+    deleteCompany(company) {
+      this.$store.dispatch("companies/deleteCompany", company);
     },
     viewCompany(company) {
       this.$router.push("/company/" + company.name);

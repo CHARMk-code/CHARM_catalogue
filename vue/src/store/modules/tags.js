@@ -19,7 +19,7 @@ export default {
       state.tags = tags;
     },
     removeTag(state, id) {
-      state.tags.splice(state.tags.findIndex((t) => t.id == id));
+      state.tags = state.tags.filter((t) => t.id != id);
     },
     removeAllTags(state) {
       state.tags = [];
@@ -49,6 +49,19 @@ export default {
           .put("/tag", tags)
           .then((resp) => {
             commit("modifyTag", tags);
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+    deleteTag({ commit }, tags) {
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/tag/" + tags.id)
+          .then((resp) => {
+            commit("removeTag", tags.id);
             resolve(resp);
           })
           .catch((err) => {
