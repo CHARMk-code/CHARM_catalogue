@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Company_view from "@/views/company";
-//import Search from '@/components/Search'
+import Search_view from "@/views/search";
 import Home from "@/components/Home";
 import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
@@ -65,6 +65,14 @@ const router = new Router({
       path: "/company/:name",
       name: "Company",
       component: Company_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/search",
+      name: "Search",
+      component: Search_view,
       meta: {
         noAuth: true,
       },
