@@ -2,6 +2,7 @@
   <v-container>
     <Table
       @save_edit="savePrepage"
+      @delete_row="deletePrepage"
       name="Prepage"
       :headers="headers"
       :data="Array.from(this.prepages)"
@@ -52,7 +53,7 @@ export default {
       row_meta: [
         { type: "image", model: "icon", label: "page image" },
         { type: "checkbox", model: "active", label: "Active" },
-        { type: "text", model: "order", label: "Order" },
+        { type: "text", model: "order", label: "Order", displayname: true },
 
         //{ type: "file",model: "icon",label: "Tag Icon",},
       ],
@@ -63,8 +64,10 @@ export default {
   },
   methods: {
     savePrepage(prepage) {
-      console.log(prepage);
       this.$store.dispatch("prepages/modifyPrepage", prepage);
+    },
+    deletePrepage(prepage) {
+      this.$store.dispatch("prepages/deletePrepage", prepage);
     },
   },
   beforeMount() {

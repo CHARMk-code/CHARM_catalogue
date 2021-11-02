@@ -33,13 +33,13 @@ def prepage_put():
         return send_status(Prepage.create(active, image,order))
     return send_status(prepage.update(active, image,order))
 
-@blueprint.route("", methods=["DELETE"])
-def prepage_delete():
+@blueprint.route("<id>", methods=["DELETE"])
+def prepage_delete(id):
     result = auth_token(request)
     if not result[0]:
         return result[1]
 
-    request_data = request.get_json()
-    id = try_int(get_if_exist(request_data,"id"))
     prepage = Prepage.query.get(id)
-    return send_status(prepage.delete())
+    if prepage:
+        return send_status(prepage.delete())
+    return "Failed", status.HTTP_400_BAD_REQUEST

@@ -17,7 +17,7 @@ export default {
       state.companies = companies;
     },
     removeCompany(state, id) {
-      state.companies.splice(state.companies.findIndex((c) => c.id == id));
+      state.companies = state.companies.filter((c) => c.id != id);
     },
     removeAllCompanies(state) {
       state.companies = [];
@@ -43,10 +43,24 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
+        delete company.tags; // FIXME: Remove when #67 is fixed
         Vue.prototype.$axios
           .put("/company", company)
           .then((resp) => {
             commit("modifyCompany", company);
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+    deleteCompany({ commit }, company) {
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/company/" + company.id)
+          .then((resp) => {
+            commit("removeCompany", company.id);
             resolve(resp);
           })
           .catch((err) => {
