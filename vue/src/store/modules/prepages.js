@@ -4,6 +4,7 @@ export default {
   namespaced: true,
   state: () => ({
     prepages: [],
+    active_prepages: [],
   }),
   mutations: {
     modifyPrepages(state, prepage) {
@@ -15,6 +16,9 @@ export default {
     },
     setPrepages(state, prepages) {
       state.prepages = prepages;
+    },
+    setActive(state, prepages) {
+      state.active_prepages = prepages;
     },
     removePrepages(state, id) {
       state.prepages.splice(state.prepages.findIndex((p) => p.id == id));
@@ -33,6 +37,19 @@ export default {
             const prepages = resp.data;
             if (prepages.length > 0) {
               commit("setPrepages", prepages);
+              let filtered_prepages = prepages.filter(
+                (page) => page.active && page.image != null
+              );
+              filtered_prepages.sort((a, b) => {
+                if (a.order > b.order) {
+                  return 1;
+                } else if (a.order < b.order) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              });
+              commit("setActive", filtered_prepages);
             }
             resolve(resp);
           })
@@ -55,5 +72,12 @@ export default {
       });
     },
   },
-  getters: {},
+  getters: {
+    get: (state) => {
+      return state.prepages;
+    },
+    getActive: (state) => {
+      return state.active_prepages;
+    },
+  },
 };
