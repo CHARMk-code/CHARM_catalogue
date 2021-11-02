@@ -43,7 +43,6 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
-        delete company.tags; // FIXME: Remove when #67 is fixed
         Vue.prototype.$axios
           .put("/company", company)
           .then((resp) => {
