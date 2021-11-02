@@ -27,7 +27,7 @@
           label="Reenter password "
           required
         ></v-text-field>
-        <a v-if="password1 != password2"> Passwords doesn't match </a>
+        <template v-if="password1 != password2"> Passwords doesn't match </template>
         <v-btn
           block
           large
