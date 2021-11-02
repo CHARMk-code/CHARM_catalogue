@@ -29,8 +29,6 @@ export default {
 
           if (filterTags.length > 0) {
             filteredCompanies = filteredCompanies.filter((c) => {
-              console.log(c);
-              console.log(rootGetters);
               return c.tags
                 .map((id) => rootGetters["tags/getTagFromId"](id))
                 .some((companyTag) =>
