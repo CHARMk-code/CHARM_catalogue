@@ -10,10 +10,10 @@
       :editable="true"
     >
       <template v-slot:item.name="{ item }">
-        <a> {{ item.name }} </a>
+        {{ item.name }}
       </template>
       <template v-slot:item.order="{ item }">
-        <a> {{ item.order }} </a>
+        {{ item.order }}
       </template>
       <template v-slot:item.active="{ item }">
         <v-simple-checkbox
