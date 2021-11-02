@@ -16,13 +16,13 @@ export default {
   data() {
     return {
       links: [
-        { name: "prepages", icon: "mdi-calendar" },
+        { name: "prepages", icon: "mdi-book-open-page-variant" },
         { name: "companies", icon: "mdi-account-group" },
-        { name: "Tags", icon: "mdi-account-group" },
-        { name: "maps", icon: "mdi-account" },
-        { name: "layout", icon: "mdi-ticket" },
-        { name: "batch", icon: "mdi-ticket" },
-        { name: "account", icon: "mdi-ticket" },
+        { name: "Tags", icon: "mdi-tag-heart-outline" },
+        { name: "maps", icon: "mdi-map" },
+        { name: "layout", icon: "mdi-human-male-board" },
+        { name: "batch", icon: "mdi-tray-arrow-up" },
+        { name: "account", icon: "mdi-account" },
       ],
       routepath: "/admin/",
     };
