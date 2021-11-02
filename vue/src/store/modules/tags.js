@@ -9,10 +9,18 @@ export default {
   }),
   mutations: {
     modifyTag(state, tag) {
-      if (!state.tags.some((t) => (t.id = tag.id))) {
-        state.tags.push(tag);
+      // As division and/or business_area could be modify so we can't use removeTag
+      // and it easiest to just filter out all arrays and pushing the new tag
+      state.business_areas = state.business_areas.filter((t) => t.id != tag.id);
+      state.divisions = state.divisions.filter((t) => t.id != tag.id);
+      state.tags = state.tags.filter((t) => t.id != tag.id);
+
+      if (tag.business_area) {
+        state.business_areas.push(tag);
+      } else if (tag.division) {
+        state.divisions.push(tag);
       } else {
-        state.tags[state.tags.findIndex((t) => t.id == tag.id)];
+        state.tags.push(tag);
       }
     },
     setTags(state, tags) {
@@ -24,8 +32,17 @@ export default {
     setDivisions(state, tags) {
       state.divisions = tags;
     },
-    removeTag(state, id) {
-      state.tags.splice(state.tags.findIndex((t) => t.id == id));
+    removeTag(state, tag) {
+      // No point wasting cpu time filtering arrays were the tag won't be
+      if (tag.business_area) {
+        state.business_areas = state.business_areas.filter(
+          (t) => t.id != tag.id
+        );
+      } else if (tag.division) {
+        state.divisions = state.divisions.filter((t) => t.id != tag.id);
+      } else {
+        state.tags = state.tags.filter((t) => t.id != tag.id);
+      }
     },
     removeAllTags(state) {
       state.tags = [];
@@ -40,9 +57,10 @@ export default {
             commit("removeAllTags");
             const tags = resp.data;
             if (tags.length > 0) {
-              commit("setTags", tags);
-              // if tags such only contains tag not prefencent in business_areas or divisions
-              // commit("setTags", tags.filter((t) => !(t.business_area || t.division));
+              commit(
+                "setTags",
+                tags.filter((t) => !(t.business_area || t.division))
+              );
               commit(
                 "setBusinessAreas",
                 tags.filter((t) => t.business_area)
@@ -76,7 +94,7 @@ export default {
   getters: {
     getTagFromId: (state) => (id) => {
       if (state.tags.length > 0) {
-        const result = state.tags.filter((t) => t.id == id);
+        const result = state.all.filter((t) => t.id == id);
         if (result.length > 0) {
           return result[0];
         }
@@ -86,11 +104,14 @@ export default {
     tags: (state) => {
       return state.tags;
     },
-    division: (state) => {
-      return state.tags;
+    divisions: (state) => {
+      return state.divisions;
     },
-    business_area: (state) => {
-      return state.tags;
+    business_areas: (state) => {
+      return state.business_areas;
+    },
+    all: (state) => {
+      return state.tags.concat(state.divisions, state.business_areas);
     },
   },
 };

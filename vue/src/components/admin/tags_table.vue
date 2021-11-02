@@ -73,7 +73,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ tags: "tags/tags" }),
+    ...mapGetters({
+      tags: "tags/all",
+    }),
   },
   methods: {
     saveTag(tag) {
