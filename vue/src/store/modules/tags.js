@@ -18,6 +18,12 @@ export default {
     setTags(state, tags) {
       state.tags = tags;
     },
+    setBusinessAreas(state, tags) {
+      state.business_areas = tags;
+    },
+    setDivisions(state, tags) {
+      state.divisions = tags;
+    },
     removeTag(state, id) {
       state.tags.splice(state.tags.findIndex((t) => t.id == id));
     },
@@ -35,6 +41,16 @@ export default {
             const tags = resp.data;
             if (tags.length > 0) {
               commit("setTags", tags);
+              // if tags such only contains tag not prefencent in business_areas or divisions
+              // commit("setTags", tags.filter((t) => !(t.business_area || t.division));
+              commit(
+                "setBusinessAreas",
+                tags.filter((t) => t.business_area)
+              );
+              commit(
+                "setDivisions",
+                tags.filter((t) => t.division)
+              );
             }
             resolve(resp);
           })
@@ -68,6 +84,12 @@ export default {
       return [];
     },
     tags: (state) => {
+      return state.tags;
+    },
+    division: (state) => {
+      return state.tags;
+    },
+    business_area: (state) => {
       return state.tags;
     },
   },
