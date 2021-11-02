@@ -17,7 +17,6 @@ export default {
       state.companies = companies;
     },
     removeCompany(state, id) {
-      console.log(state, id);
       state.companies = state.companies.filter((c) => c.id != id);
     },
     removeAllCompanies(state) {
@@ -44,13 +43,9 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
-        let copy_company = {}; // FIXME: Workaround for tags be undefined, which breaks backend
-        for (let key in company) {
-          copy_company[key] = company[key];
-        }
-        delete copy_company.tags;
+        delete company.tags; // FIXME: Remove when #67 is fixed
         Vue.prototype.$axios
-          .put("/company", copy_company)
+          .put("/company", company)
           .then((resp) => {
             commit("modifyCompany", company);
             resolve(resp);
