@@ -292,16 +292,18 @@ class Prepage(db.Model):
     Reps a prepages
     """
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
     image = db.Column(db.String(100))
     order = db.Column(db.Integer)
     active = db.Column(db.Boolean)
 
     @staticmethod
-    def create( active,image, order, ):
+    def create( name,active,image, order ):
         try:
             if Prepage.query.filter_by(image=image).first():
                 return False
             new_prepage = Prepage(
+                name = name,
                 image = image,
                 order = order,
                 active = active
@@ -313,7 +315,8 @@ class Prepage(db.Model):
             return False
         return True
 
-    def update(self,  active,image, order,):
+    def update(self, name, active,image, order,):
+        self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active, active)
         self.image = test_and_set(self.image, image)
         self.order = test_and_set(self.order, order)
@@ -329,6 +332,7 @@ class Prepage(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'name': self.name,
             'image': self.image,
             'order': self.order,
             'active': self.active

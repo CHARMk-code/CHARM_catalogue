@@ -9,8 +9,11 @@
       :row_meta="row_meta"
       :editable="true"
     >
+      <template v-slot:item.name="{ item }">
+        {{ item.name }}
+      </template>
       <template v-slot:item.order="{ item }">
-        <a> {{ item.order }} </a>
+        {{ item.order }}
       </template>
       <template v-slot:item.active="{ item }">
         <v-simple-checkbox
@@ -38,6 +41,10 @@ export default {
       icon_url: "/api/manage/image/",
       headers: [
         {
+          text: "Name",
+          value: "name",
+        },
+        {
           text: "Order",
           value: "order",
         },
@@ -53,7 +60,8 @@ export default {
       row_meta: [
         { type: "image", model: "icon", label: "page image" },
         { type: "checkbox", model: "active", label: "Active" },
-        { type: "text", model: "order", label: "Order", displayname: true },
+        { type: "text", model: "order", label: "Order" },
+        { type: "text", model: "name", label: "Name", displayname: true },
 
         //{ type: "file",model: "icon",label: "Tag Icon",},
       ],
