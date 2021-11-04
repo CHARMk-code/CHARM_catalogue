@@ -21,8 +21,32 @@
         </v-row>
         <v-row>
           <v-col>
-            <BusinessAreas class="mb-6" :areas="company.business_area" />
-            <Tags :tags="company.tags" />
+            <!-- <BusinessAreas class="mb-6" :areas="company.business_area" /> -->
+            <Tags
+              :tags="company.tags"
+              name="Tags"
+              getter_target="tags/getTagsFromIds"
+            />
+            <Tags
+              :tags="company.tags"
+              name="Business Areas"
+              getter_target="tags/getBusinessAreasFromIds"
+            />
+            <Tags
+              :tags="company.tags"
+              name="Looking for"
+              getter_target="tags/getLookingForFromIds"
+            />
+            <Tags
+              :tags="company.tags"
+              name="Divisions"
+              getter_target="tags/getDivisionsFromIds"
+            />
+            <Tags
+              :tags="company.tags"
+              name="Offering"
+              getter_target="tags/getOffersFromIds"
+            />
           </v-col>
           <v-col>
             <Trivia
@@ -44,7 +68,7 @@
 
 <script>
 import Logo from "@/components/company/Logo";
-import BusinessAreas from "@/components/company/Business_area";
+// import BusinessAreas from "@/components/company/Business_area";
 import Trivia from "@/components/company/Trivia";
 import Contacts from "@/components/company/Contacts";
 import Description from "@/components/company/Description";
@@ -59,7 +83,7 @@ export default {
   components: {
     //Art,
     Logo,
-    BusinessAreas, //Tags?
+    //BusinessAreas, //Tags?
     Trivia, //Did you know...
     Contacts, //name, email, position?
     Description, //Company description
