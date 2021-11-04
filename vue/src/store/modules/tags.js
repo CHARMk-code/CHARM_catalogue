@@ -6,6 +6,7 @@ export default {
     tags: [],
     business_areas: [],
     divisions: [],
+    looking_fors: [],
   }),
   mutations: {
     modifyTag(state, tag) {
@@ -13,12 +14,15 @@ export default {
       // and it easiest to just filter out all arrays and pushing the new tag
       state.business_areas = state.business_areas.filter((t) => t.id != tag.id);
       state.divisions = state.divisions.filter((t) => t.id != tag.id);
+      state.looking_fors = state.looking_fors.filter((t) => t.id != tag.id);
       state.tags = state.tags.filter((t) => t.id != tag.id);
 
       if (tag.business_area) {
         state.business_areas.push(tag);
       } else if (tag.division) {
         state.divisions.push(tag);
+      } else if (tag.looking_for) {
+        state.looking_fors.push(tag);
       } else {
         state.tags.push(tag);
       }
@@ -32,6 +36,9 @@ export default {
     setDivisions(state, tags) {
       state.divisions = tags;
     },
+    setLookingFors(state, tags) {
+      state.looking_fors = tags;
+    },
     removeTag(state, tag) {
       // No point wasting cpu time filtering arrays were the tag won't be
       if (tag.business_area) {
@@ -40,6 +47,8 @@ export default {
         );
       } else if (tag.division) {
         state.divisions = state.divisions.filter((t) => t.id != tag.id);
+      } else if (tag.looking_for) {
+        state.looking_fors = state.looking_fors.filter((t) => t.id != tag.id);
       } else {
         state.tags = state.tags.filter((t) => t.id != tag.id);
       }
@@ -48,6 +57,7 @@ export default {
       state.tags = [];
       state.business_areas = [];
       state.divisions = [];
+      state.looking_fors = [];
     },
   },
   actions: {
@@ -70,6 +80,10 @@ export default {
               commit(
                 "setDivisions",
                 tags.filter((t) => t.division)
+              );
+              commit(
+                "setLookingFors",
+                tags.filter((t) => t.looking_for)
               );
             }
             resolve(resp);
@@ -116,6 +130,26 @@ export default {
       }
       return [];
     },
+    getTagsFromIds: (state) => (ids) => {
+      const result = state.tags.filter((t) => ids.indexOf(t.id) != -1);
+      return result;
+    },
+    getDivisionsFromIds: (state) => (ids) => {
+      const result = state.divisions.filter((t) => ids.indexOf(t.id) != -1);
+      return result;
+    },
+    getBusinessAreasFromIds: (state) => (ids) => {
+      const result = state.business_areas.filter(
+        (t) => ids.indexOf(t.id) != -1
+      );
+      return result;
+    },
+    getLookingForFromIds: (state) => (ids) => {
+      const result = state.looking_fors.filter((t) => ids.indexOf(t.id) != -1);
+      console.log(result);
+      return result;
+    },
+
     tags: (state) => {
       return state.tags;
     },
