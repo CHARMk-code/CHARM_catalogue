@@ -35,11 +35,21 @@
             :row_meta="row_meta"
           />
         </v-dialog>
+        <v-dialog persistent v-model="show_popup" max-width="500px">
+          <tablePop
+            @close_popup="closePop()"
+            @delete_row="deleteRow"
+            :row="editedRow"
+            :row_meta="row_meta"
+            :name="name"
+          />
+        </v-dialog>
       </v-toolbar>
     </template>
 
     <template v-if="editable" v-slot:item.actions="{ item }">
       <v-icon class="mr-2" @click="editRow(item)"> mdi-pencil </v-icon>
+      <v-icon class="mr-2" @click="openPop(item)">mdi-delete</v-icon>
       <slot name="extra_actions" :item="item"></slot>
     </template>
 
@@ -54,11 +64,13 @@
 
 <script>
 import tableEditDialog from "@/components/admin/table_edit_dialog";
+import tablePop from "@/components/admin/table_popup";
 
 export default {
   name: "Table",
   components: {
     tableEditDialog,
+    tablePop,
   },
   props: ["editable", "name", "headers", "data", "row_meta"],
   data() {
@@ -68,6 +80,7 @@ export default {
       dialog: false,
       creating: true,
       editedRow: {},
+      show_popup: false,
     };
   },
   methods: {
@@ -83,6 +96,16 @@ export default {
     },
     saveRow(row) {
       this.$emit("save_edit", row);
+    },
+    openPop(row) {
+      this.show_popup = true;
+      this.editedRow = row;
+    },
+    closePop() {
+      this.show_popup = false;
+    },
+    deleteRow(row) {
+      this.$emit("delete_row", row);
     },
   },
 };

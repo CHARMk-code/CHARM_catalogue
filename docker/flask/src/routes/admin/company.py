@@ -60,14 +60,16 @@ def company_put():
                 contacts, employs_sweden, employs_world, website, logo, tag_objs))
 
 
-@blueprint.route("",methods=["DELETE"])
-def company_delete():
+@blueprint.route("<id>",methods=["DELETE"])
+def company_delete(id):
     result = auth_token(request)
     if not result[0]:
         return result[1]
 
-    request_data = request.get_json()
 
-    id = get_if_exist(request_data,"id")
+    print(id,file=sys.stderr)
     company = Company.query.get(id)
-    return send_status(company.delete())
+    if company:
+        return send_status(company.delete())
+    else:
+        return "Failed", status.HTTP_400_BAD_REQUEST

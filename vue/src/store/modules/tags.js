@@ -46,6 +46,8 @@ export default {
     },
     removeAllTags(state) {
       state.tags = [];
+      state.business_areas = [];
+      state.divisions = [];
     },
   },
   actions: {
@@ -83,6 +85,19 @@ export default {
           .put("/tag", tags)
           .then((resp) => {
             commit("modifyTag", tags);
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+    deleteTag({ commit }, tags) {
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/tag/" + tags.id)
+          .then((resp) => {
+            commit("removeTag", tags.id);
             resolve(resp);
           })
           .catch((err) => {

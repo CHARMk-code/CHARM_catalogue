@@ -2,6 +2,7 @@
   <v-container>
     <Table
       @save_edit="saveTag"
+      @delete_row="deleteTag"
       name="Tags"
       :headers="headers"
       :data="Array.from(this.tags)"
@@ -64,7 +65,7 @@ export default {
       ],
       row_meta: [
         { type: "image", model: "icon", label: "tag icon" },
-        { type: "text", model: "name", label: "Tag name" },
+        { type: "text", model: "name", label: "Tag name", displayname: true },
         { type: "checkbox", model: "business_area", label: "Business area" },
         { type: "checkbox", model: "division", label: "division" },
         { type: "checkbox", model: "looking_for", label: "Looking for" },
@@ -80,6 +81,9 @@ export default {
   methods: {
     saveTag(tag) {
       this.$store.dispatch("tags/modifyTag", tag);
+    },
+    deleteTag(tag) {
+      this.$store.dispatch("tags/deleteTag", tag);
     },
   },
 };
