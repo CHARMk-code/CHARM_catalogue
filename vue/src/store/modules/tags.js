@@ -7,6 +7,7 @@ export default {
     business_areas: [],
     divisions: [],
     looking_fors: [],
+    offers: [],
   }),
   mutations: {
     modifyTag(state, tag) {
@@ -23,6 +24,8 @@ export default {
         state.divisions.push(tag);
       } else if (tag.looking_for) {
         state.looking_fors.push(tag);
+      } else if (tag.offering) {
+        state.offers.push(tag);
       } else {
         state.tags.push(tag);
       }
@@ -39,6 +42,9 @@ export default {
     setLookingFors(state, tags) {
       state.looking_fors = tags;
     },
+    setOffers(state, tags) {
+      state.offers = tags;
+    },
     removeTag(state, tag) {
       // No point wasting cpu time filtering arrays were the tag won't be
       if (tag.business_area) {
@@ -49,6 +55,8 @@ export default {
         state.divisions = state.divisions.filter((t) => t.id != tag.id);
       } else if (tag.looking_for) {
         state.looking_fors = state.looking_fors.filter((t) => t.id != tag.id);
+      } else if (tag.offers) {
+        state.offers = state.offers.filter((t) => t.id != tag.id);
       } else {
         state.tags = state.tags.filter((t) => t.id != tag.id);
       }
@@ -58,6 +66,7 @@ export default {
       state.business_areas = [];
       state.divisions = [];
       state.looking_fors = [];
+      state.offers = [];
     },
   },
   actions: {
@@ -71,7 +80,7 @@ export default {
             if (tags.length > 0) {
               commit(
                 "setTags",
-                tags.filter((t) => !(t.business_area || t.division))
+                tags.filter((t) => !(t.business_area || t.division || t.looking_for || t.offering))
               );
               commit(
                 "setBusinessAreas",
@@ -84,6 +93,10 @@ export default {
               commit(
                 "setLookingFors",
                 tags.filter((t) => t.looking_for)
+              );
+              commit(
+                "setOffers",
+                tags.filter((t) => t.offering)
               );
             }
             resolve(resp);
@@ -146,7 +159,10 @@ export default {
     },
     getLookingForFromIds: (state) => (ids) => {
       const result = state.looking_fors.filter((t) => ids.indexOf(t.id) != -1);
-      console.log(result);
+      return result;
+    },
+    getOffersFromIds: (state) => (ids) => {
+      const result = state.offers.filter((t) => ids.indexOf(t.id) != -1);
       return result;
     },
 
@@ -159,6 +175,13 @@ export default {
     business_areas: (state) => {
       return state.business_areas;
     },
+    looking_fors: (state) => {
+      return state.looking_fors;
+    },
+    offers: (state) => {
+      return state.offers;
+    },
+
     all: (state) => {
       return state.tags.concat(state.divisions, state.business_areas);
     },

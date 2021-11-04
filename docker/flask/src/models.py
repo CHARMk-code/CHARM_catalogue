@@ -170,9 +170,10 @@ class Tag(db.Model):
     division = db.Column(db.Boolean)
     business_area = db.Column(db.Boolean)
     looking_for = db.Column(db.Boolean)
+    offering = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -185,7 +186,8 @@ class Tag(db.Model):
                 icon = icon,
                 division = division,
                 business_area = business_area,
-                looking_for = looking_for
+                looking_for = looking_for,
+                offering = offering
             )
             db.session.add(new_tag)
             db.session.commit()
@@ -193,7 +195,7 @@ class Tag(db.Model):
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
@@ -204,6 +206,7 @@ class Tag(db.Model):
             self.division = test_and_set(self.division, division)
             self.business_area = test_and_set(self.business_area, business_area)
             self.looking_for = test_and_set(self.looking_for, looking_for)
+            self.offering = test_and_set(self.offering, offering)
             db.session.commit()
             return True
         except:
@@ -228,7 +231,8 @@ class Tag(db.Model):
             'icon': self.icon,
             'division': self.division,
             'business_area': self.business_area,
-            'looking_for': self.looking_for
+            'looking_for': self.looking_for,
+            'offering': self.offering
         }
 
 class Tag_company(db.Model):

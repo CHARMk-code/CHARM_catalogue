@@ -103,7 +103,7 @@ export default {
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
-        offering: [],
+        offering: this.$store.getters["tags/getOffersFromIds"](c.tags),
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
           c.tags
         ),
