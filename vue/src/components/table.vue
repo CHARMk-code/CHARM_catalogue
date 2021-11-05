@@ -4,6 +4,7 @@
     :items="data"
     class="elevation-1"
     :search="search"
+    @click:row="onRowClick"
     item-key="id"
     multi-sort
     fixed-header
@@ -106,6 +107,9 @@ export default {
     },
     deleteRow(row) {
       this.$emit("delete_row", row);
+    },
+    onRowClick(row) {
+      this.$emit("click_row", row);
     },
   },
 };
