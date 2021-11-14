@@ -6,6 +6,7 @@
       :headers="headers"
       :data="modifiedFilteredCompanies"
       :editable="false"
+      @click_row="onRowClick"
     >
       <template v-slot:item.website="{ item }">
         <a :href="item.website">{{ item.website }}</a>
@@ -88,6 +89,16 @@ export default {
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
       return modified;
+    },
+  },
+  methods: {
+    tagsFromIDs(tags) {
+      return tags.map((id) => {
+        return this.$store.getters["tags/getTagFromId"](id);
+      });
+    },
+    onRowClick(row) {
+      this.$router.push("/company/" + row.name);
     },
   },
 };
