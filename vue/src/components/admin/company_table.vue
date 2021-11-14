@@ -27,35 +27,35 @@
       </template>
 
       <template v-slot:item.tags="{ item }">
-        <template v-for="tag in tagsFromIDs(item.tags)">
+        <template v-for="tag in item.tags">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
         </template>
       </template>
       <template v-slot:item.divisions="{ item }">
-        <template v-for="tag in tagsFromIDs(item.divisions)">
+        <template v-for="tag in item.divisions">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
         </template>
       </template>
       <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in tagsFromIDs(item.looking_for)">
+        <template v-for="tag in item.looking_for">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
         </template>
       </template>
       <template v-slot:item.offering="{ item }">
-        <template v-for="tag in tagsFromIDs(item.offering)">
+        <template v-for="tag in item.offering">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
         </template>
       </template>
       <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in tagsFromIDs(item.business_area)">
+        <template v-for="tag in item.business_areas">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
@@ -96,34 +96,25 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ companies: "companies/companies", tags: "tags/tags" }),
+    ...mapGetters({
+      companies: "companies/companies",
+      tags: "tags/tags",
+      divisions: "tags/divisions",
+      looking_for: "tags/looking_fors",
+      business_areas: "tags/business_areas",
+      offerings: "tags/offers",
+    }),
     modified_companies() {
       const companies = Array.from(this.companies);
       const modified = companies.map((c) => ({
         ...c,
-        divisions: c.tags
-          .map((id) => this.$store.getters["tags/getTagFromId"](id))
-          .filter((t) => t.division)
-          .map((t) => t.id),
-        looking_for: c.tags
-          .map((id) => this.$store.getters["tags/getTagFromId"](id))
-          .filter((t) => t.looking_for)
-          .map((t) => t.id),
-        offering: c.tags
-          .map((id) => this.$store.getters["tags/getTagFromId"](id))
-          .filter((t) => t.offering)
-          .map((t) => t.id),
-        business_area: c.tags
-          .map((id) => this.$store.getters["tags/getTagFromId"](id))
-          .filter((t) => t.business_area)
-          .map((t) => t.id),
-        tags: c.tags
-          .map((id) => this.$store.getters["tags/getTagFromId"](id))
-          .filter(
-            (t) =>
-              !(t.divisions || t.looking_for || t.offering || t.business_area)
-          )
-          .map((t) => t.id),
+        divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
+        looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
+        offering: this.$store.getters["tags/getOffersFromIds"](c.tags),
+        business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
+          c.tags
+        ),
+        tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
       return modified;
     },
@@ -165,36 +156,40 @@ export default {
         {
           type: "select",
           model: "divisions",
-          items: this.tags
-            .filter((t) => t.division)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.divisions.map((t) => ({
+            text: t.name,
+            value: t.id,
+          })),
           label: "Divisions",
           hint: "Programs the company are interested in",
         },
         {
           type: "select",
           model: "looking_for",
-          items: this.tags
-            .filter((t) => t.looking_for)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.looking_for.map((t) => ({
+            text: t.name,
+            value: t.id,
+          })),
           label: "Looking For",
           hint: "Which level of education the company is looking for",
         },
         {
           type: "select",
           model: "business_area",
-          items: this.tags
-            .filter((t) => t.business_area)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.business_areas.map((t) => ({
+            text: t.name,
+            value: t.id,
+          })),
           label: "Business areas",
           hint: "The companys business areas",
         },
         {
           type: "select",
           model: "offering",
-          items: this.tags
-            .filter((t) => t.offering)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.offerings.map((t) => ({
+            text: t.name,
+            value: t.id,
+          })),
           label: "offering",
           hint: "Which type of jobs the company is offering",
         },
@@ -210,11 +205,6 @@ export default {
     },
     viewCompany(company) {
       this.$router.push("/company/" + company.name);
-    },
-    tagsFromIDs(tags) {
-      return tags.map((id) => {
-        return this.$store.getters["tags/getTagFromId"](id);
-      });
     },
   },
 };

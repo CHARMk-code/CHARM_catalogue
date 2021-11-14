@@ -1,7 +1,7 @@
 <template>
   <v-card>
-    <v-card-title> Tags </v-card-title>
-    <v-card-content>
+    <v-card-title> {{ name }} </v-card-title>
+    <v-card-text>
       <template v-for="tag in tags_data">
         <v-btn
           :icon="tag.icon != ''"
@@ -24,19 +24,17 @@
           </template>
         </v-btn>
       </template>
-    </v-card-content>
+    </v-card-text>
   </v-card>
 </template>
 
 <script>
 export default {
   name: "Company_Tags",
-  props: ["tags"],
+  props: ["tags", "name", "getter_target"],
   computed: {
     tags_data() {
-      return this.tags.map((id) =>
-        this.$store.getters["tags/getTagFromId"](id)
-      );
+      return this.$store.getters[this.getter_target](this.tags);
     },
   },
 };
