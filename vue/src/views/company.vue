@@ -2,7 +2,9 @@
   <v-main>
     <v-sheet v-if="company != undefined">
       <v-container>
-        <v-btn v-on:click="editRow(company)" v-if="isLoggedIn"> Edit </v-btn>
+        <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
+          Edit
+        </v-btn>
         <v-dialog persistent v-model="dialog" max-width="900px">
           <tableEditDialog
             @close_dialog="closeDialog()"
