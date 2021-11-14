@@ -23,6 +23,7 @@ def prepage_put():
 
     request_data = request.get_json()
     id = try_int(get_if_exist(request_data,"id"))
+    name = get_if_exist(request_data,"name")
     active = get_if_exist(request_data, "active")
     image = get_if_exist(request_data, "image")
     order = get_if_exist(request_data, "order")
@@ -30,8 +31,8 @@ def prepage_put():
     prepage = Prepage.query.get(id)
     if not prepage:
 
-        return send_status(Prepage.create(active, image,order))
-    return send_status(prepage.update(active, image,order))
+        return send_status(Prepage.create(name,active, image,order))
+    return send_status(prepage.update(name,active, image,order))
 
 @blueprint.route("<id>", methods=["DELETE"])
 def prepage_delete(id):

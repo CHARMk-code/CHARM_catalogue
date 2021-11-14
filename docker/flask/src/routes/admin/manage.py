@@ -129,7 +129,7 @@ def parseXlsx():
     # Prepages
     prepages_sheet = workbook.sheet_by_name("Prepages")
     for i in range(1,prepages_sheet.nrows):
-        prepage = Prepage.query.filter_by(image=prepages_sheet.cell_value(i,1)).first()
+        prepage = Prepage.query.filter_by(name=prepages_sheet.cell_value(i,0)).first()
 
         data = list(map(lambda x: x.value, prepages_sheet.row(i)))
         if not prepage:
