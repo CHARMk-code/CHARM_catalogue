@@ -8,6 +8,7 @@ import Companies from "@/views/admin/Companies";
 import Tags from "@/views/admin/Tags";
 import Login from "@/views/login";
 import Upload from "@/components/Upload";
+import Account from "@/components/admin/Account";
 import Prepage_view from "@/views/admin/Prepage";
 import Prepage from "@/components/Prepage";
 
@@ -62,6 +63,8 @@ const router = new Router({
         },
         {
           path: "account",
+          name: "Account",
+          component: Account,
         },
       ],
     },

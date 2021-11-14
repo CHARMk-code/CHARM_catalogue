@@ -9,6 +9,12 @@ let config = {
   withCredentials: true, // Check cross-site Access-Control
 };
 
+// If we are in a local dev env then change config to match
+if (location.hostname == "localhost") {
+  delete config.withCredentials;
+  config.baseURL = "http://localhost:5008/api";
+}
+
 const _axios = axios.create(config);
 
 _axios.interceptors.request.use(

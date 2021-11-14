@@ -30,7 +30,7 @@ def imageLoad(request):
 
 def parseXlsx():
     NUMBER_OF_METADATA_COLS_COMPANY = 10
-    NUMBER_OF_METADATA_COLS_TAG = 4
+    NUMBER_OF_METADATA_COLS_TAG = 5
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -48,16 +48,12 @@ def parseXlsx():
     for i in range(1,tags_sheet.nrows):
         row = tags_sheet.row(i)
         tag = Tag.query.filter_by(name=row[next_col].value).first()
-
-        icon = row[0].value
-        division = row[1].value
-        business_area = row[2].value
-        looking_for = row[3].value
+        metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
         if not tag: # No tag exists
-            Tag.create(row[next_col].value,parent_tag,1,1,False,icon,division,business_area,looking_for)
+            Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
             parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
         else:
-            tag.update(row[next_col].value,parent_tag,1,1,False,icon,division,business_area,looking_for)
+            tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
             parent_tag = tag.id
 
         if (i+1 >= tags_sheet.nrows):
@@ -129,7 +125,7 @@ def parseXlsx():
     # Prepages
     prepages_sheet = workbook.sheet_by_name("Prepages")
     for i in range(1,prepages_sheet.nrows):
-        prepage = Prepage.query.filter_by(image=prepages_sheet.cell_value(i,1)).first()
+        prepage = Prepage.query.filter_by(name=prepages_sheet.cell_value(i,0)).first()
 
         data = list(map(lambda x: x.value, prepages_sheet.row(i)))
         if not prepage:
