@@ -18,9 +18,18 @@
       <template v-slot:item.looking_for="{ item }">
         <v-simple-checkbox disabled v-model="item.looking_for" />
       </template>
+      <template v-slot:item.offering="{ item }">
+        <v-simple-checkbox disabled v-model="item.offering" />
+      </template>
 
       <template v-slot:item.icon="{ item }">
-        <v-img :src="icon_url + item.icon" />
+        <v-avatar>
+          <v-img
+            max-height="36px"
+            max-width="36px"
+            :src="icon_url + item.icon"
+          />
+        </v-avatar>
       </template>
     </Table>
   </v-container>
@@ -58,7 +67,7 @@ export default {
         {
           text: "Actions",
           value: "actions",
-          width: 80,
+          width: 100,
           align: "center",
           sortable: false,
         },
@@ -67,9 +76,9 @@ export default {
         { type: "image", model: "icon", label: "tag icon" },
         { type: "text", model: "name", label: "Tag name", displayname: true },
         { type: "checkbox", model: "business_area", label: "Business area" },
-        { type: "checkbox", model: "division", label: "division" },
+        { type: "checkbox", model: "division", label: "Division" },
         { type: "checkbox", model: "looking_for", label: "Looking for" },
-        //{ type: "file",model: "icon",label: "Tag Icon",},
+        { type: "checkbox", model: "offering", label: "Offering" },
       ],
     };
   },

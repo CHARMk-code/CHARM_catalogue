@@ -89,7 +89,7 @@ export default {
           text: "Actions",
           value: "actions",
           align: "center",
-          width: 100,
+          width: 130,
           sortable: false,
         },
       ],
