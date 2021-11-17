@@ -1,8 +1,10 @@
+#!/bin/bash
+dir=$(pwd)
 docker run \
                                   --rm \
                                   -e SONAR_HOST_URL="http://77.107.46.93:9000" \
                                   -e SONAR_LOGIN=${SONAR_TOKEN} \
-  -v "/home/frennish/projects/CHARM/anyass:/usr/src" \
+  -v "${dir}:/usr/src" \
   --network=host\
                                   sonarsource/sonar-scanner-cli
 
