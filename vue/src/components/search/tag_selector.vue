@@ -1,5 +1,14 @@
 <template>
-  <v-select multiple chips @change="onChange" :label="label" :items="tags">
+  <v-select
+    multiple
+    chips
+    return-object
+    item-text="name"
+    item-value="id"
+    @change="onChange"
+    :label="label"
+    :items="tags"
+  >
     <template v-slot:item="{ item, attrs }">
       <v-simple-checkbox :value="attrs.inputValue" />
       <v-img
@@ -9,7 +18,7 @@
         max-width="36px"
         :src="'/api/manage/image/' + item.icon"
       />
-      {{ item.text }}
+      {{ item.name }}
     </template>
 
     <template v-slot:selection="{ item }">

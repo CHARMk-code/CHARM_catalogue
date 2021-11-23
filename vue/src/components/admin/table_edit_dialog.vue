@@ -39,10 +39,30 @@
               chips
               :key="col.model"
               v-model="row[col.model]"
+              item-text="name"
+              item-value="id"
+              return-object
               :items="col.items"
               :label="col.label"
               :hint="col.hint"
-            />
+            >
+              <template v-slot:selection="{ item }">
+                <template v-if="item.icon != ''">
+                  <v-avatar>
+                    <v-img
+                      max-height="32px"
+                      max-width="32px"
+                      :src="'/api/manage/image/' + item.icon"
+                    />
+                  </v-avatar>
+                </template>
+                <template v-else>
+                  <v-chip small>
+                    {{ item.name }}
+                  </v-chip>
+                </template>
+              </template>
+            </v-select>
           </template>
 
           <template v-if="col.type == 'image'">

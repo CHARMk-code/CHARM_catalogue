@@ -8,24 +8,24 @@
       <v-col cols="5">
         <tagSelector
           @change="(v) => (selected_tags.divisions = v)"
-          :tags="tags.divisions"
+          :tags="tag_divisions"
           label="Programs"
         />
         <tagSelector
           @change="(v) => (selected_tags.business_areas = v)"
-          :tags="tags.business_areas"
+          :tags="tag_business_areas"
           label="Business area"
         />
       </v-col>
       <v-col cols="5">
         <tagSelector
           @change="(v) => (selected_tags.looking_for = v)"
-          :tags="tags.looking_for"
+          :tags="tag_looking_for"
           label="Looking for"
         />
         <tagSelector
           @change="(v) => (selected_tags.offering = v)"
-          :tags="tags.offering"
+          :tags="tag_offerings"
           label="Offering"
         />
       </v-col>
@@ -46,7 +46,7 @@ export default {
     return {
       query: "",
       selected_tags: {
-        divisions: new Array(),
+        divisions: [],
         looking_for: [],
         business_areas: [],
         offering: [],
@@ -58,6 +58,10 @@ export default {
       companies: "companies/companies",
       allTags: "tags/tags",
       filteredCompanies: "filter/getFilteredCompanies",
+      tag_divisions: "tags/divisions",
+      tag_business_areas: "tags/business_areas",
+      tag_looking_for: "tags/looking_fors",
+      tag_offerings: "tags/offers",
     }),
     tags() {
       return {
