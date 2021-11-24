@@ -15,12 +15,7 @@
             {{ tag.name }}
           </template>
           <template>
-            <v-img
-              large
-              class="pa-0"
-              contain
-              :src="'/api/manage/image/' + tag.icon"
-            />
+            <v-img large class="pa-0" contain :src="base_URL + tag.icon" />
           </template>
         </v-btn>
       </template>
@@ -29,12 +24,16 @@
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "Company_Tags",
   props: ["tags", "name", "getter_target"],
   computed: {
     tags_data() {
       return this.$store.getters[this.getter_target](this.tags);
+    },
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
   },
 };

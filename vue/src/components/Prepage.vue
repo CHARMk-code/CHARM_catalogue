@@ -24,19 +24,25 @@
               <v-icon x-large>mdi-arrow-right</v-icon>
             </v-chip>
           </v-btn>
-
-          <img style="margin: auto" :src="src_base + prepages[page].image" />
+          <img
+            style="margin: auto"
+            :src="base_URL + '/manage/image/' + prepages[page].image"
+          />
         </v-sheet>
       </v-col>
     </v-row>
-  </v-container>
+  </v-main>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import Vue from "vue";
 export default {
   name: "Prepage",
   computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL;
+    },
     page() {
       return this.$route.params.page;
     },
@@ -44,11 +50,6 @@ export default {
       prepages: "prepages/getActive",
       filteredCompanies: "filter/filteredCompanies",
     }),
-  },
-  data() {
-    return {
-      src_base: "/manage/image/",
-    };
   },
   methods: {
     next() {
