@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <Header :search_disabled="search_disabled" />
+    <Header />
     <router-view />
   </v-app>
 </template>
