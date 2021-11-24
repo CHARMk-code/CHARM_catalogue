@@ -2,7 +2,6 @@ import Vue from "vue";
 import Router from "vue-router";
 import Company_view from "@/views/company";
 import Search_view from "@/views/search";
-import Home from "@/components/Home";
 import Administration from "@/views/Administration";
 import Companies from "@/views/admin/Companies";
 import Tags from "@/views/admin/Tags";
@@ -10,6 +9,8 @@ import Login from "@/views/login";
 import Upload from "@/components/Upload";
 import Account from "@/components/admin/Account";
 import Prepage_view from "@/views/admin/Prepage";
+import Home_view from "@/views/Home";
+
 import Prepage from "@/components/Prepage";
 
 Vue.use(Router);
@@ -20,7 +21,7 @@ const router = new Router({
     {
       path: "/",
       name: "Home",
-      component: Home,
+      component: Home_view,
       meta: {
         noAuth: true,
       },
@@ -77,7 +78,6 @@ const router = new Router({
       },
     },
     {
-
       path: "/search",
       name: "Search",
       component: Search_view,
@@ -90,8 +90,8 @@ const router = new Router({
       name: "Prepage",
       component: Prepage,
       meta: {
-        noAuth :true,
-      }
+        noAuth: true,
+      },
     },
     {
       path: "/login",
