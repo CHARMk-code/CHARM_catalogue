@@ -38,7 +38,6 @@ export default {
   },
   data() {
     return {
-      icon_url: "/api/manage/image/",
       headers: [
         {
           text: "Name",
@@ -52,7 +51,7 @@ export default {
         {
           text: "Actions",
           value: "actions",
-          width: 80,
+          width: 100,
           align: "center",
           sortable: false,
         },

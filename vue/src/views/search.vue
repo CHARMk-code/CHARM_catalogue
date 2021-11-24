@@ -21,9 +21,20 @@
       </template>
       <template v-slot:item.divisions="{ item }">
         <template v-for="tag in item.divisions">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
+          <template v-if="tag.icon != ''">
+            <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
+              <v-img
+                max-height="32px"
+                max-width="32px"
+                :src="'/api/manage/image/' + tag.icon"
+              />
+            </v-avatar>
+          </template>
+          <template v-else>
+            <v-chip small :key="tag.id">
+              {{ item.name }}
+            </v-chip>
+          </template>
         </template>
       </template>
       <template v-slot:item.looking_for="{ item }">
