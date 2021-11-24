@@ -2,7 +2,7 @@
   <v-app-bar color="white" app clipped-left>
     <v-row fill-height>
       <v-col class="flex-grow-0 flex-shrink-1" justify="start">
-        <router-link to="/1">
+        <router-link to="/">
           <img class="logo" src="@/assets/CHARM_logo.png" />
         </router-link>
       </v-col>
