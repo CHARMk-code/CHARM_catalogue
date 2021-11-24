@@ -16,7 +16,7 @@
         contain
         max-height="36px"
         max-width="36px"
-        :src="'/api/manage/image/' + item.icon"
+        :src="base_URL + item.icon"
       />
       {{ item.name }}
     </template>

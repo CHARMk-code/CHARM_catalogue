@@ -52,7 +52,7 @@
                     <v-img
                       max-height="32px"
                       max-width="32px"
-                      :src="'/api/manage/image/' + item.icon"
+                      :src="base_URL + item.icon"
                     />
                   </v-avatar>
                 </template>
