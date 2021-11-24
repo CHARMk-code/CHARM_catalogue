@@ -47,7 +47,7 @@ export default {
   },
   data() {
     return {
-      src_base: "/manage/image/",
+      src_base: "/api/manage/image/",
     };
   },
   methods: {
