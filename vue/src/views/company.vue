@@ -111,7 +111,13 @@ export default {
     tableEditDialog,
   },
   computed: {
-    ...mapGetters({ isLoggedIn: "auth/isLoggedIn" }),
+    ...mapGetters({
+      isLoggedIn: "auth/isLoggedIn",
+      divisions: "tags/divisions",
+      looking_for: "tags/looking_fors",
+      business_areas: "tags/business_areas",
+      offerings: "tags/offers",
+    }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](
         this.$route.params.name
@@ -165,36 +171,28 @@ export default {
         {
           type: "select",
           model: "divisions",
-          items: this.tags
-            .filter((t) => t.division)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.divisions,
           label: "Divisions",
           hint: "Programs the company are interested in",
         },
         {
           type: "select",
           model: "looking_for",
-          items: this.tags
-            .filter((t) => t.looking_for)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.looking_for,
           label: "Looking For",
           hint: "Which level of education the company is looking for",
         },
         {
           type: "select",
           model: "business_area",
-          items: this.tags
-            .filter((t) => t.business_area)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.business_areas,
           label: "Business areas",
           hint: "The companys business areas",
         },
         {
           type: "select",
           model: "offering",
-          items: this.tags
-            .filter((t) => t.offering)
-            .map((t) => ({ text: t.name, value: t.id })),
+          items: this.offerings,
           label: "offering",
           hint: "Which type of jobs the company is offering",
         },

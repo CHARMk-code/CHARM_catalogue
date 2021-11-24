@@ -22,22 +22,22 @@
         <v-icon class="mr-2" @click="viewCompany(item)"> mdi-book-open </v-icon>
       </template>
 
-      <template v-slot:item.website="{ item }">
-        <a :href="item.website">{{ item.website }}</a>
-      </template>
-
-      <template v-slot:item.tags="{ item }">
-        <template v-for="tag in item.tags">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
       <template v-slot:item.divisions="{ item }">
         <template v-for="tag in item.divisions">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
+          <template v-if="tag.icon != ''">
+            <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
+              <v-img
+                max-height="32px"
+                max-width="32px"
+                :src="'/api/manage/image/' + tag.icon"
+              />
+            </v-avatar>
+          </template>
+          <template v-else>
+            <v-chip small :key="tag.id">
+              {{ item.name }}
+            </v-chip>
+          </template>
         </template>
       </template>
       <template v-slot:item.looking_for="{ item }">
@@ -55,7 +55,7 @@
         </template>
       </template>
       <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_areas">
+        <template v-for="tag in item.business_area">
           <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
             tag.name
           }}</v-chip>
@@ -78,18 +78,16 @@ export default {
     return {
       headers: [
         { text: "Name", value: "name" },
-        { text: "Website", value: "website" },
         { text: "Programs", value: "divisions" },
         { text: "Business areas", value: "business_area" },
         { text: "Looking for", value: "looking_for" },
         { text: "offering", value: "offering" },
-        { text: "Other tags", value: "" },
         { text: "Active", value: "active", align: "center", width: 110 },
         {
           text: "Actions",
           value: "actions",
           align: "center",
-          width: 100,
+          width: 130,
           sortable: false,
         },
       ],
@@ -156,40 +154,28 @@ export default {
         {
           type: "select",
           model: "divisions",
-          items: this.divisions.map((t) => ({
-            text: t.name,
-            value: t.id,
-          })),
+          items: this.divisions,
           label: "Divisions",
           hint: "Programs the company are interested in",
         },
         {
           type: "select",
           model: "looking_for",
-          items: this.looking_for.map((t) => ({
-            text: t.name,
-            value: t.id,
-          })),
+          items: this.looking_for,
           label: "Looking For",
           hint: "Which level of education the company is looking for",
         },
         {
           type: "select",
           model: "business_area",
-          items: this.business_areas.map((t) => ({
-            text: t.name,
-            value: t.id,
-          })),
+          items: this.business_areas,
           label: "Business areas",
-          hint: "The companys business areas",
+          hint: "The companys' business areas",
         },
         {
           type: "select",
           model: "offering",
-          items: this.offerings.map((t) => ({
-            text: t.name,
-            value: t.id,
-          })),
+          items: this.offerings,
           label: "offering",
           hint: "Which type of jobs the company is offering",
         },
