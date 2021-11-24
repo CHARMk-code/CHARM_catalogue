@@ -25,10 +25,7 @@
             </v-chip>
           </v-btn>
 
-          <img
-            style="margin: auto"
-            :src="src_base + prepages[parseInt(page)].image"
-          />
+          <img style="margin: auto" :src="src_base + prepages[page].image" />
         </v-sheet>
       </v-col>
     </v-row>
@@ -43,17 +40,21 @@ export default {
     page() {
       return this.$route.params.page;
     },
-    ...mapGetters({ prepages: "prepages/getActive" }),
+    ...mapGetters({
+      prepages: "prepages/getActive",
+      filteredCompanies: "filter/filteredCompanies",
+    }),
   },
   data() {
     return {
-      src_base: "http://localhost:5008/api/manage/image/",
+      src_base: "/manage/image/",
     };
   },
   methods: {
     next() {
       if (parseInt(this.page) + 1 >= this.prepages.length) {
-        this.$router.push("/company/celllink"); // Replace with first filter company when avalible
+        this.$store.dispatch("filter/filterCompanies");
+        this.$router.push("/company/" + this.filteredCompanies[0].name);
       } else {
         this.$router.push("/prepages/" + (parseInt(this.page) + 1));
       }
