@@ -47,7 +47,7 @@ export default {
   },
   data() {
     return {
-      src_base: "http://localhost:5008/api/manage/image/",
+      src_base: "/manage/image/",
     };
   },
   methods: {
