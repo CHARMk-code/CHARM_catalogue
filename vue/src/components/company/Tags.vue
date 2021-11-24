@@ -21,7 +21,7 @@
               class="pa-0"
               max-height="36px"
               max-width="36px"
-              :src="'/api/manage/image/' + tag.icon"
+              :src="base_URL + tag.icon"
             />
           </v-avatar>
         </template>
@@ -31,12 +31,16 @@
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "Company_Tags",
   props: ["tags", "name", "getter_target"],
   computed: {
     tags_data() {
       return this.$store.getters[this.getter_target](this.tags);
+    },
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
   },
 };

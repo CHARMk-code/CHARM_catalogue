@@ -1,14 +1,15 @@
 <template>
-  <v-img :src="src_base + src" max-height="150" max-width="500" />
+  <v-img :src="base_URL + src" max-height="150" max-width="500" />
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "Company_logo",
-  data() {
-    return {
-      src_base: "/api/manage/image/",
-    };
+  computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
   },
   props: ["src"],
 };
