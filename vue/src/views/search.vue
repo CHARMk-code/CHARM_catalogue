@@ -6,6 +6,7 @@
       :headers="headers"
       :data="modifiedFilteredCompanies"
       :editable="false"
+      hide_search="true"
       @click_row="onRowClick"
     >
       <template v-slot:item.website="{ item }">
@@ -111,6 +112,9 @@ export default {
     onRowClick(row) {
       this.$router.push("/company/" + row.name);
     },
+  },
+  beforeMount() {
+    this.$store.dispatch("filter/filterCompanies");
   },
 };
 </script>

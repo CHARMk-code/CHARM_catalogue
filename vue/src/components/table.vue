@@ -9,7 +9,7 @@
     multi-sort
     fixed-header
   >
-    <template v-slot:top>
+    <template v-if="!hide_search" v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>{{ name }}</v-toolbar-title>
         <v-spacer />
@@ -73,7 +73,7 @@ export default {
     tableEditDialog,
     tablePop,
   },
-  props: ["editable", "name", "headers", "data", "row_meta"],
+  props: ["editable", "name", "headers", "data", "row_meta", "hide_search"],
   data() {
     return {
       search: "",
