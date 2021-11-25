@@ -80,7 +80,15 @@ export default {
             if (tags.length > 0) {
               commit(
                 "setTags",
-                tags.filter((t) => !(t.business_area || t.division || t.looking_for || t.offering))
+                tags.filter(
+                  (t) =>
+                    !(
+                      t.business_area ||
+                      t.division ||
+                      t.looking_for ||
+                      t.offering
+                    )
+                )
               );
               commit(
                 "setBusinessAreas",
