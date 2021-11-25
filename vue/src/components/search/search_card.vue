@@ -1,37 +1,71 @@
 <template>
   <v-container>
-    <v-row>
-      <v-text-field prepend-icon="mdi-magnify" v-model="query" />
-    </v-row>
-    <v-row>
-      <v-spacer />
-      <v-col cols="5">
-        <tagSelector
-          @change="(v) => (selected_tags.divisions = v)"
-          :tags="tag_divisions"
-          label="Programs"
-        />
-        <tagSelector
-          @change="(v) => (selected_tags.business_areas = v)"
-          :tags="tag_business_areas"
-          label="Business area"
-        />
-      </v-col>
-      <v-col cols="5">
-        <tagSelector
-          @change="(v) => (selected_tags.looking_for = v)"
-          :tags="tag_looking_for"
-          label="Looking for"
-        />
-        <tagSelector
-          @change="(v) => (selected_tags.offering = v)"
-          :tags="tag_offerings"
-          label="Offering"
-        />
-      </v-col>
-      <v-spacer />
-    </v-row>
-    <v-btn @click="search">Search </v-btn>
+    <v-sheet fluid elevation="1">
+      <v-card-title> Search </v-card-title>
+
+      <v-card-text>
+        <v-row class="px-2">
+          <v-text-field
+            prepend-icon="mdi-magnify"
+            v-model="query"
+            @input="search"
+          />
+          <v-btn x-large class="ml-6 mt-2" icon
+            ><v-icon large @click="expand = !expand"
+              >{{ expand ? "mdi-chevron-up" : "mdi-chevron-down" }}
+            </v-icon></v-btn
+          >
+        </v-row>
+        <v-expand-transition>
+          <v-row v-show="expand">
+            <v-col cols="6">
+              <tagSelector
+                @change="
+                  (v) => {
+                    selected_tags.divisions = v;
+                    search();
+                  }
+                "
+                :tags="tag_divisions"
+                label="Programs"
+              />
+              <tagSelector
+                @change="
+                  (v) => {
+                    selected_tags.business_areas = v;
+                    search();
+                  }
+                "
+                :tags="tag_business_areas"
+                label="Business area"
+              />
+            </v-col>
+            <v-col cols="6">
+              <tagSelector
+                @change="
+                  (v) => {
+                    selected_tags.looking_for = v;
+                    search();
+                  }
+                "
+                :tags="tag_looking_for"
+                label="Looking for"
+              />
+              <tagSelector
+                @change="
+                  (v) => {
+                    selected_tags.offerings = v;
+                    search();
+                  }
+                "
+                :tags="tag_offerings"
+                label="Offering"
+              />
+            </v-col>
+          </v-row>
+        </v-expand-transition>
+      </v-card-text>
+    </v-sheet>
   </v-container>
 </template>
 
@@ -44,12 +78,13 @@ export default {
   components: { tagSelector },
   data() {
     return {
+      expand: false,
       query: "",
       selected_tags: {
         divisions: [],
         looking_for: [],
         business_areas: [],
-        offering: [],
+        offerings: [],
       },
     };
   },
@@ -65,18 +100,10 @@ export default {
     }),
     tags() {
       return {
-        divisions: this.allTags
-          .filter((t) => t.division)
-          .map((t) => ({ text: t.name, icon: t.icon, value: t.id })),
-        looking_for: this.allTags
-          .filter((t) => t.looking_for)
-          .map((t) => ({ text: t.name, icon: t.icon, value: t.id })),
-        business_areas: this.allTags
-          .filter((t) => t.business_area)
-          .map((t) => ({ text: t.name, icon: t.icon, value: t.id })),
-        offering: this.allTags
-          .filter((t) => t.offering)
-          .map((t) => ({ text: t.name, icon: t.icon, value: t.id })),
+        divisions: this.tag_divisions,
+        looking_for: this.tag_looking_for,
+        business_areas: this.tag_business_areas,
+        offerings: this.tag_offerings,
       };
     },
   },
@@ -86,6 +113,7 @@ export default {
       this.selected_tags[key] = event;
     },
     search() {
+      console.log("search");
       this.$store.dispatch("filter/setFilters", {
         query: this.query,
         tags: this.selected_tags,

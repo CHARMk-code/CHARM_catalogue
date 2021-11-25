@@ -1,64 +1,66 @@
 <template>
   <v-main>
-    <searchCard />
-    <Table
-      name="Results"
-      :headers="headers"
-      :data="modifiedFilteredCompanies"
-      :editable="false"
-      @click_row="onRowClick"
-    >
-      <template v-slot:item.website="{ item }">
-        <a :href="item.website">{{ item.website }}</a>
-      </template>
-
-      <template v-slot:item.tags="{ item }">
-        <template v-for="tag in item.tags">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.divisions="{ item }">
-        <template v-for="tag in item.divisions">
-          <template v-if="tag.icon != ''">
-            <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
-              <v-img
-                max-height="32px"
-                max-width="32px"
-                :src="'/api/manage/image/' + tag.icon"
-              />
-            </v-avatar>
+    <v-container>
+      <v-row>
+        <searchCard />
+        <Table
+          class="mx-auto"
+          noSearch="true"
+          name="Results"
+          :headers="headers"
+          :data="modifiedFilteredCompanies"
+          :editable="false"
+          @click_row="onRowClick"
+        >
+          <template v-slot:item.tags="{ item }">
+            <template v-for="tag in item.tags">
+              <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+                tag.name
+              }}</v-chip>
+            </template>
           </template>
-          <template v-else>
-            <v-chip small :key="tag.id">
-              {{ item.name }}
-            </v-chip>
+          <template v-slot:item.divisions="{ item }">
+            <template v-for="tag in item.divisions">
+              <template v-if="tag.icon != ''">
+                <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
+                  <v-img
+                    max-height="32px"
+                    max-width="32px"
+                    :src="'/api/manage/image/' + tag.icon"
+                  />
+                </v-avatar>
+              </template>
+              <template v-else>
+                <v-chip small :key="tag.id">
+                  {{ item.name }}
+                </v-chip>
+              </template>
+            </template>
           </template>
-        </template>
-      </template>
-      <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in item.looking_for">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.offering="{ item }">
-        <template v-for="tag in item.offering">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_area">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-    </Table>
+          <template v-slot:item.looking_for="{ item }">
+            <template v-for="tag in item.looking_for">
+              <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+                tag.name
+              }}</v-chip>
+            </template>
+          </template>
+          <template v-slot:item.offering="{ item }">
+            <template v-for="tag in item.offerings">
+              <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+                tag.name
+              }}</v-chip>
+            </template>
+          </template>
+          <template v-slot:item.business_area="{ item }">
+            <template v-for="tag in item.business_area">
+              <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+                tag.name
+              }}</v-chip>
+            </template>
+          </template>
+        </Table>
+      </v-row>
+    </v-container>
   </v-main>
 </template>
 
@@ -76,12 +78,10 @@ export default {
     return {
       headers: [
         { text: "Name", value: "name" },
-        { text: "Website", value: "website" },
         { text: "Programs", value: "divisions" },
         { text: "Business areas", value: "business_area" },
         { text: "Looking for", value: "looking_for" },
         { text: "offering", value: "offering" },
-        { text: "Other tags", value: "" },
       ],
     };
   },
@@ -93,7 +93,7 @@ export default {
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
-        offering: [],
+        offerings: this.$store.getters["tags/getOffersFromIds"](c.tags),
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
           c.tags
         ),

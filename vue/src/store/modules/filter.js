@@ -7,7 +7,7 @@ export default {
         divisions: [],
         looking_for: [],
         business_areas: [],
-        offering: [],
+        offerings: [],
       },
     },
     filteredCompanies: [],
