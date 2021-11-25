@@ -1,6 +1,27 @@
 <template>
   <v-main>
     <v-sheet v-if="company != undefined">
+      <v-btn
+        class="prev navigation"
+        v-on:click="prev()"
+        v-if="currentIndex > 0"
+        icon
+      >
+        <v-chip x-large>
+          <v-icon x-large>mdi-arrow-left</v-icon>
+        </v-chip>
+      </v-btn>
+
+      <v-btn
+        class="next navigation"
+        v-on:click="next()"
+        v-if="currentIndex < maxIndex - 1"
+        icon
+      >
+        <v-chip x-large>
+          <v-icon x-large>mdi-arrow-right</v-icon>
+        </v-chip>
+      </v-btn>
       <v-container>
         <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
           Edit
@@ -113,6 +134,7 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedIn: "auth/isLoggedIn",
+      filteredCompanies: "filter/filteredCompanies",
       divisions: "tags/divisions",
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
@@ -129,6 +151,12 @@ export default {
         console.log("No match");
         return undefined;
       }
+    },
+    currentIndex() {
+      return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
+    },
+    maxIndex() {
+      return this.filteredCompanies.length;
     },
     tags() {
       return this.company.tags;
@@ -213,10 +241,39 @@ export default {
     saveRow(row) {
       this.$store.dispatch("companies/modifyCompany", row);
     },
+    next() {
+      this.$router.push(
+        "/company/" + this.filteredCompanies[this.currentIndex + 1].name
+      );
+    },
+    prev() {
+      this.$router.push(
+        "/company/" + this.filteredCompanies[this.currentIndex - 1].name
+      );
+    },
   },
   beforeCreate() {
     this.$store.dispatch("companies/getCompanies"); //move somewhere else
     this.$store.dispatch("tags/getTags"); //move somewhere else
   },
+  beforeMount() {
+    this.$store.dispatch("filter/filterCompanies");
+  },
 };
 </script>
+<style scoped>
+.navigation {
+  text-decoration: none;
+  margin: 20px;
+  position: absolute;
+  top: 50%;
+  z-index: 9999;
+}
+.navigation > * {
+  top: -50%;
+}
+.next {
+  right: 5%;
+}
+</style>
+
