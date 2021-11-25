@@ -37,8 +37,8 @@ def company_put():
     trivia = get_if_exist(request_data,"trivia")
     founded = get_if_exist(request_data,"founded")
     contacts = get_if_exist(request_data,"contacts")
-    employs_sweden = get_if_exist(request_data,"employs_sweden")
-    employs_world = get_if_exist(request_data,"employs_world")
+    employees_sweden = get_if_exist(request_data,"employees_sweden")
+    employees_world = get_if_exist(request_data,"employees_world")
     website = get_if_exist(request_data, "website")
     logo = get_if_exist(request_data, "logo")
     tags = get_if_exist(request_data, "tags")
@@ -52,12 +52,12 @@ def company_put():
     if not id:
 
         return send_status(Company.create(name,active,description, trivia,
-            founded, contacts, employs_sweden, employs_world, website,logo, tag_objs))
+            founded, contacts, employees_sweden, employees_world, website,logo, tag_objs))
 
     company = Company.query.get(id)
 
     return send_status(company.update(name,active, description,  trivia, founded,
-                contacts, employs_sweden, employs_world, website, logo, tag_objs))
+                contacts, employees_sweden, employees_world, website, logo, tag_objs))
 
 
 @blueprint.route("<id>",methods=["DELETE"])
