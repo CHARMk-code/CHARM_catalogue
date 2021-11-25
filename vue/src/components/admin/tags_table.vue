@@ -27,7 +27,7 @@
           <v-img
             max-height="36px"
             max-width="36px"
-            :src="icon_url + item.icon"
+            :src="base_URL + item.icon"
           />
         </v-avatar>
       </template>
@@ -38,6 +38,7 @@
 <script>
 import Table from "@/components/table";
 import { mapGetters } from "vuex";
+import Vue from "vue";
 
 export default {
   name: "tags_table",
@@ -46,7 +47,6 @@ export default {
   },
   data() {
     return {
-      icon_url: "/api/manage/image/",
       headers: [
         { text: "Icon", value: "icon", sortable: false },
         { text: "Name", value: "name" },
@@ -86,6 +86,9 @@ export default {
     ...mapGetters({
       tags: "tags/all",
     }),
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
   },
   methods: {
     saveTag(tag) {

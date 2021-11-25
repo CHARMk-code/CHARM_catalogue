@@ -52,7 +52,7 @@
                     <v-img
                       max-height="32px"
                       max-width="32px"
-                      :src="'/api/manage/image/' + item.icon"
+                      :src="base_URL + item.icon"
                     />
                   </v-avatar>
                 </template>
@@ -71,7 +71,7 @@
                 <v-col>
                   <v-img
                     v-if="row[col.model] != undefined"
-                    :src="tag_icon_base_url + row[col.model]"
+                    :src="base_URL + row[col.model]"
                     max-height="100"
                     max-width="300"
                     contain
@@ -103,12 +103,17 @@
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "table_edit_dialog",
   props: ["name", "row", "row_meta", "new"],
+  computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
+  },
   data() {
     return {
-      tag_icon_base_url: "/api/manage/image/", //Might be a different URL later
       files: {},
       test: [],
     };

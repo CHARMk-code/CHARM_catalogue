@@ -29,7 +29,7 @@
               <v-img
                 max-height="32px"
                 max-width="32px"
-                :src="'/api/manage/image/' + tag.icon"
+                :src="base_URL + tag.icon"
               />
             </v-avatar>
           </template>
@@ -68,7 +68,7 @@
 <script>
 import Table from "@/components/table";
 import { mapGetters } from "vuex";
-
+import Vue from "vue";
 export default {
   name: "companies_table",
   components: {
@@ -94,6 +94,9 @@ export default {
     };
   },
   computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
     ...mapGetters({
       companies: "companies/companies",
       tags: "tags/tags",
