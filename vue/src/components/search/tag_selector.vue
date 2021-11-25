@@ -17,7 +17,7 @@
           contain
           max-height="36px"
           max-width="36px"
-          :src="'/api/manage/image/' + item.icon"
+          :src="base_URL + item.icon"
         />
       </template>
       {{ item.name }}
@@ -29,7 +29,7 @@
           <v-img
             max-height="36px"
             max-width="36px"
-            :src="'/api/manage/image/' + item.icon"
+            :src="base_URL + item.icon"
           />
         </v-avatar>
       </template>
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "Tag_selector",
   props: {
@@ -53,6 +54,11 @@ export default {
   methods: {
     onChange(v) {
       this.$emit("change", v);
+    },
+  },
+  computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
   },
 };

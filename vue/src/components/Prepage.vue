@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-main>
     <v-row>
       <v-col>
         <v-sheet
@@ -24,36 +24,38 @@
               <v-icon x-large>mdi-arrow-right</v-icon>
             </v-chip>
           </v-btn>
-
           <img
             style="margin: auto"
-            :src="src_base + prepages[parseInt(page)].image"
+            :src="base_URL + '/manage/image/' + prepages[page].image"
           />
         </v-sheet>
       </v-col>
     </v-row>
-  </v-container>
+  </v-main>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import Vue from "vue";
 export default {
   name: "Prepage",
   computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL;
+    },
     page() {
       return this.$route.params.page;
     },
-    ...mapGetters({ prepages: "prepages/getActive" }),
-  },
-  data() {
-    return {
-      src_base: "/api/manage/image/",
-    };
+    ...mapGetters({
+      prepages: "prepages/getActive",
+      filteredCompanies: "filter/filteredCompanies",
+    }),
   },
   methods: {
     next() {
       if (parseInt(this.page) + 1 >= this.prepages.length) {
-        this.$router.push("/company/celllink"); // Replace with first filter company when avalible
+        this.$store.dispatch("filter/filterCompanies");
+        this.$router.push("/company/" + this.filteredCompanies[0].name);
       } else {
         this.$router.push("/prepages/" + (parseInt(this.page) + 1));
       }
