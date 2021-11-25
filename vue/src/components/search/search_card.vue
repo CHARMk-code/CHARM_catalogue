@@ -109,11 +109,9 @@ export default {
   },
   methods: {
     updateSelected(key, event) {
-      console.log(event);
       this.selected_tags[key] = event;
     },
     search() {
-      console.log("search");
       this.$store.dispatch("filter/setFilters", {
         query: this.query,
         tags: this.selected_tags,
