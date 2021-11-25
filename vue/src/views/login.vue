@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <Login />
+    <Login class="mt-4" />
   </v-main>
 </template>
 
