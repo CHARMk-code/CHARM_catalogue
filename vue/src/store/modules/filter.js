@@ -3,7 +3,12 @@ export default {
   state: () => ({
     filters: {
       query: "",
-      tags: { divisions: [], looking_for: [], business_area: [], offering: [] },
+      tags: {
+        divisions: [],
+        looking_for: [],
+        business_areas: [],
+        offering: [],
+      },
     },
     filteredCompanies: [],
   }),
@@ -29,11 +34,9 @@ export default {
 
           if (filterTags.length > 0) {
             filteredCompanies = filteredCompanies.filter((c) => {
-              return c.tags
-                .map((id) => rootGetters["tags/getTagFromId"](id))
-                .some((companyTag) =>
-                  filterTags.some((filterTag) => companyTag.id == filterTag)
-                );
+              return c.tags.some((t) =>
+                filterTags.some((filterTag) => t == filterTag.id)
+              );
             });
           }
         }

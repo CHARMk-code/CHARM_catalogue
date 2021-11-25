@@ -43,6 +43,14 @@ export default {
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {
+        company = {
+          ...company,
+          tags: company.looking_for
+            .map((o) => o.id)
+            .concat(company.offering.map((o) => o.id))
+            .concat(company.divisions.map((o) => o.id))
+            .concat(company.business_area.map((o) => o.id)),
+        };
         Vue.prototype.$axios
           .put("/company", company)
           .then((resp) => {

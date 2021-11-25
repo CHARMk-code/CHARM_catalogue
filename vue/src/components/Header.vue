@@ -1,34 +1,34 @@
 <template>
   <v-app-bar color="white" app clipped-left>
-    <v-row>
-      <v-col class="pa-0 pt-2 pl-6">
-        <router-link to="/1">
+    <v-row fill-height>
+      <v-col class="flex-grow-0 flex-shrink-1" justify="start">
+        <router-link to="/">
           <img class="logo" src="@/assets/CHARM_logo.png" />
         </router-link>
       </v-col>
-
-      <v-col class="pa-0 pt-3 pr-6">
-        <router-link
-          style="text-decoration: none; color: inherit; float: right"
+      <v-col class="flex-grow-1 flex-shrink-1 mt-4" justify="center">
+        <v-btn
+          class="white"
           v-for="link in links"
           :key="link.name"
           :to="link.route"
+          depressed
         >
-          <v-btn icon>
-            <v-icon large>{{ link.icon }}</v-icon>
-          </v-btn>
-        </router-link>
+          {{ link.name }}
+          <v-icon right>{{ link.icon }}</v-icon>
+        </v-btn>
+      </v-col>
+      <v-col class="flex-grow-0 flex-shrink-1 mt-4" justify="end">
+        <v-btn
+          color="primary"
+          v-on:click="logout"
+          v-if="this.$store.getters['auth/isLoggedIn']"
+          depressed
+        >
+          Logout
+        </v-btn>
       </v-col>
     </v-row>
-    <v-spacer />
-    <v-btn
-      color="primary"
-      class="mt-4"
-      v-on:click="logout"
-      v-if="this.$store.getters['auth/isLoggedIn']"
-    >
-      Logout
-    </v-btn>
   </v-app-bar>
 </template>
 
@@ -36,12 +36,6 @@
 export default {
   name: "Header",
   components: {},
-  props: {
-    search_disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data() {
     return {
       links: [{ name: "Search", route: "/search", icon: "mdi-magnify" }],
@@ -58,28 +52,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.header-inner {
-  background: black;
-  padding-left: 80px;
-  padding-right: 80px;
-  padding-top: 15px;
-}
-
 .logo {
   height: 60px;
   padding: 6.5px 1px;
-}
-
-header > div {
-  display: flex;
-  justify-content: space-between;
-}
-p {
-  color: white;
-  font-size: 2em;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>
