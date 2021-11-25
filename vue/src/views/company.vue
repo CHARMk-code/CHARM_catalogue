@@ -259,6 +259,7 @@ export default {
   beforeCreate() {
     this.$store.dispatch("companies/getCompanies"); //move somewhere else
     this.$store.dispatch("tags/getTags"); //move somewhere else
+    this.$store.dispatch("filter/filterCompanies");
   },
 };
 </script>
