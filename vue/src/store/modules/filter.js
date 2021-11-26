@@ -41,6 +41,7 @@ export default {
             });
           }
         }
+        filteredCompanies = filteredCompanies.filter((t) => t.active);
       }
       if (state.filters.favorites) {
         filteredCompanies = filteredCompanies.filter((t) =>
