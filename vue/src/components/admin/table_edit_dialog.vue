@@ -25,6 +25,19 @@
             />
           </template>
 
+          <template v-if="col.type == 'number'">
+            <v-text-field
+              :key="col.model"
+              v-model.number="row[col.model]"
+              :label="col.label"
+              :rules="[
+                (v) => {
+                  Number.isInteger(v);
+                },
+              ]"
+            />
+          </template>
+
           <template v-if="col.type == 'textarea'">
             <v-textarea
               :key="col.model"
