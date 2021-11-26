@@ -56,7 +56,15 @@ export default {
     },
   },
   getters: {
-    isLoggedIn: (state) => !!state.token,
+    isLoggedIn: (state) => {
+      try {
+        const expired = JSON.parse(atob(state.token.split(".")[1])).exp;
+        const currentTime = Math.floor(Date.now() / 1000);
+        return currentTime < expired;
+      } catch (e) {
+        return false;
+      }
+    },
     authStatus: (state) => state.status,
     token: (state) => state.token,
   },
