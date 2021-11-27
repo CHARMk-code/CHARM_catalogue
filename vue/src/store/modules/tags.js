@@ -1,4 +1,5 @@
 import Vue from "vue";
+const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export default {
   namespaced: true,
@@ -8,6 +9,7 @@ export default {
     divisions: [],
     looking_fors: [],
     offers: [],
+    load_wait: 0,
   }),
   mutations: {
     modifyTag(state, tag) {
@@ -71,48 +73,51 @@ export default {
   },
   actions: {
     getTags({ commit }) {
-      return new Promise((resolve, reject) => {
-        Vue.prototype.$axios
-          .get("/tag")
-          .then((resp) => {
-            commit("removeAllTags");
-            const tags = resp.data;
-            if (tags.length > 0) {
-              commit(
-                "setTags",
-                tags.filter(
-                  (t) =>
-                    !(
-                      t.business_area ||
-                      t.division ||
-                      t.looking_for ||
-                      t.offering
-                    )
-                )
-              );
-              commit(
-                "setBusinessAreas",
-                tags.filter((t) => t.business_area)
-              );
-              commit(
-                "setDivisions",
-                tags.filter((t) => t.division)
-              );
-              commit(
-                "setLookingFors",
-                tags.filter((t) => t.looking_for)
-              );
-              commit(
-                "setOffers",
-                tags.filter((t) => t.offering)
-              );
-            }
-            resolve(resp);
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      });
+      if (this.state.tags.load_wait < Date.now()) {
+        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+        return new Promise((resolve, reject) => {
+          Vue.prototype.$axios
+            .get("/tag")
+            .then((resp) => {
+              commit("removeAllTags");
+              const tags = resp.data;
+              if (tags.length > 0) {
+                commit(
+                  "setTags",
+                  tags.filter(
+                    (t) =>
+                      !(
+                        t.business_area ||
+                        t.division ||
+                        t.looking_for ||
+                        t.offering
+                      )
+                  )
+                );
+                commit(
+                  "setBusinessAreas",
+                  tags.filter((t) => t.business_area)
+                );
+                commit(
+                  "setDivisions",
+                  tags.filter((t) => t.division)
+                );
+                commit(
+                  "setLookingFors",
+                  tags.filter((t) => t.looking_for)
+                );
+                commit(
+                  "setOffers",
+                  tags.filter((t) => t.offering)
+                );
+              }
+              resolve(resp);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      }
     },
     modifyTag({ commit }, tags) {
       return new Promise((resolve, reject) => {
