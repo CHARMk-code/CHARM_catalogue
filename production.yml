@@ -2,6 +2,7 @@ version: "3"
 services:
   flask:
     build: ./docker/flask
+    restart: unless-stopped
     ports:
       - "5008:5000"
     depends_on:
@@ -26,6 +27,7 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
   vue:
     build: vue
+    restart: unless-stopped
     ports:
       - "8080:3000"
     volumes:
