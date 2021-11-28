@@ -9,6 +9,7 @@ export default {
         business_areas: [],
         offerings: [],
       },
+      favorites: false,
     },
     filteredCompanies: [],
   }),
@@ -40,6 +41,11 @@ export default {
             });
           }
         }
+      }
+      if (state.filters.favorites) {
+        filteredCompanies = filteredCompanies.filter((t) =>
+          rootGetters["company_meta/favorites"].has(t.id)
+        );
       }
       commit("setFilteredCompanies", filteredCompanies);
     },

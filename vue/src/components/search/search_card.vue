@@ -62,6 +62,11 @@
                 label="Offering"
               />
             </v-col>
+            <v-checkbox
+              @change="search()"
+              label="Favorites"
+              v-model="favorites"
+            />
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -86,6 +91,7 @@ export default {
         business_areas: [],
         offerings: [],
       },
+      favorites: false,
     };
   },
   computed: {
@@ -115,6 +121,7 @@ export default {
       this.$store.dispatch("filter/setFilters", {
         query: this.query,
         tags: this.selected_tags,
+        favorites: this.favorites,
       });
       this.$store.dispatch("filter/filterCompanies");
     },

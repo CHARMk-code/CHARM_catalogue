@@ -44,6 +44,25 @@
           <v-col>
             <div class="text-h2 font-weight-regular">{{ company.name }}</div>
           </v-col>
+          <v-col>
+            <v-hover v-model="favHover">
+              <v-checkbox
+                @change="favoriteChange"
+                v-model="favorite"
+                on-icon="mdi-star"
+                off-icon="mdi-star-outline"
+              />
+            </v-hover>
+            <template v-if="favHover">
+              <span>
+                Find this company interesting why not favorite them to make it
+                easier to find again. (This is stored in your browser so, they
+                won't be there if you switch browser or clears your cache. This
+                also means we don't see what company you favorite (your data is
+                your :) )</span
+              >
+            </template>
+          </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -114,7 +133,7 @@ import { mapGetters } from "vuex";
 export default {
   name: "Company_View",
   data() {
-    return { dialog: false };
+    return { dialog: false, favHover: false, favorite: false };
   },
   components: {
     //Art,
@@ -139,6 +158,7 @@ export default {
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
       offerings: "tags/offers",
+      isInFavorites: "company_meta/isInFavorites",
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](
@@ -251,12 +271,27 @@ export default {
         "/company/" + this.filteredCompanies[this.currentIndex - 1].name
       );
     },
+    favoriteChange() {
+      if (this.favorite) {
+        this.$store.commit("company_meta/addFavorite", this.company.id);
+      } else {
+        this.$store.commit("company_meta/removeFavorite", this.company.id);
+      }
+    },
+  },
+  watch: {
+    company: function (company) {
+      this.favorite = this.$store.getters["company_meta/favorites"].has(
+        company.id
+      );
+    },
   },
   beforeCreate() {
     this.$store.dispatch("companies/getCompanies"); //move somewhere else
     this.$store.dispatch("tags/getTags"); //move somewhere else
   },
   beforeMount() {
+    this.$store.commit("company_meta/loadForStorage");
     this.$store.dispatch("filter/filterCompanies");
   },
 };
