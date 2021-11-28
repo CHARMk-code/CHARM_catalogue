@@ -47,7 +47,7 @@
         </v-row>
         <v-row>
           <v-col>
-            <Description :desc="company.description" />
+            <Textblock :body="company.description" />
           </v-col>
           <v-col>
             <!--<Maps />-->
@@ -93,6 +93,10 @@
           <v-col>
             <Contacts class="mb-6" :contacts="company.contacts" />
             <Website :website="company.website" />
+            <Textblock
+              title="Talk to us about"
+              :body="company.talk_to_us_about"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -105,7 +109,7 @@ import Logo from "@/components/company/Logo";
 // import BusinessAreas from "@/components/company/Business_area";
 import Trivia from "@/components/company/Trivia";
 import Contacts from "@/components/company/Contacts";
-import Description from "@/components/company/Description";
+import Textblock from "@/components/company/Textblock";
 import Website from "@/components/company/Website";
 import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
@@ -122,7 +126,7 @@ export default {
     //BusinessAreas, //Tags?
     Trivia, //Did you know...
     Contacts, //name, email, position?
-    Description, //Company description
+    Textblock, //Company description
     Website, //Company website
     Tags, //Tags
     //Offering, //Master thesis, summer job, Trainee, Oppotunities abroad, Internship, Recruiting events

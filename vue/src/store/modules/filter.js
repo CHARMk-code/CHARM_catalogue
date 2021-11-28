@@ -9,6 +9,7 @@ export default {
         business_areas: [],
         offerings: [],
       },
+      charmtalk: false,
     },
     filteredCompanies: [],
   }),
@@ -39,6 +40,9 @@ export default {
               );
             });
           }
+        }
+        if (state.filters.charmtalk) {
+          filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
         }
       }
       commit("setFilteredCompanies", filteredCompanies);

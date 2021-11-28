@@ -62,6 +62,11 @@
                 label="Offering"
               />
             </v-col>
+            <v-checkbox
+              @change="search()"
+              v-model="charmtalk"
+              label="On CHARMtalks"
+            />
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -86,6 +91,7 @@ export default {
         business_areas: [],
         offerings: [],
       },
+      charmtalk: false,
     };
   },
   computed: {
@@ -115,6 +121,7 @@ export default {
       this.$store.dispatch("filter/setFilters", {
         query: this.query,
         tags: this.selected_tags,
+        charmtalk: this.charmtalk,
       });
       this.$store.dispatch("filter/filterCompanies");
     },
