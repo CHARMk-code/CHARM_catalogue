@@ -108,6 +108,7 @@
               :world="company.employees_world"
               :year="company.founded"
             />
+            <Note :id="company.id" />
           </v-col>
           <v-col>
             <Contacts class="mb-6" :contacts="company.contacts" />
@@ -128,6 +129,7 @@ import Description from "@/components/company/Description";
 import Website from "@/components/company/Website";
 import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
+import Note from "@/components/company/Note";
 import { mapGetters } from "vuex";
 
 export default {
@@ -138,17 +140,14 @@ export default {
   components: {
     //Art,
     Logo,
-    //BusinessAreas, //Tags?
     Trivia, //Did you know...
     Contacts, //name, email, position?
     Description, //Company description
     Website, //Company website
     Tags, //Tags
-    //Offering, //Master thesis, summer job, Trainee, Oppotunities abroad, Internship, Recruiting events
-    //Looking_for, //Bachelor, Master, Phd
-    //Programs, // Tags for all programs
     //Maps, //Map view
     tableEditDialog,
+    Note,
   },
   computed: {
     ...mapGetters({
