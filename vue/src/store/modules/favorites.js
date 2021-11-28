@@ -6,9 +6,6 @@ export default {
   mutations: {
     addFavorite(state, id) {
       state.favorites.add(id);
-      console.log(
-        JSON.stringify(Array.from(state.favorites.values()), state.favorites)
-      );
       localStorage.setItem(
         "favorites",
         JSON.stringify(Array.from(state.favorites.values()))
@@ -22,7 +19,6 @@ export default {
       );
     },
     loadForStorage(state) {
-      console.log(localStorage.getItem("favorites"));
       if (localStorage.getItem("favorites") == "{}") {
         state.favorites = new Set();
       } else {

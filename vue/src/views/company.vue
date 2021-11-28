@@ -158,7 +158,7 @@ export default {
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
       offerings: "tags/offers",
-      isInFavorites: "company_meta/isInFavorites",
+      isInFavorites: "favorites/isInFavorites",
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](
@@ -273,15 +273,15 @@ export default {
     },
     favoriteChange() {
       if (this.favorite) {
-        this.$store.commit("company_meta/addFavorite", this.company.id);
+        this.$store.commit("favorites/addFavorite", this.company.id);
       } else {
-        this.$store.commit("company_meta/removeFavorite", this.company.id);
+        this.$store.commit("favorites/removeFavorite", this.company.id);
       }
     },
   },
   watch: {
     company: function (company) {
-      this.favorite = this.$store.getters["company_meta/favorites"].has(
+      this.favorite = this.$store.getters["favorites/favorites"].has(
         company.id
       );
     },
@@ -291,7 +291,7 @@ export default {
     this.$store.dispatch("tags/getTags"); //move somewhere else
   },
   beforeMount() {
-    this.$store.commit("company_meta/loadForStorage");
+    this.$store.commit("favorites/loadForStorage");
     this.$store.dispatch("filter/filterCompanies");
   },
 };

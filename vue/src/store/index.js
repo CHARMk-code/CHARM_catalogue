@@ -5,7 +5,7 @@ import companies_module from "@/store/modules/companies.js";
 import tags_module from "@/store/modules/tags.js";
 import filter_module from "@/store/modules/filter.js";
 import prepages_module from "@/store/modules/prepages.js";
-import company_meta from "@/store/modules/company_meta";
+import favorites from "@/store/modules/favorites";
 
 Vue.use(Vuex);
 
@@ -16,6 +16,6 @@ export default new Vuex.Store({
     tags: tags_module,
     filter: filter_module,
     prepages: prepages_module,
-    company_meta: company_meta,
+    favorites: favorites,
   },
 });
