@@ -10,7 +10,10 @@ export default {
       localStorage.setItem("notes", JSON.stringify(state.notes));
     },
     loadForStorage(state) {
-      if (localStorage.getItem("notes") == "{}") {
+      if (
+        localStorage.getItem("notes") == "{}" ||
+        localStorage.getItem("notes") == null
+      ) {
         state.notes = {};
       } else {
         state.notes = JSON.parse(localStorage.getItem("notes"));
