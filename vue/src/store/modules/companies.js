@@ -27,9 +27,9 @@ export default {
   },
   actions: {
     getCompanies({ commit }) {
-      if (this.state.tags.load_wait < Date.now()) {
-        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        if (this.state.tags.load_wait < Date.now()) {
+          this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           Vue.prototype.$axios
             .get("/company")
             .then((resp) => {
@@ -43,8 +43,10 @@ export default {
             .catch((err) => {
               reject(err);
             });
-        });
-      }
+        } else {
+          resolve();
+        }
+      });
     },
     modifyCompany({ commit }, company) {
       return new Promise((resolve, reject) => {

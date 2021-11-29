@@ -73,9 +73,9 @@ export default {
   },
   actions: {
     getTags({ commit }) {
-      if (this.state.tags.load_wait < Date.now()) {
-        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        if (this.state.tags.load_wait < Date.now()) {
+          this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           Vue.prototype.$axios
             .get("/tag")
             .then((resp) => {
@@ -116,8 +116,10 @@ export default {
             .catch((err) => {
               reject(err);
             });
-        });
-      }
+        } else {
+          resolve();
+        }
+      });
     },
     modifyTag({ commit }, tags) {
       return new Promise((resolve, reject) => {
