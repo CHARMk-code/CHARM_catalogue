@@ -40,6 +40,7 @@ export default {
             });
           }
         }
+        filteredCompanies = filteredCompanies.filter((t) => t.active);
       }
       commit("setFilteredCompanies", filteredCompanies);
     },
