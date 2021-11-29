@@ -41,28 +41,28 @@
             <Logo :src="company.logo" />
           </v-col>
           <v-spacer />
+          <v-tooltip right max-width="300px">
+            <template v-slot:activator="{ on, attrs }">
+              <div v-on="on">
+                <v-checkbox
+                  class="large"
+                  v-bind="attrs"
+                  @change="favoriteChange"
+                  v-model="favorite"
+                  on-icon="mdi-star"
+                  off-icon="mdi-star-outline"
+                />
+              </div>
+            </template>
+            <span>
+              Save as favourite (This is only stored in your browser and will
+              not be transfered between browsers)
+            </span>
+          </v-tooltip>
           <v-col>
             <div class="text-h2 font-weight-regular">{{ company.name }}</div>
           </v-col>
-          <v-col>
-            <v-hover v-model="favHover">
-              <v-checkbox
-                @change="favoriteChange"
-                v-model="favorite"
-                on-icon="mdi-star"
-                off-icon="mdi-star-outline"
-              />
-            </v-hover>
-            <template v-if="favHover">
-              <span>
-                Find this company interesting why not favorite them to make it
-                easier to find again. (This is stored in your browser so, they
-                won't be there if you switch browser or clears your cache. This
-                also means we don't see what company you favorite (your data is
-                your :) )</span
-              >
-            </template>
-          </v-col>
+          <v-col> </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -135,7 +135,7 @@ import { mapGetters } from "vuex";
 export default {
   name: "Company_View",
   data() {
-    return { dialog: false, favHover: false, favorite: false };
+    return { dialog: false, favorite: false };
   },
   components: {
     //Art,
