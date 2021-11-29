@@ -2,9 +2,7 @@
   <v-app id="app">
     <Header />
     <router-view />
-    <CookieConsent
-      href="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fclipartmag.com%2Fimages%2Fcookie-monster-image-15.jpg&f=1&nofb=1"
-    >
+    <CookieConsent href="cookies">
       <template slot="button">
         <v-btn class="primary x-large ml-5">Got it</v-btn>
       </template>

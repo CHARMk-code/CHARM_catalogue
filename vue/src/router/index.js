@@ -10,6 +10,7 @@ import Upload from "@/components/Upload";
 import Account from "@/components/admin/Account";
 import Prepage_view from "@/views/admin/Prepage";
 import Home_view from "@/views/Home";
+import CookieInfo_view from "@/views/CookieInfo";
 
 import Prepage from "@/components/Prepage";
 
@@ -26,11 +27,14 @@ const router = new Router({
         noAuth: true,
       },
     },
-    //    {
-    //      path: '/Search',
-    //      name: 'Search',
-    //      component: Search
-    //    },
+    {
+      path: "/cookies",
+      name: "Cookies",
+      component: CookieInfo_view,
+      meta: {
+        noAuth: true,
+      },
+    },
     {
       path: "/Admin",
       name: "Admin",
