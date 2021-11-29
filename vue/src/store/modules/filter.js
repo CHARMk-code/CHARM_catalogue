@@ -44,7 +44,7 @@ export default {
       }
       if (state.filters.favorites) {
         filteredCompanies = filteredCompanies.filter((t) =>
-          rootGetters["company_meta/favorites"].has(t.id)
+          rootGetters["favorites/favorites"].has(t.id)
         );
       }
       commit("setFilteredCompanies", filteredCompanies);
