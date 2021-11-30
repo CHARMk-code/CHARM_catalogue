@@ -129,6 +129,11 @@ export default {
           label: "Active (required for row to be visible)",
         },
         {
+          type: "checkbox",
+          model: "charmtalk",
+          label: "On CHARMtalks",
+        },
+        {
           type: "text",
           model: "name",
           label: "Company name",
@@ -139,6 +144,11 @@ export default {
           type: "textarea",
           model: "description",
           label: "Company description",
+        },
+        {
+          type: "textarea",
+          model: "talk_to_us_about",
+          label: "Talk to us about",
         },
         { type: "number", model: "founded", label: "Founded" },
         { type: "text", model: "Contacts", label: "Contacts" },

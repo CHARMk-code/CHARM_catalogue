@@ -2,13 +2,13 @@
   <div class="file-upload">
     <v-card v-if="this.feedback">{{ this.feedback }}</v-card>
     <input type="file" @change="onFileChange" />
-    <button
+    <v-btn
       @click="onUploadFile"
-      class="upload-button"
+      class="upload-button primary"
       :disabled="!this.selectedFile"
     >
       Upload file
-    </button>
+    </v-btn>
   </div>
 </template>
 
@@ -69,9 +69,8 @@ button {
 }
 
 .upload-button {
-  width: 7rem;
+  width: 8rem;
   padding: 0.5rem;
-  background-color: #278be9;
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
