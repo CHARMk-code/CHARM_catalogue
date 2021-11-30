@@ -69,7 +69,6 @@ def company_delete(id):
         return result[1]
 
 
-    print(id,file=sys.stderr)
     company = Company.query.get(id)
     if company:
         return send_status(company.delete())
