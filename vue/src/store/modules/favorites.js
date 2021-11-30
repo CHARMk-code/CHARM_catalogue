@@ -21,7 +21,7 @@ export default {
     loadForStorage(state) {
       if (
         localStorage.getItem("favorites") == "{}" ||
-        localStorage.getItem("notes") == null
+        localStorage.getItem("favorites") == null
       ) {
         state.favorites = new Set();
       } else {
