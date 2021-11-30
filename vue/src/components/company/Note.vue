@@ -21,12 +21,15 @@ export default {
   },
   watch: {
     id: function (id) {
-      this.note = this.$store.getters["notes/notes"][id];
+      try {
+        this.note = this.$store.getters["notes/notes"][id];
+      } catch (e) {
+        this.note;
+      }
     },
   },
   beforeMount() {
     this.$store.commit("notes/loadForStorage");
-    this.note = this.$store.getters["notes/notes"][this.id];
   },
 };
 </script>
