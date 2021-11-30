@@ -28,8 +28,9 @@ export default {
   actions: {
     getCompanies({ commit }) {
       return new Promise((resolve, reject) => {
-        if (this.state.tags.load_wait < Date.now()) {
-          this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+        if (this.state.companies.load_wait < Date.now()) {
+          this.state.companies.load_wait =
+            Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           Vue.prototype.$axios
             .get("/company")
             .then((resp) => {
