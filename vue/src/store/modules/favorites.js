@@ -1,3 +1,4 @@
+import helperfunctions from "@/plugins/helperfunctions";
 export default {
   namespaced: true,
   state: () => ({
@@ -6,22 +7,28 @@ export default {
   mutations: {
     addFavorite(state, id) {
       state.favorites.add(id);
-      localStorage.setItem(
-        "favorites",
-        JSON.stringify(Array.from(state.favorites.values()))
-      );
+
+      if (helperfunctions.cookiesAccepted()) {
+        localStorage.setItem(
+          "favorites",
+          JSON.stringify(Array.from(state.favorites.values()))
+        );
+      }
     },
     removeFavorite(state, id) {
       state.favorites.delete(id);
-      localStorage.setItem(
-        "favorites",
-        JSON.stringify(Array.from(state.favorites.values()))
-      );
+
+      if (helperfunctions.cookiesAccepted()) {
+        localStorage.setItem(
+          "favorites",
+          JSON.stringify(Array.from(state.favorites.values()))
+        );
+      }
     },
     loadForStorage(state) {
       if (
         localStorage.getItem("favorites") == "{}" ||
-        localStorage.getItem("notes") == null
+        localStorage.getItem("favorites") == null
       ) {
         state.favorites = new Set();
       } else {

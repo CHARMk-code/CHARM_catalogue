@@ -67,6 +67,7 @@ class Company(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean)
+    charmtalk = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
     founded = db.Column(db.Integer)
@@ -75,6 +76,7 @@ class Company(db.Model):
     employees_world = db.Column(db.Integer)
     trivia = db.Column(db.String(500))
     website = db.Column(db.String(200))
+    talk_to_us_about = db.Column(db.String(500))
     logo = db.Column(db.String(100))
     tags = db.relationship(
         'Tag',
@@ -84,15 +86,16 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, description,
+    def create( name, active, charmtalk, description,
         trivia, founded, contacts, employees_sweden,
-        employees_world, website,logo, tags):
+        employees_world, website, talk_to_us_about, logo, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
             new_company = Company(
                 name=name,
                 active=active,
+                charmtalk=charmtalk,
                 description=description,
                 trivia=trivia,
                 founded = founded,
@@ -100,6 +103,7 @@ class Company(db.Model):
                 employees_sweden = employees_sweden,
                 employees_world = employees_world,
                 website = website,
+                talk_to_us_about = talk_to_us_about,
                 logo = logo,
                 tags = tags
             )
@@ -110,11 +114,12 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, description,
+    def update(self, name, active, charmtalk, description,
             trivia, founded, contacts, employees_sweden,
-            employees_world, website, logo, tags):
+            employees_world, website,  talk_to_us_about,logo, tags):
         self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active,active)
+        self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.description = test_and_set(self.description,description)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
@@ -123,6 +128,7 @@ class Company(db.Model):
         self.employees_world = test_and_set(self.employees_world, employees_world)
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
+        self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)
         self.tags = test_and_set(self.tags, tags)
 
         db.session.commit()
@@ -142,6 +148,7 @@ class Company(db.Model):
             'id': self.id,
             'name': self.name,
             'active': self.active,
+            'charmtalk': self.charmtalk,
             'description': self.description,
             'trivia': self.trivia,
             'founded': self.founded,
@@ -150,6 +157,7 @@ class Company(db.Model):
             'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,
+            'talk_to_us_about': self.talk_to_us_about,
             'tags': tags
         }
 
