@@ -54,6 +54,7 @@ export default {
   methods: {
     next() {
       if (parseInt(this.page) + 1 >= this.prepages.length) {
+        this.$store.dispatch("companies/getCompanies");
         this.$store.dispatch("filter/filterCompanies");
         this.$router.push("/company/" + this.filteredCompanies[0].name);
       } else {

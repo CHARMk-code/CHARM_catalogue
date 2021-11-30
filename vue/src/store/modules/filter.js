@@ -44,6 +44,7 @@ export default {
         if (state.filters.charmtalk) {
           filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
         }
+        filteredCompanies = filteredCompanies.filter((t) => t.active);
       }
       commit("setFilteredCompanies", filteredCompanies);
     },

@@ -118,6 +118,7 @@ def parseXlsx():
                         #      db.session.commit()
                 metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
                 metadata = list(map(lambda x: x.value, metadata))
+                metadata[1] = bool(metadata[1])
                 Company.create(
                         *metadata,
                         tags_temp
