@@ -58,6 +58,14 @@
               }}</v-chip>
             </template>
           </template>
+          <template v-slot:item.id="{ item }">
+            <v-checkbox
+              :input-value="$store.getters['favorites/favorites'].has(item.id)"
+              on-icon="mdi-star"
+              off-icon="mdi-star-outline"
+            />
+            <!--  TODO: Should make start clickable to changes status-->
+          </template>
         </Table>
       </v-row>
     </v-container>
@@ -81,7 +89,8 @@ export default {
         { text: "Programs", value: "divisions" },
         { text: "Business areas", value: "business_area" },
         { text: "Looking for", value: "looking_for" },
-        { text: "offering", value: "offering" },
+        { text: "Offering", value: "offering" },
+        { text: "Liked", value: "id" },
       ],
     };
   },

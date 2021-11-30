@@ -9,6 +9,7 @@ export default {
         business_areas: [],
         offerings: [],
       },
+      favorites: false,
       charmtalk: false,
     },
     filteredCompanies: [],
@@ -45,6 +46,11 @@ export default {
           filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
         }
         filteredCompanies = filteredCompanies.filter((t) => t.active);
+      }
+      if (state.filters.favorites) {
+        filteredCompanies = filteredCompanies.filter((t) =>
+          rootGetters["favorites/favorites"].has(t.id)
+        );
       }
       commit("setFilteredCompanies", filteredCompanies);
     },
