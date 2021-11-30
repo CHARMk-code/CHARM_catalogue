@@ -1,0 +1,36 @@
+version: "3"
+services:
+  flask:
+    build: ./docker/flask
+    restart: unless-stopped
+    ports:
+      - "5008:5000"
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - ./docker/flask/src:/catalogue
+      - /static
+      - /upload
+    environment:
+      FLASK_ENV: production
+      FLASK_APP: .
+  db:
+    image: "mysql"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: catalogue
+      MYSQL_USER: catalogue
+      MYSQL_PASSWORD: password
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+  vue:
+    build: vue
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+    volumes:
+      - ./vue:/app
+    environment:
+      NODE_OPTIONS: "--openssl-legacy-provider"

@@ -1,4 +1,5 @@
 import Vue from "vue";
+const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export default {
   namespaced: true,
@@ -29,34 +30,37 @@ export default {
   },
   actions: {
     getPrepages({ commit }) {
-      return new Promise((resolve, reject) => {
-        Vue.prototype.$axios
-          .get("/prepage")
-          .then((resp) => {
-            commit("removeAllPrepages");
-            const prepages = resp.data;
-            if (prepages.length > 0) {
-              commit("setPrepages", prepages);
-              let filtered_prepages = prepages.filter(
-                (page) => page.active && page.image != null
-              );
-              filtered_prepages.sort((a, b) => {
-                if (a.order > b.order) {
-                  return 1;
-                } else if (a.order < b.order) {
-                  return -1;
-                } else {
-                  return 0;
-                }
-              });
-              commit("setActive", filtered_prepages);
-            }
-            resolve(resp);
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      });
+      if (this.state.tags.load_wait < Date.now()) {
+        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+        return new Promise((resolve, reject) => {
+          Vue.prototype.$axios
+            .get("/prepage")
+            .then((resp) => {
+              commit("removeAllPrepages");
+              const prepages = resp.data;
+              if (prepages.length > 0) {
+                commit("setPrepages", prepages);
+                let filtered_prepages = prepages.filter(
+                  (page) => page.active && page.image != null
+                );
+                filtered_prepages.sort((a, b) => {
+                  if (a.order > b.order) {
+                    return 1;
+                  } else if (a.order < b.order) {
+                    return -1;
+                  } else {
+                    return 0;
+                  }
+                });
+                commit("setActive", filtered_prepages);
+              }
+              resolve(resp);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      }
     },
     modifyPrepage({ commit }, prepage) {
       return new Promise((resolve, reject) => {

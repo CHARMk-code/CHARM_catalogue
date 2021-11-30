@@ -65,7 +65,11 @@
             <v-checkbox
               @change="search()"
               label="Favorites"
-              v-model="favorites"
+              v-model="favorites"/>
+            <v-checkbox
+              @change="search()"
+              v-model="charmtalk"
+              label="On CHARMtalks"
             />
           </v-row>
         </v-expand-transition>
@@ -92,6 +96,7 @@ export default {
         offerings: [],
       },
       favorites: false,
+      charmtalk: false,
     };
   },
   computed: {
@@ -122,6 +127,7 @@ export default {
         query: this.query,
         tags: this.selected_tags,
         favorites: this.favorites,
+        charmtalk: this.charmtalk,
       });
       this.$store.dispatch("filter/filterCompanies");
     },
