@@ -119,6 +119,7 @@ def parseXlsx():
                 metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
                 metadata = list(map(lambda x: x.value, metadata))
                 metadata[1] = bool(metadata[1])
+                metadata[2] = bool(metadata[2])
                 Company.create(
                         *metadata,
                         tags_temp
