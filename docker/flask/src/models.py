@@ -66,6 +66,7 @@ class Company(db.Model):
     Reps a company
     """
     id = db.Column(db.Integer, primary_key=True)
+    last_updated = db.Column(db.DateTime)
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
     name = db.Column(db.String(200))
@@ -94,6 +95,7 @@ class Company(db.Model):
                 return False
             new_company = Company(
                 name=name,
+                last_updated=datetime.datetime.now(),
                 active=active,
                 charmtalk=charmtalk,
                 description=description,
@@ -117,7 +119,9 @@ class Company(db.Model):
     def update(self, name, active, charmtalk, description,
             trivia, founded, contacts, employees_sweden,
             employees_world, website,  talk_to_us_about,logo, tags):
+        
         self.name = test_and_set(self.name,name)
+        self.last_updated = datetime.datetime.now()
         self.active = test_and_set(self.active,active)
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.description = test_and_set(self.description,description)
@@ -150,6 +154,7 @@ class Company(db.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
             'active': self.active,
             'charmtalk': self.charmtalk,
             'description': self.description,

@@ -51,6 +51,8 @@
 import Table from "@/components/table";
 import { mapGetters } from "vuex";
 import Vue from "vue";
+import dayjs from "dayjs";
+
 export default {
   name: "companies_table",
   components: {
@@ -61,12 +63,12 @@ export default {
       headers: [
         { text: "Name", value: "name" },
         { text: "Programs", value: "divisions" },
-        { text: "Completion", value: "completion" },
-        { text: "Active", value: "active", align: "center", width: 110 },
+        { text: "Completion", value: "completion", width: 120 },
+        { text: "Active", value: "active", width: 100 },
+        { text: "Last Updated", value: "last_updated", width: 170 },
         {
           text: "Actions",
           value: "actions",
-          align: "center",
           width: 130,
           sortable: false,
         },
@@ -95,6 +97,7 @@ export default {
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
           c.tags
         ),
+        last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
 
