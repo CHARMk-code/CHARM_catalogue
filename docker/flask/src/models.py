@@ -120,7 +120,6 @@ class Company(db.Model):
             trivia, founded, contacts, employees_sweden,
             employees_world, website,  talk_to_us_about,logo, tags):
         
-        print("updating", flush=True)
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
         self.active = test_and_set(self.active,active)
