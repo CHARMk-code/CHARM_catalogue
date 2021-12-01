@@ -100,10 +100,10 @@ class Company(db.Model):
                 charmtalk=charmtalk,
                 description=description,
                 trivia=trivia,
-                founded = founded,
+                founded = founded if founded != "" else -1,
                 contacts = contacts,
-                employees_sweden = employees_sweden,
-                employees_world = employees_world,
+                employees_sweden = employees_sweden if employees_sweden != "" else -1,
+                employees_world = employees_world if employees_world != "" else -1,
                 website = website,
                 talk_to_us_about = talk_to_us_about,
                 logo = logo,
@@ -128,9 +128,12 @@ class Company(db.Model):
         self.description = test_and_set(self.description,description)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
+        self.founded = self.founded if self.founded != "" else -1,
         self.contacts = test_and_set(self.contacts,contacts)
         self.employees_sweden = test_and_set(self.employees_sweden,employees_sweden)
+        self.employees_sweden = self.employees_sweden if self.employees_sweden != "" else -1,
         self.employees_world = test_and_set(self.employees_world, employees_world)
+        self.employees_world = self.employees_world if self.employees_world != "" else -1,
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
         self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)

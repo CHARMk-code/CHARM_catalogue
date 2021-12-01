@@ -1,5 +1,10 @@
 <template>
-  <v-img :src="base_URL + src" max-height="150" max-width="500" />
+  <v-img
+    v-if="src != ''"
+    :src="base_URL + src"
+    max-height="150"
+    max-width="500"
+  />
 </template>
 
 <script>
