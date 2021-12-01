@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="website != ''">
     <v-card-title> Website </v-card-title>
     <v-card-text>
       <a :href="website">

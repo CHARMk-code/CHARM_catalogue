@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="tags_data.length > 0">
     <v-card-title> {{ name }} </v-card-title>
     <v-card-text>
       <template v-for="tag in tags_data">

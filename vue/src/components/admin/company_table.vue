@@ -40,26 +40,8 @@
           </template>
         </template>
       </template>
-      <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in item.looking_for">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.offering="{ item }">
-        <template v-for="tag in item.offering">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_area">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
+      <template v-slot:item.completion="{ item }">
+        <template> {{ item.completion }} % </template>
       </template>
     </Table>
   </v-container>

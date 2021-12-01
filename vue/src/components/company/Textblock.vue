@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="body != ''">
     <v-card-title>
       {{ title }}
     </v-card-title>
