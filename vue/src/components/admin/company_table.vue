@@ -40,26 +40,8 @@
           </template>
         </template>
       </template>
-      <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in item.looking_for">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.offering="{ item }">
-        <template v-for="tag in item.offering">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_area">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
+      <template v-slot:item.completion="{ item }">
+        <template> {{ item.completion }}/11 </template>
       </template>
     </Table>
   </v-container>
@@ -79,9 +61,7 @@ export default {
       headers: [
         { text: "Name", value: "name" },
         { text: "Programs", value: "divisions" },
-        { text: "Business areas", value: "business_area" },
-        { text: "Looking for", value: "looking_for" },
-        { text: "offering", value: "offering" },
+        { text: "Completion", value: "completion" },
         { text: "Active", value: "active", align: "center", width: 110 },
         {
           text: "Actions",
@@ -107,7 +87,7 @@ export default {
     }),
     modified_companies() {
       const companies = Array.from(this.companies);
-      const modified = companies.map((c) => ({
+      let modified = companies.map((c) => ({
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
@@ -117,6 +97,8 @@ export default {
         ),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
+
+      modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
     },
     row_meta() {
@@ -204,6 +186,22 @@ export default {
     },
     viewCompany(company) {
       this.$router.push("/company/" + company.name);
+    },
+    completionCompany(company) {
+      let missing = 0;
+      if (company.name == "") missing++;
+      if (company.logo == "") missing++;
+      if (company.tags == []) missing++;
+      if (company.talk_to_us_about == "") missing++;
+      if (company.trivia == "") missing++;
+      if (company.website == "") missing++;
+      if (company.founded == -1) missing++;
+      if (company.employees_world == -1) missing++;
+      if (company.employees_sweden == -1) missing++;
+      if (company.description == "") missing++;
+      if (company.contacts == "") missing++;
+
+      return 11 - missing;
     },
   },
 };
