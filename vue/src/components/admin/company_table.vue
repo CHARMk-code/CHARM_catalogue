@@ -40,27 +40,6 @@
           </template>
         </template>
       </template>
-      <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in item.looking_for">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.offering="{ item }">
-        <template v-for="tag in item.offering">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_area">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
     </Table>
   </v-container>
 </template>
@@ -69,6 +48,8 @@
 import Table from "@/components/table";
 import { mapGetters } from "vuex";
 import Vue from "vue";
+import dayjs from "dayjs";
+
 export default {
   name: "companies_table",
   components: {
@@ -79,14 +60,11 @@ export default {
       headers: [
         { text: "Name", value: "name" },
         { text: "Programs", value: "divisions" },
-        { text: "Business areas", value: "business_area" },
-        { text: "Looking for", value: "looking_for" },
-        { text: "offering", value: "offering" },
-        { text: "Active", value: "active", align: "center", width: 110 },
+        { text: "Active", value: "active", width: 100 },
+        { text: "Last Updated", value: "last_updated", width: 170 },
         {
           text: "Actions",
           value: "actions",
-          align: "center",
           width: 130,
           sortable: false,
         },
@@ -115,6 +93,7 @@ export default {
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
           c.tags
         ),
+        last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
       return modified;
