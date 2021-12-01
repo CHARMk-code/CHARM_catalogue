@@ -152,7 +152,7 @@ class Company(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'last_updated': self.last_updated.strftime("%Y-%m-%dT%H:%M:%S"),
+            'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
             'active': self.active,
             'charmtalk': self.charmtalk,
             'description': self.description,
