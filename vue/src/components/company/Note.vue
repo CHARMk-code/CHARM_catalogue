@@ -19,9 +19,17 @@ export default {
       this.$store.commit("notes/setNotes", { id: this.id, note: this.note });
     },
   },
+  watch: {
+    id: function (id) {
+      try {
+        this.note = this.$store.getters["notes/notes"][id];
+      } catch (e) {
+        this.note;
+      }
+    },
+  },
   beforeMount() {
     this.$store.commit("notes/loadForStorage");
-    this.note = this.$store.getters["notes/notes"][this.id];
   },
 };
 </script>
