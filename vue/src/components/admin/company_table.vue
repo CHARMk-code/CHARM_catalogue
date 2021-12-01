@@ -41,7 +41,7 @@
         </template>
       </template>
       <template v-slot:item.completion="{ item }">
-        <template> {{ item.completion }} % </template>
+        <template> {{ item.completion }}/11 </template>
       </template>
     </Table>
   </v-container>
@@ -201,7 +201,7 @@ export default {
       if (company.description == "") missing++;
       if (company.contacts == "") missing++;
 
-      return Math.round(((11 - missing) * 100) / 11);
+      return 11 - missing;
     },
   },
 };
