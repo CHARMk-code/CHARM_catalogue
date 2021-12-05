@@ -1,8 +1,19 @@
 <template>
   <v-main>
-    <v-card max-height="70vh" max-width="70vw" class="mx-auto">
-      <img contain center :src="base_URL + map_src" />
-    </v-card>
+    <v-sheet
+      min-height="50vh"
+      rounded="lg"
+      class="d-flex"
+      style="position: relative"
+    >
+      <img
+        style="margin: auto"
+        height="700px"
+        width="1400px"
+        justify="center"
+        :src="base_URL + map_src"
+      />
+    </v-sheet>
   </v-main>
 </template>
 

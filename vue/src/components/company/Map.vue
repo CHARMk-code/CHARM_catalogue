@@ -1,7 +1,7 @@
 <template>
   <v-card :to="'/maps/' + map_object.ref">
     <v-card-title> We are here</v-card-title>
-    <v-img :src="base_URL + map_object.image" />
+    <v-img max-height="400px" :src="base_URL + map_object.image" />
   </v-card>
 </template>
 
