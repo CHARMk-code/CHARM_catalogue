@@ -194,6 +194,10 @@ export default {
       const result = state.offers.filter((t) => ids.indexOf(t.id) != -1);
       return result;
     },
+    getLanguagesFromIds: (state) => (ids) => {
+      const result = state.languages.filter((t) => ids.indexOf(t.id) != -1);
+      return result;
+    },
 
     tags: (state) => {
       return state.tags;
@@ -215,7 +219,12 @@ export default {
     },
 
     all: (state) => {
-      return state.tags.concat(state.divisions, state.business_areas);
+      return state.tags.concat(
+        state.divisions,
+        state.business_areas,
+        state.languages,
+        state.offers
+      );
     },
   },
 };

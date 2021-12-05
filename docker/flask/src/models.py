@@ -80,6 +80,7 @@ class Company(db.Model):
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(500))
     logo = db.Column(db.String(100))
+    map_image = db.Column(db.String(100))
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
@@ -90,7 +91,7 @@ class Company(db.Model):
     @staticmethod
     def create( name, active, charmtalk, in_sweden, description,
         trivia, founded, contacts, employees_sweden,
-        employees_world, website, talk_to_us_about, logo, tags):
+        employees_world, website, talk_to_us_about, logo, map_image,  tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -109,6 +110,7 @@ class Company(db.Model):
                 website = website,
                 talk_to_us_about = talk_to_us_about,
                 logo = logo,
+                map_image = map_image,
                 tags = tags
             )
 
@@ -120,7 +122,7 @@ class Company(db.Model):
 
     def update(self, name, active, charmtalk, in_sweden, description,
             trivia, founded, contacts, employees_sweden,
-            employees_world, website,  talk_to_us_about,logo, tags):
+            employees_world, website,  talk_to_us_about,logo, map_image,  tags):
 
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
@@ -138,6 +140,7 @@ class Company(db.Model):
         self.employees_world = self.employees_world if self.employees_world != "" else -1,
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
+        self.map_image = test_and_set(self.map_image, map_image)
         self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)
         self.tags = test_and_set(self.tags, tags)
 
@@ -169,6 +172,7 @@ class Company(db.Model):
             'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,
+            'map_image': self.map_image,
             'talk_to_us_about': self.talk_to_us_about,
             'tags': tags
         }

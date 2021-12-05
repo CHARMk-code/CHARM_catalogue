@@ -85,6 +85,7 @@ export default {
       divisions: "tags/divisions",
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
+      languages: "tags/languages",
       offerings: "tags/offers",
     }),
     modified_companies() {
@@ -92,6 +93,7 @@ export default {
       let modified = companies.map((c) => ({
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
+        languages: this.$store.getters["tags/getLanguagesFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
         offering: this.$store.getters["tags/getOffersFromIds"](c.tags),
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
@@ -174,8 +176,15 @@ export default {
           type: "select",
           model: "offering",
           items: this.offerings,
-          label: "offering",
+          label: "Offering",
           hint: "Which type of jobs the company is offering",
+        },
+        {
+          type: "select",
+          model: "languages",
+          items: this.languages,
+          label: "Languages",
+          hint: "Which languages does the company want",
         },
       ];
     },

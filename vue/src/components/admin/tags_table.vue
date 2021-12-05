@@ -21,6 +21,9 @@
       <template v-slot:item.offering="{ item }">
         <v-simple-checkbox disabled v-model="item.offering" />
       </template>
+      <template v-slot:item.language="{ item }">
+        <v-simple-checkbox disabled v-model="item.language" />
+      </template>
 
       <template v-slot:item.icon="{ item }">
         <v-avatar>
@@ -64,6 +67,7 @@ export default {
           width: 100,
         },
         { text: "Offering", value: "offering", align: "center", width: 120 },
+        { text: "Language", value: "language", align: "center", width: 120 },
         {
           text: "Actions",
           value: "actions",
@@ -79,6 +83,7 @@ export default {
         { type: "checkbox", model: "division", label: "Division" },
         { type: "checkbox", model: "looking_for", label: "Looking for" },
         { type: "checkbox", model: "offering", label: "Offering" },
+        { type: "checkbox", model: "language", label: "Language" },
       ],
     };
   },

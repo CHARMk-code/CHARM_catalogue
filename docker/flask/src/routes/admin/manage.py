@@ -29,7 +29,7 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS_COMPANY = 13
+    NUMBER_OF_METADATA_COLS_COMPANY = 14
     NUMBER_OF_METADATA_COLS_TAG = 6
     # Inactives company
     Company.query.update({Company.active:False})
