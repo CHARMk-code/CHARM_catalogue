@@ -191,9 +191,10 @@ class Tag(db.Model):
     business_area = db.Column(db.Boolean)
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
+    langague = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, langague):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -207,7 +208,8 @@ class Tag(db.Model):
                 division = division,
                 business_area = business_area,
                 looking_for = looking_for,
-                offering = offering
+                offering = offering,
+                langague = langague
             )
             db.session.add(new_tag)
             db.session.commit()
@@ -215,7 +217,7 @@ class Tag(db.Model):
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, langague):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
@@ -227,6 +229,7 @@ class Tag(db.Model):
             self.business_area = test_and_set(self.business_area, business_area)
             self.looking_for = test_and_set(self.looking_for, looking_for)
             self.offering = test_and_set(self.offering, offering)
+            self.langague = test_and_set(self.langague, langague)
             db.session.commit()
             return True
         except:
@@ -252,7 +255,8 @@ class Tag(db.Model):
             'division': self.division,
             'business_area': self.business_area,
             'looking_for': self.looking_for,
-            'offering': self.offering
+            'offering': self.offering,
+            'langague': self.langague
         }
 
 class Tag_company(db.Model):

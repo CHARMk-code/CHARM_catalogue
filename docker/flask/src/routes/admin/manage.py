@@ -30,7 +30,7 @@ def imageLoad(request):
 
 def parseXlsx():
     NUMBER_OF_METADATA_COLS_COMPANY = 13
-    NUMBER_OF_METADATA_COLS_TAG = 5
+    NUMBER_OF_METADATA_COLS_TAG = 6
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
