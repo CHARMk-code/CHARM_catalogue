@@ -46,6 +46,20 @@
             />
           </template>
 
+          <template v-if="col.type == 'map_select'">
+            <v-select
+              chips
+              :key="col.model"
+              v-model="row[col.model]"
+              item-text="name"
+              item-value="name"
+              :items="col.items"
+              :label="col.label"
+              :hint="col.hint"
+            >
+            </v-select>
+          </template>
+
           <template v-if="col.type == 'select'">
             <v-select
               multiple

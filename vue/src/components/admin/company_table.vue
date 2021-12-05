@@ -88,6 +88,9 @@ export default {
       languages: "tags/languages",
       offerings: "tags/offers",
     }),
+    maps() {
+      return this.$store.getters["maps/get"].filter((t) => t.ref != "");
+    },
     modified_companies() {
       const companies = Array.from(this.companies);
       let modified = companies.map((c) => ({
@@ -102,7 +105,6 @@ export default {
         last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
-
       modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
     },
@@ -151,6 +153,13 @@ export default {
           label: "Number of Employees in the whole world",
         },
         { type: "text", model: "trivia", label: "Trivia" },
+        {
+          type: "map_select",
+          model: "map_image",
+          items: this.maps,
+          label: "Map",
+          hint: "Map for company location",
+        },
         {
           type: "select",
           model: "divisions",

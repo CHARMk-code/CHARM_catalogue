@@ -44,6 +44,7 @@ def company_put():
     talk_to_us_about = get_if_exist(request_data, "talk_to_us_about")
     logo = get_if_exist(request_data, "logo")
     in_sweden = get_if_exist(request_data, "in_sweden")
+    map_image = get_if_exist(request_data, "map_image")
     tags = get_if_exist(request_data, "tags")
 
     tag_objs=[]
@@ -55,12 +56,12 @@ def company_put():
     if not id:
 
         return send_status(Company.create(name,active,charmtalk, in_sweden,description, trivia,
-            founded, contacts, employees_sweden, employees_world, website, talk_to_us_about,logo, tag_objs))
+            founded, contacts, employees_sweden, employees_world, website, talk_to_us_about,logo,map_image, tag_objs))
 
     company = Company.query.get(id)
 
     return send_status(company.update(name,active, charmtalk, in_sweden, description,  trivia, founded,
-                contacts, employees_sweden, employees_world, website, talk_to_us_about, logo, tag_objs))
+                contacts, employees_sweden, employees_world, website, talk_to_us_about, logo, map_image, tag_objs))
 
 
 @blueprint.route("<id>",methods=["DELETE"])
