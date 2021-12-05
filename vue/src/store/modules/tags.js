@@ -9,6 +9,7 @@ export default {
     divisions: [],
     looking_fors: [],
     offers: [],
+    languages: [],
     load_wait: 0,
   }),
   mutations: {
@@ -18,6 +19,8 @@ export default {
       state.business_areas = state.business_areas.filter((t) => t.id != tag.id);
       state.divisions = state.divisions.filter((t) => t.id != tag.id);
       state.looking_fors = state.looking_fors.filter((t) => t.id != tag.id);
+      state.offers = state.offers.filter((t) => t.id != tag.id);
+      state.languages = state.languages.filter((t) => t.id != tag.id);
       state.tags = state.tags.filter((t) => t.id != tag.id);
 
       if (tag.business_area) {
@@ -28,6 +31,8 @@ export default {
         state.looking_fors.push(tag);
       } else if (tag.offering) {
         state.offers.push(tag);
+      } else if (tag.language) {
+        state.languages.push(tag);
       } else {
         state.tags.push(tag);
       }
@@ -46,6 +51,9 @@ export default {
     },
     setOffers(state, tags) {
       state.offers = tags;
+    },
+    setLanguages(state, tags) {
+      state.languages = tags;
     },
     removeTag(state, tag) {
       // No point wasting cpu time filtering arrays were the tag won't be
@@ -69,6 +77,7 @@ export default {
       state.divisions = [];
       state.looking_fors = [];
       state.offers = [];
+      state.languages = [];
     },
   },
   actions: {
@@ -90,7 +99,8 @@ export default {
                         t.business_area ||
                         t.division ||
                         t.looking_for ||
-                        t.offering
+                        t.offering ||
+                        t.language
                       )
                   )
                 );
@@ -109,6 +119,10 @@ export default {
                 commit(
                   "setOffers",
                   tags.filter((t) => t.offering)
+                );
+                commit(
+                  "setLanguages",
+                  tags.filter((t) => t.language)
                 );
               }
               resolve(resp);
@@ -195,6 +209,9 @@ export default {
     },
     offers: (state) => {
       return state.offers;
+    },
+    languages: (state) => {
+      return state.languages;
     },
 
     all: (state) => {

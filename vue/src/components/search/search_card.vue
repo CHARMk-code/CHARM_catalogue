@@ -62,17 +62,35 @@
                 label="Offering"
               />
             </v-col>
-            <v-checkbox
-              @change="search()"
-              label="Favorites"
-              v-model="favorites"
-            />
-            <v-checkbox
-              @change="search()"
-              v-model="charmtalk"
-              label="On CHARMtalks"
-            />
-            <v-checkbox @change="search()" v-model="sweden" label="In Sweden" />
+            <v-col>
+              <v-checkbox
+                @change="search()"
+                label="Favorites"
+                v-model="favorites"
+              />
+              <v-checkbox
+                @change="search()"
+                v-model="charmtalk"
+                label="On CHARMtalks"
+              />
+              <v-checkbox
+                @change="search()"
+                v-model="sweden"
+                label="In Sweden"
+              />
+            </v-col>
+            <v-col>
+              <tagSelector
+                @change="
+                  (v) => {
+                    selected_tags.languages = v;
+                    search();
+                  }
+                "
+                :tags="tag_languages"
+                label="Langague"
+              />
+            </v-col>
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -96,6 +114,7 @@ export default {
         looking_for: [],
         business_areas: [],
         offerings: [],
+        languages: [],
       },
       favorites: false,
       charmtalk: false,
@@ -111,6 +130,7 @@ export default {
       tag_business_areas: "tags/business_areas",
       tag_looking_for: "tags/looking_fors",
       tag_offerings: "tags/offers",
+      tag_languages: "tags/languages",
     }),
     tags() {
       return {
@@ -118,6 +138,7 @@ export default {
         looking_for: this.tag_looking_for,
         business_areas: this.tag_business_areas,
         offerings: this.tag_offerings,
+        languages: this.tag_languages,
       };
     },
   },
