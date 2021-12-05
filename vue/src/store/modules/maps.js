@@ -28,8 +28,8 @@ export default {
   },
   actions: {
     getMaps({ commit }) {
-      if (this.state.tags.load_wait < Date.now()) {
-        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+      if (this.state.maps.load_wait < Date.now()) {
+        this.state.maps.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
         return new Promise((resolve, reject) => {
           Vue.prototype.$axios
             .get("/map")

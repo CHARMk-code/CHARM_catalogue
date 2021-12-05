@@ -23,6 +23,7 @@ export default {
     this.$axios.defaults.headers.common["Authorization"] =
       "Basic " + this.$store.getters["auth/token"];
     this.$store.dispatch("maps/getMaps");
+    this.$store.dispatch("tags/getTags");
   },
 };
 </script>
