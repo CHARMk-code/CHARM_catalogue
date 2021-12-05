@@ -69,6 +69,7 @@ class Company(db.Model):
     last_updated = db.Column(db.DateTime)
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
+    in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
     founded = db.Column(db.Integer)
@@ -87,7 +88,7 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, charmtalk, description,
+    def create( name, active, charmtalk, in_sweden, description,
         trivia, founded, contacts, employees_sweden,
         employees_world, website, talk_to_us_about, logo, tags):
         try:
@@ -98,6 +99,7 @@ class Company(db.Model):
                 last_updated=datetime.datetime.now(),
                 active=active,
                 charmtalk=charmtalk,
+                in_sweden=in_sweden,
                 description=description,
                 trivia=trivia,
                 founded = founded if founded != "" else -1,
@@ -116,14 +118,15 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, charmtalk, description,
+    def update(self, name, active, charmtalk, in_sweden, description,
             trivia, founded, contacts, employees_sweden,
             employees_world, website,  talk_to_us_about,logo, tags):
-        
+
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
         self.active = test_and_set(self.active,active)
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
+        self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
@@ -157,6 +160,7 @@ class Company(db.Model):
             'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
             'active': self.active,
             'charmtalk': self.charmtalk,
+            'in_sweden': self.in_sweden,
             'description': self.description,
             'trivia': self.trivia,
             'founded': self.founded,

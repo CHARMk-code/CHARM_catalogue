@@ -29,7 +29,7 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS_COMPANY = 12
+    NUMBER_OF_METADATA_COLS_COMPANY = 13
     NUMBER_OF_METADATA_COLS_TAG = 5
     # Inactives company
     Company.query.update({Company.active:False})
@@ -120,6 +120,7 @@ def parseXlsx():
                 metadata = list(map(lambda x: x.value, metadata))
                 metadata[1] = bool(metadata[1])
                 metadata[2] = bool(metadata[2])
+                metadata[3] = bool(metadata[3])
                 Company.create(
                         *metadata,
                         tags_temp
