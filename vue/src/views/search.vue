@@ -126,8 +126,5 @@ export default {
       this.$router.push("/company/" + row.name);
     },
   },
-  beforeMount() {
-    this.$store.dispatch("filter/filterCompanies");
-  },
 };
 </script>

@@ -23,9 +23,5 @@ export default {
       ],
     };
   },
-  mounted() {
-    this.$store.dispatch("companies/getCompanies");
-    this.$store.dispatch("tags/getTags");
-  },
 };
 </script>
