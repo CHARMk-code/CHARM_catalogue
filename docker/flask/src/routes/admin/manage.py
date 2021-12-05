@@ -2,7 +2,7 @@ from flask import Blueprint, send_from_directory, request
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,os,sys
-from ...models import Company, Prepage,  Tag
+from ...models import Company, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
@@ -37,11 +37,21 @@ def parseXlsx():
 
     workbook = xlrd.open_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
+    # Adds tags
+    maps_sheet = workbook.sheet_by_name("Maps")
+
+    for i in range(1,maps_sheet.nrows):
+        map_object = Prepage.query.filter_by(name=maps_sheet.cell_value(i,0)).first()
+
+        data = list(map(lambda x: x.value, maps_sheet.row(i)))
+        if not map_object:
+            Map.create(*data)
+        else:
+            map_object.update(*data)
+
 
     # Adds tags
     tags_sheet = workbook.sheet_by_name("Tags")
-
-
 
     next_col = NUMBER_OF_METADATA_COLS_TAG
     parent_tag = None

@@ -317,6 +317,51 @@ class Tag_company(db.Model):
         except:
             return False
 
+class Map(db.Model):
+    __tablename__ = "maps"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    image = db.Column(db.String(100))
+    ref = db.Column(db.String(100))
+
+    @staticmethod
+    def create(name, image, ref):
+        try:
+
+            if Map.query.filter_by(name=name).first():
+                return False
+            new_map = Map(
+                name = name,
+                image = image,
+                ref = ref
+            )
+
+            db.session.add(new_map)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, name, image, ref):
+        self.name = test_and_set(self.name,name)
+        self.image = test_and_set(self.image, image)
+        self.ref = test_and_set(self.ref, ref)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'image': self.image,
+            'ref': self.ref
+        }
 
 class Prepage(db.Model):
     __tablename__ = "prepages"

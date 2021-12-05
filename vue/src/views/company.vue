@@ -117,6 +117,7 @@
               title="Talk to us about"
               :body="company.talk_to_us_about"
             />
+            <Map :map="company.map_image" />
           </v-col>
         </v-row>
       </v-container>
@@ -134,6 +135,7 @@ import Website from "@/components/company/Website";
 import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
 import Note from "@/components/company/Note";
+import Map from "@/components/company/Map";
 import { mapGetters } from "vuex";
 
 export default {
@@ -152,6 +154,7 @@ export default {
     //Maps, //Map view
     tableEditDialog,
     Note,
+    Map,
   },
   computed: {
     ...mapGetters({
