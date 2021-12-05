@@ -11,6 +11,7 @@ export default {
       },
       favorites: false,
       charmtalk: false,
+      sweden: false,
     },
     filteredCompanies: [],
   }),
@@ -51,6 +52,9 @@ export default {
         filteredCompanies = filteredCompanies.filter((t) =>
           rootGetters["favorites/favorites"].has(t.id)
         );
+      }
+      if (state.filters.sweden) {
+        filteredCompanies = filteredCompanies.filter((t) => t.in_sweden);
       }
       commit("setFilteredCompanies", filteredCompanies);
     },
