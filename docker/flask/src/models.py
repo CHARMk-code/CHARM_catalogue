@@ -322,7 +322,7 @@ class Map(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     image = db.Column(db.String(100))
-    ref = db.Column(db.String(100))
+    ref = db.Column(db.Integer)
 
     @staticmethod
     def create(name, image, ref):

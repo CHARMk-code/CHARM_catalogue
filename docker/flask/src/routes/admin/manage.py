@@ -44,6 +44,11 @@ def parseXlsx():
         map_object = Prepage.query.filter_by(name=maps_sheet.cell_value(i,0)).first()
 
         data = list(map(lambda x: x.value, maps_sheet.row(i)))
+        ref_object = Map.query.filter_by(name=data[2]).first()
+        if ref_object:
+            data[2] = ref_object.id
+        else:
+            data[2] = None
         if not map_object:
             Map.create(*data)
         else:
