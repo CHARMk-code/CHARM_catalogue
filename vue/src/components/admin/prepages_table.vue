@@ -15,6 +15,9 @@
       <template v-slot:item.order="{ item }">
         {{ item.order }}
       </template>
+      <template v-slot:extra_actions="{ item }">
+        <v-icon class="mr-2" @click="viewPrepage(item)"> mdi-book-open </v-icon>
+      </template>
       <template v-slot:item.active="{ item }">
         <v-simple-checkbox
           disabled
@@ -51,13 +54,13 @@ export default {
         {
           text: "Actions",
           value: "actions",
-          width: 100,
+          width: 130,
           align: "center",
           sortable: false,
         },
       ],
       row_meta: [
-        { type: "image", model: "icon", label: "page image" },
+        { type: "image", model: "image", label: "page image" },
         { type: "checkbox", model: "active", label: "Active" },
         { type: "text", model: "order", label: "Order" },
         { type: "text", model: "name", label: "Name", displayname: true },
@@ -75,6 +78,9 @@ export default {
     },
     deletePrepage(prepage) {
       this.$store.dispatch("prepages/deletePrepage", prepage);
+    },
+    viewPrepage(prepage) {
+      this.$router.push("/prepages/" + (prepage.order - 1));
     },
   },
   beforeMount() {

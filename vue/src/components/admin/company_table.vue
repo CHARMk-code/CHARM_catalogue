@@ -87,10 +87,8 @@ export default {
       business_areas: "tags/business_areas",
       languages: "tags/languages",
       offerings: "tags/offers",
+      maps: "maps/get",
     }),
-    maps() {
-      return this.$store.getters["maps/get"].filter((t) => t.ref != "");
-    },
     modified_companies() {
       const companies = Array.from(this.companies);
       let modified = companies.map((c) => ({
@@ -104,6 +102,9 @@ export default {
         ),
         last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
+        map_image: this.$store.getters["maps/get"].filter(
+          (nm) => (nm.id = c.map_image)
+        ),
       }));
       modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
@@ -154,9 +155,9 @@ export default {
         },
         { type: "text", model: "trivia", label: "Trivia" },
         {
-          type: "map_select",
+          type: "single_select",
           model: "map_image",
-          items: this.maps,
+          items: this.maps.concat([{ name: "No Map", id: null }]),
           label: "Map",
           hint: "Map for company location",
         },

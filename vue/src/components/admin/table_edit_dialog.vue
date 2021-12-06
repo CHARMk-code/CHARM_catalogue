@@ -46,13 +46,14 @@
             />
           </template>
 
-          <template v-if="col.type == 'map_select'">
+          <template v-if="col.type == 'single_select'">
             <v-select
               chips
               :key="col.model"
               v-model="row[col.model]"
               item-text="name"
-              item-value="name"
+              item-value="id"
+              return-object
               :items="col.items"
               :label="col.label"
               :hint="col.hint"
