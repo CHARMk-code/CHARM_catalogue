@@ -9,8 +9,9 @@ import Login from "@/views/login";
 import Upload from "@/components/Upload";
 import Account from "@/components/admin/Account";
 import Prepage_view from "@/views/admin/Prepage";
-import Home_view from "@/views/Home";
+import Landing_view from "@/views/Landing";
 import CookieInfo_view from "@/views/CookieInfo";
+
 
 import Prepage from "@/components/Prepage";
 
@@ -21,8 +22,8 @@ const router = new Router({
   routes: [
     {
       path: "/",
-      name: "Home",
-      component: Home_view,
+      name: "Landing",
+      component: Landing_view,
       meta: {
         noAuth: true,
       },
