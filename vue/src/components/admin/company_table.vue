@@ -103,7 +103,7 @@ export default {
         last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
         map_image: this.$store.getters["maps/get"].filter(
-          (nm) => (nm.id = c.map_image)
+          (nm) => nm.id == c.map_image
         ),
       }));
       modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
