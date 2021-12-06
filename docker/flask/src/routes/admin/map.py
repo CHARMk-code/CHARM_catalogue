@@ -22,7 +22,9 @@ def map_put():
     image = get_if_exist(request_data,"image")
     ref = get_if_exist(request_data,"ref")
 
-    ref = Map.query.filter_by(name=ref).first().id if ref != "" else None
+    ref = Map.query.filter_by(name=ref).first()
+    if ref != None:
+        ref = ref.id
 
     if not id:
         return send_status(Map.create(name,image,ref))
