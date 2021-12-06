@@ -1,9 +1,11 @@
 import Vue from "vue";
+const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export default {
   namespaced: true,
   state: () => ({
     companies: [],
+    load_wait: 0,
   }),
   mutations: {
     modifyCompany(state, company) {
@@ -26,19 +28,25 @@ export default {
   actions: {
     getCompanies({ commit }) {
       return new Promise((resolve, reject) => {
-        Vue.prototype.$axios
-          .get("/company")
-          .then((resp) => {
-            commit("removeAllCompanies");
-            const companies = resp.data;
-            if (companies.length > 0) {
-              commit("setCompanies", companies);
-            }
-            resolve(resp);
-          })
-          .catch((err) => {
-            reject(err);
-          });
+        if (this.state.companies.load_wait < Date.now()) {
+          this.state.companies.load_wait =
+            Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+          Vue.prototype.$axios
+            .get("/company")
+            .then((resp) => {
+              commit("removeAllCompanies");
+              const companies = resp.data;
+              if (companies.length > 0) {
+                commit("setCompanies", companies);
+              }
+              resolve(resp);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        } else {
+          resolve();
+        }
       });
     },
     modifyCompany({ commit }, company) {

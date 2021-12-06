@@ -5,6 +5,7 @@
     class="elevation-1"
     :search="search"
     @click:row="onRowClick"
+    fluid
     item-key="id"
     multi-sort
     fixed-header
@@ -14,6 +15,7 @@
         <v-toolbar-title>{{ name }}</v-toolbar-title>
         <v-spacer />
         <v-text-field
+          v-if="!noSearch"
           v-model="search"
           label="search"
           class="mx-4"
@@ -73,7 +75,7 @@ export default {
     tableEditDialog,
     tablePop,
   },
-  props: ["editable", "name", "headers", "data", "row_meta"],
+  props: ["editable", "name", "headers", "data", "row_meta", "noSearch"],
   data() {
     return {
       search: "",

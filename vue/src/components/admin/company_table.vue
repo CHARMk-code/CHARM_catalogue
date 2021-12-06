@@ -40,26 +40,8 @@
           </template>
         </template>
       </template>
-      <template v-slot:item.looking_for="{ item }">
-        <template v-for="tag in item.looking_for">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.offering="{ item }">
-        <template v-for="tag in item.offering">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
-      </template>
-      <template v-slot:item.business_area="{ item }">
-        <template v-for="tag in item.business_area">
-          <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-            tag.name
-          }}</v-chip>
-        </template>
+      <template v-slot:item.completion="{ item }">
+        <template> {{ item.completion }}/11 </template>
       </template>
     </Table>
   </v-container>
@@ -69,6 +51,8 @@
 import Table from "@/components/table";
 import { mapGetters } from "vuex";
 import Vue from "vue";
+import dayjs from "dayjs";
+
 export default {
   name: "companies_table",
   components: {
@@ -79,14 +63,12 @@ export default {
       headers: [
         { text: "Name", value: "name" },
         { text: "Programs", value: "divisions" },
-        { text: "Business areas", value: "business_area" },
-        { text: "Looking for", value: "looking_for" },
-        { text: "offering", value: "offering" },
-        { text: "Active", value: "active", align: "center", width: 110 },
+        { text: "Completion", value: "completion", width: 120 },
+        { text: "Active", value: "active", width: 100 },
+        { text: "Last Updated", value: "last_updated", width: 170 },
         {
           text: "Actions",
           value: "actions",
-          align: "center",
           width: 130,
           sortable: false,
         },
@@ -107,7 +89,7 @@ export default {
     }),
     modified_companies() {
       const companies = Array.from(this.companies);
-      const modified = companies.map((c) => ({
+      let modified = companies.map((c) => ({
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
@@ -115,8 +97,11 @@ export default {
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
           c.tags
         ),
+        last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
       }));
+
+      modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
     },
     row_meta() {
@@ -127,6 +112,11 @@ export default {
           on_icon: "mdi-eye",
           off_icon: "mdi-eye-off",
           label: "Active (required for row to be visible)",
+        },
+        {
+          type: "checkbox",
+          model: "charmtalk",
+          label: "On CHARMtalks",
         },
         {
           type: "text",
@@ -140,16 +130,21 @@ export default {
           model: "description",
           label: "Company description",
         },
-        { type: "text", model: "founded", label: "Founded" },
+        {
+          type: "textarea",
+          model: "talk_to_us_about",
+          label: "Talk to us about",
+        },
+        { type: "number", model: "founded", label: "Founded" },
         { type: "text", model: "Contacts", label: "Contacts" },
         { type: "text", model: "website", label: "Website" },
         {
-          type: "text",
+          type: "number",
           model: "employees_sweden",
           label: "Number of Employees in Sweden",
         },
         {
-          type: "text",
+          type: "number",
           model: "employees_world",
           label: "Number of Employees in the whole world",
         },
@@ -194,6 +189,22 @@ export default {
     },
     viewCompany(company) {
       this.$router.push("/company/" + company.name);
+    },
+    completionCompany(company) {
+      let missing = 0;
+      if (company.name == "") missing++;
+      if (company.logo == "") missing++;
+      if (company.tags == []) missing++;
+      if (company.talk_to_us_about == "") missing++;
+      if (company.trivia == "") missing++;
+      if (company.website == "") missing++;
+      if (company.founded == -1) missing++;
+      if (company.employees_world == -1) missing++;
+      if (company.employees_sweden == -1) missing++;
+      if (company.description == "") missing++;
+      if (company.contacts == "") missing++;
+
+      return 11 - missing;
     },
   },
 };

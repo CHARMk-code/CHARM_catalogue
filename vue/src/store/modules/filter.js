@@ -7,8 +7,10 @@ export default {
         divisions: [],
         looking_for: [],
         business_areas: [],
-        offering: [],
+        offerings: [],
       },
+      favorites: false,
+      charmtalk: false,
     },
     filteredCompanies: [],
   }),
@@ -40,6 +42,15 @@ export default {
             });
           }
         }
+        if (state.filters.charmtalk) {
+          filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
+        }
+        filteredCompanies = filteredCompanies.filter((t) => t.active);
+      }
+      if (state.filters.favorites) {
+        filteredCompanies = filteredCompanies.filter((t) =>
+          rootGetters["favorites/favorites"].has(t.id)
+        );
       }
       commit("setFilteredCompanies", filteredCompanies);
     },

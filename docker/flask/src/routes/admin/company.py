@@ -33,13 +33,15 @@ def company_put():
     id = get_if_exist(request_data,"id")
     name = get_if_exist(request_data,"name")
     active = get_if_exist(request_data,"active")
+    charmtalk = get_if_exist(request_data,"charmtalk")
     description = get_if_exist(request_data,"description")
     trivia = get_if_exist(request_data,"trivia")
     founded = get_if_exist(request_data,"founded")
     contacts = get_if_exist(request_data,"contacts")
-    employs_sweden = get_if_exist(request_data,"employs_sweden")
-    employs_world = get_if_exist(request_data,"employs_world")
+    employees_sweden = get_if_exist(request_data,"employees_sweden")
+    employees_world = get_if_exist(request_data,"employees_world")
     website = get_if_exist(request_data, "website")
+    talk_to_us_about = get_if_exist(request_data, "talk_to_us_about")
     logo = get_if_exist(request_data, "logo")
     tags = get_if_exist(request_data, "tags")
 
@@ -51,13 +53,13 @@ def company_put():
 
     if not id:
 
-        return send_status(Company.create(name,active,description, trivia,
-            founded, contacts, employs_sweden, employs_world, website,logo, tag_objs))
+        return send_status(Company.create(name,active,charmtalk,description, trivia,
+            founded, contacts, employees_sweden, employees_world, website, talk_to_us_about,logo, tag_objs))
 
     company = Company.query.get(id)
 
-    return send_status(company.update(name,active, description,  trivia, founded,
-                contacts, employs_sweden, employs_world, website, logo, tag_objs))
+    return send_status(company.update(name,active, charmtalk, description,  trivia, founded,
+                contacts, employees_sweden, employees_world, website, talk_to_us_about, logo, tag_objs))
 
 
 @blueprint.route("<id>",methods=["DELETE"])
@@ -67,7 +69,6 @@ def company_delete(id):
         return result[1]
 
 
-    print(id,file=sys.stderr)
     company = Company.query.get(id)
     if company:
         return send_status(company.delete())

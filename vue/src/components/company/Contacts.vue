@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="contacts != ''">
     <v-card-title> Contact information </v-card-title>
     <v-card-text>{{ contacts }} </v-card-text>
   </v-card>

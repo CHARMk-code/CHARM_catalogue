@@ -11,13 +11,15 @@
   >
     <template v-slot:item="{ item, attrs }">
       <v-simple-checkbox :value="attrs.inputValue" />
-      <v-img
-        class="ml-2 mr-4"
-        contain
-        max-height="36px"
-        max-width="36px"
-        :src="base_URL + item.icon"
-      />
+      <template v-if="item.icon != ''">
+        <v-img
+          class="ml-2 mr-4"
+          contain
+          max-height="36px"
+          max-width="36px"
+          :src="base_URL + item.icon"
+        />
+      </template>
       {{ item.name }}
     </template>
 
@@ -33,7 +35,7 @@
       </template>
       <template v-else>
         <v-chip small>
-          {{ item.text }}
+          {{ item.name }}
         </v-chip>
       </template>
     </template>

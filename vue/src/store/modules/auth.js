@@ -1,4 +1,5 @@
 import Vue from "vue";
+import helperfunctions from "@/plugins/helperfunctions";
 
 export default {
   namespaced: true,
@@ -31,8 +32,10 @@ export default {
           .post("auth", user)
           .then((resp) => {
             const token = resp.data;
-            console.log(resp);
-            localStorage.setItem("token", token);
+
+            if (helperfunctions.cookiesAccepted()) {
+              localStorage.setItem("token", token);
+            }
             Vue.prototype.$axios.defaults.headers.common["Authorization"] =
               "basic " + token;
             commit("auth_success", { token });
@@ -56,7 +59,15 @@ export default {
     },
   },
   getters: {
-    isLoggedIn: (state) => !!state.token,
+    isLoggedIn: (state) => {
+      try {
+        const expired = JSON.parse(atob(state.token.split(".")[1])).exp;
+        const currentTime = Math.floor(Date.now() / 1000);
+        return currentTime < expired;
+      } catch (e) {
+        return false;
+      }
+    },
     authStatus: (state) => state.status,
     token: (state) => state.token,
   },

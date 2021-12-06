@@ -1,6 +1,27 @@
 <template>
   <v-main>
     <v-sheet v-if="company != undefined">
+      <v-btn
+        class="prev navigation"
+        v-on:click="prev()"
+        v-if="currentIndex > 0"
+        icon
+      >
+        <v-chip x-large>
+          <v-icon x-large>mdi-arrow-left</v-icon>
+        </v-chip>
+      </v-btn>
+
+      <v-btn
+        class="next navigation"
+        v-on:click="next()"
+        v-if="currentIndex < maxIndex - 1"
+        icon
+      >
+        <v-chip x-large>
+          <v-icon x-large>mdi-arrow-right</v-icon>
+        </v-chip>
+      </v-btn>
       <v-container>
         <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
           Edit
@@ -20,13 +41,32 @@
             <Logo :src="company.logo" />
           </v-col>
           <v-spacer />
+          <v-tooltip right max-width="300px">
+            <template v-slot:activator="{ on, attrs }">
+              <div v-on="on">
+                <v-checkbox
+                  class="large"
+                  v-bind="attrs"
+                  @change="favoriteChange"
+                  v-model="favorite"
+                  on-icon="mdi-star"
+                  off-icon="mdi-star-outline"
+                />
+              </div>
+            </template>
+            <span>
+              Save as favourite (This is only stored in your browser and will
+              not be transfered between browsers)
+            </span>
+          </v-tooltip>
           <v-col>
             <div class="text-h2 font-weight-regular">{{ company.name }}</div>
           </v-col>
+          <v-col> </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <Description :desc="company.description" />
+            <Textblock :body="company.description" />
           </v-col>
           <v-col>
             <!--<Maps />-->
@@ -68,10 +108,15 @@
               :world="company.employees_world"
               :year="company.founded"
             />
+            <Note :id="company.id" />
           </v-col>
           <v-col>
             <Contacts class="mb-6" :contacts="company.contacts" />
             <Website :website="company.website" />
+            <Textblock
+              title="Talk to us about"
+              :body="company.talk_to_us_about"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -84,39 +129,39 @@ import Logo from "@/components/company/Logo";
 // import BusinessAreas from "@/components/company/Business_area";
 import Trivia from "@/components/company/Trivia";
 import Contacts from "@/components/company/Contacts";
-import Description from "@/components/company/Description";
+import Textblock from "@/components/company/Textblock";
 import Website from "@/components/company/Website";
 import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
+import Note from "@/components/company/Note";
 import { mapGetters } from "vuex";
 
 export default {
   name: "Company_View",
   data() {
-    return { dialog: false };
+    return { dialog: false, favorite: false };
   },
   components: {
     //Art,
     Logo,
-    //BusinessAreas, //Tags?
     Trivia, //Did you know...
     Contacts, //name, email, position?
-    Description, //Company description
+    Textblock, //Company description
     Website, //Company website
     Tags, //Tags
-    //Offering, //Master thesis, summer job, Trainee, Oppotunities abroad, Internship, Recruiting events
-    //Looking_for, //Bachelor, Master, Phd
-    //Programs, // Tags for all programs
     //Maps, //Map view
     tableEditDialog,
+    Note,
   },
   computed: {
     ...mapGetters({
       isLoggedIn: "auth/isLoggedIn",
+      filteredCompanies: "filter/filteredCompanies",
       divisions: "tags/divisions",
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
       offerings: "tags/offers",
+      isInFavorites: "favorites/isInFavorites",
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](
@@ -129,6 +174,12 @@ export default {
         console.log("No match");
         return undefined;
       }
+    },
+    currentIndex() {
+      return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
+    },
+    maxIndex() {
+      return this.filteredCompanies.length;
     },
     tags() {
       return this.company.tags;
@@ -213,10 +264,54 @@ export default {
     saveRow(row) {
       this.$store.dispatch("companies/modifyCompany", row);
     },
+    next() {
+      this.$router.push(
+        "/company/" + this.filteredCompanies[this.currentIndex + 1].name
+      );
+    },
+    prev() {
+      this.$router.push(
+        "/company/" + this.filteredCompanies[this.currentIndex - 1].name
+      );
+    },
+    favoriteChange() {
+      if (this.favorite) {
+        this.$store.commit("favorites/addFavorite", this.company.id);
+      } else {
+        this.$store.commit("favorites/removeFavorite", this.company.id);
+      }
+    },
+  },
+  watch: {
+    company: function (company) {
+      this.favorite = this.$store.getters["favorites/favorites"].has(
+        company.id
+      );
+    },
   },
   beforeCreate() {
     this.$store.dispatch("companies/getCompanies"); //move somewhere else
     this.$store.dispatch("tags/getTags"); //move somewhere else
   },
+  beforeMount() {
+    this.$store.commit("favorites/loadForStorage");
+    this.$store.dispatch("filter/filterCompanies");
+  },
 };
 </script>
+<style scoped>
+.navigation {
+  text-decoration: none;
+  margin: 20px;
+  position: absolute;
+  top: 50%;
+  z-index: 9999;
+}
+.navigation > * {
+  top: -50%;
+}
+.next {
+  right: 5%;
+}
+</style>
+
