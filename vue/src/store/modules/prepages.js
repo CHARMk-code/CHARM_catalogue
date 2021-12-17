@@ -4,6 +4,7 @@ const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones a
 export default {
   namespaced: true,
   state: () => ({
+    load_wait: 0,
     prepages: [],
     active_prepages: [],
   }),
@@ -30,8 +31,8 @@ export default {
   },
   actions: {
     getPrepages({ commit }) {
-      if (this.state.tags.load_wait < Date.now()) {
-        this.state.tags.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+      if (this.state.prepages.load_wait < Date.now()) {
+        this.state.prepages.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
         return new Promise((resolve, reject) => {
           Vue.prototype.$axios
             .get("/prepage")

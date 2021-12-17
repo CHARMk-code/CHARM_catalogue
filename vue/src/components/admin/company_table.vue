@@ -85,13 +85,16 @@ export default {
       divisions: "tags/divisions",
       looking_for: "tags/looking_fors",
       business_areas: "tags/business_areas",
+      languages: "tags/languages",
       offerings: "tags/offers",
+      maps: "maps/get",
     }),
     modified_companies() {
       const companies = Array.from(this.companies);
       let modified = companies.map((c) => ({
         ...c,
         divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
+        languages: this.$store.getters["tags/getLanguagesFromIds"](c.tags),
         looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
         offering: this.$store.getters["tags/getOffersFromIds"](c.tags),
         business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
@@ -99,8 +102,10 @@ export default {
         ),
         last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
         tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
+        map_image: this.$store.getters["maps/get"].filter(
+          (nm) => nm.id == c.map_image
+        ),
       }));
-
       modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
     },
@@ -150,6 +155,13 @@ export default {
         },
         { type: "text", model: "trivia", label: "Trivia" },
         {
+          type: "single_select",
+          model: "map_image",
+          items: this.maps.concat([{ name: "No Map", id: null }]),
+          label: "Map",
+          hint: "Map for company location",
+        },
+        {
           type: "select",
           model: "divisions",
           items: this.divisions,
@@ -174,8 +186,15 @@ export default {
           type: "select",
           model: "offering",
           items: this.offerings,
-          label: "offering",
+          label: "Offering",
           hint: "Which type of jobs the company is offering",
+        },
+        {
+          type: "select",
+          model: "languages",
+          items: this.languages,
+          label: "Languages",
+          hint: "Which languages does the company want",
         },
       ];
     },

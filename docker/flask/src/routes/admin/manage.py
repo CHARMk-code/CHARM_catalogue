@@ -2,7 +2,7 @@ from flask import Blueprint, send_from_directory, request
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,os,sys
-from ...models import Company, Prepage,  Tag
+from ...models import Company, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
@@ -29,19 +29,34 @@ def imageLoad(request):
     return "All files uploaded", status.HTTP_200_OK
 
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS_COMPANY = 12
-    NUMBER_OF_METADATA_COLS_TAG = 5
+    NUMBER_OF_METADATA_COLS_COMPANY = 14
+    NUMBER_OF_METADATA_COLS_TAG = 6
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
 
     workbook = xlrd.open_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
+    # Adds tags
+    maps_sheet = workbook.sheet_by_name("Maps")
+
+    for i in range(1,maps_sheet.nrows):
+        map_object = Prepage.query.filter_by(name=maps_sheet.cell_value(i,0)).first()
+
+        data = list(map(lambda x: x.value, maps_sheet.row(i)))
+        ref_object = Map.query.filter_by(name=data[2]).first()
+        if ref_object:
+            data[2] = ref_object.id
+        else:
+            data[2] = None
+        if not map_object:
+            Map.create(*data)
+        else:
+            map_object.update(*data)
+
 
     # Adds tags
     tags_sheet = workbook.sheet_by_name("Tags")
-
-
 
     next_col = NUMBER_OF_METADATA_COLS_TAG
     parent_tag = None
@@ -120,6 +135,7 @@ def parseXlsx():
                 metadata = list(map(lambda x: x.value, metadata))
                 metadata[1] = bool(metadata[1])
                 metadata[2] = bool(metadata[2])
+                metadata[3] = bool(metadata[3])
                 Company.create(
                         *metadata,
                         tags_temp

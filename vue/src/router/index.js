@@ -11,6 +11,8 @@ import Account from "@/components/admin/Account";
 import Prepage_view from "@/views/admin/Prepage";
 import Landing_view from "@/views/Landing";
 import CookieInfo_view from "@/views/CookieInfo";
+import Map from "@/components/Map";
+import Map_view from "@/views/admin/Map";
 
 
 import Prepage from "@/components/Prepage";
@@ -58,6 +60,8 @@ const router = new Router({
         },
         {
           path: "maps",
+          name: "Admin/Maps",
+          component: Map_view,
         },
         {
           path: "layout",
@@ -86,6 +90,14 @@ const router = new Router({
       path: "/search",
       name: "Search",
       component: Search_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/maps/:page",
+      name: "Map",
+      component: Map,
       meta: {
         noAuth: true,
       },

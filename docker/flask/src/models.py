@@ -69,6 +69,7 @@ class Company(db.Model):
     last_updated = db.Column(db.DateTime)
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
+    in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
     founded = db.Column(db.Integer)
@@ -79,6 +80,7 @@ class Company(db.Model):
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(500))
     logo = db.Column(db.String(100))
+    map_image = db.Column(db.String(100))
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
@@ -87,9 +89,9 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, charmtalk, description,
+    def create( name, active, charmtalk, in_sweden, description,
         trivia, founded, contacts, employees_sweden,
-        employees_world, website, talk_to_us_about, logo, tags):
+        employees_world, website, talk_to_us_about, logo, map_image,  tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -98,6 +100,7 @@ class Company(db.Model):
                 last_updated=datetime.datetime.now(),
                 active=active,
                 charmtalk=charmtalk,
+                in_sweden=in_sweden,
                 description=description,
                 trivia=trivia,
                 founded = founded if founded != "" else -1,
@@ -107,6 +110,7 @@ class Company(db.Model):
                 website = website,
                 talk_to_us_about = talk_to_us_about,
                 logo = logo,
+                map_image = map_image,
                 tags = tags
             )
 
@@ -116,14 +120,15 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, charmtalk, description,
+    def update(self, name, active, charmtalk, in_sweden, description,
             trivia, founded, contacts, employees_sweden,
-            employees_world, website,  talk_to_us_about,logo, tags):
-        
+            employees_world, website,  talk_to_us_about,logo, map_image,  tags):
+
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
         self.active = test_and_set(self.active,active)
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
+        self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
         self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
@@ -135,6 +140,7 @@ class Company(db.Model):
         self.employees_world = self.employees_world if self.employees_world != "" else -1,
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
+        self.map_image = test_and_set(self.map_image, map_image)
         self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)
         self.tags = test_and_set(self.tags, tags)
 
@@ -157,6 +163,7 @@ class Company(db.Model):
             'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
             'active': self.active,
             'charmtalk': self.charmtalk,
+            'in_sweden': self.in_sweden,
             'description': self.description,
             'trivia': self.trivia,
             'founded': self.founded,
@@ -165,6 +172,7 @@ class Company(db.Model):
             'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,
+            'map_image': self.map_image,
             'talk_to_us_about': self.talk_to_us_about,
             'tags': tags
         }
@@ -187,9 +195,10 @@ class Tag(db.Model):
     business_area = db.Column(db.Boolean)
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
+    language = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -203,7 +212,8 @@ class Tag(db.Model):
                 division = division,
                 business_area = business_area,
                 looking_for = looking_for,
-                offering = offering
+                offering = offering,
+                language = language
             )
             db.session.add(new_tag)
             db.session.commit()
@@ -211,7 +221,7 @@ class Tag(db.Model):
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
@@ -223,6 +233,7 @@ class Tag(db.Model):
             self.business_area = test_and_set(self.business_area, business_area)
             self.looking_for = test_and_set(self.looking_for, looking_for)
             self.offering = test_and_set(self.offering, offering)
+            self.language = test_and_set(self.language, language)
             db.session.commit()
             return True
         except:
@@ -248,7 +259,8 @@ class Tag(db.Model):
             'division': self.division,
             'business_area': self.business_area,
             'looking_for': self.looking_for,
-            'offering': self.offering
+            'offering': self.offering,
+            'language': self.language
         }
 
 class Tag_company(db.Model):
@@ -305,6 +317,51 @@ class Tag_company(db.Model):
         except:
             return False
 
+class Map(db.Model):
+    __tablename__ = "maps"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    image = db.Column(db.String(100))
+    ref = db.Column(db.Integer)
+
+    @staticmethod
+    def create(name, image, ref):
+        try:
+
+            if Map.query.filter_by(name=name).first():
+                return False
+            new_map = Map(
+                name = name,
+                image = image,
+                ref = ref
+            )
+
+            db.session.add(new_map)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, name, image, ref):
+        self.name = test_and_set(self.name,name)
+        self.image = test_and_set(self.image, image)
+        self.ref = test_and_set(self.ref, ref)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'image': self.image,
+            'ref': self.ref
+        }
 
 class Prepage(db.Model):
     __tablename__ = "prepages"

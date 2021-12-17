@@ -1,16 +1,16 @@
 <template>
   <v-container>
-    <tags_table />
+    <maps_table />
   </v-container>
 </template>
 
 <script>
-import tags_table from "@/components/admin/tags_table";
+import maps_table from "@/components/admin/maps_table";
 
 export default {
-  name: "Tags",
+  name: "Maps",
   components: {
-    tags_table,
+    maps_table,
   },
 };
 </script>

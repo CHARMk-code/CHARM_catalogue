@@ -26,7 +26,7 @@
                   <v-img
                     max-height="32px"
                     max-width="32px"
-                    :src="'/api/manage/image/' + tag.icon"
+                    :src="base_URL + tag.icon"
                   />
                 </v-avatar>
               </template>
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { mapGetters } from "vuex";
 import searchCard from "@/components/search/search_card";
 import Table from "@/components/table";
@@ -95,6 +96,10 @@ export default {
     };
   },
   computed: {
+    base_URL() {
+      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
+
     ...mapGetters({ filteredCompanies: "filter/filteredCompanies" }),
     modifiedFilteredCompanies() {
       const companies = Array.from(this.filteredCompanies);
@@ -120,9 +125,6 @@ export default {
     onRowClick(row) {
       this.$router.push("/company/" + row.name);
     },
-  },
-  beforeMount() {
-    this.$store.dispatch("filter/filterCompanies");
   },
 };
 </script>

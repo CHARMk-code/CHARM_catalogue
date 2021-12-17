@@ -7,6 +7,7 @@ import filter_module from "@/store/modules/filter.js";
 import prepages_module from "@/store/modules/prepages.js";
 import favorites from "@/store/modules/favorites";
 import notes from "@/store/modules/notes";
+import maps from "@/store/modules/maps";
 
 Vue.use(Vuex);
 
@@ -19,5 +20,6 @@ export default new Vuex.Store({
     prepages: prepages_module,
     favorites: favorites,
     notes: notes,
+    maps: maps,
   },
 });
