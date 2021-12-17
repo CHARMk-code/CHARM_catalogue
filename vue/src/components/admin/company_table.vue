@@ -41,7 +41,7 @@
         </template>
       </template>
       <template v-slot:item.completion="{ item }">
-        <template> {{ item.completion }}/11 </template>
+        <template> {{ item.completion }}/10 </template>
       </template>
     </Table>
   </v-container>
@@ -153,7 +153,7 @@ export default {
           model: "employees_world",
           label: "Number of Employees in the whole world",
         },
-        { type: "text", model: "trivia", label: "Trivia" },
+        { type: "text", model: "talk_to_us_about", label: "Talk to us about" },
         {
           type: "single_select",
           model: "map_image",
@@ -215,15 +215,14 @@ export default {
       if (company.logo == "") missing++;
       if (company.tags == []) missing++;
       if (company.talk_to_us_about == "") missing++;
-      if (company.trivia == "") missing++;
       if (company.website == "") missing++;
       if (company.founded == -1) missing++;
       if (company.employees_world == -1) missing++;
-      if (company.employees_sweden == -1) missing++;
       if (company.description == "") missing++;
       if (company.contacts == "") missing++;
+      if (company.map_image == "") missing++;
 
-      return 11 - missing;
+      return 10 - missing;
     },
   },
 };

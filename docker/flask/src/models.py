@@ -76,7 +76,6 @@ class Company(db.Model):
     contacts = db.Column(db.String(300))
     employees_sweden = db.Column(db.Integer)
     employees_world = db.Column(db.Integer)
-    trivia = db.Column(db.String(500))
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(500))
     logo = db.Column(db.String(100))
@@ -90,7 +89,7 @@ class Company(db.Model):
 
     @staticmethod
     def create( name, active, charmtalk, in_sweden, description,
-        trivia, founded, contacts, employees_sweden,
+         founded, contacts, employees_sweden,
         employees_world, website, talk_to_us_about, logo, map_image,  tags):
         try:
             if Company.query.filter_by(name=name).first():
@@ -102,7 +101,6 @@ class Company(db.Model):
                 charmtalk=charmtalk,
                 in_sweden=in_sweden,
                 description=description,
-                trivia=trivia,
                 founded = founded if founded != "" else -1,
                 contacts = contacts,
                 employees_sweden = employees_sweden if employees_sweden != "" else -1,
@@ -121,7 +119,7 @@ class Company(db.Model):
         return True
 
     def update(self, name, active, charmtalk, in_sweden, description,
-            trivia, founded, contacts, employees_sweden,
+            founded, contacts, employees_sweden,
             employees_world, website,  talk_to_us_about,logo, map_image,  tags):
 
         self.name = test_and_set(self.name,name)
@@ -130,7 +128,6 @@ class Company(db.Model):
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
-        self.trivia = test_and_set(self.trivia,trivia)
         self.founded = test_and_set(self.founded,founded)
         self.founded = self.founded if self.founded != "" else -1,
         self.contacts = test_and_set(self.contacts,contacts)
@@ -165,7 +162,6 @@ class Company(db.Model):
             'charmtalk': self.charmtalk,
             'in_sweden': self.in_sweden,
             'description': self.description,
-            'trivia': self.trivia,
             'founded': self.founded,
             'contacts': self.contacts,
             'employees_sweden': self.employees_sweden,
