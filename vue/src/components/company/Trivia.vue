@@ -1,11 +1,13 @@
 <template>
-  <v-card v-if="!(trivia == '' && sweden == -1 && world == -1)">
+  <v-card v-if="!(talk_to_us_about == '' && sweden == -1 && world == -1)">
     <v-card-title> Did you know...</v-card-title>
     <v-card-text>
-      <v-card flat v-if="trivia != ''">
-        <v-card-title class="text-subtitle-1 ma-0 pa-0"> Trivia: </v-card-title>
+      <v-card flat v-if="talk_to_us_about != ''">
+        <v-card-title class="text-subtitle-1 ma-0 pa-0">
+          Talk to us about:
+        </v-card-title>
         <v-card-text>
-          {{ trivia }}
+          {{ talk_to_us_about }}
         </v-card-text>
       </v-card>
 
@@ -32,6 +34,6 @@
 <script>
 export default {
   name: "Company_Trivia",
-  props: ["trivia", "sweden", "world", "year"],
+  props: ["talk_to_us_about", "sweden", "world", "year"],
 };
 </script>
