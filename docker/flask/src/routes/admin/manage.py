@@ -2,7 +2,7 @@ from flask import Blueprint, send_from_directory, request
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,os,sys
-from ...models import Company, Prepage,  Tag, Map
+from ...models import Company, Layout, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
@@ -150,6 +150,17 @@ def parseXlsx():
             Prepage.create(*data)
         else:
             prepage.update(*data)
+
+    # Layout
+    layout_sheet = workbook.sheet_by_name("Layout")
+    for i in range(1,layout_sheet.nrows):
+        layout = Layout.query.filter_by(image=layout_sheet.cell_value(i,1)).first()
+
+        data = list(map(lambda x: x.value, layout_sheet.row(i)))
+        if not layout:
+            Layout.create(*data)
+        else:
+            layout.update(*data)
 
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 

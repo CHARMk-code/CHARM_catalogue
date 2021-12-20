@@ -8,6 +8,7 @@ import prepages_module from "@/store/modules/prepages.js";
 import favorites from "@/store/modules/favorites";
 import notes from "@/store/modules/notes";
 import maps from "@/store/modules/maps";
+import layouts from "@/store/modules/layouts";
 
 Vue.use(Vuex);
 
@@ -21,5 +22,6 @@ export default new Vuex.Store({
     favorites: favorites,
     notes: notes,
     maps: maps,
+    layouts: layouts,
   },
 });

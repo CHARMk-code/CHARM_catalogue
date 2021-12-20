@@ -13,7 +13,7 @@ import Landing_view from "@/views/Landing";
 import CookieInfo_view from "@/views/CookieInfo";
 import Map from "@/components/Map";
 import Map_view from "@/views/admin/Map";
-
+import Layout from "@/views/admin/Layout";
 
 import Prepage from "@/components/Prepage";
 
@@ -65,6 +65,8 @@ const router = new Router({
         },
         {
           path: "layout",
+          name: "Admin/Layout",
+          component: Layout,
         },
         {
           path: "batch",
