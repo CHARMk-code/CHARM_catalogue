@@ -103,7 +103,7 @@
           </v-col>
           <v-col>
             <Trivia
-              :trivia="company.trivia"
+              :talk_to_us_about="company.talk_to_us_about"
               :sweden="company.employees_sweden"
               :world="company.employees_world"
               :year="company.founded"
@@ -113,10 +113,6 @@
           <v-col>
             <Contacts class="mb-6" :contacts="company.contacts" />
             <Website :website="company.website" />
-            <Textblock
-              title="Talk to us about"
-              :body="company.talk_to_us_about"
-            />
             <Map :map="company.map_image" />
           </v-col>
         </v-row>

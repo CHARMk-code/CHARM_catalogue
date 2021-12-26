@@ -1,10 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from flask_mobility import Mobility
 import toml
 from flask_cors import CORS
-from .shared_data import last_update_company, last_update_tag
+from time import sleep
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
@@ -41,5 +40,11 @@ def create_app():
     return app
 
 with create_app().app_context():
-    db.create_all()
+    while True:
+        try:
+            db.create_all()
+            break
+        except:
+            sleep(1)
+            pass
     db.session.commit()
