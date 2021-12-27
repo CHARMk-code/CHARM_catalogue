@@ -2,7 +2,7 @@
   <v-main>
     <v-btn
       v-if="button_left"
-      class="navigation"
+      class="navigation hidden-sm-and-down"
       elevation="4"
       x-large
       v-on:click="$emit('prev')"
@@ -12,7 +12,7 @@
     </v-btn>
     <v-btn
       v-if="button_right"
-      class="navigation"
+      class="navigation hidden-sm-and-down"
       v-on:click="$emit('next')"
       style="right: 0%"
       x-large
@@ -48,12 +48,12 @@
       </div>
     </div>
     <div style="position: absolute; top: 0; width: 100vw">
-      <v-row>
-        <v-col cols="2" style="height: 0px" />
-        <v-col>
+      <v-row class="pa-0 ma-0">
+        <v-col cols="2" style="height: 0px" class="pa-0 ma-0" />
+        <v-col class="pa-0 ma-0">
           <slot />
         </v-col>
-        <v-col cols="2" style="height: 0px" />
+        <v-col cols="2" style="height: 0px" class="pa-0 ma-0" />
       </v-row>
     </div>
   </v-main>
