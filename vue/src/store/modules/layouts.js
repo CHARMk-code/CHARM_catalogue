@@ -28,9 +28,10 @@ export default {
   },
   actions: {
     getLayouts({ commit }) {
-      if (this.state.layouts.load_wait < Date.now()) {
-        this.state.layouts.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        if (this.state.layouts.load_wait < Date.now()) {
+          this.state.layouts.load_wait =
+            Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           Vue.prototype.$axios
             .get("/layout")
             .then((resp) => {
@@ -44,8 +45,10 @@ export default {
             .catch((err) => {
               reject(err);
             });
-        });
-      }
+        } else {
+          resolve();
+        }
+      });
     },
     modifyLayout({ commit }, layout) {
       return new Promise((resolve, reject) => {
