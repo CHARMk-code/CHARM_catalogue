@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <sideLayout>
     <v-sheet v-if="company != undefined">
       <v-btn
         class="prev navigation"
@@ -119,7 +119,7 @@
         </v-row>
       </v-container>
     </v-sheet>
-  </v-main>
+  </sideLayout>
 </template>
 
 <script>
@@ -134,6 +134,7 @@ import tableEditDialog from "@/components/admin/table_edit_dialog";
 import Note from "@/components/company/Note";
 import Map from "@/components/company/Map";
 import Layout from "@/components/company/Layout";
+import sideLayout from "@/views/sideLayout";
 import { mapGetters } from "vuex";
 
 export default {
@@ -142,6 +143,7 @@ export default {
     return { dialog: false, favorite: false };
   },
   components: {
+    sideLayout,
     //Art,
     Logo,
     Trivia, //Did you know...
@@ -308,4 +310,3 @@ export default {
   right: 5%;
 }
 </style>
-
