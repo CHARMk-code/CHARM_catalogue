@@ -29,8 +29,7 @@ export default {
       this.$store.dispatch("companies/getCompanies"),
       this.$store.dispatch("prepages/getPrepages"),
       this.$store.dispatch("layouts/getLayouts"),
-    ]).then((v) => {
-      console.log(v);
+    ]).then(() => {
       this.$store.dispatch("filter/filterCompanies");
     });
   },

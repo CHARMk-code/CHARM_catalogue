@@ -1,24 +1,26 @@
 <template>
-  <!-- <v-row> -->
-  <!--   <v-col cols="2" class="hidden-sm-and-down"> -->
-  <!--     <v-img -->
-  <!--       v-if="leftSide != undefined" -->
-  <!--       height="100%" -->
-  <!--       :src="base_URL + leftSide.image" -->
-  <!--     /> -->
-  <!--   </v-col> -->
-  <!--   <v-col> -->
-  <!--     <slot /> -->
-  <!--   </v-col> -->
-  <!--   <v-col cols="2" class="hidden-sm-and-down"> -->
-  <!--     <v-img -->
-  <!--       v-if="rightSide != undefined" -->
-  <!--       height="100%" -->
-  <!--       :src="base_URL + rightSide.image" -->
-  <!--     /> -->
-  <!--   </v-col> -->
-  <!-- </v-row> -->
   <v-main>
+    <v-btn
+      v-if="button_left"
+      class="navigation"
+      elevation="4"
+      x-large
+      v-on:click="$emit('prev')"
+      icon
+    >
+      <v-icon x-large>mdi-arrow-left</v-icon>
+    </v-btn>
+    <v-btn
+      v-if="button_right"
+      class="navigation"
+      v-on:click="$emit('next')"
+      style="right: 0%"
+      x-large
+      elevation="4"
+      icon
+    >
+      <v-icon x-large>mdi-arrow-right</v-icon>
+    </v-btn>
     <div
       style="position: fixed; top: 0; width: 100vw"
       class="hidden-sm-and-down"
@@ -47,11 +49,11 @@
     </div>
     <div style="position: absolute; top: 0; width: 100vw">
       <v-row>
-        <v-col cols="2" />
+        <v-col cols="2" style="height: 0px" />
         <v-col>
           <slot />
         </v-col>
-        <v-col cols="2" />
+        <v-col cols="2" style="height: 0px" />
       </v-row>
     </div>
   </v-main>
@@ -62,6 +64,7 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 export default {
   name: "sideLayout",
+  props: ["button_left", "button_right"],
   computed: {
     ...mapGetters({ getSide: "layouts/getSide" }),
     leftSide() {
@@ -76,3 +79,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.navigation {
+  text-decoration: none;
+  margin: 50px;
+  position: fixed;
+  z-index: 9999999;
+  top: 50%;
+}
+.navigation > * {
+  top: -50%;
+}
+</style>

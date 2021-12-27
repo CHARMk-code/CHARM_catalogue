@@ -17,7 +17,6 @@ export default {
     },
   },
   mounted() {
-    console.log("mounting");
     this.layout = this.$store.getters["layouts/getMiddle"];
   },
 };

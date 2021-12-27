@@ -1,21 +1,10 @@
 <template>
-  <!-- <v-btn -->
-  <!--   class="prev navigation" -->
-  <!--   v-on:click="prev()" -->
-  <!--   v-if="page > 0" -->
-  <!--   icon -->
-  <!-- > -->
-  <!--   <v-chip x-large> -->
-  <!--     <v-icon x-large>mdi-arrow-left</v-icon> -->
-  <!--   </v-chip> -->
-  <!-- </v-btn> -->
-  <!--  -->
-  <!-- <v-btn class="next navigation" v-on:click="next()" icon> -->
-  <!--   <v-chip x-large> -->
-  <!--     <v-icon x-large>mdi-arrow-right</v-icon> -->
-  <!--   </v-chip> -->
-  <!-- </v-btn> -->
-  <sideLayout>
+  <sideLayout
+    v-on:next="next"
+    v-on:prev="prev"
+    v-bind:button_left="page > 0"
+    v-bind:button_right="true"
+  >
     <v-container
       v-touch="{
         right: () => prev(),
@@ -64,7 +53,6 @@ export default {
     },
     prev() {
       const next_index = parseInt(this.page) - 1;
-      console.log(next_index);
       if (next_index >= 0) {
         this.$router.push("/prepages/" + next_index);
       }
@@ -76,17 +64,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.navigation {
-  text-decoration: none;
-  margin: 20px;
-  position: absolute;
-  top: 50%;
-}
-.navigation > * {
-  top: -50%;
-}
-.next {
-  right: 0%;
-}
-</style>

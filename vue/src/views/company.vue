@@ -1,5 +1,10 @@
 <template>
-  <sideLayout>
+  <sideLayout
+    v-on:next="next"
+    v-on:prev="prev"
+    v-bind:button_left="currentIndex > 0"
+    v-bind:button_right="currentIndex < maxIndex - 1"
+  >
     <v-sheet v-if="company != undefined">
       <v-container
         v-touch="{
@@ -135,10 +140,8 @@ export default {
         this.$route.params.name
       );
       if (matching_companies.length == 1) {
-        console.log("match");
         return matching_companies[0];
       } else {
-        console.log("No match");
         return undefined;
       }
     },

@@ -84,12 +84,10 @@ export default {
     getMiddle: (state) => {
       const layouts = state.layouts.filter((t) => t.placement === 0);
       if (layouts.length === 0) {
-        console.log("undefined ");
         return undefined;
       }
 
       const index = Math.floor(Math.random() * layouts.length);
-      console.log(layouts, index, layouts[index].image);
       return layouts[index];
     },
     getSide: (state) => (side) => {
