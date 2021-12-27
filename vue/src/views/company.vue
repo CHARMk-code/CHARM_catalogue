@@ -21,31 +21,7 @@
             <Logo :src="company.logo" />
           </v-col>
           <v-col>
-            <v-row>
-              <v-col cols="2">
-                <v-tooltip right max-width="300px">
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-on="on">
-                      <v-checkbox
-                        class="large"
-                        v-bind="attrs"
-                        @change="favoriteChange"
-                        v-model="favorite"
-                        on-icon="mdi-star"
-                        off-icon="mdi-star-outline"
-                      />
-                    </div>
-                  </template>
-                  <span>
-                    Save as favourite (This is only stored in your browser and
-                    will not be transfered between browsers)
-                  </span>
-                </v-tooltip>
-              </v-col>
-              <v-col cols="10" class="text-h2 font-weight-regular">{{
-                company.name
-              }}</v-col>
-            </v-row>
+            <Name :name="company.name" :id="company.id" />
           </v-col>
         </v-row>
 
@@ -110,7 +86,7 @@
 
 <script>
 import Logo from "@/components/company/Logo";
-// import BusinessAreas from "@/components/company/Business_area";
+import Name from "@/components/company/Name";
 import Trivia from "@/components/company/Trivia";
 import Contacts from "@/components/company/Contacts";
 import Textblock from "@/components/company/Textblock";
@@ -126,11 +102,11 @@ import { mapGetters } from "vuex";
 export default {
   name: "Company_View",
   data() {
-    return { dialog: false, favorite: false };
+    return { dialog: false };
   },
   components: {
     sideLayout,
-    //Art,
+    Name,
     Logo,
     Trivia, //Did you know...
     Contacts, //name, email, position?
@@ -263,13 +239,6 @@ export default {
       this.$router.push(
         "/company/" + this.filteredCompanies[this.currentIndex - 1].name
       );
-    },
-    favoriteChange() {
-      if (this.favorite) {
-        this.$store.commit("favorites/addFavorite", this.company.id);
-      } else {
-        this.$store.commit("favorites/removeFavorite", this.company.id);
-      }
     },
   },
   watch: {
