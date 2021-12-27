@@ -1,7 +1,12 @@
 <template>
   <sideLayout>
     <v-sheet v-if="company != undefined">
-      <v-container>
+      <v-container
+        v-touch="{
+          right: () => prev(),
+          left: () => next(),
+        }"
+      >
         <!-- Edit Company -->
         <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
           Edit
@@ -227,14 +232,16 @@ export default {
       this.$store.dispatch("companies/modifyCompany", row);
     },
     next() {
-      this.$router.push(
-        "/company/" + this.filteredCompanies[this.currentIndex + 1].name
-      );
+      const index = this.currentIndex + 1;
+      if (index < this.filteredCompanies.length) {
+        this.$router.push("/company/" + this.filteredCompanies[index].name);
+      }
     },
     prev() {
-      this.$router.push(
-        "/company/" + this.filteredCompanies[this.currentIndex - 1].name
-      );
+      const index = this.currentIndex - 1;
+      if (index >= 0) {
+        this.$router.push("/company/" + this.filteredCompanies[index].name);
+      }
     },
   },
 };

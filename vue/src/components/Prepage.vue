@@ -1,44 +1,45 @@
 <template>
-  <v-main>
-    <v-row>
-      <v-col>
-        <v-sheet
-          min-height="70vh"
-          rounded="lg"
-          class="d-flex"
-          style="position: relative"
-        >
-          <v-btn
-            class="prev navigation"
-            v-on:click="prev()"
-            v-if="page > 0"
-            icon
-          >
-            <v-chip x-large>
-              <v-icon x-large>mdi-arrow-left</v-icon>
-            </v-chip>
-          </v-btn>
-
-          <v-btn class="next navigation" v-on:click="next()" icon>
-            <v-chip x-large>
-              <v-icon x-large>mdi-arrow-right</v-icon>
-            </v-chip>
-          </v-btn>
-          <img
-            style="margin: auto"
-            :src="base_URL + '/manage/image/' + prepages[page].image"
-          />
-        </v-sheet>
-      </v-col>
-    </v-row>
-  </v-main>
+  <!-- <v-btn -->
+  <!--   class="prev navigation" -->
+  <!--   v-on:click="prev()" -->
+  <!--   v-if="page > 0" -->
+  <!--   icon -->
+  <!-- > -->
+  <!--   <v-chip x-large> -->
+  <!--     <v-icon x-large>mdi-arrow-left</v-icon> -->
+  <!--   </v-chip> -->
+  <!-- </v-btn> -->
+  <!--  -->
+  <!-- <v-btn class="next navigation" v-on:click="next()" icon> -->
+  <!--   <v-chip x-large> -->
+  <!--     <v-icon x-large>mdi-arrow-right</v-icon> -->
+  <!--   </v-chip> -->
+  <!-- </v-btn> -->
+  <sideLayout>
+    <v-container
+      v-touch="{
+        right: () => prev(),
+        left: () => next(),
+      }"
+    >
+      <img
+        class="d-flex mx-auto"
+        style="position: relative; height: 100vh"
+        :src="base_URL + '/manage/image/' + prepages[page].image"
+      />
+    </v-container>
+  </sideLayout>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import Vue from "vue";
+import sideLayout from "@/views/sideLayout";
 export default {
   name: "Prepage",
+  components: {
+    sideLayout,
+  },
   computed: {
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL;
@@ -62,7 +63,11 @@ export default {
       }
     },
     prev() {
-      this.$router.push("/prepages/" + (parseInt(this.page) - 1));
+      const next_index = parseInt(this.page) - 1;
+      console.log(next_index);
+      if (next_index >= 0) {
+        this.$router.push("/prepages/" + next_index);
+      }
     },
   },
   beforeMount() {
