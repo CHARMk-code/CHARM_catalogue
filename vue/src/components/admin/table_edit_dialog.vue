@@ -93,6 +93,17 @@
             </v-select>
           </template>
 
+          <template v-if="col.type == 'radio'">
+            <v-radio-group v-model="row[col.model]" :key="row[col.model]">
+              <v-radio
+                v-for="radios in col.items"
+                :key="radios.value"
+                :label="radios.name"
+                :value="radios.value"
+              />
+            </v-radio-group>
+          </template>
+
           <template v-if="col.type == 'image'">
             <v-container :key="col.model">
               <v-row>

@@ -68,8 +68,9 @@
           <v-col>
             <Textblock :body="company.description" />
           </v-col>
+
           <v-col>
-            <!--<Maps />-->
+            <Layout />
           </v-col>
         </v-row>
         <v-row>
@@ -132,6 +133,7 @@ import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
 import Note from "@/components/company/Note";
 import Map from "@/components/company/Map";
+import Layout from "@/components/company/Layout";
 import { mapGetters } from "vuex";
 
 export default {
@@ -151,6 +153,7 @@ export default {
     tableEditDialog,
     Note,
     Map,
+    Layout,
   },
   computed: {
     ...mapGetters({

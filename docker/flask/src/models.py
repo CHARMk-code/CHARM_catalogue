@@ -410,3 +410,48 @@ class Prepage(db.Model):
             'order': self.order,
             'active': self.active
         }
+
+class Layout(db.Model):
+    __tablename__ = "layout"
+    id = db.Column(db.Integer, primary_key=True)
+    image = db.Column(db.String(100))
+    active = db.Column(db.Boolean)
+    placement = db.Column(db.Integer)
+
+    @staticmethod
+    def create(active,image, placement):
+        try:
+            if Layout.query.filter_by(image=image).first():
+                return False
+            new_layout = Layout(
+                image = image,
+                placement = placement,
+                active = active
+            )
+
+            db.session.add(new_layout)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, active,image, placement):
+        self.active = test_and_set(self.active, active)
+        self.image = test_and_set(self.image, image)
+        self.placement = test_and_set(self.placement, placement)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'image': self.image,
+            'placement': self.placement,
+            'active': self.active
+        }
