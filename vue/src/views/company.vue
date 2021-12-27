@@ -2,7 +2,7 @@
   <sideLayout
     v-on:next="next"
     v-on:prev="prev"
-    v-bind:button_left="currentIndex > 0"
+    v-bind:button_left="true"
     v-bind:button_right="currentIndex < maxIndex - 1"
   >
     <v-sheet v-if="company != undefined">
@@ -134,6 +134,7 @@ export default {
       business_areas: "tags/business_areas",
       offerings: "tags/offers",
       isInFavorites: "favorites/isInFavorites",
+      prepages: "prepages/getActive",
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](
@@ -242,8 +243,15 @@ export default {
     },
     prev() {
       const index = this.currentIndex - 1;
+      console.log(index, this.prepages.length);
       if (index >= 0) {
-        this.$router.push("/company/" + this.filteredCompanies[index].name);
+        return this.$router.push(
+          "/company/" + this.filteredCompanies[index].name
+        );
+      } else {
+        if (this.prepages.length !== 0) {
+          return this.$router.push("/prepages/" + (this.prepages.length - 1));
+        }
       }
     },
   },
