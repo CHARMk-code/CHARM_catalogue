@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <sideLayout>
     <v-container>
       <v-row>
         <searchCard />
@@ -69,10 +69,11 @@
         </Table>
       </v-row>
     </v-container>
-  </v-main>
+  </sideLayout>
 </template>
 
 <script>
+import sideLayout from "@/views/sideLayout";
 import Vue from "vue";
 import { mapGetters } from "vuex";
 import searchCard from "@/components/search/search_card";
@@ -80,6 +81,7 @@ import Table from "@/components/table";
 export default {
   name: "Search",
   components: {
+    sideLayout,
     searchCard,
     Table,
   },
