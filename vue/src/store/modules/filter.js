@@ -25,38 +25,41 @@ export default {
   },
   actions: {
     filterCompanies({ commit, state, rootGetters }) {
-      var filteredCompanies = rootGetters["companies/companies"];
-      if (state.filters != {}) {
-        if (state.filters.query != "") {
-          filteredCompanies = filteredCompanies.filter((c) =>
-            c.name.toLowerCase().includes(state.filters.query.toLowerCase())
+      return new Promise((resolve) => {
+        var filteredCompanies = rootGetters["companies/companies"];
+        if (state.filters != {}) {
+          if (state.filters.query != "") {
+            filteredCompanies = filteredCompanies.filter((c) =>
+              c.name.toLowerCase().includes(state.filters.query.toLowerCase())
+            );
+          }
+          for (const key in state.filters.tags) {
+            const filterTags = state.filters.tags[key];
+
+            if (filterTags.length > 0) {
+              filteredCompanies = filteredCompanies.filter((c) => {
+                return c.tags.some((t) =>
+                  filterTags.some((filterTag) => t == filterTag.id)
+                );
+              });
+            }
+          }
+          if (state.filters.charmtalk) {
+            filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
+          }
+          filteredCompanies = filteredCompanies.filter((t) => t.active);
+        }
+        if (state.filters.favorites) {
+          filteredCompanies = filteredCompanies.filter((t) =>
+            rootGetters["favorites/favorites"].has(t.id)
           );
         }
-        for (const key in state.filters.tags) {
-          const filterTags = state.filters.tags[key];
-
-          if (filterTags.length > 0) {
-            filteredCompanies = filteredCompanies.filter((c) => {
-              return c.tags.some((t) =>
-                filterTags.some((filterTag) => t == filterTag.id)
-              );
-            });
-          }
+        if (state.filters.sweden) {
+          filteredCompanies = filteredCompanies.filter((t) => t.in_sweden);
         }
-        if (state.filters.charmtalk) {
-          filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
-        }
-        filteredCompanies = filteredCompanies.filter((t) => t.active);
-      }
-      if (state.filters.favorites) {
-        filteredCompanies = filteredCompanies.filter((t) =>
-          rootGetters["favorites/favorites"].has(t.id)
-        );
-      }
-      if (state.filters.sweden) {
-        filteredCompanies = filteredCompanies.filter((t) => t.in_sweden);
-      }
-      commit("setFilteredCompanies", filteredCompanies);
+        commit("setFilteredCompanies", filteredCompanies);
+        resolve();
+      });
     },
     setFilters({ commit }, filters) {
       commit("setFilters", filters);

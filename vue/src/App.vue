@@ -22,13 +22,17 @@ export default {
     this.$axios.defaults.headers.common["Authorization"] =
       "Basic " + this.$store.getters["auth/token"];
     this.$store.commit("favorites/loadForStorage");
-    this.$store.dispatch("filter/filterCompanies");
-    this.$store.dispatch("maps/getMaps");
-    this.$store.dispatch("tags/getTags");
-    this.$store.dispatch("companies/getCompanies");
-    this.$store.dispatch("filter/filterCompanies");
-    this.$store.dispatch("prepages/getPrepages");
-    this.$store.dispatch("layouts/getLayouts");
+
+    Promise.all([
+      this.$store.dispatch("maps/getMaps"),
+      this.$store.dispatch("tags/getTags"),
+      this.$store.dispatch("companies/getCompanies"),
+      this.$store.dispatch("prepages/getPrepages"),
+      this.$store.dispatch("layouts/getLayouts"),
+    ]).then((v) => {
+      console.log(v);
+      this.$store.dispatch("filter/filterCompanies");
+    });
   },
 };
 </script>
