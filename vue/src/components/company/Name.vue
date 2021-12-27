@@ -20,7 +20,12 @@
         </span>
       </v-tooltip>
     </v-col>
-    <v-col cols="10" class="text-h2 font-weight-regular">{{ name }}</v-col>
+    <v-col
+      cols="10"
+      class="text-h5 text-md-h3 font-weight-regular d-flex align-center"
+    >
+      {{ name }}
+    </v-col>
   </v-row>
 </template>
 
