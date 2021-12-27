@@ -1,13 +1,12 @@
 <template>
-  <v-app id="app">
+  <div>
     <Header />
-    <router-view />
     <CookieConsent href="cookies">
       <template slot="button">
         <v-btn class="primary x-large ml-5">Got it</v-btn>
       </template>
     </CookieConsent>
-  </v-app>
+  </div>
 </template>
 
 <script>

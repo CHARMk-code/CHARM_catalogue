@@ -1,9 +1,7 @@
 <template>
   <div>
     <MenuLeft :links="links" :routepath="routepath" />
-    <v-main>
-      <router-view> </router-view>
-    </v-main>
+    <router-view> </router-view>
   </div>
 </template>
 

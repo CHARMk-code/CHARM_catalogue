@@ -1,25 +1,23 @@
 <template>
-  <v-main>
-    <v-row>
-      <v-col cols="2">
-        <v-img
-          v-if="leftSide != undefined"
-          height="100%"
-          :src="base_URL + leftSide.image"
-        />
-      </v-col>
-      <v-col cols="8">
-        <slot />
-      </v-col>
-      <v-col cols="2">
-        <v-img
-          v-if="rightSide != undefined"
-          height="100%"
-          :src="base_URL + rightSide.image"
-        />
-      </v-col>
-    </v-row>
-  </v-main>
+  <v-row>
+    <v-col cols="2" class="hidden-sm-and-down">
+      <v-img
+        v-if="leftSide != undefined"
+        height="100%"
+        :src="base_URL + leftSide.image"
+      />
+    </v-col>
+    <v-col>
+      <slot />
+    </v-col>
+    <v-col cols="2" class="hidden-sm-and-down">
+      <v-img
+        v-if="rightSide != undefined"
+        height="100%"
+        :src="base_URL + rightSide.image"
+      />
+    </v-col>
+  </v-row>
 </template>
 
 <script>

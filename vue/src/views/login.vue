@@ -1,7 +1,5 @@
 <template>
-  <v-main>
-    <Login class="mt-4" />
-  </v-main>
+  <Login class="mt-4" />
 </template>
 
 <script>
