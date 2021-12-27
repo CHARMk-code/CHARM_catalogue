@@ -70,7 +70,6 @@ export default {
           this.btn_loader = false;
 
           if (this.$route.params.nextUrl != null) {
-            console.log("going to nextUrl");
             this.$router.push(this.$route.params.nextUrl);
             return;
           }
