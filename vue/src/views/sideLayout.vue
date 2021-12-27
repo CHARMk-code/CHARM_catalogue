@@ -36,7 +36,7 @@
             />
           </v-col>
           <v-spacer />
-          <v-col cols="2" class="ma-0">
+          <v-col cols="2" class="ma-0 pa-0">
             <v-img
               class="ml-0"
               max-height="100vh"
