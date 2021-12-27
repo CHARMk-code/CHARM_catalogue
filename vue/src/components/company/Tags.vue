@@ -1,7 +1,8 @@
 <template>
-  <v-card v-if="tags_data.length > 0">
+  <v-card>
     <v-card-title> {{ name }} </v-card-title>
     <v-card-text>
+      <div v-if="tags_data.length === 0">No {{ name }}</div>
       <template v-for="tag in tags_data">
         <template v-if="tag.icon == ''">
           <v-chip small class="ma-1" :key="tag.id">

@@ -1,10 +1,5 @@
 <template>
-  <v-img
-    v-if="layout != undefined"
-    :src="base_URL + layout.image"
-    max-height="150"
-    max-width="500"
-  />
+  <v-img v-if="layout != undefined" :src="base_URL + layout.image" contain />
 </template>
 
 <script>

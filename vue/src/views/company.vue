@@ -1,28 +1,8 @@
 <template>
   <sideLayout>
     <v-sheet v-if="company != undefined">
-      <v-btn
-        class="prev navigation"
-        v-on:click="prev()"
-        v-if="currentIndex > 0"
-        icon
-      >
-        <v-chip x-large>
-          <v-icon x-large>mdi-arrow-left</v-icon>
-        </v-chip>
-      </v-btn>
-
-      <v-btn
-        class="next navigation"
-        v-on:click="next()"
-        v-if="currentIndex < maxIndex - 1"
-        icon
-      >
-        <v-chip x-large>
-          <v-icon x-large>mdi-arrow-right</v-icon>
-        </v-chip>
-      </v-btn>
       <v-container>
+        <!-- Edit Company -->
         <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
           Edit
         </v-btn>
@@ -40,82 +20,88 @@
           <v-col>
             <Logo :src="company.logo" />
           </v-col>
-          <v-spacer />
-          <v-tooltip right max-width="300px">
-            <template v-slot:activator="{ on, attrs }">
-              <div v-on="on">
-                <v-checkbox
-                  class="large"
-                  v-bind="attrs"
-                  @change="favoriteChange"
-                  v-model="favorite"
-                  on-icon="mdi-star"
-                  off-icon="mdi-star-outline"
-                />
-              </div>
-            </template>
-            <span>
-              Save as favourite (This is only stored in your browser and will
-              not be transfered between browsers)
-            </span>
-          </v-tooltip>
           <v-col>
-            <div class="text-h2 font-weight-regular">{{ company.name }}</div>
+            <v-row>
+              <v-col cols="2">
+                <v-tooltip right max-width="300px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-on="on">
+                      <v-checkbox
+                        class="large"
+                        v-bind="attrs"
+                        @change="favoriteChange"
+                        v-model="favorite"
+                        on-icon="mdi-star"
+                        off-icon="mdi-star-outline"
+                      />
+                    </div>
+                  </template>
+                  <span>
+                    Save as favourite (This is only stored in your browser and
+                    will not be transfered between browsers)
+                  </span>
+                </v-tooltip>
+              </v-col>
+              <v-col cols="10" class="text-h2 font-weight-regular">{{
+                company.name
+              }}</v-col>
+            </v-row>
           </v-col>
-          <v-col> </v-col>
         </v-row>
-        <v-row>
-          <v-col>
-            <Textblock :body="company.description" />
-          </v-col>
 
-          <v-col>
-            <Layout />
-          </v-col>
-        </v-row>
         <v-row>
           <v-col>
-            <!-- <BusinessAreas class="mb-6" :areas="company.business_area" /> -->
-            <Tags
-              :tags="company.tags"
-              name="Tags"
-              getter_target="tags/getTagsFromIds"
-            />
-            <Tags
-              :tags="company.tags"
-              name="Business Areas"
-              getter_target="tags/getBusinessAreasFromIds"
-            />
-            <Tags
-              :tags="company.tags"
-              name="Looking for"
-              getter_target="tags/getLookingForFromIds"
-            />
-            <Tags
-              :tags="company.tags"
-              name="Divisions"
-              getter_target="tags/getDivisionsFromIds"
-            />
-            <Tags
-              :tags="company.tags"
-              name="Offering"
-              getter_target="tags/getOffersFromIds"
-            />
+            <Textblock :body="company.description" class="mb-6" />
+            <Layout class="mb-6" />
+            <v-row>
+              <v-col
+                class="pa-0 mb-0 d-flex flex-wrap justify-space-between"
+                style="margin: 0 -3px"
+              >
+                <Tags
+                  :tags="company.tags"
+                  name="Divisions"
+                  getter_target="tags/getDivisionsFromIds"
+                  class="mb-6 mx-3 flex-grow-1"
+                />
+                <Tags
+                  :tags="company.tags"
+                  name="Looking for"
+                  getter_target="tags/getLookingForFromIds"
+                  class="mb-6 mx-3 flex-grow-1"
+                />
+                <Tags
+                  :tags="company.tags"
+                  name="Offering"
+                  getter_target="tags/getOffersFromIds"
+                  class="mb-6 mx-3 flex-grow-1"
+                />
+                <Tags
+                  :tags="company.tags"
+                  name="Business Areas"
+                  getter_target="tags/getBusinessAreasFromIds"
+                  class="mb-6 mx-3 flex-grow-1"
+                />
+              </v-col>
+            </v-row>
+            <Website :website="company.website" class="mb-6" />
+            <Contacts :contacts="company.contacts" />
           </v-col>
           <v-col>
+            <Map :map="company.map_image" class="mb-6" />
             <Trivia
               :talk_to_us_about="company.talk_to_us_about"
               :sweden="company.employees_sweden"
               :world="company.employees_world"
               :year="company.founded"
+              class="mb-6"
             />
-            <Note :id="company.id" />
+            <Note :id="company.id" class="mb-6" />
           </v-col>
-          <v-col>
-            <Contacts class="mb-6" :contacts="company.contacts" />
-            <Website :website="company.website" />
-            <Map :map="company.map_image" />
-          </v-col>
+        </v-row>
+        <v-row>
+          <v-col> </v-col>
+          <v-col> </v-col>
         </v-row>
       </v-container>
     </v-sheet>
