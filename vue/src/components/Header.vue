@@ -1,35 +1,76 @@
 <template>
-  <v-app-bar color="white" app clipped-left>
-    <v-row fill-height>
-      <v-col class="flex-grow-0 flex-shrink-1" justify="start">
-        <router-link to="/">
-          <img class="logo" src="@/assets/CHARM_logo.png" />
-        </router-link>
-      </v-col>
-      <v-col class="flex-grow-1 flex-shrink-1 mt-4" justify="center">
-        <v-btn
-          class="white"
-          v-for="link in links"
-          :key="link.name"
-          :to="link.route"
-          depressed
-        >
-          {{ link.name }}
-          <v-icon right>{{ link.icon }}</v-icon>
-        </v-btn>
-      </v-col>
-      <v-col class="flex-grow-0 flex-shrink-1 mt-4" justify="end">
-        <v-btn
-          color="primary"
-          v-on:click="logout"
-          v-if="this.$store.getters['auth/isLoggedIn']"
-          depressed
-        >
-          Logout
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-app-bar>
+  <v-app id="app">
+    <v-app-bar color="white" app clipped-left>
+      <v-app-bar-nav-icon
+        class="hidden-md-and-up"
+        @click="drawer = true"
+      ></v-app-bar-nav-icon>
+
+      <v-spacer class="hidden-md-and-up" />
+
+      <router-link to="/">
+        <img class="logo" src="@/assets/CHARM_logo.png" />
+      </router-link>
+
+      <v-spacer />
+
+      <v-btn
+        class="white mr-6 hidden-sm-and-down"
+        v-for="link in links"
+        :key="link.name"
+        :to="link.route"
+        depressed
+      >
+        {{ link.name }}
+        <v-icon right>{{ link.icon }}</v-icon>
+      </v-btn>
+      <v-btn
+        class="hidden-sm-and-down"
+        color="primary"
+        v-on:click="logout"
+        v-if="this.$store.getters['auth/isLoggedIn']"
+        depressed
+      >
+        Logout
+      </v-btn>
+    </v-app-bar>
+
+    <v-navigation-drawer v-model="drawer" absolute temporary>
+      <router-link class="ml-4" to="/">
+        <img class="logo" src="@/assets/CHARM_logo.png" />
+      </router-link>
+      <v-list nav dense>
+        <v-list-item-group v-model="group">
+          <v-list-item to="/">
+            <v-list-item-icon>
+              <v-icon>mdi-home</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item to="/search">
+            <v-list-item-icon>
+              <v-icon>mdi-magnify</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Search</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+
+      <v-btn
+        class="ml-4 mt-4"
+        color="primary"
+        v-on:click="logout"
+        v-if="this.$store.getters['auth/isLoggedIn']"
+        depressed
+      >
+        Logout
+      </v-btn>
+    </v-navigation-drawer>
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
@@ -38,6 +79,8 @@ export default {
   components: {},
   data() {
     return {
+      drawer: false,
+      group: null,
       links: [{ name: "Search", route: "/search", icon: "mdi-magnify" }],
     };
   },
