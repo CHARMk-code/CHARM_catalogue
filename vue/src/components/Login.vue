@@ -68,7 +68,13 @@ export default {
         .dispatch("auth/login", { password: this.password })
         .then(() => {
           this.btn_loader = false;
-          this.$router.push("/");
+
+          if (this.$route.params.nextUrl != null) {
+            console.log("going to nextUrl");
+            this.$router.push(this.$route.params.nextUrl);
+            return;
+          }
+          this.$router.push("/admin");
         })
         .catch(() => {
           this.btn_loader = false;
