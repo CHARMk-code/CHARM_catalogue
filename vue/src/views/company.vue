@@ -75,10 +75,6 @@
             <Note :id="company.id" class="mb-6" />
           </v-col>
         </v-row>
-        <v-row>
-          <v-col> </v-col>
-          <v-col> </v-col>
-        </v-row>
       </v-container>
     </v-sheet>
   </sideLayout>
