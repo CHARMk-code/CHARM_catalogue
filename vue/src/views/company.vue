@@ -241,27 +241,5 @@ export default {
       );
     },
   },
-  watch: {
-    company: function (company) {
-      this.favorite = this.$store.getters["favorites/favorites"].has(
-        company.id
-      );
-    },
-  },
 };
 </script>
-<style scoped>
-.navigation {
-  text-decoration: none;
-  margin: 20px;
-  position: absolute;
-  top: 50%;
-  z-index: 9999;
-}
-.navigation > * {
-  top: -50%;
-}
-.next {
-  right: 5%;
-}
-</style>
