@@ -5,7 +5,7 @@
 <script>
 import Login from "@/components/Login";
 export default {
-  name: "Login view",
+  name: "Login_view",
   components: {
     Login,
   },
