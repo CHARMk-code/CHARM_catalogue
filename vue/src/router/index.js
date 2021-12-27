@@ -1,21 +1,21 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Company_view from "@/views/company";
-import Search_view from "@/views/search";
-import Administration from "@/views/Administration";
-import Companies from "@/views/admin/Companies";
-import Tags from "@/views/admin/Tags";
-import Login from "@/views/login";
-import Upload from "@/components/Upload";
-import Account from "@/components/admin/Account";
-import Prepage_view from "@/views/admin/Prepage";
-import Landing_view from "@/views/Landing";
-import CookieInfo_view from "@/views/CookieInfo";
-import Map from "@/components/Map";
-import Map_view from "@/views/admin/Map";
-import Layout from "@/views/admin/Layout";
+const Company_view = () => import("@/views/company.vue");
+const Search_view = () => import("@/views/search.vue");
+const Login_view = () => import("@/views/login.vue");
+const Landing_view = () => import("@/views/Landing.vue");
+const CookieInfo_view = () => import("@/views/CookieInfo.vue");
+const Map_view = () => import("@/views/Map.vue");
+const Prepage_view = () => import("@/views/Prepage.vue");
 
-import Prepage from "@/components/Prepage";
+const Admin_view = () => import("@/views/Administration.vue");
+const Companies_admin = () => import("@/views/admin/Companies.vue");
+const Prepage_admin = () => import("@/views/admin/Prepage.vue");
+const Tags_admin = () => import("@/views/admin/Tags.vue");
+const Account_admin = () => import("@/components/admin/Account.vue");
+const Map_admin = () => import("@/views/admin/Map.vue");
+const Layout_admin = () => import("@/views/admin/Layout.vue");
+const Upload_admin = () => import("@/components/admin/Upload.vue");
 
 Vue.use(Router);
 
@@ -41,42 +41,42 @@ const router = new Router({
     {
       path: "/Admin",
       name: "Admin",
-      component: Administration,
+      component: Admin_view,
       children: [
         {
           path: "prepages",
           name: "Admin/Prepage",
-          component: Prepage_view,
+          component: Prepage_admin,
         },
         {
           path: "companies",
           name: "Admin/Companies",
-          component: Companies,
+          component: Companies_admin,
         },
         {
           path: "tags",
           name: "Admin/Tags",
-          component: Tags,
+          component: Tags_admin,
         },
         {
           path: "maps",
           name: "Admin/Maps",
-          component: Map_view,
+          component: Map_admin,
         },
         {
           path: "layout",
           name: "Admin/Layout",
-          component: Layout,
+          component: Layout_admin,
         },
         {
           path: "batch",
           name: "batch",
-          component: Upload,
+          component: Upload_admin,
         },
         {
           path: "account",
           name: "Account",
-          component: Account,
+          component: Account_admin,
         },
       ],
     },
@@ -99,7 +99,7 @@ const router = new Router({
     {
       path: "/maps/:page",
       name: "Map",
-      component: Map,
+      component: Map_view,
       meta: {
         noAuth: true,
       },
@@ -107,7 +107,7 @@ const router = new Router({
     {
       path: "/prepages/:page",
       name: "Prepage",
-      component: Prepage,
+      component: Prepage_view,
       meta: {
         noAuth: true,
       },
@@ -115,16 +115,9 @@ const router = new Router({
     {
       path: "/login",
       name: "Login",
-      component: Login,
+      component: Login_view,
       meta: {
         noAuth: true,
-      },
-      beforeEnter: (to, from, next) => {
-        if (router.app.$store.getters["auth/isLoggedIn"]) {
-          next("/");
-        } else {
-          next();
-        }
       },
     },
   ],
@@ -134,9 +127,9 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => !record.meta.noAuth)) {
     if (router.app.$store.getters["auth/isLoggedIn"]) {
       next();
-      return;
+    } else {
+      next({ name: "Login", params: { nextUrl: to.fullPath } });
     }
-    next("/login");
   } else {
     next();
   }
