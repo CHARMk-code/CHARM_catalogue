@@ -1,7 +1,7 @@
 <template>
   <v-img
-    v-if="src != ''"
-    :src="base_URL + getMiddle.image"
+    v-if="layout != undefined"
+    :src="base_URL + layout.image"
     max-height="150"
     max-width="500"
   />
@@ -9,14 +9,21 @@
 
 <script>
 import Vue from "vue";
-import { mapGetters } from "vuex";
 export default {
   name: "Company_layout",
+  data() {
+    return {
+      layout: undefined,
+    };
+  },
   computed: {
-    ...mapGetters({ getMiddle: "layouts/getMiddle" }),
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
+  },
+  mounted() {
+    console.log("mounting");
+    this.layout = this.$store.getters["layouts/getMiddle"];
   },
 };
 </script>
