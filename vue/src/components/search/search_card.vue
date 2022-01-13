@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-sheet fluid elevation="1">
+  <v-container class="px-0">
+    <v-sheet class="pa-0" fluid elevation="1">
       <v-card-title> Search </v-card-title>
 
       <v-card-text>
@@ -17,80 +17,82 @@
           >
         </v-row>
         <v-expand-transition>
-          <v-row v-show="expand">
-            <v-col cols="6">
-              <tagSelector
-                @change="
-                  (v) => {
-                    selected_tags.divisions = v;
-                    search();
-                  }
-                "
-                :tags="tag_divisions"
-                label="Programs"
-              />
-              <tagSelector
-                @change="
-                  (v) => {
-                    selected_tags.business_areas = v;
-                    search();
-                  }
-                "
-                :tags="tag_business_areas"
-                label="Business area"
-              />
-            </v-col>
-            <v-col cols="6">
-              <tagSelector
-                @change="
-                  (v) => {
-                    selected_tags.looking_for = v;
-                    search();
-                  }
-                "
-                :tags="tag_looking_for"
-                label="Looking for"
-              />
-              <tagSelector
-                @change="
-                  (v) => {
-                    selected_tags.offerings = v;
-                    search();
-                  }
-                "
-                :tags="tag_offerings"
-                label="Offering"
-              />
-            </v-col>
-            <v-col>
+          <v-row
+            v-show="expand"
+            class="mx-2 mb-1 flex align-content-space-around"
+            style="gap: 16px"
+          >
+            <tagSelector
+              @change="
+                (v) => {
+                  selected_tags.divisions = v;
+                  search();
+                }
+              "
+              :tags="tag_divisions"
+              label="Programs"
+            />
+            <tagSelector
+              @change="
+                (v) => {
+                  selected_tags.business_areas = v;
+                  search();
+                }
+              "
+              :tags="tag_business_areas"
+              label="Business area"
+            />
+            <tagSelector
+              @change="
+                (v) => {
+                  selected_tags.looking_for = v;
+                  search();
+                }
+              "
+              :tags="tag_looking_for"
+              label="Looking for"
+            />
+            <tagSelector
+              @change="
+                (v) => {
+                  selected_tags.offerings = v;
+                  search();
+                }
+              "
+              :tags="tag_offerings"
+              label="Offering"
+            />
+            <tagSelector
+              @change="
+                (v) => {
+                  selected_tags.languages = v;
+                  search();
+                }
+              "
+              :tags="tag_languages"
+              label="Langague"
+            />
+            <v-row>
               <v-checkbox
+                class="ml-2 mr-4"
                 @change="search()"
-                label="Favorites"
                 v-model="favorites"
+                label="Only Favorites"
               />
               <v-checkbox
+                class="ml-2 mr-4"
                 @change="search()"
                 v-model="charmtalk"
-                label="On CHARMtalks"
+                label="Participating in CHARMtalks"
               />
-              <v-checkbox
+            </v-row>
+            <!--
+                <v-checkbox
                 @change="search()"
                 v-model="sweden"
                 label="In Sweden"
               />
-            </v-col>
-            <v-col>
-              <tagSelector
-                @change="
-                  (v) => {
-                    selected_tags.languages = v;
-                    search();
-                  }
-                "
-                :tags="tag_languages"
-                label="Langague"
-              />
-            </v-col>
+              -->
           </v-row>
         </v-expand-transition>
       </v-card-text>

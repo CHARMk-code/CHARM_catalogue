@@ -48,12 +48,20 @@
       </div>
     </div>
     <div style="position: absolute; top: 0; width: 100vw">
-      <v-row class="pa-0 ma-0">
-        <v-col cols="2" style="height: 0px" class="pa-0 ma-0" />
-        <v-col class="pa-0 ma-0">
+      <v-row>
+        <v-col
+          cols="2"
+          style="height: 0px"
+          class="pa-0 ma-0 hidden-sm-and-down"
+        />
+        <v-col class="pa-0 ma-4">
           <slot />
         </v-col>
-        <v-col cols="2" style="height: 0px" class="pa-0 ma-0" />
+        <v-col
+          cols="2"
+          style="height: 0px"
+          class="pa-0 ma-0 hidden-sm-and-down"
+        />
       </v-row>
     </div>
   </v-main>
