@@ -140,14 +140,9 @@ export default {
           model: "talk_to_us_about",
           label: "Talk to us about",
         },
-        { type: "number", model: "founded", label: "Founded" },
-        { type: "text", model: "Contacts", label: "Contacts" },
+        { type: "text", model: "contacts", label: "Contacts" },
+        { type: "text", model: "contact_email", label: "Contacts email" },
         { type: "text", model: "website", label: "Website" },
-        {
-          type: "number",
-          model: "employees_sweden",
-          label: "Number of Employees in Sweden",
-        },
         {
           type: "number",
           model: "employees_world",
@@ -216,10 +211,10 @@ export default {
       if (company.tags == []) missing++;
       if (company.talk_to_us_about == "") missing++;
       if (company.website == "") missing++;
-      if (company.founded == -1) missing++;
       if (company.employees_world == -1) missing++;
       if (company.description == "") missing++;
       if (company.contacts == "") missing++;
+      if (company.contact_email == "") missing++;
       if (company.map_image == "") missing++;
 
       return 10 - missing;
