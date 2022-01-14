@@ -8,6 +8,7 @@ export default {
         looking_for: [],
         business_areas: [],
         offerings: [],
+        languages: [],
       },
       favorites: false,
       charmtalk: false,
