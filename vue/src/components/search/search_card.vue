@@ -93,6 +93,7 @@
                 label="In Sweden"
               />
               -->
+            <v-btn @click="clearFilter"> Clear filter </v-btn>
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -157,6 +158,15 @@ export default {
         sweden: this.sweden,
       });
       this.$store.dispatch("filter/filterCompanies");
+    },
+    clearFilter() {
+      this.query = "";
+      this.selected_tags.divisions = [];
+      this.selected_tags.business_areas = [];
+      this.selected_tags.offerings = [];
+      this.selected_tags.languages = [];
+      this.favorites = false;
+      this.charmtalk = false;
     },
   },
   mounted() {
