@@ -10,8 +10,8 @@
             v-model="query"
             @input="search"
           />
-          <v-btn x-large class="ml-6 mt-2" icon
-            ><v-icon large @click="expand = !expand"
+          <v-btn x-large @click="expand = !expand" class="ml-6 mt-2" icon
+            ><v-icon large
               >{{ expand ? "mdi-chevron-up" : "mdi-chevron-down" }}
             </v-icon></v-btn
           >
@@ -158,6 +158,14 @@ export default {
       });
       this.$store.dispatch("filter/filterCompanies");
     },
+  },
+  mounted() {
+    const stored_filter = this.$store.getters["filter/getFilter"];
+    this.query = stored_filter.query;
+    this.tags = stored_filter.tags;
+    this.favorites = stored_filter.favorites;
+    this.charmtalk = stored_filter.charmtalk;
+    this.sweden = stored_filter.sweden;
   },
 };
 </script>

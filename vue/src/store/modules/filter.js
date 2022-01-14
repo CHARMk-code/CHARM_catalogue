@@ -70,5 +70,8 @@ export default {
     filteredCompanies: (state) => {
       return state.filteredCompanies;
     },
+    getFilter: (state) => {
+      return state.filters;
+    },
   },
 };
