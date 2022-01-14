@@ -167,6 +167,7 @@ export default {
       this.selected_tags.languages = [];
       this.favorites = false;
       this.charmtalk = false;
+      this.search();
     },
   },
   mounted() {
