@@ -5,7 +5,7 @@
       <div v-if="tags_data.length === 0">No {{ name }}</div>
       <template v-for="tag in tags_data">
         <template v-if="tag.icon == ''">
-          <v-chip small class="ma-1" :key="tag.id">
+          <v-chip small class="ma-1" :key="tag.id" @click="gotoSearch(tag)">
             {{ tag.name }}
           </v-chip>
         </template>
@@ -18,6 +18,7 @@
             max-width="36px"
           >
             <v-img
+              @click="gotoSearch(tag)"
               large
               class="pa-0"
               max-height="36px"
@@ -42,6 +43,38 @@ export default {
     },
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
+    },
+  },
+  methods: {
+    gotoSearch(tag) {
+      const select_tags = {
+        business_areas: [],
+        offerings: [],
+        looking_for: [],
+        languages: [],
+        divisions: [],
+      };
+      if (tag.business_area) {
+        select_tags.business_areas.push(tag);
+      } else if (tag.offering) {
+        select_tags.offerings.push(tag);
+      } else if (tag.looking_for) {
+        select_tags.looking_for.push(tag);
+      } else if (tag.division) {
+        select_tags.divisions.push(tag);
+      }
+
+      this.$store
+        .dispatch("filter/setFilters", {
+          query: "",
+          charmtalk: false,
+          favorites: false,
+          sweden: false,
+          tags: select_tags,
+        })
+        .then(() => {
+          this.$router.push("/search");
+        });
     },
   },
 };

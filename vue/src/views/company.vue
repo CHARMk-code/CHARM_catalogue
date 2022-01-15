@@ -71,7 +71,10 @@
               </v-col>
             </v-row>
             <Website :website="company.website" class="mb-6" />
-            <Contacts :contacts="company.contacts" />
+            <Contacts
+              :contacts="company.contacts"
+              :contact_email="company.contact_email"
+            />
           </v-col>
           <v-col>
             <Map :map="company.map_image" class="mb-6" />

@@ -8,6 +8,7 @@ export default {
         looking_for: [],
         business_areas: [],
         offerings: [],
+        languages: [],
       },
       favorites: false,
       charmtalk: false,
@@ -69,6 +70,9 @@ export default {
   getters: {
     filteredCompanies: (state) => {
       return state.filteredCompanies;
+    },
+    getFilter: (state) => {
+      return state.filters;
     },
   },
 };

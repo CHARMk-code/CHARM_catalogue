@@ -72,12 +72,11 @@ class Company(db.Model):
     in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
-    founded = db.Column(db.Integer)
-    contacts = db.Column(db.String(300))
-    employees_sweden = db.Column(db.Integer)
+    contacts = db.Column(db.String(100))
+    contact_email = db.Column(db.String(320))
     employees_world = db.Column(db.Integer)
     website = db.Column(db.String(200))
-    talk_to_us_about = db.Column(db.String(500))
+    talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
     map_image = db.Column(db.String(100))
     tags = db.relationship(
@@ -89,8 +88,8 @@ class Company(db.Model):
 
     @staticmethod
     def create( name, active, charmtalk, in_sweden, description,
-         founded, contacts, employees_sweden,
-        employees_world, website, talk_to_us_about, logo, map_image,  tags):
+         contacts, contact_email, employees_world, website,
+         talk_to_us_about, logo, map_image,  tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -101,9 +100,8 @@ class Company(db.Model):
                 charmtalk=charmtalk,
                 in_sweden=in_sweden,
                 description=description,
-                founded = founded if founded != "" else -1,
                 contacts = contacts,
-                employees_sweden = employees_sweden if employees_sweden != "" else -1,
+                contact_email = contact_email,
                 employees_world = employees_world if employees_world != "" else -1,
                 website = website,
                 talk_to_us_about = talk_to_us_about,
@@ -119,8 +117,8 @@ class Company(db.Model):
         return True
 
     def update(self, name, active, charmtalk, in_sweden, description,
-            founded, contacts, employees_sweden,
-            employees_world, website,  talk_to_us_about,logo, map_image,  tags):
+            contacts, contact_email, employees_world, website,
+            talk_to_us_about,logo, map_image,  tags):
 
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
@@ -128,11 +126,8 @@ class Company(db.Model):
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
-        self.founded = test_and_set(self.founded,founded)
-        self.founded = self.founded if self.founded != "" else -1,
         self.contacts = test_and_set(self.contacts,contacts)
-        self.employees_sweden = test_and_set(self.employees_sweden,employees_sweden)
-        self.employees_sweden = self.employees_sweden if self.employees_sweden != "" else -1,
+        self.contact_email = test_and_set(self.contact_email,contact_email)
         self.employees_world = test_and_set(self.employees_world, employees_world)
         self.employees_world = self.employees_world if self.employees_world != "" else -1,
         self.website = test_and_set(self.website, website)
@@ -162,9 +157,8 @@ class Company(db.Model):
             'charmtalk': self.charmtalk,
             'in_sweden': self.in_sweden,
             'description': self.description,
-            'founded': self.founded,
             'contacts': self.contacts,
-            'employees_sweden': self.employees_sweden,
+            'contact_email': self.contact_email,
             'employees_world': self.employees_world,
             'website': self.website,
             'logo': self.logo,

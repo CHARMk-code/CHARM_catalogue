@@ -23,6 +23,9 @@ def login_post():
     request_data = request.get_json()
     password = get_if_exist(request_data,'password')
 
+    if password == None:
+        return 'No credentials supplied', status.HTTP_400_BAD_REQUEST
+
     users = User.query.all()
     user = None
     if len(users) > 0:

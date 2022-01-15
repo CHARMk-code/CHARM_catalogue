@@ -10,8 +10,8 @@
             v-model="query"
             @input="search"
           />
-          <v-btn x-large class="ml-6 mt-2" icon
-            ><v-icon large @click="expand = !expand"
+          <v-btn x-large @click="expand = !expand" class="ml-6 mt-2" icon
+            ><v-icon large
               >{{ expand ? "mdi-chevron-up" : "mdi-chevron-down" }}
             </v-icon></v-btn
           >
@@ -30,6 +30,7 @@
                 }
               "
               :tags="tag_divisions"
+              :selected_tags="selected_tags.divisions"
               label="Programs"
             />
             <tagSelector
@@ -40,6 +41,7 @@
                 }
               "
               :tags="tag_business_areas"
+              :selected_tags="selected_tags.business_areas"
               label="Business area"
             />
             <tagSelector
@@ -50,6 +52,7 @@
                 }
               "
               :tags="tag_looking_for"
+              :selected_tags="selected_tags.looking_for"
               label="Looking for"
             />
             <tagSelector
@@ -60,6 +63,7 @@
                 }
               "
               :tags="tag_offerings"
+              :selected_tags="selected_tags.offerings"
               label="Offering"
             />
             <tagSelector
@@ -70,6 +74,7 @@
                 }
               "
               :tags="tag_languages"
+              :selected_tags="selected_tags.languages"
               label="Langague"
             />
             <v-row>
@@ -93,6 +98,7 @@
                 label="In Sweden"
               />
               -->
+            <v-btn @click="clearFilter"> Clear filter </v-btn>
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -158,6 +164,25 @@ export default {
       });
       this.$store.dispatch("filter/filterCompanies");
     },
+    clearFilter() {
+      this.query = "";
+      this.selected_tags.divisions = [];
+      this.selected_tags.business_areas = [];
+      this.selected_tags.offerings = [];
+      this.selected_tags.looking_for = [];
+      this.selected_tags.languages = [];
+      this.favorites = false;
+      this.charmtalk = false;
+      this.search();
+    },
+  },
+  mounted() {
+    const stored_filter = this.$store.getters["filter/getFilter"];
+    this.query = stored_filter.query;
+    this.selected_tags = stored_filter.tags;
+    this.favorites = stored_filter.favorites;
+    this.charmtalk = stored_filter.charmtalk;
+    this.sweden = stored_filter.sweden;
   },
 };
 </script>

@@ -5,6 +5,7 @@
     return-object
     item-text="name"
     item-value="id"
+    v-model="selected_tags"
     @change="onChange"
     :label="label"
     :items="tags"
@@ -49,6 +50,7 @@ export default {
   props: {
     value: Array,
     tags: { type: Array },
+    selected_tags: { type: Array },
     label: { type: String },
   },
   methods: {
