@@ -124,6 +124,23 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
+  if (from.name == null) {
+    // Arriving from offsite, need to load data
+    router.app.$axios.defaults.headers.common["Authorization"] =
+      "Basic " + router.app.$store.getters["auth/token"];
+    router.app.$store.commit("favorites/loadForStorage");
+    Promise.all([
+      router.app.$store.dispatch("maps/getMaps"),
+      router.app.$store.dispatch("tags/getTags"),
+      router.app.$store.dispatch("companies/getCompanies"),
+      router.app.$store.dispatch("prepages/getPrepages"),
+      router.app.$store.dispatch("layouts/getLayouts"),
+    ]).then(() => {
+      router.app.$store.dispatch("filter/filterCompanies").then(() => {
+        // next();
+      });
+    });
+  }
   if (to.matched.some((record) => !record.meta.noAuth)) {
     if (router.app.$store.getters["auth/isLoggedIn"]) {
       next();
