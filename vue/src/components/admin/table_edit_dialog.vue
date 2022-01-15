@@ -47,7 +47,7 @@
           </template>
 
           <template v-if="col.type == 'single_select'">
-            <v-select
+            <v-autocomplete
               chips
               :key="col.model"
               v-model="row[col.model]"
@@ -58,11 +58,11 @@
               :label="col.label"
               :hint="col.hint"
             >
-            </v-select>
+            </v-autocomplete>
           </template>
 
           <template v-if="col.type == 'select'">
-            <v-select
+            <v-autocomplete
               multiple
               chips
               :key="col.model"
@@ -90,7 +90,7 @@
                   </v-chip>
                 </template>
               </template>
-            </v-select>
+            </v-autocomplete>
           </template>
 
           <template v-if="col.type == 'radio'">
