@@ -4,6 +4,7 @@
     :src="base_URL + src"
     max-height="150"
     max-width="500"
+    contain
   />
 </template>
 
