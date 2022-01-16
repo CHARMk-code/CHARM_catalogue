@@ -54,7 +54,7 @@
           style="height: 0px"
           class="pa-0 ma-0 hidden-sm-and-down"
         />
-        <v-col class="pa-0 ma-4">
+        <v-col cols="8" class="pa-0 px-2 ma-0">
           <slot />
         </v-col>
         <v-col
