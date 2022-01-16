@@ -1,7 +1,7 @@
-from flask import Blueprint, send_from_directory, request
+from flask import Blueprint, send_from_directory, request, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import xlrd,os,sys
+import xlrd,os,sys, datetime, xlsxwriter, math
 from ...models import Company, Layout, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
@@ -213,3 +213,60 @@ def load():
     return "Success", status.HTTP_201_CREATED
 
 
+def mapCoordToLabel(x,y):
+    y += 1
+    letters= ""
+    for i in range(math.ceil(x/26)):
+        letters += chr(65+min(25,(x-i*27)))
+
+    return f"{letters}{y}"
+
+
+@blueprint.route("/download", methods=["GET"])
+def download():
+    data_dump_name = f"CHARM_catalogue_datadump_{datetime.datetime.now().date()}"
+    data_dump_path = f"/tmp/{data_dump_name}"
+
+    # Copy all static resources into temporary folder
+    if os.path.exists(data_dump_path):
+        shutil.rmtree(data_dump_path)
+    shutil.copytree(config["flask"]["static_folder"], data_dump_path)
+
+    # Sort into images into directory to simplify for user
+
+    # (directory name, Table name, column name)
+    tables = [("Logos", Company, "logo"), ("Prepages", Prepage, "image"), ("Tag_icons", Tag, "icon"), ("Map", Map, "image"), ("Layouts", Layout, "image")]
+    for (name, table, col) in tables:
+        os.makedirs(data_dump_path+f"/{name}")
+        for row in table.query.all():
+            image_file = getattr(row,col)
+            if image_file != "" and os.path.exists(f"{data_dump_path}/{image_file}"):
+                shutil.move(f"{data_dump_path}/{image_file}",data_dump_path+f"/{name}")
+
+
+    # Generate xlsx from db
+    workbook  = xlsxwriter.Workbook(f'{data_dump_path}/CHARM_CATALOGUE_DATA.xlsx')
+
+    # Maps
+    worksheet = workbook.add_worksheet("Maps")
+
+    titles = ["Name","Image","Ref"]
+    #  for i in range(3):
+    #      print(mapCoordToLabel(i,0),file=sys.stderr)
+    #      worksheet.write(mapCoordToLabel(i,0), titles[i])
+    #
+    maps = Map.query.all()
+    for row_num in range(1,len(maps)+1):
+        map_obj = maps[row_num]
+        worksheet.write_row(0,row_num, [map_obj.name,map_obj.image,map_obj.map_obj.ref])
+        #  worksheet.write(0,, map_obj.image)
+        #  worksheet.write(f'C{row_num}', map_obj.ref)
+    workbook.close()
+
+
+
+
+    # Pack and send result
+    shutil.make_archive(data_dump_path,"zip",data_dump_path)
+    shutil.rmtree(data_dump_path)
+    return send_file(data_dump_path+".zip")
