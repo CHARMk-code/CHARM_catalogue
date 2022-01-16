@@ -1,3 +1,7 @@
+from cProfile import label
+from curses import meta
+from re import A
+from webbrowser import get
 from flask import Blueprint, send_from_directory, request, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
@@ -9,7 +13,9 @@ from ...helper_functions import *
 import shutil
 
 
-ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
+ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
+NUMBER_OF_METADATA_COLS_COMPANY = 12
+NUMBER_OF_METADATA_COLS_TAG = 6
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
@@ -28,9 +34,8 @@ def imageLoad(request):
 
     return "All files uploaded", status.HTTP_200_OK
 
+
 def parseXlsx():
-    NUMBER_OF_METADATA_COLS_COMPANY = 12
-    NUMBER_OF_METADATA_COLS_TAG = 6
     # Inactives company
     Company.query.update({Company.active:False})
     db.session.commit()
@@ -213,17 +218,13 @@ def load():
     return "Success", status.HTTP_201_CREATED
 
 
-def mapCoordToLabel(x,y):
-    y += 1
-    letters= ""
-    for i in range(math.ceil(x/26)):
-        letters += chr(65+min(25,(x-i*27)))
-
-    return f"{letters}{y}"
-
 
 @blueprint.route("/download", methods=["GET"])
 def download():
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
     data_dump_name = f"CHARM_catalogue_datadump_{datetime.datetime.now().date()}"
     data_dump_path = f"/tmp/{data_dump_name}"
 
@@ -247,25 +248,61 @@ def download():
     # Generate xlsx from db
     workbook  = xlsxwriter.Workbook(f'{data_dump_path}/CHARM_CATALOGUE_DATA.xlsx')
 
-    # Maps
-    worksheet = workbook.add_worksheet("Maps")
+    # Populate simple sheets, as there have simulater structure we can generalize them
+    metadata= [
+        ("Maps", Map, ["Name","Image","Ref"],["name","image","ref"]),
+        ("Prepages",Prepage,["Name","Active","Image","Order"],["name","active","image","order"]),
+        ("Layout",Layout,["Active","Image","PLACMENT (0 = random center, 1 = left sidebar, 2 = right sidebar)"],
+        ["active","image","placement"]),
+        ("Tags",Tag,["Logo","Divsion","Business Area","Looking for","Offering","Language","Name"],
+        ["icon","division","business_area","looking_for","offering","language","name"])
+    ]
+    for (sheet_name, table,labels,attrs) in metadata:
+        worksheet = workbook.add_worksheet(sheet_name)
+        worksheet.write_row(0,0, labels)
 
-    titles = ["Name","Image","Ref"]
-    #  for i in range(3):
-    #      print(mapCoordToLabel(i,0),file=sys.stderr)
-    #      worksheet.write(mapCoordToLabel(i,0), titles[i])
-    #
-    maps = Map.query.all()
-    for row_num in range(1,len(maps)+1):
-        map_obj = maps[row_num]
-        worksheet.write_row(0,row_num, [map_obj.name,map_obj.image,map_obj.map_obj.ref])
-        #  worksheet.write(0,, map_obj.image)
-        #  worksheet.write(f'C{row_num}', map_obj.ref)
+
+        row_num = 1
+        for table_obj in table.query.all():
+            row_data = [getattr(table_obj,attr) for attr in attrs]
+            if sheet_name == "Maps" and row_data[2] != None:
+                print(row_data,file=sys.stderr)
+                row_data[2] = Map.query.filter_by(id=row_data[2]).first().name
+            worksheet.write_row(row_num,0, row_data)
+            row_num += 1
+    
+
+    # Special case for companies
+    worksheet = workbook.add_worksheet("Companies")
+    
+    # Set object based labels
+    labels=["Name","Active","CHARMTALK","In Sweden","Description","Contact","Contact email", "Employees worldwide","Website","Talk to us about", "Logo","Map"]
+    worksheet.write_row(0,0, labels)
+
+    # Set tag based labels
+    all_tags = Tag.query.all()
+    name_for_all_tags = list(map(lambda x: x.name, all_tags))
+    id_for_all_tags = list(map(lambda x: x.id, all_tags))
+    worksheet.write_row(0,NUMBER_OF_METADATA_COLS_COMPANY,name_for_all_tags)
+
+    row_num = 1
+    attrs= ["name","active","charmtalk","in_sweden","description","contacts","contact_email","employees_world","website","talk_to_us_about","logo","map_image"]
+    # Tag data
+    for table_obj in Company.query.all():
+        # Object based data
+        row_data = [getattr(table_obj,attr) for attr in attrs]
+        worksheet.write_row(row_num,0,row_data)
+
+        # Tag data
+        offset = 0
+        for id_to_test in id_for_all_tags:
+            worksheet.write(row_num,NUMBER_OF_METADATA_COLS_COMPANY+offset, id_to_test in id_for_all_tags)
+            offset +=1
+        
+        row_num += 1
+    
+
     workbook.close()
-
-
-
-
     # Pack and send result
     shutil.make_archive(data_dump_path,"zip",data_dump_path)
     shutil.rmtree(data_dump_path)
