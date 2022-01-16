@@ -111,7 +111,7 @@ import { mapGetters } from "vuex";
 export default {
   name: "Company_View",
   data() {
-    return { dialog: false, currentIndex: 0 };
+    return { dialog: false };
   },
   components: {
     sideLayout,
@@ -153,6 +153,9 @@ export default {
       } else {
         return undefined;
       }
+    },
+    currentIndex(){
+      return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
     },
     maxIndex() {
       return this.filteredCompanies.length;
