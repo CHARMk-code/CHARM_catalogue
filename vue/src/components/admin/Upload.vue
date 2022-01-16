@@ -1,29 +1,78 @@
 <template>
-<v-main>
-  <v-card width="500px" align="center"> 
-    <div center>
-    <v-card v-if="this.feedback">{{ this.feedback }}</v-card>
-    <input type="file" @change="onFileChange" />
-    </div>
+  <v-main>
     <v-row>
       <v-col>
-    <v-btn
-      @click="onUploadFile"
-      class="primary"
-      :disabled="!this.selectedFile"
-    >
-    
-      Upload file
-    </v-btn>
-    </v-col>
-    <v-col>
-    <v-btn @click="download" class="primary">
-        download
-    </v-btn>
-    </v-col>
+        <v-card width="500px" align="center">
+          <v-card-title> Upload data or resources </v-card-title>
+
+          <div>
+            <v-card v-if="this.feedback">{{ this.feedback }}</v-card>
+            <v-tooltip bottom max-width="20%">
+              <template v-slot:activator="{ on, attrs }">
+                <div v-on="on">
+                  <input type="file" @change="onFileChange" />
+                </div>
+              </template>
+              <span>
+                Allows .jpg, .png, .svg, .xlsx, .zip, and .tar.gz. For more information please
+                refer to the github.
+              </span>
+            </v-tooltip>
+          </div>
+           
+            <v-row class="ma-auto">
+              <v-col>
+                <v-btn
+                  @click="onUploadFile"
+                  class="primary ma-auto"
+                  :disabled="!this.selectedFile"
+                >
+                  Upload file
+                </v-btn>
+              </v-col>
+              <v-col> 
+                <v-tooltip bottom max-width="20%">
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-on="on">
+                      <v-btn
+                        href="https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY"
+                        class="primary"
+                      >
+                      See example
+                    </v-btn>
+                  </div>
+                </template>
+                <span>
+                  We have provide a example of the formating for a complete upload.
+                  If you want more information please refer to the github page.
+                </span>
+              </v-tooltip>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+      <v-col>
+        <v-card  width="500px" align="center">
+          <v-card-title> Download snapshot </v-card-title>
+          <v-tooltip bottom max-width="20%">
+            <template v-slot:activator="{ on, attrs }">
+              <div v-on="on">
+              <v-btn @click="download" class="primary mb-5">
+                download
+              </v-btn>
+              </div>
+            </template>
+            <span>
+              Downloads all the data need to restore the current state of the catalogue, 
+              including images and a xlsx similarly to the example.
+              Good for when you want a checkpoint before making changes or when you want to
+              save the current catalogue for archiving. 
+            </span>
+          </v-tooltip>
+        </v-card>
+      </v-col>
     </v-row>
-  </v-card>
-</v-main>
+  </v-main>
 </template>
 
 <script>
@@ -42,7 +91,7 @@ export default {
       this.selectedFile = selectedFile;
     },
     download(){
-      this.$axios({
+      axios({
         url: Vue.prototype.$axios.defaults.baseURL+'/manage/download',
         method: 'GET',
         responseType: 'blob',
