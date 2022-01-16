@@ -1,18 +1,33 @@
 <template>
-  <div class="file-upload">
+<v-main>
+  <v-card width="500px" align="center"> 
+    <div center>
     <v-card v-if="this.feedback">{{ this.feedback }}</v-card>
     <input type="file" @change="onFileChange" />
+    </div>
+    <v-row>
+      <v-col>
     <v-btn
       @click="onUploadFile"
-      class="upload-button primary"
+      class="primary"
       :disabled="!this.selectedFile"
     >
+    
       Upload file
     </v-btn>
-  </div>
+    </v-col>
+    <v-col>
+    <v-btn @click="download" class="primary">
+        download
+    </v-btn>
+    </v-col>
+    </v-row>
+  </v-card>
+</v-main>
 </template>
 
 <script>
+import Vue from "vue";
 export default {
   name: "Upload",
   data() {
@@ -25,6 +40,24 @@ export default {
     onFileChange(e) {
       const selectedFile = e.target.files[0]; // accessing file
       this.selectedFile = selectedFile;
+    },
+    download(){
+      this.$axios({
+        url: Vue.prototype.$axios.defaults.baseURL+'/manage/download',
+        method: 'GET',
+        responseType: 'blob',
+    }).then((response) => {
+      var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      var fURL = document.createElement('a');
+
+      fURL.href = fileURL;
+      fURL.setAttribute('download',"CHARM_catalogue_datadump.zip");
+      document.body.appendChild(fURL);
+
+      fURL.click();
+      }).catch((err) => {
+          console.log(err);
+        });
     },
     onUploadFile() {
       const formData = new FormData();
@@ -63,7 +96,7 @@ input {
 }
 
 input,
-div,
+v-card,
 button {
   margin-top: 2rem;
 }
@@ -75,7 +108,6 @@ button {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 1rem;
 }
 
 .upload-button:disabled {
