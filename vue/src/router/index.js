@@ -123,13 +123,14 @@ const router = new Router({
   ],
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (from.name == null) {
     // Arriving from offsite, need to load data
     router.app.$axios.defaults.headers.common["Authorization"] =
       "Basic " + router.app.$store.getters["auth/token"];
     router.app.$store.commit("favorites/loadForStorage");
-    Promise.all([
+
+    await Promise.all([
       router.app.$store.dispatch("maps/getMaps"),
       router.app.$store.dispatch("tags/getTags"),
       router.app.$store.dispatch("companies/getCompanies"),
