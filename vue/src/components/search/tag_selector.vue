@@ -1,5 +1,5 @@
 <template>
-  <v-select
+  <v-autocomplete
     multiple
     chips
     return-object
@@ -40,7 +40,7 @@
         </v-chip>
       </template>
     </template>
-  </v-select>
+  </v-autocomplete>
 </template>
 
 <script>
