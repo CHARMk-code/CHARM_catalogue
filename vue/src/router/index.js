@@ -15,6 +15,7 @@ const Tags_admin = () => import("@/views/admin/Tags.vue");
 const Account_admin = () => import("@/components/admin/Account.vue");
 const Map_admin = () => import("@/views/admin/Map.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
+const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
 
 Vue.use(Router);
@@ -62,6 +63,11 @@ const router = new Router({
           path: "maps",
           name: "Admin/Maps",
           component: Map_admin,
+        },
+        {
+          path: "shortcuts",
+          name: "Admin/Shortcuts",
+          component: Shortcuts_admin,
         },
         {
           path: "layout",
@@ -136,6 +142,7 @@ router.beforeEach(async (to, from, next) => {
       router.app.$store.dispatch("companies/getCompanies"),
       router.app.$store.dispatch("prepages/getPrepages"),
       router.app.$store.dispatch("layouts/getLayouts"),
+      router.app.$store.dispatch("shortcuts/getShortcuts"),
     ]).then(() => {
       router.app.$store.dispatch("filter/filterCompanies").then(() => {
         // next();

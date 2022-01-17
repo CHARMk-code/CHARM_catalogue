@@ -19,6 +19,7 @@ export default {
         { name: "Tags", icon: "mdi-tag-heart-outline" },
         { name: "maps", icon: "mdi-map" },
         { name: "layout", icon: "mdi-human-male-board" },
+        { name: "shortcuts", icon: "mdi-star" },
         { name: "batch", icon: "mdi-tray-arrow-up" },
         { name: "account", icon: "mdi-account" },
       ],

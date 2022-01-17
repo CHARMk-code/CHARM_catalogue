@@ -50,32 +50,6 @@ export default {
   data() {
     return {
       hover: false,
-      shortcuts: [
-        {
-          name: "CHARMtalks",
-          icon: "mdi-domain",
-          desc: "Companies part of and attending CHARMtalks",
-          link: "/prepages/0",
-        },
-        {
-          name: "A-companies",
-          icon: "mdi-domain",
-          desc: "Companies with an 'A' in the name",
-          link: "/prepages/0",
-        },
-        {
-          name: "Offering Summer jobs",
-          icon: "mdi-domain",
-          desc: "Checkout companies offering summer jobs",
-          link: "/prepages/0",
-        },
-        {
-          name: "Offering Master Thesis work",
-          icon: "mdi-domain",
-          desc: "Checkout companies offering Master thesis work",
-          link: "/prepages/0",
-        },
-      ],
     };
   },
   computed: {
@@ -85,10 +59,8 @@ export default {
     },
     ...mapGetters({
       prepages: "prepages/getActive",
+      shortcuts: "shortcuts/get",
     }),
-  },
-  beforeMount() {
-    this.$store.dispatch("prepages/getPrepages");
   },
 };
 </script>
