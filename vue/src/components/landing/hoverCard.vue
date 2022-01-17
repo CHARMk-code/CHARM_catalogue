@@ -7,7 +7,7 @@
           fill-height
           :class="{ 'on-hover': hover, 'white--text': true }"
           :style="{
-            'background-color': 'rgba(0, 0, 0, 0.70)',
+            'background-color': 'rgba(0, 0, 0, 0.35)',
           }"
         >
           <slot />
