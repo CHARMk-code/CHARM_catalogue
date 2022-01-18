@@ -154,7 +154,7 @@ export default {
         return undefined;
       }
     },
-    currentIndex(){
+    currentIndex() {
       return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
     },
     maxIndex() {
