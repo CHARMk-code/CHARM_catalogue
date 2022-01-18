@@ -9,6 +9,7 @@ import favorites from "@/store/modules/favorites";
 import notes from "@/store/modules/notes";
 import maps from "@/store/modules/maps";
 import layouts from "@/store/modules/layouts";
+import shortcuts from "@/store/modules/shortcuts";
 
 Vue.use(Vuex);
 
@@ -23,5 +24,6 @@ export default new Vuex.Store({
     notes: notes,
     maps: maps,
     layouts: layouts,
+    shortcuts: shortcuts,
   },
 });

@@ -449,3 +449,51 @@ class Layout(db.Model):
             'placement': self.placement,
             'active': self.active
         }
+
+class Shortcut(db.Model):
+    __tablename__ = "shortcuts"
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(100))
+    desc = db.Column(db.String(100))
+    link = db.Column(db.String(100))
+    icon = db.Column(db.String(100))
+
+    @staticmethod
+    def create(name, desc, link, icon):
+        try:
+            new_shortcut = Shortcut(
+                name=name,
+                desc=desc,
+                link=link,
+                icon=icon
+            )
+
+            db.session.add(new_shortcut)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, name, desc, link, icon):
+        self.name = test_and_set(self.name, name)
+        self.desc = test_and_set(self.desc, desc)
+        self.link = test_and_set(self.link, link)
+        self.icon = test_and_set(self.icon, icon)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'desc': self.desc,
+            'link': self.link,
+            'icon': self.icon
+        }
