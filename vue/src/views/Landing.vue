@@ -9,7 +9,9 @@
           <hoverCard
             class="mx-auto"
             to="/prepages/0"
-            :background_image="base_URL + prepages[0].image"
+            :background_image="
+              base_URL + (prepages.length === 0 ? '' : prepages[0].image)
+            "
             max_width="400"
           >
             <div class="text-h3 text-center">Start Browsing</div>
