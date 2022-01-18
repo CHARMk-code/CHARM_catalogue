@@ -3,7 +3,7 @@
     <Table
       @save_edit="saveMap"
       @delete_row="deleteMap"
-      name="Map"
+      name="Map (Do NOT modify this table it will corrupt the data)"
       :headers="headers"
       :data="modified_maps"
       :row_meta="row_meta"

@@ -5,7 +5,7 @@
     v-bind:button_left="true"
     v-bind:button_right="currentIndex < maxIndex - 1"
   >
-    <v-sheet v-if="company != undefined">
+    <v-sheet v-if="company != undefined && company.active == true">
       <v-container
         v-touch="{
           right: () => prev(),
