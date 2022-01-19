@@ -137,9 +137,7 @@ router.beforeEach(async (to, from, next) => {
       router.app.$store.dispatch("prepages/getPrepages"),
       router.app.$store.dispatch("layouts/getLayouts"),
     ]).then(() => {
-      router.app.$store.dispatch("filter/filterCompanies").then(() => {
-        // next();
-      });
+      router.app.$store.dispatch("filter/filterCompanies");
     });
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
