@@ -155,14 +155,52 @@ export default {
       this.selected_tags[key] = event;
     },
     search() {
-      this.$store.dispatch("filter/setFilters", {
-        query: this.query,
-        tags: this.selected_tags,
-        favorites: this.favorites,
-        charmtalk: this.charmtalk,
-        sweden: this.sweden,
+      this.$store
+        .dispatch("filter/setFilters", {
+          query: this.query,
+          tags: this.selected_tags,
+          favorites: this.favorites,
+          charmtalk: this.charmtalk,
+          sweden: this.sweden,
+        })
+        .then(() => {
+          this.$store.dispatch("filter/filterCompanies");
+        });
+      let query = {};
+      this.query.length > 0 ? (query.q = this.query) : null;
+      if (this.selected_tags.divisions.length > 0) {
+        query.divisions = this.selected_tags.divisions
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (this.selected_tags.looking_for.length > 0) {
+        query.looking_for = this.selected_tags.looking_for
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (this.selected_tags.business_areas.length > 0) {
+        query.business_areas = this.selected_tags.business_areas
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (this.selected_tags.offerings.length > 0) {
+        query.offerings = this.selected_tags.offerings
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (this.selected_tags.languages.length > 0) {
+        query.languages = this.selected_tags.languages
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      this.favorites && (query.favorites = true);
+      this.charmtalk && (query.charmtalk = true);
+      this.sweden && (query.sweden = true);
+
+      this.$router.replace({
+        path: "/search",
+        query,
       });
-      this.$store.dispatch("filter/filterCompanies");
     },
     clearFilter() {
       this.query = "";
