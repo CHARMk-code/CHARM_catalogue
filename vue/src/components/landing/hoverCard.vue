@@ -1,7 +1,7 @@
 <template>
   <v-hover v-slot="{ hover }">
     <v-card center :to="to">
-      <v-img contain :max-width="max_width" center :src="background_image">
+      <v-img contain center :src="background_image">
         <v-container
           id="hovereffect"
           fill-height
@@ -19,7 +19,7 @@
 <script>
 export default {
   name: "hoverCard",
-  props: ["to", "background_image", "max_width"],
+  props: ["to", "background_image"],
   data() {
     return { hover: false };
   },
