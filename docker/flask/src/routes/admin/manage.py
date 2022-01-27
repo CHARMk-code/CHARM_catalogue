@@ -1,7 +1,3 @@
-from cProfile import label
-from curses import meta
-from re import A
-from webbrowser import get
 from flask import Blueprint, send_from_directory, request, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
@@ -119,32 +115,37 @@ def parseXlsx():
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
         for i in range(1,companies_sheet.nrows):
-            if not Company.query.filter_by(name=companies_sheet.cell_value(i,0)).first():
-                tags_temp = []
-                for j in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
-                    if companies_sheet.cell_value(i,j):
-                        tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
+            tags_temp = []
+            for j in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
+                if companies_sheet.cell_value(i,j):
+                    tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
 
-                        # Tempary removed user supplied tag company connection and ratings
-                        #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
-                        #      new_link = Tag_company(
-                        #          tag = tags[j-2],
-                        #          company = comp_id,
-                        #          crowd_soured = False,
-                        #          score = 1,
-                        #          votes = 1
-                        #      )
-                        #      db.session.add(new_link)
-                        #      db.session.commit()
-                metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
-                metadata = list(map(lambda x: x.value, metadata))
-                metadata[1] = bool(metadata[1])
-                metadata[2] = bool(metadata[2])
-                metadata[3] = bool(metadata[3])
+                    # Tempary removed user supplied tag company connection and ratings
+                    #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
+                    #      new_link = Tag_company(
+                    #          tag = tags[j-2],
+                    #          company = comp_id,
+                    #          crowd_soured = False,
+                    #          score = 1,
+                    #          votes = 1
+                    #      )
+                    #      db.session.add(new_link)
+                    #      db.session.commit()
+            metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
+            metadata = list(map(lambda x: x.value, metadata))
+            metadata[1] = bool(metadata[1])
+            metadata[2] = bool(metadata[2])
+            metadata[3] = bool(metadata[3])
+
+            company = Company.query.filter_by(name = metadata[0]).first()
+            if  company == None:
                 Company.create(
                         *metadata,
                         tags_temp
                         )
+            else:
+                company.update(*metadata,tags_temp)
+
     # Prepages
     prepages_sheet = workbook.sheet_by_name("Prepages")
     for i in range(1,prepages_sheet.nrows):
