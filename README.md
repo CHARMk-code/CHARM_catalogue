@@ -27,7 +27,7 @@ The system is likely to expenses a large number (ca 5000) of simultaneous user w
 
 Documentation can be created by running `doxygen doxygen_conf` in doc/
 
-## Setup
+## Developer setup
 
 To start the backend use
 
@@ -46,6 +46,21 @@ yarn install && yarn serve
 in vue directory.
 which install depends and starts the host server, requires yarn.
 
+## Production setup
+In order to run in production use
+```
+docker-compose -f production.yml up
+```
+
+This will pull the docker images from the github container registry so no need to download this repo. 
+This image are built for production so more secury and faster.
+
+## Site modes
+This site have two modes, which can be selected by changing the enviroment SERVER_MODE:
+- "summer job" - Serves a version of the catalogue modify, this only displays companies that offers 
+summer job and show an extra textbox for SUMMER_JOB_DESCRIPTION. It also hiddens tags of the offerings
+and looking_for type.
+- Otherwise - Default version.
 ## Api endpoints
 
 Below is a map of the endpoints provide by the api.
