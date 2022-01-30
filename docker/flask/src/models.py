@@ -1,3 +1,4 @@
+from re import S
 from . import db,config
 from flask_login import UserMixin
 import sys
@@ -72,6 +73,7 @@ class Company(db.Model):
     in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
+    summer_job_description = db.Column(db.String(1000))
     contacts = db.Column(db.String(100))
     contact_email = db.Column(db.String(320))
     employees_world = db.Column(db.Integer)
@@ -87,7 +89,7 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, charmtalk, in_sweden, description,
+    def create( name, active, charmtalk, in_sweden, description,summer_job_description,
          contacts, contact_email, employees_world, website,
          talk_to_us_about, logo, map_image,  tags):
         try:
@@ -100,6 +102,7 @@ class Company(db.Model):
                 charmtalk=charmtalk,
                 in_sweden=in_sweden,
                 description=description,
+                summer_job_description = summer_job_description,
                 contacts = contacts,
                 contact_email = contact_email,
                 employees_world = employees_world if employees_world != "" else -1,
@@ -116,7 +119,7 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, charmtalk, in_sweden, description,
+    def update(self, name, active, charmtalk, in_sweden, description, summer_job_description,
             contacts, contact_email, employees_world, website,
             talk_to_us_about,logo, map_image,  tags):
 
@@ -126,6 +129,7 @@ class Company(db.Model):
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
+        self.summer_job_description = test_and_set(self.summer_job_description, summer_job_description)
         self.contacts = test_and_set(self.contacts,contacts)
         self.contact_email = test_and_set(self.contact_email,contact_email)
         self.employees_world = test_and_set(self.employees_world, employees_world)
@@ -157,6 +161,7 @@ class Company(db.Model):
             'charmtalk': self.charmtalk,
             'in_sweden': self.in_sweden,
             'description': self.description,
+            'summer_job_description': self.summer_job_description,
             'contacts': self.contacts,
             'contact_email': self.contact_email,
             'employees_world': self.employees_world,

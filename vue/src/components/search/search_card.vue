@@ -45,6 +45,8 @@
               label="Business area"
             />
             <tagSelector
+
+              v-if="server_mode !=='summer job'"
               @change="
                 (v) => {
                   selected_tags.looking_for = v;
@@ -56,6 +58,7 @@
               label="Looking for"
             />
             <tagSelector
+              v-if="server_mode !=='summer job'"
               @change="
                 (v) => {
                   selected_tags.offerings = v;
@@ -139,6 +142,7 @@ export default {
       tag_looking_for: "tags/looking_fors",
       tag_offerings: "tags/offers",
       tag_languages: "tags/languages",
+      server_mode: "site_settings/getServerMode"
     }),
     tags() {
       return {

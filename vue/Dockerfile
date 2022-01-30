@@ -1,4 +1,4 @@
-FROM node
+FROM node AS builder
 
 WORKDIR /app
 
@@ -8,6 +8,12 @@ RUN cd /tmp && yarn
 RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules && ln -s /tmp/package.json
 
 RUN yarn install
-RUN yarn build
+RUN yarn build 
+
+
+#FROM node
+
+#COPY --from=builder /tmp/dist /dist
+
 RUN yarn global add serve
 CMD serve -s dist

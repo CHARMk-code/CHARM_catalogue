@@ -10,7 +10,7 @@ import shutil
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
-NUMBER_OF_METADATA_COLS_COMPANY = 12
+NUMBER_OF_METADATA_COLS_COMPANY = 13
 NUMBER_OF_METADATA_COLS_TAG = 6
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[

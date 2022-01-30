@@ -137,6 +137,11 @@ export default {
         },
         {
           type: "textarea",
+          model: "summer_job_description",
+          label: "Description of summer job",
+        },
+        {
+          type: "textarea",
           model: "talk_to_us_about",
           label: "Talk to us about",
         },

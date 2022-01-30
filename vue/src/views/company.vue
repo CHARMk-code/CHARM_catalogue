@@ -38,6 +38,11 @@
       <v-row>
         <v-col>
           <Textblock :body="company.description" class="mb-6" />
+          <Textblock 
+            v-if="server_mode === 'summer job'"
+           :body="company.summer_job_description"
+            class="mb-6"
+          />
           <Layout class="mb-6" />
           <v-row>
             <v-col
@@ -51,12 +56,14 @@
                 class="mb-6 mx-3 flex-grow-1"
               />
               <Tags
+                v-if="server_mode !== 'summer job'"
                 :tags="company.tags"
                 name="Looking for"
                 getter_target="tags/getLookingForFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
               <Tags
+                v-if="server_mode !== 'summer job'"
                 :tags="company.tags"
                 name="Offering"
                 getter_target="tags/getOffersFromIds"
@@ -77,7 +84,11 @@
           />
         </v-col>
         <v-col>
-          <Map :map="company.map_image" class="mb-6" />
+          <Map 
+            v-if="server_mode !== 'summer job'"
+            :map="company.map_image" 
+            class="mb-6"
+          />
           <Trivia
             :talk_to_us_about="company.talk_to_us_about"
             :sweden="company.employees_sweden"
@@ -121,7 +132,6 @@ export default {
     Textblock, //Company description
     Website, //Company website
     Tags, //Tags
-    //Maps, //Map view
     tableEditDialog,
     Note,
     Map,
@@ -142,6 +152,7 @@ export default {
       offerings: "tags/offers",
       isInFavorites: "favorites/isInFavorites",
       prepages: "prepages/getActive",
+      server_mode: "site_settings/getServerMode"
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](

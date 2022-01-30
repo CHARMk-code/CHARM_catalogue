@@ -35,6 +35,7 @@ def company_put():
     active = get_if_exist(request_data,"active")
     charmtalk = get_if_exist(request_data,"charmtalk")
     description = get_if_exist(request_data,"description")
+    summer_job_description = get_if_exist(request_data, "summer_job_description")
     contacts = get_if_exist(request_data,"contacts")
     contact_email = get_if_exist(request_data,"contact_email")
     employees_world = get_if_exist(request_data,"employees_world")
@@ -53,12 +54,12 @@ def company_put():
 
     if not id:
 
-        return send_status(Company.create(name,active,charmtalk, in_sweden,description,
+        return send_status(Company.create(name,active,charmtalk, in_sweden,description, summer_job_description,
             contacts, contact_email, employees_world, website, talk_to_us_about,logo,map_image, tag_objs))
 
     company = Company.query.get(id)
 
-    return send_status(company.update(name,active, charmtalk, in_sweden, description,
+    return send_status(company.update(name,active, charmtalk, in_sweden, description, summer_job_description,
                 contacts, contact_email, employees_world, website, talk_to_us_about, logo, map_image, tag_objs))
 
 
