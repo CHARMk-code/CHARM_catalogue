@@ -148,12 +148,12 @@ export default {
           });
       });
     },
-    deleteTag({ commit }, tags) {
+    deleteTag({ commit }, tag) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .delete("/tag/" + tags.id)
+          .delete("/tag/" + tag.id)
           .then((resp) => {
-            commit("removeTag", tags.id);
+            commit("removeTag", tag);
             resolve(resp);
           })
           .catch((err) => {

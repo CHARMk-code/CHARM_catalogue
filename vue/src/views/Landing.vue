@@ -1,9 +1,9 @@
 <template>
   <sideLayout>
-    <v-container class="d-flex flex-wrap">
-      <v-row>
-        <v-col class="d-flex flex-wrap">
-          <div class="mx-auto mb-4 text-center text-h3">
+    <v-container>
+      <v-row style="justify-content: center">
+        <v-col full-width xs="12" md="6">
+          <div class="mx-auto mb-4 text-center text-h5 text-md-h3">
             Browse the catalogue
           </div>
           <hoverCard
@@ -12,13 +12,12 @@
             :background_image="
               base_URL + (prepages.length === 0 ? '' : prepages[0].image)
             "
-            max_width="400"
-          >
-            <div class="text-h3 text-center">Start Browsing</div>
-          </hoverCard>
+          />
         </v-col>
-        <v-col>
-          <div class="mx-auto mb-4 d-block text-center text-h3">Shortcuts</div>
+        <v-col xs="12" md="6">
+          <div class="mx-auto mb-4 d-block text-center text-h5 text-md-h3">
+            Shortcuts
+          </div>
           <v-container class="ma-0 pa-0 d-flex flex-wrap" style="gap: 16px">
             <shortcut
               v-for="shortcut in shortcuts"

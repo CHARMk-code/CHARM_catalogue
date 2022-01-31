@@ -25,7 +25,10 @@
       style="position: fixed; top: 0; width: 100vw"
       class="hidden-sm-and-down"
     >
-      <div class="ma-0 pa-0 d-flex justify-content-between" style="width: 100%">
+      <div
+        class="ma-0 pa-0 d-flex justify-content-between"
+        style="width: 100vw"
+      >
         <v-row class="ma-0 pa-0">
           <v-col cols="2" class="pa-0">
             <v-img
@@ -48,17 +51,19 @@
       </div>
     </div>
     <div style="position: absolute; top: 0; width: 100vw">
-      <v-row>
+      <v-row class="justify-center">
         <v-col
-          cols="2"
+          xs="0"
+          md="2"
           style="height: 0px"
           class="pa-0 ma-0 hidden-sm-and-down"
         />
-        <v-col cols="8" class="pa-0 px-2 ma-0">
+        <v-col xs="12" md="8" class="pa-0 ma-md-0 ma-sm-0">
           <slot />
         </v-col>
         <v-col
-          cols="2"
+          xs="0"
+          md="2"
           style="height: 0px"
           class="pa-0 ma-0 hidden-sm-and-down"
         />

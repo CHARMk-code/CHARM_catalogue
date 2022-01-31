@@ -32,6 +32,10 @@ export default {
     filterCompanies({ commit, state, rootGetters }) {
       return new Promise((resolve) => {
         var filteredCompanies = rootGetters["companies/companies"];
+
+        //remove all non active companies
+        filteredCompanies = filteredCompanies.filter((t) => t.active);
+
         if (state.filters != {}) {
           if (state.filters.query != "") {
             filteredCompanies = filteredCompanies.filter((c) =>
@@ -52,15 +56,14 @@ export default {
           if (state.filters.charmtalk) {
             filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
           }
-          filteredCompanies = filteredCompanies.filter((t) => t.active);
-        }
-        if (state.filters.favorites) {
-          filteredCompanies = filteredCompanies.filter((t) =>
-            rootGetters["favorites/favorites"].has(t.id)
-          );
-        }
-        if (state.filters.sweden) {
-          filteredCompanies = filteredCompanies.filter((t) => t.in_sweden);
+          if (state.filters.favorites) {
+            filteredCompanies = filteredCompanies.filter((t) =>
+              rootGetters["favorites/favorites"].has(t.id)
+            );
+          }
+          if (state.filters.sweden) {
+            filteredCompanies = filteredCompanies.filter((t) => t.in_sweden);
+          }
         }
         commit("setFilteredCompanies", filteredCompanies);
         resolve();
@@ -68,7 +71,6 @@ export default {
     },
     setFilters({ commit }, filters) {
       commit("setFilters", filters);
-      //      dispatch("filterCompanies");
     },
   },
   getters: {

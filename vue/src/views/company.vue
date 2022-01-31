@@ -5,91 +5,90 @@
     v-bind:button_left="true"
     v-bind:button_right="currentIndex < maxIndex - 1"
   >
-    <v-sheet v-if="company != undefined && company.active == true">
-      <v-container
-        v-touch="{
-          right: () => prev(),
-          left: () => next(),
-        }"
-      >
-        <!-- Edit Company -->
-        <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
-          Edit
-        </v-btn>
-        <v-dialog persistent v-model="dialog" max-width="900px">
-          <tableEditDialog
-            @close_dialog="closeDialog()"
-            @save_row="saveRow"
-            name="Company"
-            :row="company"
-            :row_meta="row_meta"
+    <v-container
+      v-if="company != undefined && company.active == true"
+      v-touch="{
+        right: () => prev(),
+        left: () => next(),
+      }"
+    >
+      <!-- Edit Company -->
+      <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
+        Edit
+      </v-btn>
+      <v-dialog persistent v-model="dialog" max-width="900px">
+        <tableEditDialog
+          @close_dialog="closeDialog()"
+          @save_row="saveRow"
+          name="Company"
+          :row="company"
+          :row_meta="row_meta"
+        />
+      </v-dialog>
+
+      <v-row>
+        <v-col align="center" xs="12" sm="12" md="auto">
+          <Logo :src="company.logo" />
+        </v-col>
+        <v-col>
+          <Name :name="company.name" :id="company.id" />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <Textblock :body="company.description" class="mb-6" />
+          <Layout class="mb-6" />
+          <v-row>
+            <v-col
+              class="pa-0 mb-0 d-flex flex-wrap justify-space-between"
+              style="margin: 0 -3px"
+            >
+              <Tags
+                :tags="company.tags"
+                name="Divisions"
+                getter_target="tags/getDivisionsFromIds"
+                class="mb-6 mx-3 flex-grow-1"
+              />
+              <Tags
+                :tags="company.tags"
+                name="Looking for"
+                getter_target="tags/getLookingForFromIds"
+                class="mb-6 mx-3 flex-grow-1"
+              />
+              <Tags
+                :tags="company.tags"
+                name="Offering"
+                getter_target="tags/getOffersFromIds"
+                class="mb-6 mx-3 flex-grow-1"
+              />
+              <Tags
+                :tags="company.tags"
+                name="Business Areas"
+                getter_target="tags/getBusinessAreasFromIds"
+                class="mb-6 mx-3 flex-grow-1"
+              />
+            </v-col>
+          </v-row>
+          <Website :website="company.website" class="mb-6" />
+          <Contacts
+            :contacts="company.contacts"
+            :contact_email="company.contact_email"
           />
-        </v-dialog>
-
-        <v-row>
-          <v-col>
-            <Logo :src="company.logo" />
-          </v-col>
-          <v-col>
-            <Name :name="company.name" :id="company.id" />
-          </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col>
-            <Textblock :body="company.description" class="mb-6" />
-            <Layout class="mb-6" />
-            <v-row>
-              <v-col
-                class="pa-0 mb-0 d-flex flex-wrap justify-space-between"
-                style="margin: 0 -3px"
-              >
-                <Tags
-                  :tags="company.tags"
-                  name="Divisions"
-                  getter_target="tags/getDivisionsFromIds"
-                  class="mb-6 mx-3 flex-grow-1"
-                />
-                <Tags
-                  :tags="company.tags"
-                  name="Looking for"
-                  getter_target="tags/getLookingForFromIds"
-                  class="mb-6 mx-3 flex-grow-1"
-                />
-                <Tags
-                  :tags="company.tags"
-                  name="Offering"
-                  getter_target="tags/getOffersFromIds"
-                  class="mb-6 mx-3 flex-grow-1"
-                />
-                <Tags
-                  :tags="company.tags"
-                  name="Business Areas"
-                  getter_target="tags/getBusinessAreasFromIds"
-                  class="mb-6 mx-3 flex-grow-1"
-                />
-              </v-col>
-            </v-row>
-            <Website :website="company.website" class="mb-6" />
-            <Contacts
-              :contacts="company.contacts"
-              :contact_email="company.contact_email"
-            />
-          </v-col>
-          <v-col>
-            <Map :map="company.map_image" class="mb-6" />
-            <Trivia
-              :talk_to_us_about="company.talk_to_us_about"
-              :sweden="company.employees_sweden"
-              :world="company.employees_world"
-              :year="company.founded"
-              class="mb-6"
-            />
-            <Note :id="company.id" class="mb-6" />
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-sheet>
+        </v-col>
+        <v-col>
+          <Map :map="company.map_image" class="mb-6" />
+          <Trivia
+            :talk_to_us_about="company.talk_to_us_about"
+            :sweden="company.employees_sweden"
+            :world="company.employees_world"
+            :year="company.founded"
+            class="mb-6"
+          />
+          <Note :id="company.id" class="mb-6" />
+        </v-col>
+      </v-row>
+    </v-container>
   </sideLayout>
 </template>
 

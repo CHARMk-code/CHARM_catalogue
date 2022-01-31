@@ -116,6 +116,7 @@ export default {
       this.$axios
         .post("/manage/upload", formData)
         .then((res) => {
+          window.location.reload();
           this.feedback = res.data;
         })
         .catch((err) => {

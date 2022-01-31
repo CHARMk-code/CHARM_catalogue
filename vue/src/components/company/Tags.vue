@@ -73,6 +73,7 @@ export default {
           tags: select_tags,
         })
         .then(() => {
+          this.$store.dispatch("filter/filterCompanies");
           this.$router.push("/search");
         });
     },
