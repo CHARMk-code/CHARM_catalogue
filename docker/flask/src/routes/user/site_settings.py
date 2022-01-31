@@ -1,14 +1,15 @@
 from flask import Blueprint,jsonify
+from ...models import Company_card
 from flask_cors import CORS
 from flask_api import status
+from ...helper_functions import *
 import os
 
-blueprint = Blueprint('site_settings', __name__, url_prefix='/api/site_settings')
+blueprint = Blueprint('settings', __name__, url_prefix='/api/settings')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-@blueprint.route("",methods=["GET"])
-def companies_get():
-    json = dict()
-    json["server_mode"] = os.environ["SERVER_MODE"]
-    return jsonify(json), status.HTTP_200_OK
+@blueprint.route("company_view",methods=["GET"])
+def company_view():
+    cards = Company_card.query.all()
+    return jsonify([card_object.serialize for card_object in cards]), status.HTTP_200_OK

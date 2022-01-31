@@ -41,7 +41,7 @@
         </template>
       </template>
       <template v-slot:item.completion="{ item }">
-        <template> {{ item.completion }}/10 </template>
+        <template> {{ completed(item) }} </template>
       </template>
     </Table>
   </v-container>
@@ -106,7 +106,6 @@ export default {
           (nm) => nm.id == c.map_image
         ),
       }));
-      modified.forEach((c) => (c["completion"] = this.completionCompany(c)));
       return modified;
     },
     row_meta() {
@@ -141,6 +140,11 @@ export default {
           label: "Description of summer job",
         },
         {
+          type: "text",
+          model: "summer_job_link",
+          label: "Link to summer job application",
+        },
+        {
           type: "textarea",
           model: "talk_to_us_about",
           label: "Talk to us about",
@@ -153,7 +157,6 @@ export default {
           model: "employees_world",
           label: "Number of Employees in the whole world",
         },
-        { type: "text", model: "talk_to_us_about", label: "Talk to us about" },
         {
           type: "single_select",
           model: "map_image",
@@ -209,20 +212,35 @@ export default {
     viewCompany(company) {
       this.$router.push("/company/" + company.name);
     },
-    completionCompany(company) {
+    completed(company) {
       let missing = 0;
-      if (company.name == "") missing++;
-      if (company.logo == "") missing++;
-      if (company.tags == []) missing++;
-      if (company.talk_to_us_about == "") missing++;
-      if (company.website == "") missing++;
-      if (company.employees_world == -1) missing++;
-      if (company.description == "") missing++;
-      if (company.contacts == "") missing++;
-      if (company.contact_email == "") missing++;
-      if (company.map_image == "") missing++;
+      let total = 0;
+      for (const key in company) {
+        if (
+          company[key] === "" ||
+          company[key].length === 0 ||
+          company[key] === -1
+        ) {
+          console.log("missing");
+          missing += 1;
+        }
+        total += 1;
+      }
 
-      return 10 - missing;
+      return total - missing + "/" + total;
+      //let missing = 0;
+      //if (company.name == "") missing++;
+      //if (company.logo == "") missing++;
+      //if (company.tags == []) missing++;
+      //if (company.talk_to_us_about == "") missing++;
+      //if (company.website == "") missing++;
+      //if (company.employees_world == -1) missing++;
+      //if (company.description == "") missing++;
+      //if (company.contacts == "") missing++;
+      //if (company.contact_email == "") missing++;
+      //if (company.map_image == "") missing++;
+
+      //return 10 - missing;
     },
   },
 };

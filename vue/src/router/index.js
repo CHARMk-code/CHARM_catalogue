@@ -143,7 +143,7 @@ router.beforeEach(async (to, from, next) => {
       router.app.$store.dispatch("prepages/getPrepages"),
       router.app.$store.dispatch("layouts/getLayouts"),
       router.app.$store.dispatch("shortcuts/getShortcuts"),
-      router.app.$store.dispatch("site_settings/getSettings"),
+      router.app.$store.dispatch("site_settings/getCompanyCards"),
     ]).then(() => {
       router.app.$store.dispatch("filter/filterCompanies");
     });

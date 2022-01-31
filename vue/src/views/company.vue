@@ -38,11 +38,7 @@
       <v-row>
         <v-col>
           <Textblock :body="company.description" class="mb-6" />
-          <Textblock 
-            v-if="server_mode === 'summer job'"
-           :body="company.summer_job_description"
-            class="mb-6"
-          />
+          <Summerjob :name="summerjob" class="mb-6" />
           <Layout class="mb-6" />
           <v-row>
             <v-col
@@ -51,27 +47,31 @@
             >
               <Tags
                 :tags="company.tags"
-                name="Divisions"
+                name="tag_divisions"
+                title="Divisions"
                 getter_target="tags/getDivisionsFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
               <Tags
                 v-if="server_mode !== 'summer job'"
                 :tags="company.tags"
-                name="Looking for"
+                name="tag_looking_for"
+                title="Looking for"
                 getter_target="tags/getLookingForFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
               <Tags
                 v-if="server_mode !== 'summer job'"
                 :tags="company.tags"
-                name="Offering"
+                name="tag_offering"
+                title="Offering"
                 getter_target="tags/getOffersFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
               <Tags
                 :tags="company.tags"
-                name="Business Areas"
+                name="tag_business_areas"
+                title="Business Areas"
                 getter_target="tags/getBusinessAreasFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
@@ -84,9 +84,9 @@
           />
         </v-col>
         <v-col>
-          <Map 
+          <Map
             v-if="server_mode !== 'summer job'"
-            :map="company.map_image" 
+            :map="company.map_image"
             class="mb-6"
           />
           <Trivia
@@ -114,6 +114,7 @@ import Tags from "@/components/company/Tags";
 import tableEditDialog from "@/components/admin/table_edit_dialog";
 import Note from "@/components/company/Note";
 import Map from "@/components/company/Map";
+import Summerjob from "@/components/company/summerjob";
 import Layout from "@/components/company/Layout";
 import sideLayout from "@/views/sideLayout";
 import { mapGetters } from "vuex";
@@ -135,6 +136,7 @@ export default {
     tableEditDialog,
     Note,
     Map,
+    Summerjob,
     Layout,
   },
   watch: {
@@ -152,7 +154,7 @@ export default {
       offerings: "tags/offers",
       isInFavorites: "favorites/isInFavorites",
       prepages: "prepages/getActive",
-      server_mode: "site_settings/getServerMode"
+      server_mode: "site_settings/getServerMode",
     }),
     company() {
       const matching_companies = this.$store.getters["companies/companyByName"](

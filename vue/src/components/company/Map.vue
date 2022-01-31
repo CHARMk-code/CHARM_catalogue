@@ -1,14 +1,21 @@
 <template>
-  <v-card :to="'/maps/' + map_object.ref">
+  <company_card_wrapper name="map">
     <v-card-title> We are here</v-card-title>
-    <v-img max-height="400px" :src="base_URL + map_object.image" />
-  </v-card>
+    <v-sheet :to="'/maps/' + map_object.ref">
+      <v-img max-height="400px" :src="base_URL + map_object.image" />
+    </v-sheet>
+  </company_card_wrapper>
 </template>
 
 <script>
 import Vue from "vue";
+import company_card_wrapper from "@/components/company/card_wrapper";
+
 export default {
   name: "Company_map",
+  components: {
+    company_card_wrapper,
+  },
   computed: {
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";

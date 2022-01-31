@@ -1,8 +1,8 @@
 <template>
-  <v-card>
-    <v-card-title> {{ name }} </v-card-title>
+  <company_card_wrapper :name="name">
+    <v-card-title> {{ title }} </v-card-title>
     <v-card-text>
-      <div v-if="tags_data.length === 0">No {{ name }}</div>
+      <div v-if="tags_data.length === 0">No {{ title }}</div>
       <template v-for="tag in tags_data">
         <template v-if="tag.icon == ''">
           <v-chip small class="ma-1" :key="tag.id" @click="gotoSearch(tag)">
@@ -29,14 +29,19 @@
         </template>
       </template>
     </v-card-text>
-  </v-card>
+  </company_card_wrapper>
 </template>
 
 <script>
+import company_card_wrapper from "@/components/company/card_wrapper";
+
 import Vue from "vue";
 export default {
   name: "Company_Tags",
-  props: ["tags", "name", "getter_target"],
+  props: ["tags", "name", "title", "getter_target"],
+  components: {
+    company_card_wrapper,
+  },
   computed: {
     tags_data() {
       return this.$store.getters[this.getter_target](this.tags);
