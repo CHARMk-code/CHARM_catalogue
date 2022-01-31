@@ -18,7 +18,11 @@ export default {
   }),
   mutations: {
     setFilters(state, filters) {
-      state.filters = filters;
+      state.filters = {
+        ...state.filters,
+        ...filters,
+        tags: { ...state.filters.tags, ...filters.tags },
+      };
     },
     setFilteredCompanies(state, companies) {
       state.filteredCompanies = companies;

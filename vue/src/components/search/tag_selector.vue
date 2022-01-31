@@ -5,7 +5,7 @@
     return-object
     item-text="name"
     item-value="id"
-    v-model="selected_tags"
+    v-model="selected_tags_computed"
     @change="onChange"
     :label="label"
     :items="tags"
@@ -59,6 +59,14 @@ export default {
     },
   },
   computed: {
+    selected_tags_computed: {
+      get() {
+        return this.selected_tags;
+      },
+      set() {
+        return;
+      },
+    },
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
