@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title> Visible Elements </v-card-title>
+      <v-card-title> Visible Company Cards</v-card-title>
       <v-combobox
         flat
         class="mx-4"
@@ -33,6 +33,11 @@
           <v-chip label>
             {{ item.text }}
           </v-chip>
+        </template>
+        <template v-slot:no-data>
+          <v-list-item>
+            <span class="subheading">All cards are activated</span>
+          </v-list-item>
         </template>
       </v-combobox>
       <v-card-actions>

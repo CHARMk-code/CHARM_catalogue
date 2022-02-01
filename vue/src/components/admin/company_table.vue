@@ -228,19 +228,6 @@ export default {
       }
 
       return total - missing + "/" + total;
-      //let missing = 0;
-      //if (company.name == "") missing++;
-      //if (company.logo == "") missing++;
-      //if (company.tags == []) missing++;
-      //if (company.talk_to_us_about == "") missing++;
-      //if (company.website == "") missing++;
-      //if (company.employees_world == -1) missing++;
-      //if (company.description == "") missing++;
-      //if (company.contacts == "") missing++;
-      //if (company.contact_email == "") missing++;
-      //if (company.map_image == "") missing++;
-
-      //return 10 - missing;
     },
   },
 };
