@@ -1,8 +1,8 @@
 <template>
-  <v-card>
-    <v-card-title> {{ name }} </v-card-title>
+  <company_card_wrapper :name="name">
+    <v-card-title> {{ title }} </v-card-title>
     <v-card-text>
-      <div v-if="tags_data.length === 0">No {{ name }}</div>
+      <div v-if="tags_data.length === 0">No {{ title }}</div>
       <template v-for="tag in tags_data">
         <template v-if="tag.icon == ''">
           <v-chip small class="ma-1" :key="tag.id" @click="gotoSearch(tag)">
@@ -10,33 +10,46 @@
           </v-chip>
         </template>
         <template v-if="tag.icon != ''">
-          <v-avatar
-            :key="tag.id"
-            large
-            :icon="tag.icon != ''"
-            max-height="36px"
-            max-width="36px"
-          >
-            <v-img
-              @click="gotoSearch(tag)"
-              large
-              class="pa-0"
-              max-height="36px"
-              max-width="36px"
-              :src="base_URL + tag.icon"
-            />
-          </v-avatar>
+          <v-tooltip :key="tag.id" bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-avatar
+                large
+                :icon="tag.icon != ''"
+                max-height="36px"
+                max-width="36px"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-img
+                  @click="gotoSearch(tag)"
+                  large
+                  class="pa-0"
+                  max-height="36px"
+                  max-width="36px"
+                  :src="base_URL + tag.icon"
+                />
+              </v-avatar>
+            </template>
+            <span>
+              {{ tag.name }}
+            </span>
+          </v-tooltip>
         </template>
       </template>
     </v-card-text>
-  </v-card>
+  </company_card_wrapper>
 </template>
 
 <script>
+import company_card_wrapper from "@/components/company/card_wrapper";
+
 import Vue from "vue";
 export default {
   name: "Company_Tags",
-  props: ["tags", "name", "getter_target"],
+  props: ["tags", "name", "title", "getter_target"],
+  components: {
+    company_card_wrapper,
+  },
   computed: {
     tags_data() {
       return this.$store.getters[this.getter_target](this.tags);

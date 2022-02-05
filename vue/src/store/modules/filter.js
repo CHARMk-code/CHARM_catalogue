@@ -46,13 +46,25 @@ export default {
             const filterTags = state.filters.tags[key];
 
             if (filterTags.length > 0) {
-              filteredCompanies = filteredCompanies.filter((c) => {
-                return c.tags.some((t) =>
-                  filterTags.some((filterTag) => t == filterTag.id)
-                );
-              });
+              if (this.getters["site_settings/getServerMode"] === "summer job" && (key === "looking_for" || key === "offerings")){
+                filteredCompanies = filteredCompanies.filter((c) => {
+                  return c.tags.some((t) =>
+                    filterTags.some((filterTag) => t == filterTag.id)
+                 );
+                });
+              }
             }
           }
+          if (this.getters["site_settings/getServerMode"] === "summer job") {
+            const summer_job_tag = this.getters["tags/offers"].filter((c) => {
+              return c.name === "Summer Job"
+            })[0];
+            filteredCompanies = filteredCompanies.filter((c) => {
+              return c.tags.includes(summer_job_tag.id)
+            });
+          }
+
+
           if (state.filters.charmtalk) {
             filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);
           }

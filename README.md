@@ -27,7 +27,7 @@ The system is likely to expenses a large number (ca 5000) of simultaneous user w
 
 Documentation can be created by running `doxygen doxygen_conf` in doc/
 
-## Setup
+## Developer setup
 
 To start the backend use
 
@@ -45,6 +45,15 @@ yarn install && yarn serve
 
 in vue directory.
 which install depends and starts the host server, requires yarn.
+
+## Production setup
+In order to run in production use
+```
+docker-compose -f production.yml up
+```
+
+This will pull the docker images from the github container registry so no need to download this repo. 
+This image are built for production so more secury and faster.
 
 ## Api endpoints
 

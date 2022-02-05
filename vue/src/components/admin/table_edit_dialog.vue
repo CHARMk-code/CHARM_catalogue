@@ -30,11 +30,6 @@
               :key="col.model"
               v-model.number="row[col.model]"
               :label="col.label"
-              :rules="[
-                (v) => {
-                  Number.isInteger(v);
-                },
-              ]"
             />
           </template>
 

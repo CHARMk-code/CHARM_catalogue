@@ -16,6 +16,8 @@ services:
     environment:
       FLASK_ENV: production
       FLASK_APP: .
+      SERVER_MODE: summer job
+
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
