@@ -10,22 +10,30 @@
           </v-chip>
         </template>
         <template v-if="tag.icon != ''">
-          <v-avatar
-            :key="tag.id"
-            large
-            :icon="tag.icon != ''"
-            max-height="36px"
-            max-width="36px"
-          >
-            <v-img
-              @click="gotoSearch(tag)"
-              large
-              class="pa-0"
-              max-height="36px"
-              max-width="36px"
-              :src="base_URL + tag.icon"
-            />
-          </v-avatar>
+          <v-tooltip :key="tag.id" bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-avatar
+                large
+                :icon="tag.icon != ''"
+                max-height="36px"
+                max-width="36px"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-img
+                  @click="gotoSearch(tag)"
+                  large
+                  class="pa-0"
+                  max-height="36px"
+                  max-width="36px"
+                  :src="base_URL + tag.icon"
+                />
+              </v-avatar>
+            </template>
+            <span>
+              {{ tag.name }}
+            </span>
+          </v-tooltip>
         </template>
       </template>
     </v-card-text>

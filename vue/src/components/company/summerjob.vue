@@ -5,7 +5,7 @@
     <v-card-text> {{ desc }}</v-card-text>
 
     <v-card-actions>
-      <v-btn> Apply here </v-btn>
+      <v-btn :href="link"> Apply here </v-btn>
     </v-card-actions>
   </company_card_wrapper>
 </template>
@@ -15,7 +15,7 @@ import company_card_wrapper from "@/components/company/card_wrapper";
 
 export default {
   name: "summer-job",
-  props: ["desc"],
+  props: ["desc", "link"],
   components: {
     company_card_wrapper,
   },

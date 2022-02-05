@@ -59,6 +59,8 @@ def reset_company_view():
         { 'text': "Map", 'name': "map", 'active': True },
         { 'text': "Summer job", 'name': "summerjob", 'active': True },
         { 'text': "Notes", 'name': "notes", 'active': True },
+        { 'text': "CHARMtalks", 'name': "CHARMtalks", 'active': True },
+        { 'text': "Language", 'name': "language", 'active': True },
     ]
     cards = Company_card.query.all()
     for card in cards: 

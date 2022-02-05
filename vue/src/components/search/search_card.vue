@@ -23,6 +23,7 @@
             style="gap: 16px"
           >
             <tagSelector
+              v-if="isVisible('tag_divisions')"
               @change="
                 (v) => {
                   selected_tags.divisions = v;
@@ -34,6 +35,7 @@
               label="Programs"
             />
             <tagSelector
+              v-if="isVisible('tag_business_areas')"
               @change="
                 (v) => {
                   selected_tags.business_areas = v;
@@ -45,7 +47,7 @@
               label="Business area"
             />
             <tagSelector
-              v-if="server_mode !== 'summer job'"
+              v-if="isVisible('tag_looking_for')"
               @change="
                 (v) => {
                   selected_tags.looking_for = v;
@@ -57,7 +59,7 @@
               label="Looking for"
             />
             <tagSelector
-              v-if="server_mode !== 'summer job'"
+              v-if="isVisible('tag_offering')"
               @change="
                 (v) => {
                   selected_tags.offerings = v;
@@ -69,6 +71,7 @@
               label="Offering"
             />
             <tagSelector
+              v-if="isVisible('language')"
               @change="
                 (v) => {
                   selected_tags.languages = v;
@@ -77,16 +80,18 @@
               "
               :tags="tag_languages"
               :selected_tags="selected_tags.languages"
-              label="Langague"
+              label="Language"
             />
             <v-row>
               <v-checkbox
+                v-if="isVisible('name')"
                 class="ml-2 mr-4"
                 @change="search()"
                 v-model="favorites"
                 label="Only Favorites"
               />
               <v-checkbox
+                v-if="isVisible('CHARMtalks')"
                 class="ml-2 mr-4"
                 @change="search()"
                 v-model="charmtalk"
@@ -141,7 +146,7 @@ export default {
       tag_looking_for: "tags/looking_fors",
       tag_offerings: "tags/offers",
       tag_languages: "tags/languages",
-      server_mode: "site_settings/getServerMode",
+      visibleCards: "site_settings/getCompanyCards",
     }),
     tags() {
       return {
@@ -177,6 +182,11 @@ export default {
       this.favorites = false;
       this.charmtalk = false;
       this.search();
+    },
+    isVisible(name) {
+      return this.visibleCards.some((c) =>
+        c.name === name ? c.active : false
+      );
     },
   },
   mounted() {

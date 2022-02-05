@@ -59,6 +59,7 @@
         <template v-slot:item.id="{ item }">
           <v-checkbox
             :input-value="$store.getters['favorites/favorites'].has(item.id)"
+            disabled
             on-icon="mdi-star"
             off-icon="mdi-star-outline"
           />
@@ -82,24 +83,37 @@ export default {
     searchCard,
     Table,
   },
-  data() {
-    return {
-      headers: [
-        { text: "Name", value: "name" },
-        { text: "Programs", value: "divisions" },
-        { text: "Business areas", value: "business_area" },
-        { text: "Looking for", value: "looking_for" },
-        { text: "Offering", value: "offering" },
-        { text: "Liked", value: "id" },
-      ],
-    };
-  },
   computed: {
+    headers() {
+      const headers = [];
+      this.isVisible("name")
+        ? headers.push({ text: "Name", value: "name" })
+        : null;
+      this.isVisible("tag_divisions")
+        ? headers.push({ text: "Programs", value: "divisions" })
+        : null;
+      this.isVisible("tag_business_areas")
+        ? headers.push({ text: "Business areas", value: "business_area" })
+        : null;
+      this.isVisible("tag_looking_for")
+        ? headers.push({ text: "Looking for", value: "looking_for" })
+        : null;
+      this.isVisible("tag_offering")
+        ? headers.push({ text: "Offering", value: "offering" })
+        : null;
+      this.isVisible("name")
+        ? headers.push({ text: "Liked", value: "id", width: "80" })
+        : null;
+      return headers;
+    },
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
 
-    ...mapGetters({ filteredCompanies: "filter/filteredCompanies" }),
+    ...mapGetters({
+      visibleCards: "site_settings/getCompanyCards",
+      filteredCompanies: "filter/filteredCompanies",
+    }),
     modifiedFilteredCompanies() {
       const companies = Array.from(this.filteredCompanies);
       const modified = companies.map((c) => ({
@@ -116,6 +130,11 @@ export default {
     },
   },
   methods: {
+    isVisible(name) {
+      return this.visibleCards.some((c) =>
+        c.name === name ? c.active : false
+      );
+    },
     tagsFromIDs(tags) {
       return tags.map((id) => {
         return this.$store.getters["tags/getTagFromId"](id);
