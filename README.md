@@ -1,105 +1,77 @@
-## Goal
+# CHARMcatalogue
 
-This project aims to provide a digital catalogue for CHARM.
-Strategic goal:
+A fully fledged digital catalogue for the CHARMfair at Chalmers. The system is built to be easily usable and customizable by an administrator with minimal programming understanding.
 
-- Simplify for the average student to find companies that fit them.
+## Features
 
-Which should provide:
+- Company pages
+    - Idividually hideable for users
+    - Company Logo
+    - Description of the company
+    - Show relevant tags (such as Programs, Offering, Business Areas, Looking for)
+    - Summer jobs, if relevant
+    - Map of where at the fair the company is located
+    - Link to their website
+    - Save favorite companies
+    - Take notes (only saved locally)
+- Pre pages (Custom png for other information)
+- Searching and filtering companies
+- Shortcuts 
+    - To premade search and filtering query
+    - To anywhere on the web
+- Batch updates 
+    - Upload a csv to update any information saved in database
+    - Download current configuration (to save or upload later)
+- Customizable layout 
+    - Choose which company information to show on company pages
+    - Adds customized art for all pages
+- Tagging system
+    - Explicitly handles:
+        - Programs the company is interested in
+        - Business areas they operate in
+        - The level of study they're looking for (Bachelor, Masters, PhD)
+        - Types of job the offer
+    - Can handle generic tags as well
+- Easy to use admin interface
+    - Allows configuration and changing of most (if not all) information entered about companies, tags, prepages, shortcuts, etc.
 
-- A view for filter and search for companies
-- A admin interface for creating and modifying companies
-- A admin interface for batch creating companies
-- A interface for authenticating admins.
+## Batch uploading
 
-It would be improved by:
+When the system is setup it can easily be populated by uploading a `.zip` file containing a `.csv` file along with all the images (named correctly) as an administrator. 
 
-- Be well adopted for mobile
-- Support map functionally to display where company are
-- Support for liking(I would like to come back to this) and writing notes
-- Allow user to add and up/down vote tags for company, crowd sourcing want tags each company right has
+An example of such a file can be found [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing)
 
-## Plan
+# Setup
+## Production
 
-The system is likely to expenses a large number (ca 5000) of simultaneous user with limits hosting resources, as such we aim to off load computation on to the user.
+### Requirements
 
-## Documentation
+A system configured with `Docker` and `Docker-compose`
 
-Documentation can be created by running `doxygen doxygen_conf` in doc/
+## Running 
 
-## Developer setup
+Download and the `production.yml` file found in `.` and run it with `docker-compose up` 
 
-To start the backend use
 
+## Development
+
+### Requirements
+
+A system configured with `Docker`, `Docker-compose` and `yarn`
+
+### Running 
+The backend is started by simple running 
 ```
 docker-compose up
 ```
 
-This requires [docker](https://www.docker.com/).
-
-To start the frontend running
-
+For the frontend go in to the `vue` directorty and run 
 ```
-yarn install && yarn serve
+yarn install 
 ```
-
-in vue directory.
-which install depends and starts the host server, requires yarn.
-
-## Production setup
-In order to run in production use
+Followed by 
 ```
-docker-compose -f production.yml up
+yarn serve
 ```
 
-This will pull the docker images from the github container registry so no need to download this repo. 
-This image are built for production so more secury and faster.
 
-## Api endpoints
-
-Below is a map of the endpoints provide by the api.
-Keys:
-A - Requires user to be logged in, all endpoints of this type is placed under directory admin.
-
-```
-api-|-tag-----|-create
-    |         |-add
-    |         |-match
-    |         |-get
-    |         |-update(A)
-    |         |-comapany-update(A)
-    |
-    |-company-|-get
-    |         |-update(A)
-    |
-    |-manage--|-load(A)
-    |
-    |-auth----|-login
-              |-logout(A)
-              |-signout(A)
-              |-change_password(A)
-```
-
-## Create/modify companies
-
-There are multiple way of doing this, singular company are easiest handle interactivity in the frontend, while a large among of companies can easily be created or modify by uploading a xlsx file.
-
-### Interactive method
-
-TODO: Write when functionally is available.
-
-### Batch creation
-
-Images and company data can be upload via `/api/mange/load` endpoint, this endpoint allows single image, just the data(in a .xlsx file), or any number of image and/or data in a zip or tar.gz file.
-A example is available [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing). The zip and tar file can have any structure, the system will find all file in the directory and subdirectories.
-
-#### Data formatting of xlsx file
-
-The tags sheet is structure in a tree structure, where indentions indicates a sublevel. In template the tag 'Software' has two subtag 'Open source' and 'AI' The structure always infinitely many sublevels. The first col gives the name of the icon to use, the following three cols are metadata, which is used for set special properties on the tag, such as it being a student division.
-
-The Companies sheet is structured with columns A-J being metadata metadata, followed by a list of tags. The tag list is structured as if a company_A has tag_A then put TRUE(click the checkbox) cell where tag_A and company_A intersects.
-
-The Prepage sheet is very simple it each prepage with it three attributes. The first column specify what to show this page, second specify the image filename, third the order of the pages lower number first.
-## Contribute
-
-In order to keep the improve code quality, all contributions such be peer review via a pull request before being push the master.
