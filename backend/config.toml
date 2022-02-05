@@ -1,0 +1,16 @@
+test = "test"
+[creds]
+password = "password"
+secret = ""
+
+[backend]
+secret_key = ""
+upload_folder = "/upload"
+static_folder = "/static"
+
+[database]
+user = "catalogue"
+pass = "password"
+db = "catalogue"
+server = "db"
+port = "3306"
