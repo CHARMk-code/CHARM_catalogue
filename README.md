@@ -48,7 +48,7 @@ An example of such a file can be found [here](https://drive.google.com/drive/fol
 
 A system configured with `Docker` and `Docker-compose`
 
-## Running 
+### Running 
 
 Download and the `production.yml` file found in `.` and run it with `docker-compose up` 
 
