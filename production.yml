@@ -1,7 +1,7 @@
 version: "3"
 services:
   flask:
-    build: ./docker/flask
+    image: ghcr.io/CHARMk-code/catalogue_flask:latest
     restart: unless-stopped
     ports:
       - "5008:5000"
@@ -28,11 +28,9 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
   vue:
-    build: vue
+    image: ghcr.io/CHARMk-code/catalogue_vue:latest
     restart: unless-stopped
     ports:
       - "8080:3000"
     volumes:
       - ./vue:/app
-    environment:
-      NODE_OPTIONS: "--openssl-legacy-provider"
