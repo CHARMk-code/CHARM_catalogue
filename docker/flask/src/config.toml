@@ -1,18 +1,15 @@
-# Configuration of the service
 [creds]
 password = "password"
-secret = "adasdjasofhsgfalsöduas öfoyasl312312"
+secret = ""
 
 [flask]
-secret_key = "9OLWxND4o83j4K4iuopO"
+secret_key = ""
 upload_folder = "/upload"
 static_folder = "/static"
 
 [database]
-# The user and the db need to be created beforehandc (add it in the docker-compose)
 user = "catalogue"
 pass = "password"
 db = "catalogue"
-
 server = "db"
 port = "3306"
