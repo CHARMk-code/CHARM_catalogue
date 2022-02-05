@@ -20,7 +20,7 @@ jobs:
 
       # Create latested vesion
       - name: Build the latest Docker image
-        run: docker build ./docker/flask --file Dockerfile_production --tag ghcr.io/CHARMk-code/catalogue_flask:latest
+        run: docker build docker/flask --file Dockerfile_production --tag ghcr.io/CHARMk-code/catalogue_flask:latest
       - name: Push the latest Docker image
         run: docker push ghcr.io/CHARMk-code/catalogue_flask:latest
 
