@@ -6,7 +6,7 @@
     v-bind:button_right="true"
   >
     <v-sheet
-      style="margin-top: -52px; max-height: 80%"
+      class="prepage-sheet"
       v-touch="{ right: () => prev(), left: () => next() }"
     >
       <v-img
@@ -63,8 +63,20 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.prepage {
-  max-height: calc(100vh - 64px);
-}
+<style lang="sass" scoped>
+@import '~vuetify/src/styles/styles.sass'
+
+@media #{map-get($display-breakpoints, 'md-and-up')}
+  .prepage
+    max-height: calc(100vh - 64px)
+
+  .prepage-sheet
+      margin-top: -64px
+
+@media #{map-get($display-breakpoints, 'sm-and-down')}
+  .prepage
+    max-height: calc(100vh - 56px)
+
+  .prepage-sheet
+      margin-top: -56px
 </style>
