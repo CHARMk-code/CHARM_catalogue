@@ -1,6 +1,6 @@
 # CHARMcatalogue
 
-A fully fledged digital catalogue for the CHARMfair at Chalmers. The system is built to be easily usable and customizable by an administrator with minimal programming understanding.
+A fully fledged digital catalogue for the CHARMfair at Chalmers. The system is built to be easily usable and customizable by an administrator with minimal programming understanding. The current published version in production should be available on http://catalogue.charm.chalmers.se
 
 ## Features
 
