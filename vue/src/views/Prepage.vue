@@ -5,18 +5,17 @@
     v-bind:button_left="page > 0"
     v-bind:button_right="true"
   >
-    <v-container
-      v-touch="{
-        right: () => prev(),
-        left: () => next(),
-      }"
+    <v-sheet
+      style="margin-top: -52px; max-height: 80%"
+      v-touch="{ right: () => prev(), left: () => next() }"
     >
-      <img
-        class="d-flex mx-auto"
-        style="position: relative; height: 100vh"
+      <v-img
+        class="prepage"
+        contain
+        max-width="100%"
         :src="base_URL + '/manage/image/' + prepages[page].image"
       />
-    </v-container>
+    </v-sheet>
   </sideLayout>
 </template>
 
@@ -64,3 +63,8 @@ export default {
 };
 </script>
 
+<style lang="scss" scoped>
+.prepage {
+  max-height: calc(100vh - 64px);
+}
+</style>
