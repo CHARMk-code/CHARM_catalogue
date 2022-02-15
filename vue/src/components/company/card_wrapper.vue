@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="isVisible" :flat="flat">
+  <v-card min-width="296px" v-if="isVisible" :flat="flat">
     <slot />
   </v-card>
 </template>
