@@ -5,7 +5,7 @@ A fully fledged digital catalogue for the CHARMfair at Chalmers. The system is b
 ## Features
 
 - Company pages
-    - Idividually hideable for users
+    - Individually hideable for users
     - Company Logo
     - Description of the company
     - Show relevant tags (such as Programs, Offering, Business Areas, Looking for)
