@@ -87,7 +87,7 @@
           />
         </v-col>
         <v-col>
-          <Map :map="company.map_image" class="mb-6" />
+          <Map :map="company.map_image" :booth_number="company.booth_number" class="mb-6" />
           <Trivia
             :talk_to_us_about="company.talk_to_us_about"
             :sweden="company.employees_sweden"

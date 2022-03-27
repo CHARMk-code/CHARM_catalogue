@@ -1,9 +1,11 @@
 <template>
   <company_card_wrapper name="map">
-    <v-card-title> We are here</v-card-title>
+    <v-card-title> Location </v-card-title>
     <v-sheet :to="'/maps/' + map_object.ref">
-      <v-img max-height="400px" :src="base_URL + map_object.image" />
+      <v-img class="ma-2" max-height="400px" contain :src="base_URL + map_object.image" />
     </v-sheet>
+    <v-card-text> <v-icon>mdi-map-marker</v-icon> {{booth_number}}</v-card-text>
+
   </company_card_wrapper>
 </template>
 
@@ -27,6 +29,6 @@ export default {
     },
   },
 
-  props: ["map"],
+  props: ["map","booth_number"],
 };
 </script>
