@@ -70,7 +70,6 @@ class Company(db.Model):
     last_updated = db.Column(db.DateTime)
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
-    in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
     summer_job_description = db.Column(db.String(1000))
@@ -82,6 +81,7 @@ class Company(db.Model):
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
     map_image = db.Column(db.String(100))
+    booth_number = db.Column(db.Integer)
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
@@ -90,9 +90,9 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, charmtalk, in_sweden, description,summer_job_description, summer_job_link,
+    def create( name, active, charmtalk, description, summer_job_description, summer_job_link,
          contacts, contact_email, employees_world, website,
-         talk_to_us_about, logo, map_image,  tags):
+         talk_to_us_about, logo, map_image, booth_number, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -101,7 +101,6 @@ class Company(db.Model):
                 last_updated=datetime.datetime.now(),
                 active=active,
                 charmtalk=charmtalk,
-                in_sweden=in_sweden,
                 description=description,
                 summer_job_description = summer_job_description,
                 summer_job_link = summer_job_link,
@@ -112,6 +111,7 @@ class Company(db.Model):
                 talk_to_us_about = talk_to_us_about,
                 logo = logo,
                 map_image = map_image,
+                booth_number = booth_number,
                 tags = tags
             )
 
@@ -121,15 +121,14 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, charmtalk, in_sweden, description, summer_job_description, summer_job_link,
+    def update(self, name, active, charmtalk, description, summer_job_description, summer_job_link,
             contacts, contact_email, employees_world, website,
-            talk_to_us_about,logo, map_image,  tags):
+            talk_to_us_about,logo, map_image, booth_number, tags):
 
         self.name = test_and_set(self.name,name)
         self.last_updated = datetime.datetime.now()
         self.active = test_and_set(self.active,active)
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
-        self.in_sweden = test_and_set(self.in_sweden,in_sweden)
         self.description = test_and_set(self.description,description)
         self.summer_job_description = test_and_set(self.summer_job_description, summer_job_description)
         self.summer_job_link = test_and_set(self.summer_job_link, summer_job_link)
@@ -140,6 +139,7 @@ class Company(db.Model):
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
         self.map_image = test_and_set(self.map_image, map_image)
+        self.booth_number = test_and_set(self.booth_number, booth_number)
         self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)
         self.tags = test_and_set(self.tags, tags)
 
@@ -162,7 +162,6 @@ class Company(db.Model):
             'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
             'active': self.active,
             'charmtalk': self.charmtalk,
-            'in_sweden': self.in_sweden,
             'description': self.description,
             'summer_job_description': self.summer_job_description,
             'summer_job_link': self.summer_job_link,
@@ -172,6 +171,7 @@ class Company(db.Model):
             'website': self.website,
             'logo': self.logo,
             'map_image': self.map_image,
+            'booth_number': self.booth_number,
             'talk_to_us_about': self.talk_to_us_about,
             'tags': tags
         }
