@@ -254,14 +254,15 @@ export default {
       this.$store.dispatch("companies/modifyCompany", row);
     },
     next() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex + 1;
       if (index < this.filteredCompanies.length) {
         this.$router.push("/company/" + this.filteredCompanies[index].name);
       }
     },
     prev() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex - 1;
-      console.log(index, this.prepages.length);
       if (index >= 0) {
         return this.$router.push(
           "/company/" + this.filteredCompanies[index].name
