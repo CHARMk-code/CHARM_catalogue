@@ -1,19 +1,19 @@
 <template>
-  <company_card_wrapper name="map">
+  <company_card_wrapper class="mb-6" name="map">
     <v-card-title> Location </v-card-title>
     <v-card-text class="text-subtitle-1 text-center">
       <v-icon color="primary" large>mdi-map-marker</v-icon> Booth #{{
         booth_number
       }}
+      <v-card flat :to="'/maps/' + map_ref_object.name">
+        <v-img
+          class="ma-2"
+          max-height="400px"
+          contain
+          :src="base_URL + map_object.image"
+        />
+      </v-card>
     </v-card-text>
-    <v-card flat :to="'/maps/' + map_ref_object.name">
-      <v-img
-        class="ma-2"
-        max-height="400px"
-        contain
-        :src="base_URL + map_object.image"
-      />
-    </v-card>
   </company_card_wrapper>
 </template>
 
