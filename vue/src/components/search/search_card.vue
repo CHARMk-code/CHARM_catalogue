@@ -180,6 +180,7 @@ export default {
         })
         .then(() => {
           this.$store.dispatch("filter/filterCompanies");
+          this.$store.dispatch("filter/sortCompanies", "!");
         });
       let query = {};
       this.query.length > 0 && (query.q = this.query);
@@ -298,6 +299,7 @@ export default {
     }
     this.$store.dispatch("filter/setFilters", newFilter);
     this.$store.dispatch("filter/filterCompanies", newFilter);
+    this.$store.dispatch("filter/sortCompanies", "!");
 
     const stored_filter = this.$store.getters["filter/getFilter"];
     this.query = stored_filter.query;
