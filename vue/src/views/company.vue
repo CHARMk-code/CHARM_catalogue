@@ -147,6 +147,15 @@ export default {
       this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
     },
   },
+created() {
+    window.addEventListener('keydown', (e) => {
+       if (e.key == "ArrowRight"){
+         this.next();
+       } else if (e.key == "ArrowLeft"){
+         this.prev();
+       }
+    });
+  },
   computed: {
     ...mapGetters({
       isLoggedIn: "auth/isLoggedIn",
@@ -258,14 +267,15 @@ export default {
       this.$store.dispatch("companies/modifyCompany", row);
     },
     next() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex + 1;
       if (index < this.filteredCompanies.length) {
         this.$router.push("/company/" + this.filteredCompanies[index].name);
       }
     },
     prev() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex - 1;
-      console.log(index, this.prepages.length);
       if (index >= 0) {
         return this.$router.push(
           "/company/" + this.filteredCompanies[index].name

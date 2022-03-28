@@ -122,6 +122,9 @@ def parseXlsx():
 
             metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
+            
+            if metadata[0] == "":
+                continue
 
             company = Company.query.filter_by(name = metadata[0]).first()
             if  company == None:
