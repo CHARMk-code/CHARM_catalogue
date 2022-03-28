@@ -5,6 +5,7 @@ export default {
   namespaced: true,
   state: () => ({
     layouts: [],
+    current_center: "",
     load_wait: 0,
   }),
   mutations: {
@@ -25,6 +26,14 @@ export default {
     removeAllLayouts(state) {
       state.layouts = [];
     },
+    updateCenter(state){
+    
+      const layouts = state.layouts.filter((t) => t.placement === 0);
+      if (layouts.length !== 0) {
+        const index = Math.floor(Math.random() * layouts.length);
+        state.current_center = layouts[index];
+      }
+    }
   },
   actions: {
     getLayouts({ commit }) {
@@ -82,14 +91,9 @@ export default {
       return state.layouts;
     },
     getMiddle: (state) => {
-      const layouts = state.layouts.filter((t) => t.placement === 0);
-      if (layouts.length === 0) {
-        return undefined;
-      }
-
-      const index = Math.floor(Math.random() * layouts.length);
-      return layouts[index];
+      return state.current_center;
     },
+
     getSide: (state) => (side) => {
       const layout = state.layouts.filter((t) => t.placement === side);
       return layout.length === 0 ? undefined : layout[0];

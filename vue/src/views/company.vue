@@ -30,7 +30,7 @@
         <v-col align="center" xs="12" sm="12" md="auto">
           <Logo :src="company.logo" />
         </v-col>
-        <v-col>
+        <v-col align-content="start">
           <Name :name="company.name" :id="company.id" />
         </v-col>
       </v-row>
@@ -87,7 +87,11 @@
           />
         </v-col>
         <v-col>
-          <Map :map="company.map_image" :booth_number="company.booth_number" class="mb-6" />
+          <Map
+            :map="company.map_image"
+            :booth_number="company.booth_number"
+            class="mb-6"
+          />
           <Trivia
             :talk_to_us_about="company.talk_to_us_about"
             :sweden="company.employees_sweden"
@@ -142,6 +146,15 @@ export default {
     filteredCompanies: function (val) {
       this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
     },
+  },
+created() {
+    window.addEventListener('keydown', (e) => {
+       if (e.key == "ArrowRight"){
+         this.next();
+       } else if (e.key == "ArrowLeft"){
+         this.prev();
+       }
+    });
   },
   computed: {
     ...mapGetters({
@@ -254,14 +267,15 @@ export default {
       this.$store.dispatch("companies/modifyCompany", row);
     },
     next() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex + 1;
       if (index < this.filteredCompanies.length) {
         this.$router.push("/company/" + this.filteredCompanies[index].name);
       }
     },
     prev() {
+      this.$store.commit("layouts/updateCenter");
       const index = this.currentIndex - 1;
-      console.log(index, this.prepages.length);
       if (index >= 0) {
         return this.$router.push(
           "/company/" + this.filteredCompanies[index].name

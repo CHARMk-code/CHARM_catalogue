@@ -27,6 +27,9 @@ export default {
     setFilteredCompanies(state, companies) {
       state.filteredCompanies = companies;
     },
+    sortCompanies(state, strategy) {
+      state.filteredCompanies.sort(strategy);
+    },
   },
   actions: {
     filterCompanies({ commit, state, rootGetters }) {
@@ -71,6 +74,12 @@ export default {
     },
     setFilters({ commit }, filters) {
       commit("setFilters", filters);
+    },
+    sortCompanies({ commit }, strategy) {
+      strategy = (a, b) => {
+        return ("" + a.name).localeCompare(b.name);
+      };
+      commit("sortCompanies", strategy);
     },
   },
   getters: {

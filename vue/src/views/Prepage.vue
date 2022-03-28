@@ -28,6 +28,15 @@ export default {
   components: {
     sideLayout,
   },
+  created() {
+    window.addEventListener('keydown', (e) => {
+       if (e.key == "ArrowRight"){
+         this.next();
+       } else if (e.key == "ArrowLeft"){
+         this.prev();
+       }
+    });
+  },
   computed: {
     base_URL() {
       return Vue.prototype.$axios.defaults.baseURL;
