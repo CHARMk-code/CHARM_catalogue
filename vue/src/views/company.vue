@@ -143,6 +143,15 @@ export default {
       this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
     },
   },
+created() {
+    window.addEventListener('keydown', (e) => {
+       if (e.key == "ArrowRight"){
+         this.next();
+       } else if (e.key == "ArrowLeft"){
+         this.prev();
+       }
+    });
+  },
   computed: {
     ...mapGetters({
       isLoggedIn: "auth/isLoggedIn",
