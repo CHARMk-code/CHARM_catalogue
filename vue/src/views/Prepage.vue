@@ -29,13 +29,10 @@ export default {
     sideLayout,
   },
   created() {
-    window.addEventListener('keydown', (e) => {
-       if (e.key == "ArrowRight"){
-         this.next();
-       } else if (e.key == "ArrowLeft"){
-         this.prev();
-       }
-    });
+    window.addEventListener("keydown", this.arrowKeyHandler);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.arrowKeyHandler);
   },
   computed: {
     base_URL() {
@@ -50,6 +47,13 @@ export default {
     }),
   },
   methods: {
+    arrowKeyHandler(e) {
+      if (e.key == "ArrowRight") {
+        this.next();
+      } else if (e.key == "ArrowLeft") {
+        this.prev();
+      }
+    },
     next() {
       if (parseInt(this.page) + 1 >= this.prepages.length) {
         this.$store.dispatch("companies/getCompanies");

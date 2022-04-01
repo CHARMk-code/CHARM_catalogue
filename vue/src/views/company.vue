@@ -147,14 +147,11 @@ export default {
       this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
     },
   },
-created() {
-    window.addEventListener('keydown', (e) => {
-       if (e.key == "ArrowRight"){
-         this.next();
-       } else if (e.key == "ArrowLeft"){
-         this.prev();
-       }
-    });
+  created() {
+    window.addEventListener("keydown", this.arrowKeyHandler);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.arrowKeyHandler);
   },
   computed: {
     ...mapGetters({
@@ -265,6 +262,13 @@ created() {
     },
     saveRow(row) {
       this.$store.dispatch("companies/modifyCompany", row);
+    },
+    arrowKeyHandler(e) {
+      if (e.key == "ArrowRight") {
+        this.next();
+      } else if (e.key == "ArrowLeft") {
+        this.prev();
+      }
     },
     next() {
       this.$store.commit("layouts/updateCenter");
