@@ -82,19 +82,6 @@
               :selected_tags="selected_tags.languages"
               label="Language"
             />
-
-            <tagSelector
-              v-if="isVisible('language')"
-              @change="
-                (v) => {
-                  selected_tags.areas = v;
-                  search();
-                }
-              "
-              :tags="tag_areas"
-              :selected_tags="selected_tags.areas"
-              label="Fair Area"
-            />
             <v-row>
               <v-checkbox
                 v-if="isVisible('name')"
@@ -143,7 +130,6 @@ export default {
         business_areas: [],
         offerings: [],
         languages: [],
-        areas: []
       },
       favorites: false,
       charmtalk: false,
@@ -170,11 +156,6 @@ export default {
       visibleCards: "site_settings/getCompanyCards",
       getUrlQuery: "filter/getUrlQuery"
     }),
-    tag_areas(){
-      const all_maps = new Set(this.companies.map((t) => t.map_image));
-      const areas = Array.from(all_maps).map((t) => new Object({"name": t}))
-      return areas
-    },
     tags() {
       return {
         divisions: this.tag_divisions,
@@ -182,7 +163,6 @@ export default {
         business_areas: this.tag_business_areas,
         offerings: this.tag_offerings,
         languages: this.tag_languages,
-        areas: this.tag_areas,
       };
     },
   },
@@ -222,7 +202,6 @@ export default {
       this.selected_tags.offerings = [];
       this.selected_tags.looking_for = [];
       this.selected_tags.languages = [];
-      this.selected_tags.areas = [];
       this.favorites = false;
       this.charmtalk = false;
       this.search();

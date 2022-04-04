@@ -9,7 +9,6 @@ export default {
         business_areas: [],
         offerings: [],
         languages: [],
-        areas:[]
       },
       favorites: false,
       charmtalk: false,
@@ -45,23 +44,14 @@ export default {
           }
           for (const key in state.filters.tags) {
             const filterTags = state.filters.tags[key];
-            if (key == "areas") {
-              if (filterTags.length > 0) {
-                filteredCompanies = filteredCompanies.filter((c) => {
-                  return filterTags.some((filterTag) => c.map_image == filterTag.name
-                  );
-                });
-              }
-            } else {
-              if (filterTags.length > 0) {
-                filteredCompanies = filteredCompanies.filter((c) => {
-                  return c.tags.some((t) =>
-                    filterTags.some((filterTag) => t == filterTag.id)
-                  );
-                });
-              }
+
+            if (filterTags.length > 0) {
+              filteredCompanies = filteredCompanies.filter((c) => {
+                return c.tags.some((t) =>
+                  filterTags.some((filterTag) => t == filterTag.id)
+                );
+              });
             }
-            
           }
           if (state.filters.charmtalk) {
             filteredCompanies = filteredCompanies.filter((t) => t.charmtalk);

@@ -25,7 +25,7 @@
     </template>
 
     <template v-slot:selection="{ item }">
-      <template v-if="item.icon != undefined && item.icon != ''">
+      <template v-if="item.icon != ''">
         <v-avatar>
           <v-img
             max-height="36px"
