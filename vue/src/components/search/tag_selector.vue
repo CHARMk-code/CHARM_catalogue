@@ -10,8 +10,8 @@
     :label="label"
     :items="tags"
   >
-    <template v-slot:item="{ item, attrs }">
-      <v-simple-checkbox :value="attrs.inputValue" />
+    <template v-slot:item="{ item /*, attrs */}">
+      <!--<v-simple-checkbox :value="attrs.inputValue" />-->
       <template v-if="item.icon != ''">
         <v-img
           class="ml-2 mr-4"
@@ -56,7 +56,7 @@ export default {
   methods: {
     onChange(v) {
       this.$emit("change", v);
-    },
+    }
   },
   computed: {
     selected_tags_computed: {
