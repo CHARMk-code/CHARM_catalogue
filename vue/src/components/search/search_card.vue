@@ -236,6 +236,8 @@ export default {
   },
   async created() {
     const urlQuery = this.$route.query;
+    if (Object.keys(urlQuery).length == 0) return;
+    this.clearFilter();
     const newFilter = { tags: {} };
     console.log(urlQuery);
     if (typeof urlQuery.q !== "undefined" && urlQuery.q.length > 0) {
