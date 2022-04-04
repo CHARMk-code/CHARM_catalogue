@@ -89,6 +89,9 @@ export default {
       this.isVisible("name")
         ? headers.push({ text: "Name", value: "name" })
         : null;
+      this.isVisible("map")
+        ? headers.push({ text: "Fair Area", value: "map_image" })
+        : null;
       this.isVisible("tag_divisions")
         ? headers.push({ text: "Programs", value: "divisions" })
         : null;
