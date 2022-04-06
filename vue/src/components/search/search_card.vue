@@ -290,6 +290,7 @@ export default {
       this.favorites ||
       this.charmtalk ||
       this.sweden;
+
   },
 };
 </script>
