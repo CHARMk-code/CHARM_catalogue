@@ -129,7 +129,7 @@ export default {
       }
       query.page = page_data.page
       this.$router.replace({
-        path: "/search",
+        path: this.$route.path,
         query,
       });
     }
