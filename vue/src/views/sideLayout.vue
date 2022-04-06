@@ -21,9 +21,13 @@
     >
       <v-icon x-large>mdi-arrow-right</v-icon>
     </v-btn>
-      <v-container
-        class="ma-0 pa-0  justify-content-between hidden-sm-and-down"
-        style="width: 100vw; position: fixed; top: 0; left:0;"
+    <div
+      style="position: fixed; top: 0; width: 100vw"
+      class="hidden-sm-and-down"
+    >
+      <div
+        class="ma-0 pa-0 d-flex justify-content-between"
+        style="width: 100vw"
       >
         <v-row class="ma-0 pa-0">
           <v-col cols="2" class="pa-0">
@@ -44,10 +48,9 @@
             />
           </v-col>
         </v-row>
-      </v-container>
-    <v-container
-      style="position: absolute; top: 0; width: 100vw; max-width: 100%"
-    >
+      </div>
+    </div>
+    <div style="position: absolute; top: 0; width: 100vw">
       <v-row class="justify-center">
         <v-col
           xs="0"
@@ -65,7 +68,7 @@
           class="pa-0 ma-0 hidden-sm-and-down"
         />
       </v-row>
-    </v-container>
+    </div>
   </v-main>
 </template>
 
