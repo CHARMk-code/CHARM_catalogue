@@ -168,6 +168,7 @@ export default {
       tag_offerings: "tags/offers",
       tag_languages: "tags/languages",
       visibleCards: "site_settings/getCompanyCards",
+      getUrlQuery: "filter/getUrlQuery"
     }),
     tag_areas(){
       const all_maps = new Set(this.companies.map((t) => t.map_image));
@@ -201,37 +202,14 @@ export default {
         .then(() => {
           this.$store.dispatch("filter/filterCompanies");
         });
-      let query = {};
-      this.query.length > 0 && (query.q = this.query);
-      if (this.selected_tags.divisions.length > 0) {
-        query.divisions = this.selected_tags.divisions
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.looking_for.length > 0) {
-        query.looking_for = this.selected_tags.looking_for
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.business_areas.length > 0) {
-        query.business_areas = this.selected_tags.business_areas
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.offerings.length > 0) {
-        query.offerings = this.selected_tags.offerings
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.languages.length > 0) {
-        query.languages = this.selected_tags.languages
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      this.favorites && (query.favorites = true);
-      this.charmtalk && (query.charmtalk = true);
-      this.sweden && (query.sweden = true);
+      
+      let query = this.getUrlQuery;
 
+      // Handles not removing page, should be made more general
+      const urlQuery = this.$route.query;
+      if (typeof urlQuery.page != "undefined") {
+        query.page= urlQuery.page;
+      }
       this.$router.replace({
         path: "/search",
         query,
@@ -260,7 +238,6 @@ export default {
     if (Object.keys(urlQuery).length == 0) return;
     this.clearFilter();
     const newFilter = { tags: {} };
-    console.log(urlQuery);
     if (typeof urlQuery.q !== "undefined" && urlQuery.q.length > 0) {
       newFilter.query = urlQuery.q;
     }

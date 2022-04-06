@@ -143,7 +143,7 @@ export default {
       this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
     },
   },
-created() {
+  created() {
     window.addEventListener('keydown', (e) => {
        if (e.key == "ArrowRight"){
          this.next();

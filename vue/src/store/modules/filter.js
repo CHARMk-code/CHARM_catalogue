@@ -90,5 +90,39 @@ export default {
     getFilter: (state) => {
       return state.filters;
     },
+    getUrlQuery: (state) => {
+      let query = {};
+      state.filters.query.length > 0 && (query.q = state.filters.query);
+      if (state.filters.tags.divisions.length > 0) {
+        query.divisions = state.filters.tags.divisions
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (state.filters.tags.looking_for.length > 0) {
+        query.looking_for = state.filters.tags.looking_for
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (state.filters.tags.business_areas.length > 0) {
+        query.business_areas = state.filters.tags.business_areas
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (state.filters.tags.offerings.length > 0) {
+        query.offerings = state.filters.tags.offerings
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      if (state.filters.tags.languages.length > 0) {
+        query.languages = state.filters.tags.languages
+          .map((t) => t.id.toString())
+          .toString();
+      }
+      state.filters.favorites && (query.favorites = true);
+      state.filters.charmtalk && (query.charmtalk = true);
+      state.filters.sweden && (query.sweden = true);
+
+      return query;
+    }
   },
 };

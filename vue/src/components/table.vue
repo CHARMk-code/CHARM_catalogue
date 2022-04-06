@@ -5,10 +5,12 @@
     class="elevation-1"
     :search="search"
     @click:row="onRowClick"
+    v-on:pagination="pageChange"
     fluid
     item-key="id"
     multi-sort
     fixed-header
+    :page="page"
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -69,6 +71,7 @@
 import tableEditDialog from "@/components/admin/table_edit_dialog";
 import tablePop from "@/components/admin/table_popup";
 
+import { mapGetters } from "vuex";
 export default {
   name: "Table",
   components: {
@@ -84,7 +87,13 @@ export default {
       creating: true,
       editedRow: {},
       show_popup: false,
+      page:1
     };
+  },
+  computed: {
+    ...mapGetters({
+      getUrlQuery: "filter/getUrlQuery"
+    })
   },
   methods: {
     editRow(row) {
@@ -113,6 +122,23 @@ export default {
     onRowClick(row) {
       this.$emit("click_row", row);
     },
+    pageChange(page_data){ 
+      let query = {};
+      if (this.$route.name == "Search") {
+        query = this.getUrlQuery;
+      }
+      query.page = page_data.page
+      this.$router.replace({
+        path: "/search",
+        query,
+      });
+    }
   },
+  created(){
+      const urlQuery = this.$route.query;
+      if (typeof urlQuery.page != "undefined") {
+        this.page= Number(urlQuery.page);
+      }
+  }
 };
 </script>
