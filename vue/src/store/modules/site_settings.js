@@ -25,7 +25,7 @@ export default {
           this.state.site_settings.load_wait =
             Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           Vue.prototype.$axios
-            .get("/settings/company_view")
+            .get("/settings")
             .then((resp) => {
               commit("setCompanyCards", resp.data);
               resolve(resp);

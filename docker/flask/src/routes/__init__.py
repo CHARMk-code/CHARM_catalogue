@@ -13,7 +13,10 @@ def register_all_blueprints(app):
             continue
 
         routes.append(dirname(f)[len(basedir)+1:].replace('/','.') + "." +basename(f)[:-3])
-    
+
     for route in routes:
+        if route[0] == '.':
+            route = route[1:]
+
         route_module = import_module('catalogue.routes.' + route)
         app.register_blueprint(route_module.blueprint)
