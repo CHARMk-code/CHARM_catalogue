@@ -67,11 +67,14 @@ class Company(db.Model):
     Reps a company
     """
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime)
+    name = db.Column(db.String(200))
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
+<<<<<<< HEAD
     in_sweden = db.Column(db.Boolean)
     name = db.Column(db.String(200))
+=======
+>>>>>>> fb92af7... Generic PUT and DELETE
     description = db.Column(db.String(1000))
     summer_job_description = db.Column(db.String(1000))
     summer_job_link = db.Column(db.String(1000))
@@ -82,6 +85,11 @@ class Company(db.Model):
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
     map_image = db.Column(db.String(100))
+<<<<<<< HEAD
+=======
+    booth_number = db.Column(db.Integer)
+    last_updated = db.Column(db.DateTime)
+>>>>>>> fb92af7... Generic PUT and DELETE
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
@@ -369,9 +377,9 @@ class Prepage(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
+    active = db.Column(db.Boolean)
     image = db.Column(db.String(100))
     order = db.Column(db.Integer)
-    active = db.Column(db.Boolean)
 
     @staticmethod
     def create( name,active,image, order ):
@@ -417,8 +425,8 @@ class Prepage(db.Model):
 class Layout(db.Model):
     __tablename__ = "layout"
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.String(100))
     active = db.Column(db.Boolean)
+    image = db.Column(db.String(100))
     placement = db.Column(db.Integer)
 
     @staticmethod
