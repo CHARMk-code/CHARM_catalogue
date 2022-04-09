@@ -22,9 +22,9 @@ path_LUT = {
 
 @blueprint.route("<path>", methods=["PUT"])
 def generic_put(path):
-    #result = auth_token(request)
-    #if not result[0]:
-    #    return result[1]
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
 
 
     table = path_LUT[path]
@@ -58,9 +58,9 @@ def generic_put(path):
 
 @blueprint.route("<path>/<id>",methods=["DELETE"])
 def company_delete(path,id):
-    #result = auth_token(request)
-    #if not result[0]:
-    #    return result[1]
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
 
     table = path_LUT[path]
     row = table.query.get(id)
