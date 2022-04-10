@@ -1,8 +1,7 @@
 from flask import Blueprint, request
-from ..models import Company, Tag, Layout, Prepage, Shortcut, Company_card, Map
+from ..models import Company, Tag, Layout, Prepage, Shortcut, Company_card, Map, createGeneric, deleteGeneric, updateGeneric
 from flask_cors import CORS
 from ..helper_functions import *
-import sys
 
 blueprint = Blueprint('admin', __name__, url_prefix='/api/')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
@@ -32,11 +31,9 @@ def generic_put(path):
     request_data = request.get_json()
     values = []
     for attr in table.__table__.columns.keys():
-        print(attr,file=sys.stderr)
         values.append(get_if_exist(request_data,attr))
 
     if path == "company":
-        del values[-1]
         tags = get_if_exist(request_data, "tags")
         tag_objs=[]
         if tags:
@@ -44,17 +41,12 @@ def generic_put(path):
                 tag_objs.append(Tag.query.get(tag))
         values.append(tag_objs)
 
-    print(values, file=sys.stderr)
     id = values.pop(0)
-    print(f"id={id}", file=sys.stderr)
-
     if not id:
-        print("creating new",file=sys.stderr)
-        return send_status(table.create(*values))
+        return send_status(createGeneric(table, values))
     else:
         row = table.query.get(int(id))
-        print("Updating",file=sys.stderr)
-        return send_status(row.update(*values))
+        return send_status(updateGeneric(table, row, values))
 
 @blueprint.route("<path>/<id>",methods=["DELETE"])
 def company_delete(path,id):
@@ -65,6 +57,6 @@ def company_delete(path,id):
     table = path_LUT[path]
     row = table.query.get(id)
     if row:
-        return send_status(row.delete())
+        return send_status(deleteGeneric(row))
     else:
         return "Failed", status.HTTP_400_BAD_REQUEST

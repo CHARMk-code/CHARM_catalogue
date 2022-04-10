@@ -2,7 +2,7 @@ from flask import Blueprint, send_from_directory, request, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import xlrd,os,sys, datetime, xlsxwriter, math
-from ...models import Company, Layout, Prepage,  Tag, Map
+from ...models import Company, Layout, Prepage,  Tag, Map, createGeneric, updateGeneric
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
@@ -51,9 +51,9 @@ def parseXlsx():
         else:
             data[2] = None
         if not map_object:
-            Map.create(*data)
+            createGeneric(Map,data)
         else:
-            map_object.update(*data)
+            updateGeneric(Map,map_object,data)
 
 
     # Adds tags
@@ -66,10 +66,10 @@ def parseXlsx():
         tag = Tag.query.filter_by(name=row[next_col].value).first()
         metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
         if not tag: # No tag exists
-            Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
+            createGeneric(Tag,[row[next_col].value,parent_tag,1,1,False,*metadata])
             parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
         else:
-            tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
+            updateGeneric(Tag,tag,[row[next_col].value,parent_tag,1,1,False,*metadata])
             parent_tag = tag.id
 
         if (i+1 >= tags_sheet.nrows):
@@ -133,18 +133,17 @@ def parseXlsx():
                     #      db.session.commit()
             metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
-            metadata[1] = bool(metadata[1])
-            metadata[2] = bool(metadata[2])
-            metadata[3] = bool(metadata[3])
+            
+            if metadata[0] == "":
+                continue
+            
 
             company = Company.query.filter_by(name = metadata[0]).first()
+            metadata.append(tags_temp)
             if  company == None:
-                Company.create(
-                        *metadata,
-                        tags_temp
-                        )
+                createGeneric(Company,metadata)
             else:
-                company.update(*metadata,tags_temp)
+                updateGeneric(Company, company, metadata)
 
     # Prepages
     prepages_sheet = workbook.sheet_by_name("Prepages")
@@ -153,9 +152,9 @@ def parseXlsx():
 
         data = list(map(lambda x: x.value, prepages_sheet.row(i)))
         if not prepage:
-            Prepage.create(*data)
+            createGeneric(Prepage, data)
         else:
-            prepage.update(*data)
+            updateGeneric(Prepage,prepage,data)
 
     # Layout
     layout_sheet = workbook.sheet_by_name("Layout")
@@ -164,9 +163,9 @@ def parseXlsx():
 
         data = list(map(lambda x: x.value, layout_sheet.row(i)))
         if not layout:
-            Layout.create(*data)
+            createGeneric(Layout,data)
         else:
-            layout.update(*data)
+            updateGeneric(Layout,layout,data)
 
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 

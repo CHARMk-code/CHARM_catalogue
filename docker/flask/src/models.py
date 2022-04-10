@@ -1,4 +1,3 @@
-from re import S
 from . import db,config
 from flask_login import UserMixin
 import sys
@@ -6,6 +5,95 @@ import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
 from .helper_functions import test_and_set
+import sys
+
+def serializeGeneric(table,obj):
+    result = {}
+    for attr in table.__table__.columns.keys():
+        if attr == "last_updated":
+            tags = []
+            for tag in obj.tags:
+                tags.append(tag.id)
+
+            result[attr] = (getattr(obj,attr) + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S")
+            result["tags"] = tags
+        else:
+            result[attr] = getattr(obj,attr)
+    return result
+
+
+def createGeneric(table,args):
+    try:
+        if type(args) == list:
+            if table.query.filter_by(name=args[0]).first():
+                return False
+            
+            new_obj = table()
+            attrs =  table.__table__.columns.keys()
+
+            if table == Company:
+                attrs.append("tags")
+
+            index = 0
+            for attr in table.__table__.columns.keys()[1:]:
+                if attr == "last_updated":
+                    continue
+                else:
+                    setattr(new_obj,attr,args[index])
+
+                index += 1
+
+        elif type(args) == dict:
+            primary_key = table.__table__.columns.keys()[1]
+            if table.query.filter_by(name=args[primary_key]).first():
+                return False
+
+            new_obj = table()
+            for attr in table.__table__.columns.keys()[1:]:
+                setattr(new_obj,attr,args[attr])
+        
+        else:
+            raise Exception(f"{type(args)} is not a valid input" )
+        
+        # Handle company edge case
+        if table is Company:
+            new_obj.last_updated=datetime.datetime.now(),
+            new_obj.tags = args[-1] 
+
+        db.session.add(new_obj)
+        db.session.commit()
+    except Exception as e:
+        return False
+    return True
+
+def updateGeneric(table,obj,args):
+    try:
+
+        if type(args) == list:
+            for index, attr in enumerate(table.__table__.columns.keys()[1:]):
+                setattr(obj,attr,test_and_set(getattr(obj,attr),args[index]))
+
+        elif type(args) == dict:
+            for attr in table.__table__.columns.keys()[1:]:
+                setattr(obj,attr,test_and_set(getattr(obj,attr),args[attr]))
+        else:
+            raise Exception(f"{type(args)} is not a valid input" )
+        
+        # Handle company edge case
+        if table is Company:
+            obj.last_updated=datetime.datetime.now(),
+        db.session.commit()
+    except:
+        return False
+    return True
+
+def deleteGeneric(obj):
+    try:
+        db.session.delete(obj)
+        db.session.commit()
+    except:
+        return False
+    return True
 
 
 # Crowd:
@@ -70,11 +158,6 @@ class Company(db.Model):
     name = db.Column(db.String(200))
     active = db.Column(db.Boolean)
     charmtalk = db.Column(db.Boolean)
-<<<<<<< HEAD
-    in_sweden = db.Column(db.Boolean)
-    name = db.Column(db.String(200))
-=======
->>>>>>> fb92af7... Generic PUT and DELETE
     description = db.Column(db.String(1000))
     summer_job_description = db.Column(db.String(1000))
     summer_job_link = db.Column(db.String(1000))
@@ -85,104 +168,15 @@ class Company(db.Model):
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
     map_image = db.Column(db.String(100))
-<<<<<<< HEAD
-=======
     booth_number = db.Column(db.Integer)
     last_updated = db.Column(db.DateTime)
->>>>>>> fb92af7... Generic PUT and DELETE
     tags = db.relationship(
         'Tag',
         secondary=companies_tags,
         lazy='subquery',
         backref=db.backref('tags', lazy=True, cascade='all, delete')
     )
-
-    @staticmethod
-    def create( name, active, charmtalk, in_sweden, description,summer_job_description, summer_job_link,
-         contacts, contact_email, employees_world, website,
-         talk_to_us_about, logo, map_image,  tags):
-        try:
-            if Company.query.filter_by(name=name).first():
-                return False
-            new_company = Company(
-                name=name,
-                last_updated=datetime.datetime.now(),
-                active=active,
-                charmtalk=charmtalk,
-                in_sweden=in_sweden,
-                description=description,
-                summer_job_description = summer_job_description,
-                summer_job_link = summer_job_link,
-                contacts = contacts,
-                contact_email = contact_email,
-                employees_world = employees_world if employees_world != "" else -1,
-                website = website,
-                talk_to_us_about = talk_to_us_about,
-                logo = logo,
-                map_image = map_image,
-                tags = tags
-            )
-
-            db.session.add(new_company)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, name, active, charmtalk, in_sweden, description, summer_job_description, summer_job_link,
-            contacts, contact_email, employees_world, website,
-            talk_to_us_about,logo, map_image,  tags):
-
-        self.name = test_and_set(self.name,name)
-        self.last_updated = datetime.datetime.now()
-        self.active = test_and_set(self.active,active)
-        self.charmtalk = test_and_set(self.charmtalk,charmtalk)
-        self.in_sweden = test_and_set(self.in_sweden,in_sweden)
-        self.description = test_and_set(self.description,description)
-        self.summer_job_description = test_and_set(self.summer_job_description, summer_job_description)
-        self.summer_job_link = test_and_set(self.summer_job_link, summer_job_link)
-        self.contacts = test_and_set(self.contacts,contacts)
-        self.contact_email = test_and_set(self.contact_email,contact_email)
-        self.employees_world = test_and_set(self.employees_world, employees_world)
-        self.employees_world = self.employees_world if self.employees_world != "" else -1,
-        self.website = test_and_set(self.website, website)
-        self.logo = test_and_set(self.logo, logo)
-        self.map_image = test_and_set(self.map_image, map_image)
-        self.talk_to_us_about = test_and_set(self.talk_to_us_about, talk_to_us_about)
-        self.tags = test_and_set(self.tags, tags)
-
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        tags = []
-        for tag in self.tags:
-            tags.append(tag.id)
-        return {
-            'id': self.id,
-            'name': self.name,
-            'last_updated': (self.last_updated + datetime.timedelta(hours=1, seconds=0)).strftime("%Y-%m-%mT%H:%M:%S"),
-            'active': self.active,
-            'charmtalk': self.charmtalk,
-            'in_sweden': self.in_sweden,
-            'description': self.description,
-            'summer_job_description': self.summer_job_description,
-            'summer_job_link': self.summer_job_link,
-            'contacts': self.contacts,
-            'contact_email': self.contact_email,
-            'employees_world': self.employees_world,
-            'website': self.website,
-            'logo': self.logo,
-            'map_image': self.map_image,
-            'talk_to_us_about': self.talk_to_us_about,
-            'tags': tags
-        }
+    last_updated = db.Column(db.DateTime)
 
 
 class Tag(db.Model):
@@ -203,127 +197,6 @@ class Tag(db.Model):
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
     language = db.Column(db.Boolean)
-
-    @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
-        try:
-            if Tag.query.filter_by(name=name).first():
-                return False
-            new_tag = Tag(
-                name=name,
-                parent_tag=parent_tag,
-                up_votes = up_votes,
-                down_votes = down_votes,
-                crowd_sourced=crowd_sourced,
-                icon = icon,
-                division = division,
-                business_area = business_area,
-                looking_for = looking_for,
-                offering = offering,
-                language = language
-            )
-            db.session.add(new_tag)
-            db.session.commit()
-        except:
-            return False
-        return True
-
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
-        try:
-            self.name = test_and_set(self.name,name)
-            self.parent_tag = test_and_set(self.parent_tag,parent_tag)
-            self.up_votes = test_and_set(self.up_votes,up_votes)
-            self.down_votes = test_and_set(self.down_votes, down_votes)
-            self.crowd_sourced = test_and_set(self.crowd_sourced,crowd_sourced)
-            self.icon = test_and_set(self.icon, icon)
-            self.division = test_and_set(self.division, division)
-            self.business_area = test_and_set(self.business_area, business_area)
-            self.looking_for = test_and_set(self.looking_for, looking_for)
-            self.offering = test_and_set(self.offering, offering)
-            self.language = test_and_set(self.language, language)
-            db.session.commit()
-            return True
-        except:
-            return False
-
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'parent_tag': self.parent_tag,
-            'up_votes': self.up_votes,
-            'down_votes': self.down_votes,
-            'crowd_sourced': self.crowd_sourced,
-            'icon': self.icon,
-            'division': self.division,
-            'business_area': self.business_area,
-            'looking_for': self.looking_for,
-            'offering': self.offering,
-            'language': self.language
-        }
-
-class Tag_company(db.Model):
-    """
-    These are the reletion between a company and tag.
-    These can be crowd source, it supports voting to improve the accuracy of the relation.
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    tag = db.Column(db.Integer)
-    company = db.Column(db.Integer)
-    votes = db.Column(db.Integer)
-    score = db.Column(db.Integer)
-    crowd_sourced = db.Column(db.Boolean)
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'tag': self.tag,
-            'company': self.company,
-            'up_votes': self.up_votes,
-            'down_votes': self.down_votes,
-            'crowd_sourced': self.crowd_sourced,
-        }
-
-    @staticmethod
-    def create(tag, company, up_votes, down_votes, crowd_sourced):
-        try:
-            if Tag_company.query.filter_by(tag=tag,company=company).first():
-                return False
-            new_tag_company = Tag_company(
-                tag=tag,
-                company=company,
-                up_votes=up_votes,
-                down_votes=down_votes,
-                crowd_sourced=crowd_sourced
-            )
-
-            db.session.add(new_tag_company)
-            db.session.commit()
-        except:
-            return False
-        return True
-
-    def update(self, tag, company, up_votes, down_votes, crowd_sourced):
-        try:
-            self.tag = test_and_set(self.tag, tag)
-            self.company = test_and_set(self.company,company)
-            self.up_votes= test_and_set(self.up_votes, up_votes)
-            self.down_votes= test_and_set(self.down_votes, down_votes)
-            self.crowd_sourced = test_and_set(self.crowd_sourced, crowd_sourced)
-            db.session.commit()
-            return True
-        except:
-            return False
-
 class Map(db.Model):
     __tablename__ = "maps"
     id = db.Column(db.Integer, primary_key=True)
@@ -331,44 +204,6 @@ class Map(db.Model):
     image = db.Column(db.String(100))
     ref = db.Column(db.Integer)
 
-    @staticmethod
-    def create(name, image, ref):
-        try:
-
-            if Map.query.filter_by(name=name).first():
-                return False
-            new_map = Map(
-                name = name,
-                image = image,
-                ref = ref
-            )
-
-            db.session.add(new_map)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, name, image, ref):
-        self.name = test_and_set(self.name,name)
-        self.image = test_and_set(self.image, image)
-        self.ref = test_and_set(self.ref, ref)
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'image': self.image,
-            'ref': self.ref
-        }
 
 class Prepage(db.Model):
     __tablename__ = "prepages"
@@ -381,91 +216,12 @@ class Prepage(db.Model):
     image = db.Column(db.String(100))
     order = db.Column(db.Integer)
 
-    @staticmethod
-    def create( name,active,image, order ):
-        try:
-            if Prepage.query.filter_by(image=image).first():
-                return False
-            new_prepage = Prepage(
-                name = name,
-                image = image,
-                order = order,
-                active = active
-            )
-
-            db.session.add(new_prepage)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, name, active,image, order,):
-        self.name = test_and_set(self.name,name)
-        self.active = test_and_set(self.active, active)
-        self.image = test_and_set(self.image, image)
-        self.order = test_and_set(self.order, order)
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'image': self.image,
-            'order': self.order,
-            'active': self.active
-        }
-
 class Layout(db.Model):
     __tablename__ = "layout"
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean)
     image = db.Column(db.String(100))
     placement = db.Column(db.Integer)
-
-    @staticmethod
-    def create(active,image, placement):
-        try:
-            if Layout.query.filter_by(image=image).first():
-                return False
-            new_layout = Layout(
-                image = image,
-                placement = placement,
-                active = active
-            )
-
-            db.session.add(new_layout)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, active,image, placement):
-        self.active = test_and_set(self.active, active)
-        self.image = test_and_set(self.image, image)
-        self.placement = test_and_set(self.placement, placement)
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'image': self.image,
-            'placement': self.placement,
-            'active': self.active
-        }
 
 class Shortcut(db.Model):
     __tablename__ = "shortcuts"
@@ -476,85 +232,10 @@ class Shortcut(db.Model):
     link = db.Column(db.String(100))
     icon = db.Column(db.String(100))
 
-    @staticmethod
-    def create(name, desc, link, icon):
-        try:
-            new_shortcut = Shortcut(
-                name=name,
-                desc=desc,
-                link=link,
-                icon=icon
-            )
-
-            db.session.add(new_shortcut)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, name, desc, link, icon):
-        self.name = test_and_set(self.name, name)
-        self.desc = test_and_set(self.desc, desc)
-        self.link = test_and_set(self.link, link)
-        self.icon = test_and_set(self.icon, icon)
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'desc': self.desc,
-            'link': self.link,
-            'icon': self.icon
-        }
-
 class Company_card(db.Model):
     __tablename__ = "company_cards"
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String(100))
     text = db.Column(db.String(100))
+    name = db.Column(db.String(100))
     active = db.Column(db.Boolean)
-
-    @staticmethod
-    def create(name, text, active):
-        try:
-            new_company_card = Company_card(
-                name=name,
-                text=text,
-                active=active
-            )
-
-            db.session.add(new_company_card)
-            db.session.commit()
-        except Exception as e:
-            return False
-        return True
-
-    def update(self, name, text, active):
-        self.name = test_and_set(self.name, name)
-        self.text = test_and_set(self.text, text)
-        self.active = test_and_set(self.active, active)
-        db.session.commit()
-        return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'text': self.text,
-            'active': self.active,
-        }

@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify
-from ..models import Company, Layout, Map, Prepage, Shortcut, Company_card, Tag
+from ..models import Company, Layout, Map, Prepage, Shortcut, Company_card, Tag, serializeGeneric
 from flask_cors import CORS
 from flask_api import status
 
@@ -21,4 +21,4 @@ path_LUT = {
 def company_view(path):
     table = path_LUT[path]
     rows = table.query.all()
-    return jsonify([row.serialize for row in rows]), status.HTTP_200_OK
+    return jsonify([serializeGeneric(table,row) for row in rows]), status.HTTP_200_OK

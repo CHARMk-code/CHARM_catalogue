@@ -204,6 +204,21 @@ export default {
   },
   methods: {
     saveCompany(company) {
+      if (company.looking_for === undefined) {
+        company.looking_for = []
+      }
+      if (company.offering === undefined) {
+        company.offering = []
+      }
+      if (company.business_area === undefined) {
+        company.business_area = []
+      }
+      if (company.language === undefined) {
+        company.language = []
+      }
+      if (company.divisions === undefined) {
+        company.divisions = [] 
+      }
       this.$store.dispatch("companies/modifyCompany", company);
     },
     deleteCompany(company) {
@@ -217,9 +232,11 @@ export default {
       let total = 0;
       for (const key in company) {
         if (
+          company[key] === undefined ||
           company[key] === "" ||
           company[key].length === 0 ||
-          company[key] === -1
+          company[key] === -1 
+          
         ) {
           console.log("missing");
           missing += 1;

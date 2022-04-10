@@ -55,7 +55,7 @@ export default {
       return new Promise((resolve, reject) => {
         const cards = state.settings.company_view.cards;
         Vue.prototype.$axios
-          .put("/settings/company_view", cards)
+          .put("/settings", cards)
           .then(() => {
             resolve();
           })
@@ -67,7 +67,7 @@ export default {
     resetCompanyCards({ dispatch }) {
       return new Promise((resolve, reject) => {
         Vue.prototype.$axios
-          .get("/settings/company_view/reset")
+          .get("/settings/reset")
           .then(() => {
             resolve(dispatch("getCompanyCards", true));
           })
