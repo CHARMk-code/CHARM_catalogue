@@ -120,17 +120,6 @@ def parseXlsx():
                 if companies_sheet.cell_value(i,j):
                     tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
 
-                    # Tempary removed user supplied tag company connection and ratings
-                    #  if not Tag_company.query.filter_by( tag = tags[j-2],  company = comp_id).first():
-                    #      new_link = Tag_company(
-                    #          tag = tags[j-2],
-                    #          company = comp_id,
-                    #          crowd_soured = False,
-                    #          score = 1,
-                    #          votes = 1
-                    #      )
-                    #      db.session.add(new_link)
-                    #      db.session.commit()
             metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
             
@@ -266,7 +255,6 @@ def download():
         for table_obj in table.query.all():
             row_data = [getattr(table_obj,attr) for attr in attrs]
             if sheet_name == "Maps" and row_data[2] != None:
-                print(row_data,file=sys.stderr)
                 row_data[2] = Map.query.filter_by(id=row_data[2]).first().name
             worksheet.write_row(row_num,0, row_data)
             row_num += 1
@@ -276,7 +264,7 @@ def download():
     worksheet = workbook.add_worksheet("Companies")
     
     # Set object based labels
-    labels=["Name","Active","CHARMTALK","In Sweden","Description","Contact","Contact email", "Employees worldwide","Website","Talk to us about", "Logo","Map"]
+    labels=["Name","Active","CHARMTALK","Summer job description", "Summer job link","Description","Contact","Contact email", "Employees worldwide","Website","Talk to us about", "Logo","Map","Booth number"]
     worksheet.write_row(0,0, labels)
 
     # Set tag based labels
@@ -286,7 +274,7 @@ def download():
     worksheet.write_row(0,NUMBER_OF_METADATA_COLS_COMPANY,name_for_all_tags)
 
     row_num = 1
-    attrs= ["name","active","charmtalk","in_sweden","description","contacts","contact_email","employees_world","website","talk_to_us_about","logo","map_image"]
+    attrs= ["name","active","charmtalk","summer_job_description", "summer_job_link","description","contacts","contact_email","employees_world","website","talk_to_us_about","logo","map_image","booth_number"]
     # Tag data
     for table_obj in Company.query.all():
         # Object based data
@@ -295,8 +283,9 @@ def download():
 
         # Tag data
         offset = 0
+        company_tag_ids = list(map(lambda x:x.id, table_obj.tags))
         for id_to_test in id_for_all_tags:
-            worksheet.write(row_num,NUMBER_OF_METADATA_COLS_COMPANY+offset, id_to_test in id_for_all_tags)
+            worksheet.write(row_num,NUMBER_OF_METADATA_COLS_COMPANY+offset, id_to_test in company_tag_ids)
             offset +=1
         
         row_num += 1

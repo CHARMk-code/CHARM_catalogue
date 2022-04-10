@@ -16,8 +16,14 @@ export default {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
   },
-  mounted() {
-    this.layout = this.$store.getters["layouts/getMiddle"];
+  mounted(){
+    this.$store.commit("layouts/updateCenter");
   },
+  watch: {
+    "$store.state.layouts.current_center"(val)
+    {
+      this.layout = val;
+  }
+  }
 };
 </script>

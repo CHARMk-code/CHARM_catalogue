@@ -62,6 +62,7 @@ export default {
     return {
       headers: [
         { text: "Name", value: "name" },
+        { text: "Booth", value: "booth_number"},
         { text: "Programs", value: "divisions" },
         { text: "Completion", value: "completion", width: 120 },
         { text: "Active", value: "active", width: 100 },
@@ -127,6 +128,11 @@ export default {
           model: "name",
           label: "Company name",
           displayname: true,
+        },
+        {
+          type: "number",
+          model: "booth_number",
+          label: "Booth number"
         },
         { type: "image", model: "logo", label: "Company Logo" },
         {
@@ -238,7 +244,6 @@ export default {
           company[key] === -1 
           
         ) {
-          console.log("missing");
           missing += 1;
         }
         total += 1;

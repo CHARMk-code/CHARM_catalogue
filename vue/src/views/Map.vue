@@ -1,18 +1,7 @@
 <template>
   <v-main>
-    <v-sheet
-      min-height="50vh"
-      rounded="lg"
-      class="d-flex"
-      style="position: relative"
-    >
-      <img
-        style="margin: auto"
-        height="700px"
-        width="1400px"
-        justify="center"
-        :src="base_URL + map_src"
-      />
+    <v-sheet class="pa-6">
+      <v-img contain justify="center" :src="base_URL + map_src" />
     </v-sheet>
   </v-main>
 </template>
@@ -26,6 +15,7 @@ export default {
       return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
     },
     map_src() {
+      console.log(this.$store.getters["maps/get"]);
       return this.$store.getters["maps/get"].filter(
         (t) => t.name == this.$route.params.page
       )[0].image;

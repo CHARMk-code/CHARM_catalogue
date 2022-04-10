@@ -25,7 +25,7 @@
       style="position: fixed; top: 0; width: 100vw"
       class="hidden-sm-and-down"
     >
-      <div
+      <v-container
         class="ma-0 pa-0 d-flex justify-content-between"
         style="width: 100vw"
       >
@@ -48,9 +48,11 @@
             />
           </v-col>
         </v-row>
-      </div>
+      </v-container>
     </div>
-    <div style="position: absolute; top: 0; width: 100vw">
+    <v-container
+      style="position: absolute; top: 0; width: 100vw; max-width: 100%"
+    >
       <v-row class="justify-center">
         <v-col
           xs="0"
@@ -68,7 +70,7 @@
           class="pa-0 ma-0 hidden-sm-and-down"
         />
       </v-row>
-    </div>
+    </v-container>
   </v-main>
 </template>
 

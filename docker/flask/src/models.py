@@ -176,7 +176,6 @@ class Company(db.Model):
         lazy='subquery',
         backref=db.backref('tags', lazy=True, cascade='all, delete')
     )
-    last_updated = db.Column(db.DateTime)
 
 
 class Tag(db.Model):

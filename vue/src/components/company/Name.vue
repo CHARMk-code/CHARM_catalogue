@@ -1,7 +1,7 @@
 <template>
   <company_card_wrapper name="name" flat>
-    <v-row>
-      <v-col cols="2">
+    <div class="d-flex flex-row-reverse">
+      <div class="pl-6">
         <v-tooltip right max-width="300px">
           <template v-slot:activator="{ on, attrs }">
             <div v-on="on">
@@ -20,14 +20,14 @@
             be transfered between browsers)
           </span>
         </v-tooltip>
-      </v-col>
-      <v-col
-        cols="10"
-        class="text-h5 text-md-h3 font-weight-regular d-flex align-center"
+      </div>
+      <div
+        class="text-h5 text-md-h3 font-weight-regular"
+        style="align-self: center"
       >
         {{ name }}
-      </v-col>
-    </v-row>
+      </div>
+    </div>
   </company_card_wrapper>
 </template>
 

@@ -5,18 +5,17 @@
     v-bind:button_left="page > 0"
     v-bind:button_right="true"
   >
-    <v-container
-      v-touch="{
-        right: () => prev(),
-        left: () => next(),
-      }"
+    <v-sheet
+      class="prepage-sheet"
+      v-touch="{ right: () => prev(), left: () => next() }"
     >
-      <img
-        class="d-flex mx-auto"
-        style="position: relative; height: 100vh"
+      <v-img
+        class="prepage"
+        contain
+        max-width="100%"
         :src="base_URL + '/manage/image/' + prepages[page].image"
       />
-    </v-container>
+    </v-sheet>
   </sideLayout>
 </template>
 
@@ -28,6 +27,12 @@ export default {
   name: "Prepage",
   components: {
     sideLayout,
+  },
+  created() {
+    window.addEventListener("keydown", this.arrowKeyHandler);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.arrowKeyHandler);
   },
   computed: {
     base_URL() {
@@ -42,6 +47,13 @@ export default {
     }),
   },
   methods: {
+    arrowKeyHandler(e) {
+      if (e.key == "ArrowRight") {
+        this.next();
+      } else if (e.key == "ArrowLeft") {
+        this.prev();
+      }
+    },
     next() {
       if (parseInt(this.page) + 1 >= this.prepages.length) {
         this.$store.dispatch("companies/getCompanies");
@@ -64,3 +76,20 @@ export default {
 };
 </script>
 
+<style lang="sass" scoped>
+@import '~vuetify/src/styles/styles.sass'
+
+@media #{map-get($display-breakpoints, 'md-and-up')}
+  .prepage
+    max-height: calc(100vh - 64px)
+
+  .prepage-sheet
+      margin-top: -64px
+
+@media #{map-get($display-breakpoints, 'sm-and-down')}
+  .prepage
+    max-height: calc(100vh - 56px)
+
+  .prepage-sheet
+      margin-top: -56px
+</style>
