@@ -1,12 +1,12 @@
 from flask import Blueprint, send_from_directory, request, send_file
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import xlrd,os,sys, datetime, xlsxwriter, math
+import xlrd,os,sys, datetime, xlsxwriter
 from ...models import Company, Layout, Prepage,  Tag, Map, createGeneric, updateGeneric
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
-import shutil
+import shutil,urllib
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
@@ -26,7 +26,8 @@ def imageLoad(request):
     filename = file.filename
     if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
         return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-    file.save(os.path.join(config['flask']['static_folder'], secure_filename(filename)))
+    url_safe_filename = urllib.parse.quote(filename)
+    file.save(os.path.join(config['flask']['static_folder'], secure_filename(url_safe_filename)))
 
     return "All files uploaded", status.HTTP_200_OK
 

@@ -1,11 +1,10 @@
 from . import db,config
 from flask_login import UserMixin
-import sys
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
 from .helper_functions import test_and_set
-import sys
+import sys,urllib
 
 def serializeGeneric(table,obj):
     result = {}
@@ -38,6 +37,8 @@ def createGeneric(table,args):
             for attr in table.__table__.columns.keys()[1:]:
                 if attr == "last_updated":
                     continue
+                elif attr in ["attr", "map_image","icon"]:
+                    setattr(new_obj,attr,urllib.parse.quote(args[index]))
                 else:
                     setattr(new_obj,attr,args[index])
 
