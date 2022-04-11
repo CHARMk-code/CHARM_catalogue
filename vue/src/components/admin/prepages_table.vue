@@ -8,6 +8,7 @@
       :data="Array.from(this.prepages)"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.name="{ item }">
         {{ item.name }}
@@ -82,6 +83,9 @@ export default {
     viewPrepage(prepage) {
       this.$router.push("/prepages/" + (prepage.order - 1));
     },
+    clearAll(){
+      this.$store.dispatch("prepages/deleteAllPrepages");
+    }
   },
   beforeMount() {
     this.$store.dispatch("prepages/getPrepages");

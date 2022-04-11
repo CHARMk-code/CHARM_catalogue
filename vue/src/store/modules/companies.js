@@ -83,6 +83,19 @@ export default {
           });
       });
     },
+    deleteAllCompanies({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/company")
+          .then((resp) => {
+            commit("removeAllCompanies");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     companies: (state) => {

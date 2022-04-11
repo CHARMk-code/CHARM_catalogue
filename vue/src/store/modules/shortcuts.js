@@ -76,6 +76,19 @@ export default {
           });
       });
     },
+    deleteAllShortcuts({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/shortcut")
+          .then((resp) => {
+            commit("removeAllShortcuts");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     get: (state) => {

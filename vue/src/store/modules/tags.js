@@ -161,6 +161,19 @@ export default {
           });
       });
     },
+    deleteAllTags({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/tag")
+          .then((resp) => {
+            commit("removeAllTags");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     getTagFromId: (state) => (id) => {

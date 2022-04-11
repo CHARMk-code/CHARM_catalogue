@@ -96,6 +96,15 @@ def deleteGeneric(obj):
         return False
     return True
 
+def deleteAll(table):
+    try:
+        for row in table.query.all():
+            db.session.delete(row)
+        db.session.commit()
+    except:
+        return False
+    return True
+
 
 # Crowd:
 # 0 - all

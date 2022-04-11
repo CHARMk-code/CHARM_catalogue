@@ -8,6 +8,7 @@
       :data="modified_maps"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.name="{ item }">
         {{ item.name }}
@@ -83,6 +84,9 @@ export default {
     deleteMap(map) {
       this.$store.dispatch("maps/deleteMap", map);
     },
+    clearAll(){
+      this.$store.dispatch("maps/deleteAllMaps");
+    }
   },
 };
 </script>

@@ -85,6 +85,19 @@ export default {
           });
       });
     },
+    deleteAllLayout({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/layout")
+          .then((resp) => {
+            commit("removeAllLayouts");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     get: (state) => {

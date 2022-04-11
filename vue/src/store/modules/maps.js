@@ -75,6 +75,19 @@ export default {
           });
       });
     },
+    deleteAllMaps({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/map")
+          .then((resp) => {
+            commit("removeAllMaps");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     get: (state) => {

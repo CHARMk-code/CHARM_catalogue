@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from ..models import Company, Tag, Layout, Prepage, Shortcut, Company_card, Map, createGeneric, deleteGeneric, updateGeneric
+from ..models import Company, Tag, Layout, Prepage, Shortcut, Company_card, Map, createGeneric, deleteGeneric, updateGeneric, deleteAll
 from flask_cors import CORS
 from ..helper_functions import *
 
@@ -49,7 +49,7 @@ def generic_put(path):
         return send_status(updateGeneric(table, row, values))
 
 @blueprint.route("<path>/<id>",methods=["DELETE"])
-def company_delete(path,id):
+def deleteOne(path,id):
     result = auth_token(request)
     if not result[0]:
         return result[1]
@@ -60,3 +60,12 @@ def company_delete(path,id):
         return send_status(deleteGeneric(row))
     else:
         return "Failed", status.HTTP_400_BAD_REQUEST
+
+@blueprint.route("<path>",methods=["DELETE"])
+def companyALl(path):
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
+    table = path_LUT[path]
+    return send_status(deleteAll(table))

@@ -92,6 +92,19 @@ export default {
           });
       });
     },
+    deleteAllPrepages({commit}){
+      return new Promise((resolve, reject) => {
+        Vue.prototype.$axios
+          .delete("/prepage")
+          .then((resp) => {
+            commit("removeAllPrepages");
+            resolve(resp);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
   },
   getters: {
     get: (state) => {

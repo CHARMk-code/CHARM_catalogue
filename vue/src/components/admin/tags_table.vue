@@ -8,6 +8,7 @@
       :data="Array.from(this.tags)"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.business_area="{ item }">
         <v-simple-checkbox disabled v-model="item.business_area" />
@@ -102,6 +103,9 @@ export default {
     deleteTag(tag) {
       this.$store.dispatch("tags/deleteTag", tag);
     },
+    clearAll(){
+      this.$store.dispatch("tags/deleteAllTags")
+    }
   },
 };
 </script>

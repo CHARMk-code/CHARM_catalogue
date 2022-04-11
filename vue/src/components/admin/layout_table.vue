@@ -8,6 +8,7 @@
       :data="Array.from(this.layouts)"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.placement="{ item }">
         <template v-if="item.placement == 0"> Company page</template>
@@ -81,6 +82,9 @@ export default {
     deleteLayout(layout) {
       this.$store.dispatch("layouts/deleteLayout", layout);
     },
+    clearAll(){
+      this.$store.dispatch("layouts/deleteAllLayouts");
+    }
   },
   beforeMount() {
     this.$store.dispatch("layouts/getLayouts");

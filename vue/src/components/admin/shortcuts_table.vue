@@ -8,6 +8,7 @@
       :data="modified_shortcuts"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.name="{ item }">
         {{ item.name }}
@@ -84,6 +85,9 @@ export default {
     deleteShortcut(shortcut) {
       this.$store.dispatch("shortcuts/deleteShortcut", shortcut);
     },
+    clearAll() {
+      this.$store.dispatch("shortcuts/deleteAllShortcuts")
+    }
   },
 };
 </script>

@@ -8,6 +8,7 @@
       :data="modified_companies"
       :row_meta="row_meta"
       :editable="true"
+      @clear_all="clearAll"
     >
       <template v-slot:item.active="{ item }">
         <v-simple-checkbox
@@ -251,6 +252,9 @@ export default {
 
       return total - missing + "/" + total;
     },
+    clearAll(){
+      this.$store.dispatch("companies/deleteAllCompanies")
+    }
   },
 };
 </script>

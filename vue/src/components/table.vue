@@ -38,6 +38,7 @@
             :row_meta="row_meta"
           />
         </v-dialog>
+        <v-btn  color="primary" dark class="mb-2 ml-1" @click="clearAll()" > Clear all</v-btn>
         <v-dialog persistent v-model="show_popup" max-width="500px">
           <tablePop
             @close_popup="closePop()"
@@ -109,6 +110,9 @@ export default {
     },
     deleteRow(row) {
       this.$emit("delete_row", row);
+    },
+    clearAll(){
+      this.$emit('clear_all'); 
     },
     onRowClick(row) {
       this.$emit("click_row", row);
