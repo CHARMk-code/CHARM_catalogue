@@ -24,12 +24,15 @@ def serializeGeneric(table,obj):
 def createGeneric(table,args):
     try:
         if type(args) == list:
-            if table.query.filter_by(name=args[0]).first():
-                return False
+            if table == Layout:
+                if table.query.filter_by(image=args[1]).first():
+                    return False
+            else:      
+                if table.query.filter_by(name=args[0]).first():
+                    return False
             
             new_obj = table()
             attrs =  table.__table__.columns.keys()
-
             if table == Company:
                 attrs.append("tags")
 
@@ -64,6 +67,7 @@ def createGeneric(table,args):
         db.session.add(new_obj)
         db.session.commit()
     except Exception as e:
+        print(e, file=sys.stderr)
         return False
     return True
 
@@ -84,7 +88,8 @@ def updateGeneric(table,obj,args):
         if table is Company:
             obj.last_updated=datetime.datetime.now(),
         db.session.commit()
-    except:
+    except Exception as e:
+        print(e, file=sys.stderr)
         return False
     return True
 
@@ -156,20 +161,20 @@ class Company(db.Model):
     Reps a company
     """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
-    active = db.Column(db.Boolean)
-    charmtalk = db.Column(db.Boolean)
-    description = db.Column(db.String(1000))
-    summer_job_description = db.Column(db.String(1000))
-    summer_job_link = db.Column(db.String(1000))
-    contacts = db.Column(db.String(100))
-    contact_email = db.Column(db.String(320))
-    employees_world = db.Column(db.Integer)
-    website = db.Column(db.String(200))
-    talk_to_us_about = db.Column(db.String(1000))
-    logo = db.Column(db.String(100))
-    map_image = db.Column(db.String(100))
-    booth_number = db.Column(db.Integer)
+    name = db.Column(db.String(200), default="")
+    active = db.Column(db.Boolean, default=False)
+    charmtalk = db.Column(db.Boolean, default=False)
+    description = db.Column(db.String(1000), default="")
+    summer_job_description = db.Column(db.String(1000), default="")
+    summer_job_link = db.Column(db.String(1000),default="")
+    contacts = db.Column(db.String(100),default="")
+    contact_email = db.Column(db.String(320),default="")
+    employees_world = db.Column(db.Integer, default=-1)
+    website = db.Column(db.String(200), default="")
+    talk_to_us_about = db.Column(db.String(1000), default="")
+    logo = db.Column(db.String(100), default="")
+    map_image = db.Column(db.String(100), default="")
+    booth_number = db.Column(db.Integer, default=-1)
     last_updated = db.Column(db.DateTime)
     tags = db.relationship(
         'Tag',
@@ -186,22 +191,22 @@ class Tag(db.Model):
     These can be crowd sourced.
     """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
+    name = db.Column(db.String(200), default="")
     parent_tag = db.Column(db.Integer)
-    up_votes = db.Column(db.Integer)
-    down_votes = db.Column(db.Integer)
-    crowd_sourced = db.Column(db.Boolean)
-    icon = db.Column(db.String(100))
-    division = db.Column(db.Boolean)
-    business_area = db.Column(db.Boolean)
-    looking_for = db.Column(db.Boolean)
-    offering = db.Column(db.Boolean)
-    language = db.Column(db.Boolean)
+    up_votes = db.Column(db.Integer, default=0)
+    down_votes = db.Column(db.Integer, default=0)
+    crowd_sourced = db.Column(db.Boolean, default=False)
+    icon = db.Column(db.String(100), default="")
+    division = db.Column(db.Boolean, default=False)
+    business_area = db.Column(db.Boolean, default=False)
+    looking_for = db.Column(db.Boolean, default=False)
+    offering = db.Column(db.Boolean, default=False)
+    language = db.Column(db.Boolean, default=False)
 class Map(db.Model):
     __tablename__ = "maps"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    image = db.Column(db.String(100))
+    name = db.Column(db.String(100), default="")
+    image = db.Column(db.String(100), default="")
     ref = db.Column(db.Integer)
 
 
@@ -211,31 +216,31 @@ class Prepage(db.Model):
     Reps a prepages
     """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    active = db.Column(db.Boolean)
-    image = db.Column(db.String(100))
-    order = db.Column(db.Integer)
+    name = db.Column(db.String(100), default="")
+    active = db.Column(db.Boolean, default=False)
+    image = db.Column(db.String(100), default="")
+    order = db.Column(db.Integer, default=-1)
 
 class Layout(db.Model):
     __tablename__ = "layout"
     id = db.Column(db.Integer, primary_key=True)
-    active = db.Column(db.Boolean)
-    image = db.Column(db.String(100))
-    placement = db.Column(db.Integer)
+    active = db.Column(db.Boolean, default=False)
+    image = db.Column(db.String(100), default="")
+    placement = db.Column(db.Integer, default=-1)
 
 class Shortcut(db.Model):
     __tablename__ = "shortcuts"
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String(100))
-    desc = db.Column(db.String(100))
-    link = db.Column(db.String(100))
-    icon = db.Column(db.String(100))
+    name = db.Column(db.String(100), default="")
+    desc = db.Column(db.String(100), default="")
+    link = db.Column(db.String(100), default="")
+    icon = db.Column(db.String(100), default="")
 
 class Company_card(db.Model):
     __tablename__ = "company_cards"
     id = db.Column(db.Integer, primary_key=True)
 
-    text = db.Column(db.String(100))
-    name = db.Column(db.String(100))
-    active = db.Column(db.Boolean)
+    text = db.Column(db.String(100), default="")
+    name = db.Column(db.String(100), default="")
+    active = db.Column(db.Boolean, default=False)
