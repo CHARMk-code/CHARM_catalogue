@@ -23,19 +23,21 @@ def serializeGeneric(table,obj):
 
 
 def createGeneric(table,args):
+    attrs =  table.__table__.columns.keys()
+    for unneed_attr in ["id"]:
+        attrs.remove(unneed_attr)
     try:
         if type(args) == list:
             if table.query.filter_by(name=args[0]).first():
                 return False
             
             new_obj = table()
-            attrs =  table.__table__.columns.keys()
 
             if table == Company:
                 attrs.append("tags")
 
             index = 0
-            for attr in table.__table__.columns.keys()[1:]:
+            for attr in attrs:
                 if attr == "last_updated":
                     continue
                 else:
@@ -44,12 +46,12 @@ def createGeneric(table,args):
                 index += 1
 
         elif type(args) == dict:
-            primary_key = table.__table__.columns.keys()[1]
+            primary_key = attrs[0]
             if table.query.filter_by(name=args[primary_key]).first():
                 return False
 
             new_obj = table()
-            for attr in table.__table__.columns.keys()[1:]:
+            for attr in attrs:
                 setattr(new_obj,attr,args[attr])
         
         else:
@@ -60,9 +62,17 @@ def createGeneric(table,args):
             new_obj.last_updated=datetime.datetime.now(),
             new_obj.tags = args[-1] 
 
+
+        current_date = datetime.datetime.now()
+        if current_date.month > 5:
+            new_obj.year =  current_date.year + 1
+        else:
+            new_obj.year = current_date.year
+         
         db.session.add(new_obj)
         db.session.commit()
     except Exception as e:
+        print(e, file=sys.stderr)
         return False
     return True
 
@@ -83,7 +93,8 @@ def updateGeneric(table,obj,args):
         if table is Company:
             obj.last_updated=datetime.datetime.now(),
         db.session.commit()
-    except:
+    except Exception as e :
+        print(e, file=sys.stderr)
         return False
     return True
 
@@ -91,7 +102,8 @@ def deleteGeneric(obj):
     try:
         db.session.delete(obj)
         db.session.commit()
-    except:
+    except Exception as e:
+        print(e, file=sys.stderr)
         return False
     return True
 
@@ -176,6 +188,7 @@ class Company(db.Model):
         lazy='subquery',
         backref=db.backref('tags', lazy=True, cascade='all, delete')
     )
+    year = db.Column(db.Integer)
 
 
 class Tag(db.Model):
@@ -196,12 +209,14 @@ class Tag(db.Model):
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
     language = db.Column(db.Boolean)
+    year = db.Column(db.Integer)
 class Map(db.Model):
     __tablename__ = "maps"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     image = db.Column(db.String(100))
     ref = db.Column(db.Integer)
+    year = db.Column(db.Integer)
 
 
 class Prepage(db.Model):
@@ -214,6 +229,7 @@ class Prepage(db.Model):
     active = db.Column(db.Boolean)
     image = db.Column(db.String(100))
     order = db.Column(db.Integer)
+    year = db.Column(db.Integer)
 
 class Layout(db.Model):
     __tablename__ = "layout"
@@ -221,6 +237,7 @@ class Layout(db.Model):
     active = db.Column(db.Boolean)
     image = db.Column(db.String(100))
     placement = db.Column(db.Integer)
+    year = db.Column(db.Integer)
 
 class Shortcut(db.Model):
     __tablename__ = "shortcuts"
@@ -230,6 +247,7 @@ class Shortcut(db.Model):
     desc = db.Column(db.String(100))
     link = db.Column(db.String(100))
     icon = db.Column(db.String(100))
+    year = db.Column(db.Integer)
 
 class Company_card(db.Model):
     __tablename__ = "company_cards"
@@ -238,3 +256,4 @@ class Company_card(db.Model):
     text = db.Column(db.String(100))
     name = db.Column(db.String(100))
     active = db.Column(db.Boolean)
+    year = db.Column(db.Integer)

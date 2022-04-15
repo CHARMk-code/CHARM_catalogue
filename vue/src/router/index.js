@@ -126,7 +126,102 @@ const router = new Router({
         noAuth: true,
       },
     },
-  ],
+    {
+      path: "/:year/",
+      name: "Landing",
+      component: Landing_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/:year/cookies",
+      name: "Cookies",
+      component: CookieInfo_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/:year/Admin",
+      name: "Admin",
+      component: Admin_view,
+      children: [
+        {
+          path: "prepages",
+          name: "Admin/Prepage",
+          component: Prepage_admin,
+        },
+        {
+          path: "companies",
+          name: "Admin/Companies",
+          component: Companies_admin,
+        },
+        {
+          path: "tags",
+          name: "Admin/Tags",
+          component: Tags_admin,
+        },
+        {
+          path: "maps",
+          name: "Admin/Maps",
+          component: Map_admin,
+        },
+        {
+          path: "shortcuts",
+          name: "Admin/Shortcuts",
+          component: Shortcuts_admin,
+        },
+        {
+          path: "layout",
+          name: "Admin/Layout",
+          component: Layout_admin,
+        },
+        {
+          path: "batch",
+          name: "batch",
+          component: Upload_admin,
+        },
+        {
+          path: "account",
+          name: "Account",
+          component: Account_admin,
+        },
+      ],
+    },
+    {
+      path: "/:year/company/:name",
+      name: "Company",
+      component: Company_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/:year/search",
+      name: "Search",
+      component: Search_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/:year/maps/:page",
+      name: "Map",
+      component: Map_view,
+      meta: {
+        noAuth: true,
+      },
+    },
+    {
+      path: "/:year/prepages/:page",
+      name: "Prepage",
+      component: Prepage_view,
+      meta: {
+        noAuth: true,
+      },
+    }
+  ]
 });
 
 router.beforeEach(async (to, from, next) => {
@@ -135,6 +230,22 @@ router.beforeEach(async (to, from, next) => {
     router.app.$axios.defaults.headers.common["Authorization"] =
       "Basic " + router.app.$store.getters["auth/token"];
     router.app.$store.commit("favorites/loadForStorage");
+
+    let year = 0
+    if (to.params.year !== undefined){
+      year = Number(to.params.year)
+      router.base="/" + year + "/"
+    }else{
+      router.year = "/"
+      const now = new Date();
+      if (now.getMonth() < 5) {
+        year = now.getFullYear();
+      } else {
+        year = now.getFullYear() +1;
+      }
+    }
+    console.log(year,router)
+    
 
     await Promise.all([
       router.app.$store.dispatch("maps/getMaps"),

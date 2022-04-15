@@ -18,7 +18,14 @@ path_LUT = {
 }
 
 @blueprint.route("/<path>",methods=["GET"])
-def company_view(path):
+def getAll(path):
     table = path_LUT[path]
     rows = table.query.all()
+    return jsonify([serializeGeneric(table,row) for row in rows]), status.HTTP_200_OK
+
+
+@blueprint.route("/<path>/<year>",methods=["GET"])
+def getSpecfic(path,year):
+    table = path_LUT[path]
+    rows = table.query.filter_by(year = year).all()
     return jsonify([serializeGeneric(table,row) for row in rows]), status.HTTP_200_OK
