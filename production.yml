@@ -1,7 +1,7 @@
 version: "3"
 services:
   flask:
-    image: ghcr.io/CHARMk-code/catalogue_flask:latest
+    image: ghcr.io/charmk-code/catalogue_flask:latest
     restart: unless-stopped
     ports:
       - "5008:5000"
@@ -28,9 +28,7 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
   vue:
-    image: ghcr.io/CHARMk-code/catalogue_vue:latest
+    image: ghcr.io/charmk-code/catalogue_vue:latest
     restart: unless-stopped
     ports:
       - "8080:3000"
-    volumes:
-      - ./vue:/app

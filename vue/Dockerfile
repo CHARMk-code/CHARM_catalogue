@@ -3,17 +3,19 @@ FROM node AS builder
 WORKDIR /app
 
 # Install packages using Yarn
-ADD package.json /tmp/
-RUN cd /tmp && yarn
-RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules && ln -s /tmp/package.json
+ADD package.json yarn.lock /tmp/
 
-RUN yarn install
-RUN yarn build 
+RUN cd /tmp && yarn --ignore-engines
+ADD ./babel.config.js ./vue.config.js ./.eslintrc.js ./
+ADD ./public ./public
+ADD ./src ./src
+RUN ln -s /tmp/node_modules && ln -s /tmp/package.json
 
+RUN yarn build
 
-#FROM node
+RUN mv /app/dist /dist && rm /app /tmp -r
 
-#COPY --from=builder /tmp/dist /dist
+WORKDIR /
+RUN yarn global add http-server
 
-RUN yarn global add serve
-CMD serve -s dist
+CMD ["http-server", "/dist", "-s"]
