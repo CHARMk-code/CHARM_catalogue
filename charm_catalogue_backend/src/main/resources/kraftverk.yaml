@@ -1,0 +1,8 @@
+jdbc:
+  url: jdbc:h2:mem:userdb
+http:
+  port: 8088
+  swagger:
+    title: User API
+    description: An API for managing users.
+    ui-path: /

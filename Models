@@ -1,0 +1,66 @@
+User {
+  id int
+  password string(100)
+}
+
+Company {
+  id int
+  name String(200)
+  description String(1000)
+  last_updated datetime
+  contacts String(100)
+  contact_email string(320)
+  employees_world int
+  website String(200)
+  talk_to_us_about String(1000)
+  logo string(100)
+  map_image String(100)
+  booth_number int
+  tags one-to-many ref to tags
+  charmtalk bool
+  summer_job bool
+  summer_job_description ?String(1000)
+  summer_job_link ?String(1000)
+}
+
+Tag {
+  id int
+  name String(200)
+  icon string(200)
+  division bool
+  looking_for bool
+  offering bool
+  language bool
+}
+
+Map {
+  id int
+  name string(100)
+  image string(100)
+  ref int
+}
+
+Prepage {
+  id int
+  name string(100)
+  order int
+  active bool
+}
+
+Layout {
+  id int
+  image string(100)
+  active bool
+  placement int
+}
+
+
+Shortcut {
+  id int
+  name string(100)
+  description string(100)
+  link string(100)
+  icon string(100)
+}
+
+
