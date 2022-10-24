@@ -138,15 +138,17 @@ router.beforeEach(async (to, from, next) => {
 
     await Promise.all([
       router.app.$store.dispatch("maps/getMaps"),
-      router.app.$store.dispatch("tags/getTags"),
+      router.app.$store.dispatch("tags/getTags"), // This one fails if db is empty, check why
       router.app.$store.dispatch("companies/getCompanies"),
       router.app.$store.dispatch("prepages/getPrepages"),
       router.app.$store.dispatch("layouts/getLayouts"),
       router.app.$store.dispatch("shortcuts/getShortcuts"),
       router.app.$store.dispatch("site_settings/getCompanyCards"),
-    ]).then(() => {
-      router.app.$store.dispatch("filter/filterCompanies");
-    });
+    ])
+      .then(() => {
+        router.app.$store.dispatch("filter/filterCompanies");
+      })
+      .catch(() => {}); // add some error here in the future?
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
     if (router.app.$store.getters["auth/isLoggedIn"]) {
