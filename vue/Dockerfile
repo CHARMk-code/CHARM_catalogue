@@ -1,4 +1,4 @@
-FROM node AS builder
+FROM node:16 AS builder
 
 WORKDIR /app
 
@@ -18,4 +18,6 @@ RUN mv /app/dist /dist && rm /app /tmp -r
 WORKDIR /
 RUN yarn global add http-server
 
-CMD ["http-server", "/dist", "-s"]
+ADD ./setup_analytics.sh .
+
+entrypoint /setup_analytics.sh; http-server -P http://localhost:8080? /dist
