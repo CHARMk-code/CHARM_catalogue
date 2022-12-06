@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import Table from "@/components/table";
+import Table from "@/components/table.vue";
 import { mapGetters } from "vuex";
 import Vue from "vue";
 import dayjs from "dayjs";
@@ -211,7 +211,7 @@ export default {
   methods: {
     saveCompany(company) {
       let new_company = company;
-      new_company.map_image = company.map_image.name  
+      new_company.map_image = company.map_image.name
       this.$store.dispatch("companies/modifyCompany", new_company);
     },
     deleteCompany(company) {

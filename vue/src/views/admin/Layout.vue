@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import layouts_table from "@/components/admin/layout_table";
-import company_cards from "@/components/admin/company_cards";
+import layouts_table from "@/components/admin/layout_table.vue";
+import company_cards from "@/components/admin/company_cards.vue";
 
 export default {
   name: "Layout",

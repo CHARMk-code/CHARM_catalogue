@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import maps_table from "@/components/admin/maps_table";
+import maps_table from "@/components/admin/maps_table.vue";
 
 export default {
   name: "Maps",

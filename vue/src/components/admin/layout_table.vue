@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Table from "@/components/table";
+import Table from "@/components/table.vue";
 import { mapGetters } from "vuex";
 
 export default {

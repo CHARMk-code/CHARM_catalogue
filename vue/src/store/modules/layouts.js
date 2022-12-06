@@ -27,7 +27,7 @@ export default {
       state.layouts = [];
     },
     updateCenter(state){
-    
+
       const layouts = state.layouts.filter((t) => t.placement === 0);
       if (layouts.length !== 0) {
         const index = Math.floor(Math.random() * layouts.length);

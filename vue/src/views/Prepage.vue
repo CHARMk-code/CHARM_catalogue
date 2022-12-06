@@ -22,7 +22,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Vue from "vue";
-import sideLayout from "@/views/sideLayout";
+import sideLayout from "@/views/sideLayout.vue";
 export default {
   name: "Prepage",
   components: {
@@ -75,21 +75,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-@import '~vuetify/src/styles/styles.sass'
-
-@media #{map-get($display-breakpoints, 'md-and-up')}
-  .prepage
-    max-height: calc(100vh - 64px)
-
-  .prepage-sheet
-      margin-top: -64px
-
-@media #{map-get($display-breakpoints, 'sm-and-down')}
-  .prepage
-    max-height: calc(100vh - 56px)
-
-  .prepage-sheet
-      margin-top: -56px
-</style>

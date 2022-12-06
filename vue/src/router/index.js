@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
+import store from "@/store/index.js"
 const Company_view = () => import("@/views/company.vue");
 const Search_view = () => import("@/views/search.vue");
 const Login_view = () => import("@/views/login.vue");
@@ -133,25 +134,25 @@ router.beforeEach(async (to, from, next) => {
   if (from.name == null) {
     // Arriving from offsite, need to load data
     router.app.$axios.defaults.headers.common["Authorization"] =
-      "Basic " + router.app.$store.getters["auth/token"];
-    router.app.$store.commit("favorites/loadForStorage");
+      "Basic " + store.getters["auth/token"];
+    store.commit("favorites/loadForStorage");
 
     await Promise.all([
-      router.app.$store.dispatch("maps/getMaps"),
-      router.app.$store.dispatch("tags/getTags"), // This one fails if db is empty, check why
-      router.app.$store.dispatch("companies/getCompanies"),
-      router.app.$store.dispatch("prepages/getPrepages"),
-      router.app.$store.dispatch("layouts/getLayouts"),
-      router.app.$store.dispatch("shortcuts/getShortcuts"),
-      router.app.$store.dispatch("site_settings/getCompanyCards"),
+      store.dispatch("maps/getMaps"),
+      store.dispatch("tags/getTags"), // This one fails if db is empty, check why
+      store.dispatch("companies/getCompanies"),
+      store.dispatch("prepages/getPrepages"),
+      store.dispatch("layouts/getLayouts"),
+      store.dispatch("shortcuts/getShortcuts"),
+      store.dispatch("site_settings/getCompanyCards"),
     ])
       .then(() => {
-        router.app.$store.dispatch("filter/filterCompanies");
+        store.dispatch("filter/filterCompanies");
       })
       .catch(() => {}); // add some error here in the future?
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
-    if (router.app.$store.getters["auth/isLoggedIn"]) {
+    if (store.getters["auth/isLoggedIn"]) {
       next();
     } else {
       next({ name: "Login", params: { nextUrl: to.fullPath } });

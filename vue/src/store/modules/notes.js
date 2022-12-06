@@ -1,5 +1,3 @@
-import helperfunctions from "@/plugins/helperfunctions";
-
 export default {
   namespaced: true,
   state: () => ({
@@ -9,9 +7,7 @@ export default {
     setNotes(state, data) {
       console.log(data);
       state.notes[data.id] = data.note;
-      if (helperfunctions.cookiesAccepted()) {
-        localStorage.setItem("notes", JSON.stringify(state.notes));
-      }
+      localStorage.setItem("notes", JSON.stringify(state.notes));
     },
     loadForStorage(state) {
       if (

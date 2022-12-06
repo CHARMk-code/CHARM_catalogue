@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import tagSelector from "@/components/search/tag_selector";
+import tagSelector from "@/components/search/tag_selector.vue";
 
 import { mapGetters } from "vuex";
 export default {
