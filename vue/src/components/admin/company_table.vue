@@ -139,6 +139,11 @@ export default {
           type: "textarea",
           model: "description",
           label: "Company description",
+        }, 
+        {
+          type: "textarea",
+          model: "unique_selling_point",
+          label: "What is the unique selling points",
         },
         {
           type: "textarea",
@@ -162,6 +167,11 @@ export default {
           type: "number",
           model: "employees_world",
           label: "Number of Employees in the whole world",
+        }, 
+        {
+          type: "number",
+          model: "employees_sweden",
+          label: "Number of Employees in Sweden",
         },
         {
           type: "single_select",
@@ -225,9 +235,10 @@ export default {
       let total = 0;
       for (const key in company) {
         if (
+          company[key] === null ||
           company[key] === "" ||
           company[key].length === 0 ||
-          company[key] === -1
+          company[key] === -1 
         ) {
           missing += 1;
         }

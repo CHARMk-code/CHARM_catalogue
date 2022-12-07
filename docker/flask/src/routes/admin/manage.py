@@ -1,16 +1,17 @@
-from flask import Blueprint, send_from_directory, request, send_file
+from flask import Blueprint, send_from_directory, request, send_file, session
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import xlrd,os,sys, datetime, xlsxwriter, math
+import os,sys, datetime, math
 from ...models import Company, Layout, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
 from ...helper_functions import *
 import shutil
+import openpyxl
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
-NUMBER_OF_METADATA_COLS_COMPANY = 14
+NUMBER_OF_METADATA_COLS_COMPANY = 17
 NUMBER_OF_METADATA_COLS_TAG = 6
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
@@ -36,15 +37,15 @@ def parseXlsx():
     Company.query.update({Company.active:False})
     db.session.commit()
 
-    workbook = xlrd.open_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
+    workbook = openpyxl.load_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 
-    # Adds tags
-    maps_sheet = workbook.sheet_by_name("Maps")
+    # Adds maps
+    maps_sheet = workbook["Maps"]
 
-    for i in range(1,maps_sheet.nrows):
-        map_object = Prepage.query.filter_by(name=maps_sheet.cell_value(i,0)).first()
+    for i in range(2,maps_sheet.max_row + 1):
+        map_object = Prepage.query.filter_by(name=maps_sheet.cell(i,1)).first()
 
-        data = list(map(lambda x: x.value, maps_sheet.row(i)))
+        data = list(map(lambda x: x.value, maps_sheet[i]))
         ref_object = Map.query.filter_by(name=data[2]).first()
         if ref_object:
             data[2] = ref_object.id
@@ -55,77 +56,108 @@ def parseXlsx():
         else:
             map_object.update(*data)
 
+    # Prepages
+    prepages_sheet = workbook["Prepages"]
+    for i in range(2,prepages_sheet.max_row + 1):
+        prepage = Prepage.query.filter_by(name=prepages_sheet.cell(i,1)).first()
+
+        data = list(map(lambda x: x.value, prepages_sheet[i]))
+        if not prepage:
+            Prepage.create(*data)
+        else:
+            prepage.update(*data)
+
+    # Layout
+    layout_sheet = workbook["Layout"]
+    for i in range(2,layout_sheet.max_row + 1):
+        layout = Layout.query.filter_by(image=layout_sheet.cell(i,2)).first()
+
+        data = list(map(lambda x: x.value, layout_sheet[i]))
+        if not layout:
+            Layout.create(*data)
+        else:
+            layout.update(*data)
+
 
     # Adds tags
-    tags_sheet = workbook.sheet_by_name("Tags")
-
-    next_col = NUMBER_OF_METADATA_COLS_TAG
-    parent_tag = None
-    for i in range(1,tags_sheet.nrows):
-        row = tags_sheet.row(i)
-        tag = Tag.query.filter_by(name=row[next_col].value).first()
+    tags_sheet = workbook["Tags"]
+    for i in range(2,tags_sheet.max_row + 1):
+        row = tags_sheet[i]
+        tag = Tag.query.filter_by(name=row[NUMBER_OF_METADATA_COLS_TAG].value).first()
         metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
         if not tag: # No tag exists
-            Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
-            parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
+            Tag.create(row[NUMBER_OF_METADATA_COLS_TAG].value,None,1,1,False,*metadata)
         else:
-            tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
-            parent_tag = tag.id
+            tag.update(row[NUMBER_OF_METADATA_COLS_TAG].value,None,1,1,False,*metadata)
 
-        if (i+1 >= tags_sheet.nrows):
-            break
-        if (tags_sheet.cell_value(i+1,next_col)!=''):
-            if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-                parent_tag = None
-            continue
-        elif (next_col+1 < tags_sheet.ncols):
-            if (tags_sheet.cell_value(i+1,next_col+1)!=''):
-                next_col += 1
-                continue
 
-        for j in range(tags_sheet.ncols):
-            if tags_sheet.cell_value(i+1,j) != '':
-                if (j==NUMBER_OF_METADATA_COLS_TAG):
-                    parent_tag = None
-                next_col = j
-                break
-            if (tags_sheet.cell_value(i+1,next_col)!=''):
-                if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-                    parent_tag = None
-                continue
-            elif (next_col+1 < tags_sheet.ncols):
-                if (tags_sheet.cell_value(i+1,next_col+1)!=''):
-                    next_col += 1
-                    continue
+   # next_col = NUMBER_OF_METADATA_COLS_TAG
+   # parent_tag = None
+   # for i in range(2,tags_sheet.max_row + 1):
+   #     row = tags_sheet[i]
+   #     tag = Tag.query.filter_by(name=row[next_col].value).first()
+   #     metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
+   #     if not tag: # No tag exists
+   #         Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
+   #         parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
+   #     else:
+   #         tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
+   #         parent_tag = tag.id
+   #
+   #     if (i+1 >= tags_sheet.max_row):
+   #         break
+   #     if (tags_sheet.cell(i+1,next_col)!=''):
+   #         if (next_col==NUMBER_OF_METADATA_COLS_TAG):
+   #             parent_tag = None
+   #         continue
+   #     elif (next_col+1 < tags_sheet.ncols):
+   #         if (tags_sheet.cell(i+1,next_col+1)!=''):
+   #             next_col += 1
+   #             continue
+##
+   #     print(tags_sheet, file=sys.stderr)
+   #     for j in range(tags_sheet.ncols):
+   #         if tags_sheet.cell(i+1,j) != '':
+   #             if (j==NUMBER_OF_METADATA_COLS_TAG):
+   #                 parent_tag = None
+   #             next_col = j
+   #             break
+   #         if (tags_sheet.cell(i+1,next_col)!=''):
+   ##             if (next_col==NUMBER_OF_METADATA_COLS_TAG):
+   #                 parent_tag = None
+   #             continue
+   #         elif (next_col+1 < tags_sheet.ncols):
+  # #             if (tags_sheet.cell(i+1,next_col+1)!=''):
+  #                  next_col += 1
+   #                 continue
 
-            for j in range(tags_sheet.ncols):
-                if tags_sheet.cell_value(i+1,j) != '':
-                    if (j==NUMBER_OF_METADATA_COLS_TAG):
-                        parent_tag = None
-                    next_col = j
-                    break
-
+     #       for j in range(tags_sheet.ncols):
+     #           if tags_sheet.cell(i+1,j) != '':
+     #               if (j==NUMBER_OF_METADATA_COLS_TAG):
+     #                   parent_tag = None
+     #               next_col = j
+      #              break
     # Generats companies
-    companies_sheet = workbook.sheet_by_name("Companies")
+    companies_sheet = workbook["Companies"]
     tags = []
 
-    tag_row = companies_sheet.row(0)
+    tag_row = companies_sheet[1]
     with db.session.no_autoflush:
-        for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
+        for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.max_column):
             tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
-        for i in range(1,companies_sheet.nrows):
+        for i in range(2,companies_sheet.max_row ):
             tags_temp = []
-            for j in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.ncols):
-                if companies_sheet.cell_value(i,j):
+            for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column):
+                if companies_sheet.cell(i,j):
                     tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
 
-            metadata = companies_sheet.row(i)[:NUMBER_OF_METADATA_COLS_COMPANY]
+            metadata = companies_sheet[i][:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
-            
+
             if metadata[0] == "":
                 continue
-
+            print(metadata, file=sys.stderr)
             company = Company.query.filter_by(name = metadata[0]).first()
             if  company == None:
                 Company.create(
@@ -135,27 +167,8 @@ def parseXlsx():
             else:
                 company.update(*metadata,tags_temp)
 
-    # Prepages
-    prepages_sheet = workbook.sheet_by_name("Prepages")
-    for i in range(1,prepages_sheet.nrows):
-        prepage = Prepage.query.filter_by(name=prepages_sheet.cell_value(i,0)).first()
+    db.session.flush()
 
-        data = list(map(lambda x: x.value, prepages_sheet.row(i)))
-        if not prepage:
-            Prepage.create(*data)
-        else:
-            prepage.update(*data)
-
-    # Layout
-    layout_sheet = workbook.sheet_by_name("Layout")
-    for i in range(1,layout_sheet.nrows):
-        layout = Layout.query.filter_by(image=layout_sheet.cell_value(i,1)).first()
-
-        data = list(map(lambda x: x.value, layout_sheet.row(i)))
-        if not layout:
-            Layout.create(*data)
-        else:
-            layout.update(*data)
 
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
 

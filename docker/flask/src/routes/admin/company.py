@@ -35,15 +35,17 @@ def company_put():
     active = get_if_exist(request_data,"active")
     charmtalk = get_if_exist(request_data,"charmtalk")
     description = get_if_exist(request_data,"description")
+    unique_selling_point = get_if_exist(request_data, "unique_selling_point")
     summer_job_description = get_if_exist(request_data, "summer_job_description")
     summer_job_link = get_if_exist(request_data, "summer_job_link")
+    summer_job_deadline = get_if_exist(request_data, "summer_job_deadline")
     contacts = get_if_exist(request_data,"contacts")
     contact_email = get_if_exist(request_data,"contact_email")
     employees_world = get_if_exist(request_data,"employees_world")
+    employees_sweden = get_if_exist(request_data, "employees_sweden")
     website = get_if_exist(request_data, "website")
     talk_to_us_about = get_if_exist(request_data, "talk_to_us_about")
     logo = get_if_exist(request_data, "logo")
-    in_sweden = get_if_exist(request_data, "in_sweden")
     map_image = get_if_exist(request_data, "map_image")
     booth_number = get_if_exist(request_data,"booth_number")
     tags = get_if_exist(request_data, "tags")
@@ -56,13 +58,13 @@ def company_put():
 
     if not id:
 
-        return send_status(Company.create(name,active,charmtalk,description, summer_job_description, summer_job_link, 
-            contacts, contact_email, employees_world, website, talk_to_us_about,logo,map_image, booth_number, tag_objs))
+        return send_status(Company.create(name,active,charmtalk,description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline,
+            contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about,logo,map_image, booth_number, tag_objs))
 
     company = Company.query.get(id)
 
-    return send_status(company.update(name,active, charmtalk, description, summer_job_description, summer_job_link,
-                contacts, contact_email, employees_world, website, talk_to_us_about, logo, map_image, booth_number, tag_objs))
+    return send_status(company.update(name,active, charmtalk, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline,
+                contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number, tag_objs))
 
 
 @blueprint.route("<id>",methods=["DELETE"])
