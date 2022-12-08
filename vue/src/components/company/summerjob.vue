@@ -1,6 +1,6 @@
 <template>
   <company_card_wrapper name="summerjob">
-    <v-card-title> Summer jobs</v-card-title>
+    <v-card-title> Summer Jobs</v-card-title>
 
     <v-card-text> {{ desc }}</v-card-text>
     <v-card-text> Apply before: {{ deadline }}</v-card-text>

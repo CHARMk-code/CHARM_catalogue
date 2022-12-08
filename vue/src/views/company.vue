@@ -38,6 +38,7 @@
       <v-row>
         <v-col>
           <Textblock :body="company.description" class="mb-6" />
+          <Textblock :body="company.unique_selling_point" title="What Makes Us Special" class="mb-6" />
           <Summerjob
             name="summerjob"
             :desc="company.summer_job_description"
@@ -61,7 +62,7 @@
               <Tags
                 :tags="company.tags"
                 name="tag_looking_for"
-                title="Looking for"
+                title="Looking For"
                 getter_target="tags/getLookingForFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
