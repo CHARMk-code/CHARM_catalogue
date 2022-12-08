@@ -42,6 +42,7 @@
             name="summerjob"
             :desc="company.summer_job_description"
             :link="company.summer_job_link"
+            :deadline="company.summer_job_deadline"
             class="mb-6"
           />
           <Layout class="mb-6" />

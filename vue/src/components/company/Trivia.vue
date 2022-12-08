@@ -18,7 +18,7 @@
         <v-card-title class="text-subtitle-1 ma-0 pa-0">
           Employees:
         </v-card-title>
-        <v-card-text> {{ world }} in the world </v-card-text>
+        <v-card-text> {{ sweden }} in sweden and {{ world }} in the world </v-card-text>
       </v-card>
     </v-card-text>
   </company_card_wrapper>
