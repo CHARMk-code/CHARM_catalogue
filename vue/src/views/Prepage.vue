@@ -75,3 +75,19 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+@media (min-width: 960px)
+  .prepage
+    max-height: calc(100vh - 64px)
+  .prepage-sheet
+      margin-top: -64px
+
+
+@media (max-width: 960px)
+  .prepage
+    max-height: calc(100vh - 56px)
+
+  .prepage-sheet
+      margin-top: -56px
+</style>
