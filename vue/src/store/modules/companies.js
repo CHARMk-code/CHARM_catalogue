@@ -36,6 +36,9 @@ export default {
             .then((resp) => {
               commit("removeAllCompanies");
               const companies = resp.data;
+
+              // Work around to get deadline on correct format
+              companies.forEach(x => x.summer_job_deadline = new Date(x.summer_job_deadline))
               if (companies.length > 0) {
                 commit("setCompanies", companies);
               }

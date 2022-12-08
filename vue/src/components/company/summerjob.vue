@@ -3,7 +3,7 @@
     <v-card-title> Summer Jobs</v-card-title>
 
     <v-card-text> {{ desc }}</v-card-text>
-    <v-card-text> Apply before: {{ deadline }}</v-card-text>
+    <v-card-text> Apply before: {{deadline.getFullYear()}}-{{ deadline.getMonth() }}-{{ deadline.getDate() }}</v-card-text>
 
     <v-card-actions>
       <v-btn :href="link"> Apply here </v-btn>
