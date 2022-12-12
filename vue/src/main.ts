@@ -15,15 +15,16 @@ import * as directives from 'vuetify/directives'
 
 const app = createApp(App)
 
-// Vuetify
-const vuetify = createVuetify({ components, directives })
-app.use(vuetify)
-
 // Pinia
 const pinia = createPinia();
 app.use(pinia)
 //injects axios into all pinia stores
 pinia.use(({ store }) => store.axios = markRaw(axios))
+
+// Vuetify
+const vuetify = createVuetify({ components, directives })
+app.use(vuetify)
+
 
 
 //Router

@@ -1,8 +1,8 @@
-import { defineStore } from "pinia"
+import { defineStore } from "pinia";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-interface Map {
+interface Company_Map {
   id: number,
   name: string,
   image: string,
@@ -10,7 +10,7 @@ interface Map {
 }
 
 interface State {
-  maps: Map[],
+  maps: Company_Map[],
   load_wait: number,
 
 }
@@ -22,7 +22,7 @@ export const useMapsStore = defineStore('maps', {
     load_wait: 0,
   }),
   actions: {
-    setMaps(maps: Map[]) {
+    setMaps(maps: Company_Map[]) {
       this.maps = maps;
     },
     removeMap(id: number) {
@@ -36,6 +36,7 @@ export const useMapsStore = defineStore('maps', {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+          console.log(this.axios)
           this.axios
             .get("/map")
             .then((resp: any) => {
@@ -54,7 +55,7 @@ export const useMapsStore = defineStore('maps', {
         }
       });
     },
-    modifyMap(map: Map) {
+    modifyMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
           .put("/map", map)
@@ -71,7 +72,7 @@ export const useMapsStore = defineStore('maps', {
           });
       });
     },
-    deleteMap(map: Map) {
+    deleteMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
           .delete("/map/" + map.id)

@@ -28,7 +28,7 @@
         class="hidden-sm-and-down"
         color="primary"
         v-on:click="logout"
-        v-if="this.$store.getters['auth/isLoggedIn']"
+        v-if="this.isLoggedIn"
         depressed
       >
         Logout
@@ -61,7 +61,7 @@
         class="ml-4 mt-4"
         color="primary"
         v-on:click="logout"
-        v-if="this.$store.getters['auth/isLoggedIn']"
+        v-if="this.isLoggedIn"
         depressed
       >
         Logout
@@ -74,6 +74,8 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/stores/modules/auth"
+
 export default {
   name: "Header",
   components: {},
@@ -84,9 +86,14 @@ export default {
       links: [{ name: "Search", route: "/search", icon: "mdi-magnify" }],
     };
   },
+  computed: {
+    isLoggedIn() {
+      return useAuthStore().isLoggedIn
+    }
+  },
   methods: {
     logout() {
-      this.$store.dispatch("auth/logout");
+      useAuthStore().logout();
       this.$router.push("/");
     },
   },
