@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Header />
+    <Header></Header>
   </div>
 </template>
 
-<script>
+<script type="ts">
 import Header from "@/components/Header.vue";
 export default {
   name: "App",

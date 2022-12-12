@@ -1,6 +1,16 @@
-import Vue from "vue";
-import Router from "vue-router";
-import store from "@/store/index.js"
+import { createRouter, createWebHistory } from "vue-router";
+
+import { useAuthStore } from "@/stores/modules/auth";
+import { useMapsStore } from "@/stores/modules/maps";
+import { useTagsStore } from "@/stores/modules/tags";
+import { useCompaniesStore } from "@/stores/modules/companies";
+import { usePrePagesStore } from "@/stores/modules/prepages";
+import { useLayoutsStore } from "@/stores/modules/layouts";
+import { useShortcutsStore } from "@/stores/modules/shortcuts";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { useFilterStore } from "@/stores/modules/filter";
+import { useFavoritesStore } from "@/stores/modules/favorites";
+
 const Company_view = () => import("@/views/company.vue");
 const Search_view = () => import("@/views/search.vue");
 const Login_view = () => import("@/views/login.vue");
@@ -19,10 +29,8 @@ const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
 
-Vue.use(Router);
-
-const router = new Router({
-  mode: "history",
+const router = createRouter({
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
@@ -133,26 +141,29 @@ const router = new Router({
 router.beforeEach(async (to, from, next) => {
   if (from.name == null) {
     // Arriving from offsite, need to load data
-    router.app.$axios.defaults.headers.common["Authorization"] =
-      "Basic " + store.getters["auth/token"];
-    store.commit("favorites/loadForStorage");
+    // TODO Might still be needed
+    // router.app.axios.defaults.headers.common["Authorization"] =
+    //   "Basic " + store.getters["auth/token"];
+    useFavoritesStore().loadFromStorage();
 
     await Promise.all([
-      store.dispatch("maps/getMaps"),
-      store.dispatch("tags/getTags"), // This one fails if db is empty, check why
-      store.dispatch("companies/getCompanies"),
-      store.dispatch("prepages/getPrepages"),
-      store.dispatch("layouts/getLayouts"),
-      store.dispatch("shortcuts/getShortcuts"),
-      store.dispatch("site_settings/getCompanyCards"),
+      useMapsStore().getMaps(),
+      useTagsStore().getTags(), // This one fails if db is empty, check why
+      useCompaniesStore().getCompanies(),
+      usePrePagesStore().getPrepages(),
+      useLayoutsStore().getLayouts(),
+      useShortcutsStore().getShortcuts(),
+      useSite_settingsStore().getCompanyCards(),
     ])
       .then(() => {
-        store.dispatch("filter/filterCompanies");
+        useFilterStore().filterCompanies()
       })
       .catch(() => {}); // add some error here in the future?
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
-    if (store.getters["auth/isLoggedIn"]) {
+    const authStore = useAuthStore();
+
+    if (authStore.isLoggedIn) {
       next();
     } else {
       next({ name: "Login", params: { nextUrl: to.fullPath } });
