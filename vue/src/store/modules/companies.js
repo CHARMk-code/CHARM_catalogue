@@ -1,4 +1,5 @@
 import Vue from "vue";
+import dayjs from "dayjs"
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export default {
@@ -36,6 +37,13 @@ export default {
             .then((resp) => {
               commit("removeAllCompanies");
               const companies = resp.data;
+
+              // Work around to get summer job deadline in correct format
+              companies.forEach(comp => {
+                comp.summer_job_deadline =
+                  dayjs(comp.summer_job_deadline, "DD MMM YYYY HH:mm:ss", false).format("YYYY-MM-DD");
+              });
+
               if (companies.length > 0) {
                 commit("setCompanies", companies);
               }

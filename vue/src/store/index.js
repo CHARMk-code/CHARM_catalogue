@@ -10,7 +10,7 @@ import notes from "@/store/modules/notes";
 import maps from "@/store/modules/maps";
 import layouts from "@/store/modules/layouts";
 import shortcuts from "@/store/modules/shortcuts";
-import site_settings from "@/store/modules/site_settings"
+import site_settings from "@/store/modules/site_settings";
 
 Vue.use(Vuex);
 

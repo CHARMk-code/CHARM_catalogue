@@ -66,8 +66,8 @@
 </template>
 
 <script>
-import tableEditDialog from "@/components/admin/table_edit_dialog";
-import tablePop from "@/components/admin/table_popup";
+import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
+import tablePop from "@/components/admin/table_popup.vue";
 
 export default {
   name: "Table",

@@ -121,29 +121,33 @@ def tags_get():
     return:
         List Tags - A json list of all tags that match the optional args.
     """
-    request_data = request.get_json()
-    company_filter = get_if_exist(request_data, "company_filter")
-    only_ids = get_if_exist(request_data,"only_ids")
-    crowd = get_if_exist(request_data, "crowd")
-    if crowd:
-        if crowd > 2:
-            return status.HTTP_400_BAD_REQUEST
-    crowd = 0
-    if company_filter:
-        t = db.session.query(
-            Tag_company.tag,
-        ).filter(Tag_company.company == int(company_filter)).group_by(Tag_company.tag).subquery('t')
 
-        Tag_query = Tag.query.filter(
-            Tag.id == t.c.tag
-        )
-    else:
-        Tag_query = Tag.query
+    #request_data = request.get_json()
+    #company_filter = get_if_exist(request_data, "company_filter")
+    #only_ids = get_if_exist(request_data,"only_ids")
+    #crowd = get_if_exist(request_data, "crowd")
+    #if crowd:
+    #    if crowd > 2:
+    #        return status.HTTP_400_BAD_REQUEST
+    crowd = 0
+    #if company_filter:
+    #    t = db.session.query(
+    #        Tag_company.tag,
+    #    ).filter(Tag_company.company == int(company_filter)).group_by(Tag_company.tag).subquery('t')
+#
+    #    Tag_query = Tag.query.filter(
+    #        Tag.id == t.c.tag
+    #    )
+    #else:
+    Tag_query = Tag.query
+
+
     if crowd != 0:
         crowd = (1==crowd)
         Tag_query = Tag_query.filter_by(crowd_soured = crowd)
     tags = Tag_query.all()
-    if only_ids:
-        return jsonify([tag.id for tag in tags]), status.HTTP_200_OK
-    else:
-        return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK
+
+    #if only_ids:
+        #return jsonify([tag.id for tag in tags]), status.HTTP_200_OK
+    #else:
+    return jsonify([tag.serialize for tag in tags]), status.HTTP_200_OK

@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import sideLayout from "@/views/sideLayout";
+import sideLayout from "@/views/sideLayout.vue";
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import searchCard from "@/components/search/search_card";
-import Table from "@/components/table";
+import searchCard from "@/components/search/search_card.vue";
+import Table from "@/components/table.vue";
 export default {
   name: "Search",
   components: {

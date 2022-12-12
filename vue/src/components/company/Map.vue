@@ -19,7 +19,7 @@
 
 <script>
 import Vue from "vue";
-import company_card_wrapper from "@/components/company/card_wrapper";
+import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
 export default {
   name: "Company_map",

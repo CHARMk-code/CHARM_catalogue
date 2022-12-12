@@ -1,4 +1,3 @@
-import helperfunctions from "@/plugins/helperfunctions";
 export default {
   namespaced: true,
   state: () => ({
@@ -8,22 +7,18 @@ export default {
     addFavorite(state, id) {
       state.favorites.add(id);
 
-      if (helperfunctions.cookiesAccepted()) {
-        localStorage.setItem(
-          "favorites",
-          JSON.stringify(Array.from(state.favorites.values()))
-        );
-      }
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify(Array.from(state.favorites.values()))
+      );
     },
     removeFavorite(state, id) {
       state.favorites.delete(id);
 
-      if (helperfunctions.cookiesAccepted()) {
-        localStorage.setItem(
-          "favorites",
-          JSON.stringify(Array.from(state.favorites.values()))
-        );
-      }
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify(Array.from(state.favorites.values()))
+      );
     },
     loadForStorage(state) {
       if (

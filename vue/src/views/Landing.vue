@@ -37,9 +37,9 @@
 <script>
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import sideLayout from "@/views/sideLayout";
-import hoverCard from "@/components/landing/hoverCard";
-import shortcut from "@/components/landing/shortcut";
+import sideLayout from "@/views/sideLayout.vue";
+import hoverCard from "@/components/landing/hoverCard.vue";
+import shortcut from "@/components/landing/shortcut.vue";
 
 export default {
   name: "Landing_view",

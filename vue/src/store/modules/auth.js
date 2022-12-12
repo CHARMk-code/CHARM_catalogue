@@ -1,5 +1,4 @@
 import Vue from "vue";
-import helperfunctions from "@/plugins/helperfunctions";
 
 export default {
   namespaced: true,
@@ -33,9 +32,7 @@ export default {
           .then((resp) => {
             const token = resp.data;
 
-            if (helperfunctions.cookiesAccepted()) {
-              localStorage.setItem("token", token);
-            }
+            localStorage.setItem("token", token);
             Vue.prototype.$axios.defaults.headers.common["Authorization"] =
               "basic " + token;
             commit("auth_success", { token });

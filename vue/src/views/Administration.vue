@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import MenuLeft from "@/components/admin/MenuLeft";
+import MenuLeft from "@/components/admin/MenuLeft.vue";
 // @ is an alias to /src
 export default {
   name: "Administration",

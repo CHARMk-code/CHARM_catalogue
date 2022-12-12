@@ -4,7 +4,7 @@ import Vue from "vue";
 import axios from "axios";
 
 let config = {
-  baseURL: (process.env.baseURL || process.env.apiUrl || "") + "/api",
+  baseURL: (import.meta.env.baseURL || import.meta.env.apiUrl || "") + "/api",
   timeout: 60 * 1000, // Timeout
   withCredentials: true, // Check cross-site Access-Control
 };

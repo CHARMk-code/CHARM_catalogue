@@ -38,10 +38,12 @@
       <v-row>
         <v-col>
           <Textblock :body="company.description" class="mb-6" />
+          <Textblock :body="company.unique_selling_point" title="What Makes Us Special" class="mb-6" />
           <Summerjob
             name="summerjob"
             :desc="company.summer_job_description"
             :link="company.summer_job_link"
+            :deadline="company.summer_job_deadline"
             class="mb-6"
           />
           <Layout class="mb-6" />
@@ -60,7 +62,7 @@
               <Tags
                 :tags="company.tags"
                 name="tag_looking_for"
-                title="Looking for"
+                title="Looking For"
                 getter_target="tags/getLookingForFromIds"
                 class="mb-6 mx-3 flex-grow-1"
               />
@@ -107,19 +109,19 @@
 </template>
 
 <script>
-import Logo from "@/components/company/Logo";
-import Name from "@/components/company/Name";
-import Trivia from "@/components/company/Trivia";
-import Contacts from "@/components/company/Contacts";
-import Textblock from "@/components/company/Textblock";
-import Website from "@/components/company/Website";
-import Tags from "@/components/company/Tags";
-import tableEditDialog from "@/components/admin/table_edit_dialog";
-import Note from "@/components/company/Note";
-import Map from "@/components/company/Map";
-import Summerjob from "@/components/company/summerjob";
-import Layout from "@/components/company/Layout";
-import sideLayout from "@/views/sideLayout";
+import Logo from "@/components/company/Logo.vue";
+import Name from "@/components/company/Name.vue";
+import Trivia from "@/components/company/Trivia.vue";
+import Contacts from "@/components/company/Contacts.vue";
+import Textblock from "@/components/company/Textblock.vue";
+import Website from "@/components/company/Website.vue";
+import Tags from "@/components/company/Tags.vue";
+import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
+import Note from "@/components/company/Note.vue";
+import Map from "@/components/company/Map.vue";
+import Summerjob from "@/components/company/summerjob.vue";
+import Layout from "@/components/company/Layout.vue";
+import sideLayout from "@/views/sideLayout.vue";
 import { mapGetters } from "vuex";
 
 export default {

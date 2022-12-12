@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import shortcuts_table from "@/components/admin/shortcuts_table";
+import shortcuts_table from "@/components/admin/shortcuts_table.vue";
 
 export default {
   name: "Shortcuts",

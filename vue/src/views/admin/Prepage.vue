@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import prepages_table from "@/components/admin/prepages_table";
+import prepages_table from "@/components/admin/prepages_table.vue";
 
 export default {
   name: "Prepages",

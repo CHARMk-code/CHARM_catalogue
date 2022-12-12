@@ -6,7 +6,7 @@ WORKDIR /app
 ADD package.json yarn.lock /tmp/
 
 RUN cd /tmp && yarn --ignore-engines
-ADD ./babel.config.js ./vue.config.js ./.eslintrc.js ./
+ADD  ./vite.config.js  ./
 ADD ./public ./public
 ADD ./src ./src
 RUN ln -s /tmp/node_modules && ln -s /tmp/package.json

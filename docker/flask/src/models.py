@@ -72,11 +72,14 @@ class Company(db.Model):
     charmtalk = db.Column(db.Boolean)
     name = db.Column(db.String(200))
     description = db.Column(db.String(1000))
+    unique_selling_point = db.Column(db.String(1000))
     summer_job_description = db.Column(db.String(1000))
     summer_job_link = db.Column(db.String(1000))
+    summer_job_deadline = db.Column(db.Date)
     contacts = db.Column(db.String(100))
     contact_email = db.Column(db.String(320))
     employees_world = db.Column(db.Integer)
+    employees_sweden = db.Column(db.Integer)
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
@@ -90,9 +93,9 @@ class Company(db.Model):
     )
 
     @staticmethod
-    def create( name, active, charmtalk, description, summer_job_description, summer_job_link,
-         contacts, contact_email, employees_world, website,
-         talk_to_us_about, logo, map_image, booth_number, tags):
+    def create( name, active, charmtalk, description, unique_selling_point, summer_job_description,
+               summer_job_link, summer_job_deadline, contacts, contact_email, employees_world,
+               employees_sweden, website, talk_to_us_about, logo, map_image, booth_number, tags):
         try:
             if Company.query.filter_by(name=name).first():
                 return False
@@ -102,11 +105,14 @@ class Company(db.Model):
                 active=active,
                 charmtalk=charmtalk,
                 description=description,
+                unique_selling_point = unique_selling_point,
                 summer_job_description = summer_job_description,
                 summer_job_link = summer_job_link,
+                summer_job_deadline = summer_job_deadline,
                 contacts = contacts,
                 contact_email = contact_email,
-                employees_world = employees_world if employees_world != "" else -1,
+                employees_world = employees_world,
+                employees_sweden = employees_sweden,
                 website = website,
                 talk_to_us_about = talk_to_us_about,
                 logo = logo,
@@ -121,8 +127,9 @@ class Company(db.Model):
             return False
         return True
 
-    def update(self, name, active, charmtalk, description, summer_job_description, summer_job_link,
-            contacts, contact_email, employees_world, website,
+    def update(self, name, active, charmtalk, description, unique_selling_point,
+               summer_job_description, summer_job_link, summer_job_deadline, contacts, 
+               contact_email, employees_world, employees_sweden, website,
             talk_to_us_about,logo, map_image, booth_number, tags):
 
         self.name = test_and_set(self.name,name)
@@ -130,12 +137,13 @@ class Company(db.Model):
         self.active = test_and_set(self.active,active)
         self.charmtalk = test_and_set(self.charmtalk,charmtalk)
         self.description = test_and_set(self.description,description)
+        self.unique_selling_point = test_and_set(self.unique_selling_point, unique_selling_point)
         self.summer_job_description = test_and_set(self.summer_job_description, summer_job_description)
         self.summer_job_link = test_and_set(self.summer_job_link, summer_job_link)
         self.contacts = test_and_set(self.contacts,contacts)
         self.contact_email = test_and_set(self.contact_email,contact_email)
         self.employees_world = test_and_set(self.employees_world, employees_world)
-        self.employees_world = self.employees_world if self.employees_world != "" else -1,
+        self.employees_sweden = test_and_set(self.employees_sweden, employees_sweden)
         self.website = test_and_set(self.website, website)
         self.logo = test_and_set(self.logo, logo)
         self.map_image = test_and_set(self.map_image, map_image)
@@ -163,11 +171,14 @@ class Company(db.Model):
             'active': self.active,
             'charmtalk': self.charmtalk,
             'description': self.description,
+            'unique_selling_point': self.unique_selling_point,
             'summer_job_description': self.summer_job_description,
             'summer_job_link': self.summer_job_link,
+            'summer_job_deadline': self.summer_job_deadline,
             'contacts': self.contacts,
             'contact_email': self.contact_email,
             'employees_world': self.employees_world,
+            'employees_sweden': self.employees_sweden,
             'website': self.website,
             'logo': self.logo,
             'map_image': self.map_image,

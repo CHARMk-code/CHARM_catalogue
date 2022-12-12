@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import companies_table from "@/components/admin/company_table";
+import companies_table from "@/components/admin/company_table.vue";
 
 export default {
   name: "Companies",

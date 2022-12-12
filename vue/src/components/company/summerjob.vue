@@ -1,8 +1,9 @@
 <template>
   <company_card_wrapper name="summerjob">
-    <v-card-title> Summer jobs</v-card-title>
+    <v-card-title> Summer Jobs</v-card-title>
 
     <v-card-text> {{ desc }}</v-card-text>
+    <v-card-text> Apply before: {{ deadline }}</v-card-text>
 
     <v-card-actions>
       <v-btn :href="link"> Apply here </v-btn>
@@ -11,11 +12,11 @@
 </template>
 
 <script>
-import company_card_wrapper from "@/components/company/card_wrapper";
+import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
 export default {
   name: "summer-job",
-  props: ["desc", "link"],
+  props: ["desc", "link", "deadline"],
   components: {
     company_card_wrapper,
   },
