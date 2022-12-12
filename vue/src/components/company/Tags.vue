@@ -4,12 +4,12 @@
     <v-card-text>
       <div v-if="tags_data.length === 0">No {{ title }}</div>
       <template v-for="tag in tags_data">
-        <template v-if="tag.icon == ''">
+        <template v-if="tag.icon == null">
           <v-chip small class="ma-1" :key="tag.id" @click="gotoSearch(tag)">
             {{ tag.name }}
           </v-chip>
         </template>
-        <template v-if="tag.icon != ''">
+        <template v-if="tag.icon != null">
           <v-tooltip :key="tag.id" bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-avatar
