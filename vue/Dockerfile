@@ -7,6 +7,7 @@ ADD package.json yarn.lock /tmp/
 
 RUN cd /tmp && yarn --ignore-engines
 ADD  ./vite.config.js  ./
+ADD ./index.html ./
 ADD ./public ./public
 ADD ./src ./src
 RUN ln -s /tmp/node_modules && ln -s /tmp/package.json
