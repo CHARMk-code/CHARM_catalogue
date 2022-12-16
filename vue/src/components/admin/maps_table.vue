@@ -1,88 +1,49 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveMap"
-      @delete_row="deleteMap"
-      name="Map (Do NOT modify this table it will corrupt the data)"
-      :headers="headers"
-      :data="modified_maps"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-      </template>
-      <template v-slot:item.image="{ item }">
-        {{ item.image }}
-      </template>
-      <template v-slot:item.ref="{ item }">
-        {{ item.ref == null || item.ref == "No Goto" ? "" : item.ref.name }}
-      </template>
-    </Table>
-  </v-container>
+  <v-card>
+    <v-card-title>Maps</v-card-title>
+    <v-card-text>
+      <Table
+        @saveEdit="(m) => mapsStore.updateMap(m)"
+        @deleteRow="(m) => mapsStore.removeMap(m)"
+        name="Map (Do NOT modify this table it will corrupt the data)"
+        :tableColumns="headers"
+        :rows="Array.from(mapsStore.maps.values())"
+        :colMeta="colMeta"
+        :editable="true"
+      >
+        <template #col(ref)="{ value }">
+          {{ (mapsStore.getMapFromId(value) || { name: "None" }).name }}
+        </template>
+      </Table>
+    </v-card-text>
+  </v-card>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+import { useMapsStore } from "@/stores/modules/maps";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "maps_table",
-  components: {
-    Table,
+const mapsStore = useMapsStore();
+
+const headers = [
+  { name: "Name", value: "name" },
+  { name: "Image", value: "image" },
+  { name: "Parent", value: "ref" },
+];
+
+const colMeta: TableColMeta[] = [
+  { type: "image", model: "image", label: "Map image" },
+  {
+    type: "single-select",
+    model: "ref",
+    label: "Parent",
+    items: Array.from(mapsStore.maps)
+      .map(([_, m]) => {
+        return { title: m.name, value: m.id };
+      })
+      .concat([{ title: "No Goto", value: -1 }]),
   },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Image",
-          value: "image",
-        },
-        { text: "Goto", value: "ref" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 100,
-          align: "center",
-          sortable: false,
-        },
-      ],
-    };
-  },
-  computed: {
-    ...mapGetters({
-      maps: "maps/get",
-    }),
-    row_meta() {
-      return [
-        { type: "image", model: "image", label: "Map image" },
-        {
-          type: "single_select",
-          model: "ref",
-          label: "Goto",
-          items: this.maps.concat([{ name: "No Goto", id: null }]),
-        },
-        { type: "text", model: "name", label: "Name", displayname: true },
-      ];
-    },
-    modified_maps() {
-      return this.maps.map((m) => ({
-        ...m,
-        ref: m.ref == null ? "" : this.maps.filter((rm) => rm.id == m.ref)[0],
-      }));
-    },
-  },
-  methods: {
-    saveMap(map) {
-      this.$store.dispatch("maps/modifyMap", { ...map, ref: map.ref.id });
-    },
-    deleteMap(map) {
-      this.$store.dispatch("maps/deleteMap", map);
-    },
-  },
-};
+  { type: "text", model: "name", label: "Name" },
+];
 </script>

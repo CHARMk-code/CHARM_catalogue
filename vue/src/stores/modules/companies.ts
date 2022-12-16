@@ -21,35 +21,31 @@ export interface Company {
   website: string,
   talk_to_us_about: string,
   logo: string,
-  map_image: string,
+  map_image: number,
   booth_number: number,
-  tags: number[],
-  looking_for?: number[],
-  business_areas?: number[],
-  offerings?: number[],
-  divisions?: number[],
+  tags: Set<number>,
 }
 
 
 interface State {
-  companies: Company[],
+  companies: Map<number,Company>,
   load_wait: number
 }
 
 export const useCompaniesStore = defineStore('companies', {
   state: (): State => ({
-    companies: [],
+    companies: new Map(),
     load_wait: 0,
   }),
   actions: {
     setAllCompanies(companies: Company[]) {
-      this.companies = companies;
+      this.companies = new Map(companies.map(c => [c.id, c]))
     },
-    removeCompany(id: number) {
-      this.companies = this.companies.filter((c) => c.id != id);
+    removeCompanyById(id: number) {
+      this.companies.delete(id)
     },
     removeAllCompanies() {
-      this.companies = [];
+      this.companies = new Map();
     },
     getCompanies() {
       return new Promise<void>((resolve, reject) => {
@@ -57,8 +53,9 @@ export const useCompaniesStore = defineStore('companies', {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
             .get("/company")
-            .then((resp: any) => {
+            .then((resp: any) => { //TODO Remove this any and replace with actual type
               this.removeAllCompanies()
+              resp.data.tags = new Set(resp.data.tags)
               const companies: Company[] = resp.data;
 
               // Work around to get summer job deadline in correct format
@@ -80,23 +77,12 @@ export const useCompaniesStore = defineStore('companies', {
         }
       });
     },
-    modifyCompany(company: Company) {
+    updateCompany(company: Company) {
       return new Promise((resolve, reject) => {
-        const updated_company = {
-          ...company,
-          tags: company.looking_for.map((o) => o.id) //This will be changed when the parts relying on this has changed
-            .concat(company.offering.map((o) => o.id))
-            .concat(company.divisions.map((o) => o.id))
-            .concat(company.business_area.map((o) => o.id)),
-        };
-        this.axios
+       this.axios
           .put("/company", company)
           .then((resp: any) => {
-            if (!this.companies.some((c) => (c.id = company.id))) {
-              this.companies.push(company);
-            } else {
-              this.companies[this.companies.findIndex((c) => c.id == company.id)];
-            }
+            this.companies.set(company.id, company)
             resolve(resp);
           })
           .catch((err: any) => {
@@ -104,12 +90,12 @@ export const useCompaniesStore = defineStore('companies', {
           });
       });
     },
-    deleteCompany(company: Company) {
+    removeCompany(company: Company) {
       return new Promise((resolve, reject) => {
         this.axios
           .delete("/company/" + company.id)
           .then((resp: any) => {
-            this.removeCompany(company.id);
+            this.removeCompanyById(company.id);
             resolve(resp);
           })
           .catch((err: any) => {
@@ -120,7 +106,7 @@ export const useCompaniesStore = defineStore('companies', {
   },
   getters: {
     companyByName: (state) => (name: string) => {
-      return state.companies.filter((c) => c.name == name);
+      return Array.from(state.companies.values()).filter((c) => c.name == name);
     },
   },
 });

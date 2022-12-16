@@ -1,14 +1,19 @@
+import { registerRuntimeHelpers } from "@vue/compiler-core";
 import { defineStore } from "pinia";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-interface Shortcut {
-  id: number,
+export interface Shortcut {
+  id?: number,
   name: string,
   desc: string,
   link: string,
   icon: string,
 }
+
+/*
+shortcutsStore.modifyShortcut({"id": 1, "name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
+*/
 
 
 interface State {
@@ -16,7 +21,7 @@ interface State {
   load_wait: number,
 }
 
-export const useShortcutsStore = defineStore ('shortcuts', {
+export const useShortcutsStore = defineStore('shortcuts', {
   state: (): State => ({
     shortcuts: [],
     load_wait: 0,
@@ -50,6 +55,9 @@ export const useShortcutsStore = defineStore ('shortcuts', {
         this.axios
           .put("/shortcut", shortcut)
           .then((resp: any) => {
+            if (!shortcut.id) {
+              shortcut.id = resp.data.id;
+            }
             if (!this.shortcuts.some((p) => p.id === shortcut.id)) {
               this.shortcuts.push(shortcut);
             } else {

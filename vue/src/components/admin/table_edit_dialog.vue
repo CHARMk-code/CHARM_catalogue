@@ -1,54 +1,36 @@
 <template>
   <v-card>
     <v-card-title>{{
-      (this.new ? "Create " : "Edit ") + this.name.toLowerCase()
+      (newRow ? "Create " : "Update ") + name.toLowerCase()
     }}</v-card-title>
     <v-card-text>
       <v-form>
-        <template v-for="col in row_meta">
+        <template v-for="col in colMeta">
           <template v-if="col.type == 'checkbox'">
             <v-checkbox
               large
-              :key="col.model"
               v-model="row[col.model]"
-              :on-icon="col.on_icon"
-              :off-icon="col.off_icon"
+              :on-icon="col.onIcon"
+              :off-icon="col.offIcon"
               :label="col.label"
             />
           </template>
 
           <template v-if="col.type == 'text'">
-            <v-text-field
-              :key="col.model"
-              v-model="row[col.model]"
-              :label="col.label"
-            />
+            <v-text-field v-model="row[col.model]" :label="col.label" />
           </template>
 
           <template v-if="col.type == 'number'">
-            <v-text-field
-              :key="col.model"
-              v-model.number="row[col.model]"
-              :label="col.label"
-            />
+            <v-text-field v-model.number="row[col.model]" :label="col.label" />
           </template>
 
           <template v-if="col.type == 'textarea'">
-            <v-textarea
-              :key="col.model"
-              v-model="row[col.model]"
-              :label="col.label"
-            />
+            <v-textarea v-model="row[col.model]" :label="col.label" />
           </template>
 
-          <template v-if="col.type == 'single_select'">
+          <template v-if="col.type == 'single-select'">
             <v-autocomplete
-              chips
-              :key="col.model"
               v-model="row[col.model]"
-              item-text="name"
-              item-value="id"
-              return-object
               :items="col.items"
               :label="col.label"
               :hint="col.hint"
@@ -56,15 +38,13 @@
             </v-autocomplete>
           </template>
 
-          <template v-if="col.type == 'select'">
+          <template v-if="col.type == 'multiple-select'">
             <v-autocomplete
               multiple
+              closable-chips
               chips
               :key="col.model"
               v-model="row[col.model]"
-              item-text="name"
-              item-value="id"
-              return-object
               :items="col.items"
               :label="col.label"
               :hint="col.hint"
@@ -93,7 +73,7 @@
               <v-radio
                 v-for="radios in col.items"
                 :key="radios.value"
-                :label="radios.name"
+                :label="radios.title"
                 :value="radios.value"
               />
             </v-radio-group>
@@ -129,62 +109,86 @@
       </v-form>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="primary" @click="save()"> Save </v-btn>
+      <v-btn variant="flat" color="primary" @click="save()"> Save </v-btn>
 
       <v-btn @click="close()"> Cancel </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
-<script>
-import Vue from "vue";
-export default {
-  name: "table_edit_dialog",
-  props: ["name", "row", "row_meta", "new"],
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-  },
-  data() {
-    return {
-      files: {},
-      test: [],
-    };
-  },
-  methods: {
-    save() {
-      this.uploadFiles(this.files).then(() => {
-        this.$emit("save_row", this.row);
-        this.close();
-      });
-    },
-    uploadFiles(files) {
-      const file_models = Object.keys(files);
+<script lang="ts" setup>
+import type { TableRow } from "@/components/table.vue";
+import axios from "@/plugins/axios";
+import { ref } from "vue";
 
-      return Promise.all(
-        Object.values(files).map((f, index) => {
-          return new Promise((resolve, reject) => {
-            const formData = new FormData();
-            formData.append("file", f);
-            this.$axios
-              .post("/manage/upload", formData)
-              .then((res) => {
-                this.row[file_models[index]] = f.name;
-                console.log(res.data);
-                return resolve(res);
-              })
-              .catch((err) => {
-                console.log(err);
-                return reject(err);
-              });
+export interface TableColMeta {
+  type:
+    | "checkbox"
+    | "text"
+    | "number"
+    | "textarea"
+    | "single-select"
+    | "multiple-select"
+    | "radio"
+    | "image";
+  model: string;
+  label: string;
+  onIcon?: string;
+  offIcon?: string;
+  items?: { title: string; value: string | number }[];
+  hint?: string;
+}
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+const props = defineProps<{
+  name: string;
+  row: TableRow;
+  colMeta: TableColMeta[];
+  newRow: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "saveRow", row: TableRow): void;
+  (e: "closeDialog"): void;
+}>();
+
+const files = ref({});
+const test = [];
+
+async function save() {
+  if (props.colMeta.filter((r) => r.type === "image").length > 0) {
+    await uploadFiles(files);
+  }
+  emit("saveRow", props.row);
+  close();
+}
+
+function close() {
+  emit("closeDialog");
+}
+
+function uploadFiles(files) {
+  const file_models = Object.keys(files);
+
+  return Promise.all(
+    Object.values(files).map((f, index) => {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append("file", f);
+        axios
+          .post("/manage/upload", formData)
+          .then((res) => {
+            this.row[file_models[index]] = f.name;
+            console.log(res.data);
+            return resolve(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            return reject(err);
           });
-        })
-      );
-    },
-    close() {
-      this.$emit("close_dialog");
-    },
-  },
-};
+      });
+    })
+  );
+}
 </script>

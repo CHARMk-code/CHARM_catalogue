@@ -8,6 +8,7 @@ interface Tags {
   business_areas: number[],
   offerings: number[],
   languages: number[],
+  [key: string]: number[];
 }
 
 interface Filters {
@@ -24,7 +25,7 @@ interface State {
 }
 
 export const useFilterStore = defineStore('filter', {
-  state: () => ({
+  state: (): State => ({
     filters: {
       query: "",
       tags: {
@@ -41,17 +42,26 @@ export const useFilterStore = defineStore('filter', {
     filteredCompanies: [],
   }),
   actions: {
-    setFilters(filters: Filters) {
+    resetFilter() {
       this.filters = {
-        ...this.filters,
-        ...filters,
-        tags: { ...this.filters.tags, ...filters.tags },
-      };
+        query: "",
+        tags: {
+          divisions: [],
+          looking_for: [],
+          business_areas: [],
+          offerings: [],
+          languages: [],
+        },
+        favorites: false,
+        charmtalk: false,
+        sweden: false,
+      }
+      this.filterCompanies()
     },
     filterCompanies() {
       return new Promise<void>((resolve) => {
         const companiesStore = useCompaniesStore();
-        var filteredCompanies = companiesStore.companies;
+        var filteredCompanies = Array.from(companiesStore.companies.values());
 
         // Filter all non active companies
         filteredCompanies = filteredCompanies.filter((t) => t.active);
@@ -64,16 +74,13 @@ export const useFilterStore = defineStore('filter', {
         }
 
         // Filter on tags
-        for (const key in Object.keys(this.filters.tags)) {
-          const filterTags = this.filters.tags[key];
+        var filterTags: number[] = []
+        for (var key in this.filters.tags) filterTags = filterTags.concat(this.filters.tags[key]);
 
-          if (filterTags.length > 0) {
-            filteredCompanies = filteredCompanies.filter((c) => {
-              return c.tags.some((t) =>
-                filterTags.some((filterTag: number) => t == filterTag)
-              );
-            });
-          }
+        if (filterTags.length > 0) {
+          filteredCompanies = filteredCompanies.filter((c) => {
+            return filterTags.some((filterTag: number) => c.tags.has(filterTag))
+          });
         }
 
         // Filter on attendance to charmtalks
@@ -97,17 +104,9 @@ export const useFilterStore = defineStore('filter', {
         resolve();
       });
     },
-    sortCompanies(strategy: ((a: any, b: any) => number)) {
-      strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
+    sortCompanies() {
+      const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
       this.filteredCompanies.sort(strategy);
-    },
-  },
-  getters: {
-    filteredCompanies: (state) => {
-      return state.filteredCompanies;
-    },
-    getFilter: (state) => {
-      return state.filters;
     },
   },
 });

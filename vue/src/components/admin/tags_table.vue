@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <Table
-      @save_edit="saveTag"
-      @delete_row="deleteTag"
+      @saveRow="(t) => tagsStore.modifyTag(t)"
+      @deleteRow="(t) => tagsStore.deleteTag(t)"
       name="Tags"
-      :headers="headers"
-      :data="Array.from(this.tags)"
-      :row_meta="row_meta"
+      :tableColumns="headers"
+      :rows="Array.from(tagsStore.tags)"
+      :colMeta="colMeta"
       :editable="true"
     >
       <template v-slot:item.business_area="{ item }">
@@ -38,70 +38,33 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
-import Vue from "vue";
+import axios from "@/plugins/axios";
+import { useTagsStore } from "@/stores/modules/tags";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "tags_table",
-  components: {
-    Table,
-  },
-  data() {
-    return {
-      headers: [
-        { text: "Icon", value: "icon", sortable: false },
-        { text: "Name", value: "name" },
-        {
-          text: "Business Area",
-          value: "business_area",
-          align: "center",
-          width: 100,
-        },
-        { text: "Division", value: "division", align: "center", width: 120 },
-        {
-          text: "Looking for",
-          value: "looking_for",
-          align: "center",
-          width: 100,
-        },
-        { text: "Offering", value: "offering", align: "center", width: 120 },
-        { text: "Language", value: "language", align: "center", width: 120 },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 100,
-          align: "center",
-          sortable: false,
-        },
-      ],
-      row_meta: [
-        { type: "image", model: "icon", label: "tag icon" },
-        { type: "text", model: "name", label: "Tag name", displayname: true },
-        { type: "checkbox", model: "business_area", label: "Business area" },
-        { type: "checkbox", model: "division", label: "Division" },
-        { type: "checkbox", model: "looking_for", label: "Looking for" },
-        { type: "checkbox", model: "offering", label: "Offering" },
-        { type: "checkbox", model: "language", label: "Language" },
-      ],
-    };
-  },
-  computed: {
-    ...mapGetters({
-      tags: "tags/all",
-    }),
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-  },
-  methods: {
-    saveTag(tag) {
-      this.$store.dispatch("tags/modifyTag", tag);
-    },
-    deleteTag(tag) {
-      this.$store.dispatch("tags/deleteTag", tag);
-    },
-  },
-};
+const tagsStore = useTagsStore();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+const headers = [
+  { name: "Icon", value: "icon" },
+  { name: "Name", value: "name" },
+  { name: "Business Area", value: "business_area" },
+  { name: "Division", value: "division" },
+  { name: "Looking for", value: "looking_for" },
+  { name: "Offering", value: "offering" },
+  { name: "Language", value: "language" },
+];
+
+const colMeta: TableColMeta[] = [
+  { type: "image", model: "icon", label: "tag icon" },
+  { type: "text", model: "name", label: "Tag name" },
+  { type: "checkbox", model: "business_area", label: "Business area" },
+  { type: "checkbox", model: "division", label: "Division" },
+  { type: "checkbox", model: "looking_for", label: "Looking for" },
+  { type: "checkbox", model: "offering", label: "Offering" },
+  { type: "checkbox", model: "language", label: "Language" },
+];
 </script>

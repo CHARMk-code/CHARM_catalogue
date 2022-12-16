@@ -12,8 +12,7 @@ export default {
   name: "Company_card_wrapper",
   props: { name: String, flat: { type: Boolean, default: false } },
   computed: {
-    ...mapStores(useSite_settingsStore)
-    },
+    ...mapStores(useSite_settingsStore),
     isVisible() {
       const visibleCards = this.site_settingsStore.company_view.cards;
       return this.visibleCards.some((c) =>

@@ -4,13 +4,6 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import maps_table from "@/components/admin/maps_table.vue";
-
-export default {
-  name: "Maps",
-  components: {
-    maps_table,
-  },
-};
 </script>

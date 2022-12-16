@@ -7,11 +7,10 @@
             Browse the catalogue
           </div>
           <hoverCard
+            v-if="first_prepage"
             class="mx-auto"
             to="/prepages/0"
-            :background_image="
-              base_URL + (prepages.length === 0 ? '' : prepages[0].image)
-            "
+            :background_image="base_URL + first_prepage.image"
           />
         </v-col>
         <v-col xs="12" md="6">
@@ -20,7 +19,7 @@
           </div>
           <v-container class="ma-0 pa-0 d-flex flex-wrap" style="gap: 16px">
             <shortcut
-              v-for="shortcut in shortcuts"
+              v-for="shortcut in shortcutsStore.shortcuts"
               :key="shortcut.name"
               :icon="shortcut.icon"
               :name="shortcut.name"
@@ -34,36 +33,27 @@
   </sideLayout>
 </template>
 
-<script>
-import Vue from "vue";
-import { mapGetters } from "vuex";
+<script lang="ts" setup>
 import sideLayout from "@/views/sideLayout.vue";
 import hoverCard from "@/components/landing/hoverCard.vue";
 import shortcut from "@/components/landing/shortcut.vue";
+import axios from "@/plugins/axios";
+import { computed } from "vue";
+import { usePrePagesStore } from "@/stores/modules/prepages";
+import { useShortcutsStore } from "@/stores/modules/shortcuts";
 
-export default {
-  name: "Landing_view",
-  components: {
-    sideLayout,
-    hoverCard,
-    shortcut,
-  },
-  data() {
-    return {
-      hover: false,
-    };
-  },
-  computed: {
-    base_URL() {
-      console.log(this.hover);
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    ...mapGetters({
-      prepages: "prepages/getActive",
-      shortcuts: "shortcuts/get",
-    }),
-  },
-};
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+const prepagesStore = usePrePagesStore();
+const shortcutsStore = useShortcutsStore();
+
+const first_prepage = computed(() => {
+  const active_prepages = prepagesStore.active_prepages;
+  if (active_prepages.length > 0) {
+    return active_prepages[0];
+  } else {
+    return undefined;
+  }
+})
 </script>
 
 <style scoped>

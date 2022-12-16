@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-interface Layout {
+export interface Layout {
   id: number,
   image: string,
   active: boolean,
@@ -84,8 +84,9 @@ export const useLayoutsStore = defineStore('layouts', {
     },
   },
   getters: {
-    getSide: (state) => (side: number) => {
-      const layout = state.layouts.filter((t) => t.placement === side);
+    getSide: (state) => (side: "left" | "right") => {
+      const side_number = side === "left" ? 1 : 2
+      const layout = state.layouts.filter((t) => t.placement === side_number);
       return layout.length === 0 ? undefined : layout[0];
     },
     getCenter: (state) => {

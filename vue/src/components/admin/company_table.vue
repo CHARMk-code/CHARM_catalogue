@@ -5,7 +5,7 @@
       @delete_row="deleteCompany"
       name="Companies"
       :headers="headers"
-      :data="modified_companies"
+      :data="companiesStore.companies"
       :row_meta="row_meta"
       :editable="true"
     >
@@ -47,206 +47,186 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
-import Vue from "vue";
+import axios from "@/plugins/axios"
+import { computed } from "vue";
 import dayjs from "dayjs";
+import { useTagsStore } from "@/stores/modules/tags";
+import { useCompaniesStore, type Company } from "@/stores/modules/companies";
+import { useMapsStore } from "@/stores/modules/maps";
+import { useRouter } from "vue-router";
 
-export default {
-  name: "companies_table",
-  components: {
-    Table,
-  },
-  data() {
-    return {
-      headers: [
-        { text: "Name", value: "name" },
-        { text: "Booth", value: "booth_number"},
-        { text: "Programs", value: "divisions" },
-        { text: "Completion", value: "completion", width: 120 },
-        { text: "Active", value: "active", width: 100 },
-        { text: "Last Updated", value: "last_updated", width: 170 },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 130,
-          sortable: false,
-        },
-      ],
-    };
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    ...mapGetters({
-      companies: "companies/companies",
-      tags: "tags/tags",
-      divisions: "tags/divisions",
-      looking_for: "tags/looking_fors",
-      business_areas: "tags/business_areas",
-      languages: "tags/languages",
-      offerings: "tags/offers",
-      maps: "maps/get",
-    }),
-    modified_companies() {
-      const companies = Array.from(this.companies);
-      let modified = companies.map((c) => ({
-        ...c,
-        divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
-        languages: this.$store.getters["tags/getLanguagesFromIds"](c.tags),
-        looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
-        offering: this.$store.getters["tags/getOffersFromIds"](c.tags),
-        business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
-          c.tags
-        ),
-        last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
-        tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
-        map_image: this.$store.getters["maps/get"].filter(
-          (nm) => nm.id == c.map_image
-        ),
-      }));
-      return modified;
-    },
-    row_meta() {
-      return [
-        {
-          type: "checkbox",
-          model: "active",
-          on_icon: "mdi-eye",
-          off_icon: "mdi-eye-off",
-          label: "Active (required for row to be visible)",
-        },
-        {
-          type: "checkbox",
-          model: "charmtalk",
-          label: "On CHARMtalks",
-        },
-        {
-          type: "text",
-          model: "name",
-          label: "Company name",
-          displayname: true,
-        },
-        {
-          type: "number",
-          model: "booth_number",
-          label: "Booth number"
-        },
-        { type: "image", model: "logo", label: "Company Logo" },
-        {
-          type: "textarea",
-          model: "description",
-          label: "Company description",
-        }, 
-        {
-          type: "textarea",
-          model: "unique_selling_point",
-          label: "What is the unique selling points",
-        },
-        {
-          type: "textarea",
-          model: "summer_job_description",
-          label: "Description of summer job",
-        },
-        {
-          type: "text",
-          model: "summer_job_link",
-          label: "Link to summer job application",
-        },
-        {
-          type: "textarea",
-          model: "talk_to_us_about",
-          label: "Talk to us about",
-        },
-        { type: "text", model: "contacts", label: "Contacts" },
-        { type: "text", model: "contact_email", label: "Contacts email" },
-        { type: "text", model: "website", label: "Website" },
-        {
-          type: "number",
-          model: "employees_world",
-          label: "Number of Employees in the whole world",
-        }, 
-        {
-          type: "number",
-          model: "employees_sweden",
-          label: "Number of Employees in Sweden",
-        },
-        {
-          type: "single_select",
-          model: "map_image",
-          items: this.maps.concat([{ name: "No Map", id: null }]),
-          label: "Map",
-          hint: "Map for company location",
-        },
-        {
-          type: "select",
-          model: "divisions",
-          items: this.divisions,
-          label: "Divisions",
-          hint: "Programs the company are interested in",
-        },
-        {
-          type: "select",
-          model: "looking_for",
-          items: this.looking_for,
-          label: "Looking For",
-          hint: "Which level of education the company is looking for",
-        },
-        {
-          type: "select",
-          model: "business_area",
-          items: this.business_areas,
-          label: "Business areas",
-          hint: "The companys' business areas",
-        },
-        {
-          type: "select",
-          model: "offering",
-          items: this.offerings,
-          label: "Offering",
-          hint: "Which type of jobs the company is offering",
-        },
-        {
-          type: "select",
-          model: "languages",
-          items: this.languages,
-          label: "Languages",
-          hint: "Which languages does the company want",
-        },
-      ];
-    },
-  },
-  methods: {
-    saveCompany(company) {
-      let new_company = company;
-      new_company.map_image = company.map_image.name
-      this.$store.dispatch("companies/modifyCompany", new_company);
-    },
-    deleteCompany(company) {
-      this.$store.dispatch("companies/deleteCompany", company);
-    },
-    viewCompany(company) {
-      this.$router.push("/company/" + company.name);
-    },
-    completed(company) {
-      let missing = 0;
-      let total = 0;
-      for (const key in company) {
-        if (
-          company[key] === null ||
-          company[key] === "" ||
-          company[key].length === 0 ||
-          company[key] === -1 
-        ) {
-          missing += 1;
-        }
-        total += 1;
-      }
+const base_URL = axios.defaults.baseURL + "/manage/image/"
 
-      return total - missing + "/" + total;
-    },
+const headers = [
+  { text: "Name", value: "name" },
+  { text: "Booth", value: "booth_number" },
+  { text: "Programs", value: "divisions" },
+  { text: "Completion", value: "completion", width: 120 },
+  { text: "Active", value: "active", width: 100 },
+  { text: "Last Updated", value: "last_updated", width: 170 },
+  {
+    text: "Actions",
+    value: "actions",
+    width: 130,
+    sortable: false,
   },
-};
+]
+
+const tagsStore = useTagsStore()
+const companiesStore = useCompaniesStore()
+const mapsStore = useMapsStore()
+
+// const modified_companies = computed(() => {
+//   const companies = Array.from(companiesStore.companies.values());
+//   return companies.map((c) => ({
+//     ...c,
+//     divisions: tagsStore.getDivisionsFromIds(c.tags),
+//     languages: tagsStore.getLanguagesFromIds(c.tags),
+//     looking_for: tagsStore.getLookingForFromIds(c.tags),
+//     offering: tagsStore.getOfferingsFromIds(c.tags),
+//     business_area: tagsStore.getBusinessAreasFromIds(c.tags),
+//     last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
+//     tags: tagsStore.getTagsFromIds(c.tags),
+//     map_image: mapsStore.getMapFromId(c.map_image)
+//   }) )
+// });
+
+const saveCompany = (company: Company) => {
+  companiesStore.updateCompany(company)
+}
+const deleteCompany = (company: Company) => {
+  companiesStore.removeCompany(company);
+}
+const viewCompany = (company: Company) => {
+  useRouter().push("/company/" + company.name);
+}
+
+const hasNonValidValue = (value: any): boolean => {
+  return value === null
+    || value === ""
+    || value.length === 0
+    || value === -1
+}
+
+
+const completed = (company: Company) => {
+  let missing = 0;
+  let total = 0;
+  for (const key in Object.keys(company)) {
+    if (hasNonValidValue(company[key])) {
+      missing += 1;
+    }
+    total += 1;
+  }
+
+  return total - missing + "/" + total;
+},
+const row_meta = computed(() => [
+  {
+    type: "checkbox",
+    model: "active",
+    on_icon: "mdi-eye",
+    off_icon: "mdi-eye-off",
+    label: "Active (required for row to be visible)",
+  },
+  {
+    type: "checkbox",
+    model: "charmtalk",
+    label: "On CHARMtalks",
+  },
+  {
+    type: "text",
+    model: "name",
+    label: "Company name",
+    displayname: true,
+  },
+  {
+    type: "number",
+    model: "booth_number",
+    label: "Booth number"
+  },
+  { type: "image", model: "logo", label: "Company Logo" },
+  {
+    type: "textarea",
+    model: "description",
+    label: "Company description",
+  },
+  {
+    type: "textarea",
+    model: "unique_selling_point",
+    label: "What is the unique selling points",
+  },
+  {
+    type: "textarea",
+    model: "summer_job_description",
+    label: "Description of summer job",
+  },
+  {
+    type: "text",
+    model: "summer_job_link",
+    label: "Link to summer job application",
+  },
+  {
+    type: "textarea",
+    model: "talk_to_us_about",
+    label: "Talk to us about",
+  },
+  { type: "text", model: "contacts", label: "Contacts" },
+  { type: "text", model: "contact_email", label: "Contacts email" },
+  { type: "text", model: "website", label: "Website" },
+  {
+    type: "number",
+    model: "employees_world",
+    label: "Number of Employees in the whole world",
+  },
+  {
+    type: "number",
+    model: "employees_sweden",
+    label: "Number of Employees in Sweden",
+  },
+  {
+    type: "single_select",
+    model: "map_image",
+    items: Array.from(mapsStore.maps.values()).concat([{ name: "No Map", id: -1, image: "", ref: -1 }]),
+    label: "Map",
+    hint: "Map for company location",
+  },
+  {
+    type: "select",
+    model: "divisions",
+    items: tagsStore.divisions,
+    label: "Divisions",
+    hint: "Programs the company are interested in",
+  },
+  {
+    type: "select",
+    model: "looking_for",
+    items: tagsStore.looking_for,
+    label: "Looking For",
+    hint: "Which level of education the company is looking for",
+  },
+  {
+    type: "select",
+    model: "business_area",
+    items: tagsStore.business_areas,
+    label: "Business areas",
+    hint: "The companys' business areas",
+  },
+  {
+    type: "select",
+    model: "offering",
+    items: tagsStore.offering,
+    label: "Offering",
+    hint: "Which type of jobs the company is offering",
+  },
+  {
+    type: "select",
+    model: "languages",
+    items: tagsStore.languages,
+    label: "Languages",
+    hint: "Which languages does the company want",
+  },
+]);
 </script>

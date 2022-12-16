@@ -10,7 +10,7 @@ interface Company_Map {
 }
 
 interface State {
-  maps: Company_Map[],
+  maps: Map<number, Company_Map>,
   load_wait: number,
 
 }
@@ -18,32 +18,30 @@ interface State {
 
 export const useMapsStore = defineStore('maps', {
   state: (): State => ({
-    maps: [],
+    maps: new Map(),
     load_wait: 0,
   }),
   actions: {
-    setMaps(maps: Company_Map[]) {
-      this.maps = maps;
+    setAllMaps(company_maps: Company_Map[]) {
+      this.maps = new Map(company_maps.map(m => [m.id, m]))
     },
-    removeMap(id: number) {
-      this.maps = this.maps.filter((p) => p.id != id);
+    removeMapById(id: number) {
+      this.maps.delete(id);
     },
-
     removeAllMaps() {
-      this.maps = [];
+      this.maps = new Map();
     },
     getMaps() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
-          console.log(this.axios)
           this.axios
             .get("/map")
             .then((resp: any) => {
               this.removeAllMaps();
               const maps = resp.data;
               if (maps.length > 0) {
-                this.setMaps(maps)
+                this.setAllMaps(maps)
               }
               resolve(resp);
             })
@@ -55,16 +53,12 @@ export const useMapsStore = defineStore('maps', {
         }
       });
     },
-    modifyMap(map: Company_Map) {
+    updateMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
           .put("/map", map)
           .then((resp: any) => {
-            if (!this.maps.some((p) => (p.id = map.id))) {
-              this.maps.push(map);
-            } else {
-              this.maps[this.maps.findIndex((p) => p.id == map.id)];
-            }
+            this.maps.set(map.id, map)
             resolve(resp);
           })
           .catch((err: any) => {
@@ -72,12 +66,12 @@ export const useMapsStore = defineStore('maps', {
           });
       });
     },
-    deleteMap(map: Company_Map) {
+    removeMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
           .delete("/map/" + map.id)
           .then((resp: any) => {
-            this.removeMap(map.id)
+            this.removeMapById(map.id)
             resolve(resp);
           })
           .catch((err: any) => {
@@ -87,8 +81,8 @@ export const useMapsStore = defineStore('maps', {
     },
   },
   getters: {
-    get: (state) => {
-      return state.maps;
+    getMapFromId: (state) => (id: number) => {
+      return state.maps.get(id);
     },
   },
 });

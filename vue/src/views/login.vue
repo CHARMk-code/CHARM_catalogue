@@ -2,12 +2,7 @@
   <Login class="mt-4" />
 </template>
 
-<script>
+<script lang="ts" setup>
 import Login from "@/components/Login.vue";
-export default {
-  name: "Login_view",
-  components: {
-    Login,
-  },
-};
+
 </script>

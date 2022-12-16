@@ -6,13 +6,13 @@
         noSearch="true"
         name="Results"
         :headers="headers"
-        :data="modifiedFilteredCompanies"
+        :data="filterStore.filteredCompanies"
         :editable="false"
         @click_row="onRowClick"
       >
         <template v-slot:item.tags="{ item }">
-          <template v-for="tag in item.tags">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+          <template v-for="tag in item.tags" :key="tag.id">
+            <v-chip class="mr-1 mb-1" x-small>{{
               tag.name
             }}</v-chip>
           </template>
@@ -36,29 +36,29 @@
           </template>
         </template>
         <template v-slot:item.looking_for="{ item }">
-          <template v-for="tag in item.looking_for">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+          <template v-for="tag in item.looking_for" :key="tag.id">
+            <v-chip class="mr-1 mb-1" x-small>{{
               tag.name
             }}</v-chip>
           </template>
         </template>
         <template v-slot:item.offering="{ item }">
-          <template v-for="tag in item.offerings">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+          <template v-for="tag in item.offerings" :key="tag.id">
+            <v-chip class="mr-1 mb-1" x-small>{{
               tag.name
             }}</v-chip>
           </template>
         </template>
         <template v-slot:item.business_area="{ item }">
-          <template v-for="tag in item.business_area">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
+          <template v-for="tag in item.business_area" :key="tag.id">
+            <v-chip class="mr-1 mb-1" x-small>{{
               tag.name
             }}</v-chip>
           </template>
         </template>
         <template v-slot:item.id="{ item }">
           <v-checkbox
-            :input-value="$store.getters['favorites/favorites'].has(item.id)"
+            :input-value="favoritesStore.favorites.has(item.id)"
             disabled
             on-icon="mdi-star"
             off-icon="mdi-star-outline"
@@ -70,79 +70,40 @@
   </sideLayout>
 </template>
 
-<script>
+<script lang="ts" setup>
 import sideLayout from "@/views/sideLayout.vue";
-import Vue from "vue";
-import { mapGetters } from "vuex";
 import searchCard from "@/components/search/search_card.vue";
 import Table from "@/components/table.vue";
-export default {
-  name: "Search",
-  components: {
-    sideLayout,
-    searchCard,
-    Table,
-  },
-  computed: {
-    headers() {
-      const headers = [];
-      this.isVisible("name")
-        ? headers.push({ text: "Name", value: "name" })
-        : null;
-      this.isVisible("tag_divisions")
-        ? headers.push({ text: "Programs", value: "divisions" })
-        : null;
-      this.isVisible("tag_business_areas")
-        ? headers.push({ text: "Business areas", value: "business_area" })
-        : null;
-      this.isVisible("tag_looking_for")
-        ? headers.push({ text: "Looking for", value: "looking_for" })
-        : null;
-      this.isVisible("tag_offering")
-        ? headers.push({ text: "Offering", value: "offering" })
-        : null;
-      this.isVisible("name")
-        ? headers.push({ text: "Liked", value: "id", width: "80" })
-        : null;
-      return headers;
-    },
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
+import axios from "@/plugins/axios";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { useFilterStore } from "@/stores/modules/filter";
+import { useRouter } from "vue-router";
+import { useFavoritesStore } from "@/stores/modules/favorites";
+import type { Company } from "@/stores/modules/companies";
 
-    ...mapGetters({
-      visibleCards: "site_settings/getCompanyCards",
-      filteredCompanies: "filter/filteredCompanies",
-    }),
-    modifiedFilteredCompanies() {
-      const companies = Array.from(this.filteredCompanies);
-      const modified = companies.map((c) => ({
-        ...c,
-        divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
-        looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
-        offerings: this.$store.getters["tags/getOffersFromIds"](c.tags),
-        business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
-          c.tags
-        ),
-        tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
-      }));
-      return modified;
-    },
-  },
-  methods: {
-    isVisible(name) {
-      return this.visibleCards.some((c) =>
-        c.name === name ? c.active : false
-      );
-    },
-    tagsFromIDs(tags) {
-      return tags.map((id) => {
-        return this.$store.getters["tags/getTagFromId"](id);
-      });
-    },
-    onRowClick(row) {
-      this.$router.push("/company/" + row.name);
-    },
-  },
-};
+const site_settingsStore = useSite_settingsStore();
+const filterStore = useFilterStore();
+const favoritesStore = useFavoritesStore();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+
+const visibleCards = site_settingsStore.settings.company_view.cards.filter((card) => card.active)
+
+const isVisible = (name: string) => visibleCards.some((c) => c.name === name)
+
+const headers = [
+    isVisible("name") ? { text: "Name", value: "name" } : null,
+    isVisible("tag_divisions") ? { text: "Programs", value: "divisions" } : null,
+    isVisible("tag_business_areas") ? { text: "Business areas", value: "business_area" } : null,
+    isVisible("tag_looking_for") ? { text: "Looking for", value: "looking_for" } : null,
+    isVisible("tag_offering") ? { text: "Offering", value: "offering" } : null,
+    isVisible("name") ? { text: "Liked", value: "id", width: "80" } : null,
+  ].filter(a => a !== null)
+
+const router = useRouter();
+
+function onRowClick(company: Company) {
+  router.push("/company/" + company.name);
+}
 </script>

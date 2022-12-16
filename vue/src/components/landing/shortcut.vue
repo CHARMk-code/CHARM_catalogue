@@ -13,8 +13,12 @@
   </v-card>
 </template>
 
-<script>
-export default {
-  props: ["icon", "link", "name", "desc"],
-};
+<script lang="ts" setup>
+const props = defineProps<{
+  icon: string
+  link: string
+  name: string
+  desc: string
+}>()
+
 </script>

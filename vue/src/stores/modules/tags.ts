@@ -19,7 +19,9 @@ interface State {
   tags: Tag[],
   load_wait: number,
 }
-
+/*
+tagsStore.modifyTag({"name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
+*/
 export const useTagsStore = defineStore('tags', {
   state: (): State => ({
     tags: [],
@@ -37,14 +39,14 @@ export const useTagsStore = defineStore('tags', {
               const tags: Tag[] = resp.data;
               if (tags.length > 0) {
                 this.tags = tags.filter(
-                    (t) =>
-                      !(
-                        t.business_area ||
-                        t.division ||
-                        t.looking_for ||
-                        t.offering ||
-                        t.language
-                      )
+                  (t) =>
+                    !(
+                      t.business_area ||
+                      t.division ||
+                      t.looking_for ||
+                      t.offering ||
+                      t.language
+                    )
                 );
               }
               resolve(resp);
@@ -96,35 +98,32 @@ export const useTagsStore = defineStore('tags', {
     },
     getTagsFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => ids.indexOf(t.id) != -1);
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     getDivisionsFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => t.division)
-      .filter((t) => ids.indexOf(t.id) != -1);
+        .filter((t) => t.division)
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     getBusinessAreasFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => t.business_area)
-      .filter((t) => ids.indexOf(t.id) != -1);
+        .filter((t) => t.business_area)
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     getLookingForFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => t.looking_for)
-      .filter((t) => ids.indexOf(t.id) != -1);
+        .filter((t) => t.looking_for)
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     getOfferingsFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => t.offering)
-      .filter((t) => ids.indexOf(t.id) != -1);
+        .filter((t) => t.offering)
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     getLanguagesFromIds: (state) => (ids: number[]) => {
       return state.tags
-      .filter((t) => t.language)
-      .filter((t) => ids.indexOf(t.id) != -1);
-    },
-    tags: (state) => {
-      return state.tags;
+        .filter((t) => t.language)
+        .filter((t) => ids.indexOf(t.id) != -1);
     },
     divisions: (state) => {
       return state.tags.filter((t) => t.division);

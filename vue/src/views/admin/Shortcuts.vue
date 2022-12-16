@@ -4,13 +4,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import shortcuts_table from "@/components/admin/shortcuts_table.vue";
 
-export default {
-  name: "Shortcuts",
-  components: {
-    shortcuts_table,
-  },
-};
 </script>

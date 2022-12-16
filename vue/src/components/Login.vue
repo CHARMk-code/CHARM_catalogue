@@ -16,7 +16,6 @@
       >
         <v-text-field
           v-model="password"
-          :rules="[rules.required]"
           :append-icon="show_pass ? 'mdi-eye' : 'mdi-eye-off'"
           prepend-inner-icon="mdi-lock"
           :type="show_pass ? 'text' : 'password'"
@@ -41,45 +40,43 @@
   </v-card>
 </template>
 
-<script>
-// @ is an alias to /src
+<script lang="ts" setup>
+import { useAuthStore } from '@/stores/modules/auth';
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-export default {
-  name: "Login",
-  components: {},
-  data() {
-    return {
-      show_pass: false,
-      btn_loader: false,
-      valid: true,
-      email: "",
-      password: "",
-      error: false,
-      rules: {
-        required: (value) => !!value || "Required",
-      },
-    };
-  },
-  methods: {
-    validate() {
-      console.log("Validating");
-      this.btn_loader = true;
-      this.$store
-        .dispatch("auth/login", { password: this.password })
-        .then(() => {
-          this.btn_loader = false;
+const authStore = useAuthStore();
 
-          if (this.$route.params.nextUrl != null) {
-            this.$router.push(this.$route.params.nextUrl);
-            return;
-          }
-          this.$router.push("/admin");
-        })
-        .catch(() => {
-          this.btn_loader = false;
-          this.error = true; // "Invalid sign in credentials!";
-        });
-    },
-  },
-};
+const route = useRoute();
+const router = useRouter();
+const test = () => {
+  show_pass.value = !show_pass.value
+  console.log(show_pass)
+}
+let show_pass = ref(false);
+let btn_loader = false;
+let valid = ref(true);
+let email = "";
+let password = ref("");
+let error = false;
+
+
+
+function validate() {
+  btn_loader = true;
+  authStore.login({ password: password.value })
+    .then(() => {
+      btn_loader = false;
+
+      if (route.params.nextUrl && !Array.isArray(route.params.nextUrl)) {
+        router.push(route.params.nextUrl);
+        return;
+      }
+      router.push("/admin")
+    })
+    .catch(() => {
+      btn_loader = false;
+      error = true; // "Invalid sign in credentials!";
+    });
+}
 </script>

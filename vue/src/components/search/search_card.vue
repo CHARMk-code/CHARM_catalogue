@@ -7,7 +7,7 @@
         <v-row class="px-2">
           <v-text-field
             prepend-icon="mdi-magnify"
-            v-model="query"
+            v-model="filter.query"
             @input="search"
           />
           <v-btn x-large @click="expand = !expand" class="ml-6 mt-2" icon
@@ -25,61 +25,61 @@
             <tagSelector
               v-if="isVisible('tag_divisions')"
               @change="
-                (v) => {
-                  selected_tags.divisions = v;
+                (tags: number[]) => {
+                  filter.tags.divisions = tags;
                   search();
                 }
               "
-              :tags="tag_divisions"
-              :selected_tags="selected_tags.divisions"
+              :tags="tagsStore.divisions"
+              :selected_tags="filter.tags.divisions"
               label="Programs"
             />
             <tagSelector
               v-if="isVisible('tag_business_areas')"
               @change="
-                (v) => {
-                  selected_tags.business_areas = v;
+                (tags: number[]) => {
+                  filter.tags.business_areas = tags;
                   search();
                 }
               "
-              :tags="tag_business_areas"
-              :selected_tags="selected_tags.business_areas"
+              :tags="tagsStore.business_areas"
+              :selected_tags="filter.tags.business_areas"
               label="Business area"
             />
             <tagSelector
               v-if="isVisible('tag_looking_for')"
               @change="
-                (v) => {
-                  selected_tags.looking_for = v;
+                (tags: number[]) => {
+                  filter.tags.looking_for = tags;
                   search();
                 }
               "
-              :tags="tag_looking_for"
-              :selected_tags="selected_tags.looking_for"
+              :tags="tagsStore.looking_for"
+              :selected_tags="filter.tags.looking_for"
               label="Looking for"
             />
             <tagSelector
               v-if="isVisible('tag_offering')"
               @change="
-                (v) => {
-                  selected_tags.offerings = v;
+                (tags: number[]) => {
+                  filter.tags.offerings = tags;
                   search();
                 }
               "
-              :tags="tag_offerings"
-              :selected_tags="selected_tags.offerings"
+              :tags="tagsStore.offering"
+              :selected_tags="filter.tags.offerings"
               label="Offering"
             />
             <tagSelector
               v-if="isVisible('language')"
               @change="
-                (v) => {
-                  selected_tags.languages = v;
+                (tags: number[]) => {
+                  filter.tags.languages = tags;
                   search();
                 }
               "
-              :tags="tag_languages"
-              :selected_tags="selected_tags.languages"
+              :tags="tagsStore.languages"
+              :selected_tags="filter.tags.languages"
               label="Language"
             />
             <v-row>
@@ -87,25 +87,18 @@
                 v-if="isVisible('name')"
                 class="ml-2 mr-4"
                 @change="search()"
-                v-model="favorites"
+                v-model="filter.favorites"
                 label="Only Favorites"
               />
               <v-checkbox
                 v-if="isVisible('CHARMtalks')"
                 class="ml-2 mr-4"
                 @change="search()"
-                v-model="charmtalk"
+                v-model="filter.charmtalk"
                 label="Participating in CHARMtalks"
               />
             </v-row>
-            <!--
-                <v-checkbox
-                @change="search()"
-                v-model="sweden"
-                label="In Sweden"
-              />
-              -->
-            <v-btn @click="clearFilter"> Clear filter </v-btn>
+            <v-btn @click="filterStore.resetFilter"> Clear filter </v-btn>
           </v-row>
         </v-expand-transition>
       </v-card-text>
@@ -113,208 +106,117 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import tagSelector from "@/components/search/tag_selector.vue";
+import { useCompaniesStore } from "@/stores/modules/companies";
+import { useFilterStore } from "@/stores/modules/filter";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { useTagsStore, type Tag } from "@/stores/modules/tags";
+import { useRoute, useRouter } from "vue-router";
 
-import { mapGetters } from "vuex";
-export default {
-  name: "Filters",
-  components: { tagSelector },
-  data() {
-    return {
-      expand: false,
-      query: "",
-      selected_tags: {
-        divisions: [],
-        looking_for: [],
-        business_areas: [],
-        offerings: [],
-        languages: [],
-      },
-      favorites: false,
-      charmtalk: false,
-      sweden: false,
-    };
-  },
-  computed: {
-    ...mapGetters({
-      companies: "companies/companies",
-      allTags: "tags/tags",
-      filteredCompanies: "filter/getFilteredCompanies",
-      filter: "filter/getFilter",
-      getTagsFromIds: "tags/getTagsFromIds",
-      getDivisionsFromIds: "tags/getDivisionsFromIds",
-      getBusinessAreasFromIds: "tags/getBusinessAreasFromIds",
-      getLookingForFromIds: "tags/getLookingForFromIds",
-      getOffersFromIds: "tags/getOffersFromIds",
-      getLanguagesFromIds: "tags/getLanguagesFromIds",
-      tag_divisions: "tags/divisions",
-      tag_business_areas: "tags/business_areas",
-      tag_looking_for: "tags/looking_fors",
-      tag_offerings: "tags/offers",
-      tag_languages: "tags/languages",
-      visibleCards: "site_settings/getCompanyCards",
-    }),
-    tags() {
-      return {
-        divisions: this.tag_divisions,
-        looking_for: this.tag_looking_for,
-        business_areas: this.tag_business_areas,
-        offerings: this.tag_offerings,
-        languages: this.tag_languages,
-      };
-    },
-  },
-  methods: {
-    updateSelected(key, event) {
-      this.selected_tags[key] = event;
-    },
-    search() {
-      this.$store
-        .dispatch("filter/setFilters", {
-          query: this.query,
-          tags: this.selected_tags,
-          favorites: this.favorites,
-          charmtalk: this.charmtalk,
-          sweden: this.sweden,
-        })
-        .then(() => {
-          this.$store.dispatch("filter/filterCompanies");
-          this.$store.dispatch("filter/sortCompanies", "!");
-        });
-      let query = {};
-      this.query.length > 0 && (query.q = this.query);
-      if (this.selected_tags.divisions.length > 0) {
-        query.divisions = this.selected_tags.divisions
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.looking_for.length > 0) {
-        query.looking_for = this.selected_tags.looking_for
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.business_areas.length > 0) {
-        query.business_areas = this.selected_tags.business_areas
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.offerings.length > 0) {
-        query.offerings = this.selected_tags.offerings
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      if (this.selected_tags.languages.length > 0) {
-        query.languages = this.selected_tags.languages
-          .map((t) => t.id.toString())
-          .toString();
-      }
-      this.favorites && (query.favorites = true);
-      this.charmtalk && (query.charmtalk = true);
-      this.sweden && (query.sweden = true);
+const filterStore = useFilterStore();
+const companiesStore = useCompaniesStore();
+const tagsStore = useTagsStore();
+const site_settingsStore = useSite_settingsStore();
 
-      this.$router.replace({
-        path: "/search",
-        query,
-      });
-    },
-    clearFilter() {
-      this.query = "";
-      this.selected_tags.divisions = [];
-      this.selected_tags.business_areas = [];
-      this.selected_tags.offerings = [];
-      this.selected_tags.looking_for = [];
-      this.selected_tags.languages = [];
-      this.favorites = false;
-      this.charmtalk = false;
-      this.search();
-    },
-    isVisible(name) {
-      return this.visibleCards.some((c) =>
-        c.name === name ? c.active : false
-      );
-    },
-  },
-  async created() {
-    const urlQuery = this.$route.query;
-    if (Object.keys(urlQuery).length == 0) return;
-    this.clearFilter();
-    const newFilter = { tags: {} };
-    console.log(urlQuery);
-    if (typeof urlQuery.q !== "undefined" && urlQuery.q.length > 0) {
-      newFilter.query = urlQuery.q;
-    }
-    if (
-      typeof urlQuery.divisions !== "undefined" &&
-      urlQuery.divisions.length > 0
-    ) {
-      newFilter.tags.divisions = this.getDivisionsFromIds(
-        urlQuery.divisions.split(",").map((t) => parseInt(t))
-      );
-    }
-    if (
-      typeof urlQuery.looking_for !== "undefined" &&
-      urlQuery.looking_for.length > 0
-    ) {
-      newFilter.tags.looking_for = this.getLookingForFromIds(
-        urlQuery.looking_for.split(",").map((t) => parseInt(t))
-      );
-    }
-    if (
-      typeof urlQuery.business_areas !== "undefined" &&
-      urlQuery.business_areas.length > 0
-    ) {
-      newFilter.tags.business_areas = this.getBusinessAreasFromIds(
-        urlQuery.business_areas.split(",").map((t) => parseInt(t))
-      );
-    }
-    if (
-      typeof urlQuery.offerings !== "undefined" &&
-      urlQuery.offerings.length > 0
-    ) {
-      newFilter.tags.offerings = this.getOffersFromIds(
-        urlQuery.offerings.split(",").map((t) => parseInt(t))
-      );
-    }
-    if (
-      typeof urlQuery.languages !== "undefined" &&
-      urlQuery.languages.length > 0
-    ) {
-      newFilter.tags.languages = this.getLanguagesFromIds(
-        urlQuery.languages.split(",").map((t) => parseInt(t))
-      );
-    }
-    if (
-      typeof urlQuery.favorites !== "undefined" &&
-      urlQuery.favorites.length > 0
-    ) {
-      newFilter.favorites = true;
-    }
-    if (
-      typeof urlQuery.charmtalk !== "undefined" &&
-      urlQuery.charmtalk.length > 0
-    ) {
-      newFilter.charmtalk = true;
-    }
-    if (typeof urlQuery.sweden !== "undefined" && urlQuery.sweden.length > 0) {
-      newFilter.sweden = true;
-    }
-    this.$store.dispatch("filter/setFilters", newFilter);
-    this.$store.dispatch("filter/filterCompanies", newFilter);
-    this.$store.dispatch("filter/sortCompanies", "!");
+const router = useRouter();
+const route = useRoute();
 
-    const stored_filter = this.$store.getters["filter/getFilter"];
-    this.query = stored_filter.query;
-    this.selected_tags = stored_filter.tags;
-    this.favorites = stored_filter.favorites;
-    this.charmtalk = stored_filter.charmtalk;
-    this.sweden = stored_filter.sweden;
+const filter = filterStore.filters;
 
-    this.expand =
-      Object.values(this.selected_tags).some((v) => v.length > 0) ||
-      this.favorites ||
-      this.charmtalk ||
-      this.sweden;
-  },
-};
+const expand = false;
+
+interface Route_query {
+  q?: string
+  tags?: string
+  favorites?: string
+  charmtalk?: string
+  sweden?: string
+  [key: string]: string | undefined
+}
+
+function search() {
+  filterStore.filterCompanies()
+    .then(() => filterStore.sortCompanies())
+
+  let query: Route_query = {}
+
+  filter.query.length > 0 && (query.q = filter.query);
+
+  if (filter.tags.divisions.length > 0
+    || filter.tags.business_areas.length > 0
+    || filter.tags.looking_for.length > 0
+    || filter.tags.languages.length > 0
+    || filter.tags.offerings.length > 0
+  ) {
+    query.tags = [
+      filter.tags.business_areas,
+      filter.tags.looking_for,
+      filter.tags.languages,
+      filter.tags.divisions,
+      filter.tags.offerings
+    ]
+    .reduce((res, tags) => res.concat(tags), [])
+    .toString()
+  }
+
+  filter.favorites && (query.favorites = "true");
+  filter.charmtalk && (query.charmtalk = "true");
+  filter.sweden && (query.sweden = "true");
+
+  router.replace({
+    path: "/search",
+    query,
+  });
+}
+
+function beforeCreate() {
+  const urlQuery: Route_query = route.query;
+
+  if (Object.keys(urlQuery).length == 0) return;
+
+  filterStore.resetFilter();
+
+  if (typeof urlQuery.q) {
+    filter.query = urlQuery.q || "";
+  }
+
+  if (urlQuery.tags) {
+    let allTags = urlQuery.tags.split(',').map(parseInt)
+
+    filter.tags.divisions = tagsStore
+      .getDivisionsFromIds(allTags).map(t => t.id);
+
+    filter.tags.looking_for = tagsStore
+      .getLookingForFromIds(allTags).map(t => t.id);
+
+    filter.tags.business_areas = tagsStore
+      .getBusinessAreasFromIds(allTags).map(t => t.id);
+
+    filter.tags.languages = tagsStore
+      .getLanguagesFromIds(allTags).map(t => t.id);
+
+    filter.tags.offerings = tagsStore
+      .getOfferingsFromIds(allTags).map(t => t.id);
+  }
+
+  if (urlQuery.favorites) {
+    filter.favorites = true;
+  }
+
+  if (urlQuery.charmtalk) {
+    filter.charmtalk = true;
+  }
+
+  if (urlQuery.sweden) {
+    filter.sweden = true;
+  }
+
+  filterStore.filterCompanies()
+    .then(() => filterStore.sortCompanies() )
+}
+
+const visibleCards = site_settingsStore.settings.company_view.cards.filter((card) => card.active)
+
+const isVisible = (name: string) => visibleCards.some((c) => c.name === name)
 </script>

@@ -5,7 +5,7 @@
     return-object
     item-text="name"
     item-value="id"
-    v-model="selected_tags_computed"
+    v-model="selected_tags"
     @change="onChange"
     :label="label"
     :items="tags"
@@ -43,33 +43,33 @@
   </v-autocomplete>
 </template>
 
-<script>
-import Vue from "vue";
-export default {
-  name: "Tag_selector",
-  props: {
-    value: Array,
-    tags: { type: Array },
-    selected_tags: { type: Array },
-    label: { type: String },
+<script lang="ts" setup>
+import axios from '@/plugins/axios';
+import { useTagsStore, type Tag } from '@/stores/modules/tags';
+import { computed, type Ref } from 'vue';
+
+const tagsStore = useTagsStore();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+const props = defineProps<{
+  tags: number[]
+  selected_tags: number[]
+  label: string
+}>();
+
+const emit = defineEmits(['change'])
+
+function onChange(v: number[]) {
+  emit("change", v)
+}
+
+const selected_tags: Ref<Tag[]> = computed({
+  get() {
+    return tagsStore.getTagsFromIds(props.selected_tags);
   },
-  methods: {
-    onChange(v) {
-      this.$emit("change", v);
-    }
-  },
-  computed: {
-    selected_tags_computed: {
-      get() {
-        return this.selected_tags;
-      },
-      set() {
-        return;
-      },
-    },
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-  },
-};
+  set(newTags) {
+    return newTags.map(tag => tag.id);
+  }
+});
 </script>

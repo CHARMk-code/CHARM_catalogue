@@ -5,15 +5,7 @@
   </v-container>
 </template>
 
-<script>
-import layouts_table from "@/components/admin/layout_table.vue";
+<script lang="ts" setup>
 import company_cards from "@/components/admin/company_cards.vue";
-
-export default {
-  name: "Layout",
-  components: {
-    layouts_table,
-    company_cards,
-  },
-};
+import layouts_table from "@/components/admin/layout_table.vue";
 </script>

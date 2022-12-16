@@ -13,81 +13,65 @@
         class="prepage"
         contain
         max-width="100%"
-        :src="base_URL + '/manage/image/' + prepages[page].image"
+        max-height="90vh"
+        :src="base_URL + prepagesStore.active_prepages[page].image"
       />
     </v-sheet>
   </sideLayout>
 </template>
 
-<script>
-import { mapGetters } from "vuex";
-import Vue from "vue";
+<script lang="ts" setup>
+import axios from "@/plugins/axios";
+import { useCompaniesStore } from "@/stores/modules/companies";
+import { useFilterStore } from "@/stores/modules/filter";
+import { usePrePagesStore } from "@/stores/modules/prepages";
 import sideLayout from "@/views/sideLayout.vue";
-export default {
-  name: "Prepage",
-  components: {
-    sideLayout,
-  },
-  created() {
-    window.addEventListener("keydown", this.arrowKeyHandler);
-  },
-  beforeDestroy() {
-    window.removeEventListener("keydown", this.arrowKeyHandler);
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL;
-    },
-    page() {
-      return this.$route.params.page;
-    },
-    ...mapGetters({
-      prepages: "prepages/getActive",
-      filteredCompanies: "filter/filteredCompanies",
-    }),
-  },
-  methods: {
-    arrowKeyHandler(e) {
-      if (e.key == "ArrowRight") {
-        this.next();
-      } else if (e.key == "ArrowLeft") {
-        this.prev();
-      }
-    },
-    next() {
-      if (parseInt(this.page) + 1 >= this.prepages.length) {
-        this.$store.dispatch("companies/getCompanies");
-        this.$store.dispatch("filter/filterCompanies");
-        this.$router.push("/company/" + this.filteredCompanies[0].name);
-      } else {
-        this.$router.push("/prepages/" + (parseInt(this.page) + 1));
-      }
-    },
-    prev() {
-      const next_index = parseInt(this.page) - 1;
-      if (next_index >= 0) {
-        this.$router.push("/prepages/" + next_index);
-      }
-    },
-  },
-  beforeMount() {
-    this.$store.dispatch("prepages/getPrepages");
-  },
-};
+import { onMounted, onUnmounted, computed, onBeforeMount } from "vue"
+import { useRoute, useRouter } from "vue-router";
+
+const companiesStore = useCompaniesStore();
+const filtersStore = useFilterStore();
+const prepagesStore = usePrePagesStore();
+const router = useRouter();
+const route = useRoute();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/"
+
+onBeforeMount(() => {
+  prepagesStore.getPrepages();
+})
+
+onMounted(() => {
+  window.addEventListener("keydown", arrowKeyHandler);
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", arrowKeyHandler);
+})
+
+const arrowKeyHandler = (e: { key: string; }) => {
+  if (e.key == "ArrowRight") {
+    next();
+  } else if (e.key == "ArrowLeft") {
+    prev();
+  }
+}
+
+const page = computed(() => { return parseInt(route.params.page[0])})
+
+const next = () => {
+  if (page.value + 1 >= prepagesStore.active_prepages.length) {
+    companiesStore.getCompanies();
+    filtersStore.filterCompanies();
+    router.push("/company/" + filtersStore.filteredCompanies[0].name);
+  } else {
+    router.push("/prepages/" + (page.value + 1));
+  }
+}
+const prev = () => {
+  const next_index = page.value - 1;
+  if (next_index >= 0) {
+    router.push("/prepages/" + next_index);
+  }
+}
 </script>
-
-<style lang="sass" scoped>
-@media (min-width: 960px)
-  .prepage
-    max-height: calc(100vh - 64px)
-  .prepage-sheet
-      margin-top: -64px
-
-
-@media (max-width: 960px)
-  .prepage
-    max-height: calc(100vh - 56px)
-
-  .prepage-sheet
-      margin-top: -56px
-</style>

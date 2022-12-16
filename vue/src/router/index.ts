@@ -10,6 +10,7 @@ import { useShortcutsStore } from "@/stores/modules/shortcuts";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useFavoritesStore } from "@/stores/modules/favorites";
+import { mapStores } from "pinia";
 
 const Company_view = () => import("@/views/company.vue");
 const Search_view = () => import("@/views/search.vue");
@@ -141,13 +142,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (from.name == null) {
     // Arriving from offsite, need to load data
-    // TODO Might still be needed
-    // router.app.axios.defaults.headers.common["Authorization"] =
-    //   "Basic " + store.getters["auth/token"];
+    useAuthStore().setAuthorizationHeader()
     useFavoritesStore().loadFromStorage();
 
+    const mapsStore = useMapsStore();
+
     await Promise.all([
-      useMapsStore().getMaps(),
+      mapsStore.getMaps(),
       useTagsStore().getTags(), // This one fails if db is empty, check why
       useCompaniesStore().getCompanies(),
       usePrePagesStore().getPrepages(),

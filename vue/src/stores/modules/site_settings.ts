@@ -2,10 +2,10 @@ import { defineStore } from "pinia";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-interface Card {
+export interface Card {
   id: number,
   name: string,
-  test: string,
+  text: string,
   active: boolean,
 }
 

@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { type AxiosInstance } from "axios";
+import type { PiniaCustomProperties, PiniaPluginContext } from "pinia";
 
 let config = {
   baseURL: `${import.meta.env.baseURL || import.meta.env.apiUrl || ""}/api`,
@@ -12,6 +13,16 @@ if (location.hostname == "localhost") {
   config.baseURL = "http://localhost:5008/api";
 }
 
-const _axios = axios.create(config);
+const axios_instance: AxiosInstance = axios.create(config);
 
-export default _axios
+declare module 'pinia' {
+  export interface PiniaCustomProperties {
+    axios: AxiosInstance
+  }
+}
+
+export function piniaAxiosPlugin(context: PiniaPluginContext) {
+    return { axios: axios_instance }
+}
+
+export default axios_instance

@@ -10,24 +10,26 @@
         <v-text-field
           v-model="password1"
           :rules="[rules.required]"
-          :append-icon="show_pass ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-icon="show_pass1 ? 'mdi-eye' : 'mdi-eye-off'"
           prepend-inner-icon="mdi-lock"
-          :type="show_pass ? 'text' : 'password'"
-          @click:append="show_pass = !show_pass"
+          :type="show_pass1 ? 'text' : 'password'"
+          @click:append="show_pass1 = !show_pass1"
           label="Enter Password"
           required
         ></v-text-field>
         <v-text-field
           v-model="password2"
           :rules="[rules.required]"
-          :append-icon="show_pass ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-icon="show_pass2 ? 'mdi-eye' : 'mdi-eye-off'"
           prepend-inner-icon="mdi-lock"
-          :type="show_pass ? 'text' : 'password'"
-          @click:append="show_pass = !show_pass"
-          label="Reenter password "
+          :type="show_pass2 ? 'text' : 'password'"
+          @click:append="show_pass2 = !show_pass2"
+          label="Enter password again"
           required
         ></v-text-field>
-        <template v-if="password1 != password2"> Passwords doesn't match </template>
+        <template v-if="password1 != password2">
+          Passwords doesn't match
+        </template>
         <v-btn
           block
           large
@@ -44,40 +46,34 @@
   </v-card>
 </template>
 
-<script>
-// @ is an alias to /src
-import Vue from "vue";
-export default {
-  name: "Account",
-  components: {},
-  data() {
-    return {
-      show_pass: false,
-      btn_loader: false,
-      valid: true,
-      password1: "",
-      password2: "",
-      error: false,
-      rules: {
-        required: (value) => !!value || "Required",
-      },
-    };
-  },
-  methods: {
-    update() {
-      if (this.password1 == this.password2) {
-        this.btn_loader = true;
-        Vue.prototype.$axios
-          .put("auth", { password: this.password1 })
-          .then(() => {
-            this.btn_loader = false;
-          })
-          .catch(() => {
-            this.btn_loader = false;
-            this.error = true; // "Invalid sign in credentials!";
-          });
+<script lang="ts" setup>
+import { useAuthStore } from "@/stores/modules/auth";
+import { ref } from "vue";
+
+let btn_loader = false
+let valid = ref(true)
+let show_pass1 = ref(false)
+let show_pass2 = ref(false)
+let password1 = ref("")
+let password2 = ref("")
+let error = false
+
+const rules = {
+        required: (value: any) => !!value || "Required"
       }
-    },
-  },
-};
+
+function update() {
+  if (password1.value == password2.value) {
+    btn_loader = true;
+
+    useAuthStore().changePass(password1.value)
+      .then(() => {
+        btn_loader = false;
+      })
+      .catch(() => {
+        btn_loader = false;
+        error = true; // "Invalid sign in credentials!";
+      });
+  }
+}
 </script>
