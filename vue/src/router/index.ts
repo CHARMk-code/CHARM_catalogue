@@ -41,14 +41,6 @@ const router = createRouter({
       },
     },
     {
-      path: "/cookies",
-      name: "Cookies",
-      component: CookieInfo_view,
-      meta: {
-        noAuth: true,
-      },
-    },
-    {
       path: "/Admin",
       name: "Admin",
       component: Admin_view,
