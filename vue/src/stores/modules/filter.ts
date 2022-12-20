@@ -20,8 +20,8 @@ interface Filters {
 }
 
 interface State {
-    filters: Filters,
-    filteredCompanies: Company[],
+  filters: Filters,
+  filteredCompanies: Company[],
 }
 
 export const useFilterStore = defineStore('filter', {
@@ -95,7 +95,7 @@ export const useFilterStore = defineStore('filter', {
             favoritesStore.favorites.has(c.id)
           );
         }
-
+        this.filteredCompanies = filteredCompanies
         // Filter on in sweden (no sweden attribute left)
         // if (state.filters.sweden) {
         //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);

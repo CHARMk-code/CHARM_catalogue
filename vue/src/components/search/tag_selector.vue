@@ -2,74 +2,69 @@
   <v-autocomplete
     multiple
     chips
-    return-object
-    item-text="name"
+    item-title="name"
     item-value="id"
-    v-model="selected_tags"
-    @change="onChange"
+    v-model="selected"
     :label="label"
     :items="tags"
+    :maxWidth="400"
+    :menuProps="{ maxHeight: 300 }"
+    clearable
+    persistent-clear
+    variant="outlined"
   >
-    <template v-slot:item="{ item /*, attrs */}">
-      <!--<v-simple-checkbox :value="attrs.inputValue" />-->
-      <template v-if="item.icon != ''">
-        <v-img
-          class="ml-2 mr-4"
-          contain
-          max-height="36px"
-          max-width="36px"
-          :src="base_URL + item.icon"
-        />
-      </template>
-      {{ item.name }}
+    <template v-slot:item="{ item, props }">
+      <v-list-item v-bind="props">
+        <template v-if="item.raw.icon" #prepend>
+          <TagComp :tag="item.raw"></TagComp>
+        </template>
+      </v-list-item>
     </template>
 
-    <template v-slot:selection="{ item }">
-      <template v-if="item.icon != ''">
-        <v-avatar>
-          <v-img
-            max-height="36px"
-            max-width="36px"
-            :src="base_URL + item.icon"
-          />
-        </v-avatar>
-      </template>
-      <template v-else>
-        <v-chip small>
-          {{ item.name }}
-        </v-chip>
-      </template>
+    <template v-slot:chip="{ index, item }">
+      <TagComp v-if="index < props.maxShown" :tag="item.raw"></TagComp>
+      <span
+        v-if="index === props.maxShown"
+        class="text-grey text-caption align-self-center"
+        >(+ {{ selected_tagIds.length - maxShown }} others)</span
+      >
     </template>
   </v-autocomplete>
 </template>
 
 <script lang="ts" setup>
-import axios from '@/plugins/axios';
-import { useTagsStore, type Tag } from '@/stores/modules/tags';
-import { computed, type Ref } from 'vue';
+import axios from "@/plugins/axios";
+import { useTagsStore, type Tag } from "@/stores/modules/tags";
+import { computed, isReadonly, readonly, ref, type Ref } from "vue";
+import TagComp from "@/components/Tag.vue";
 
 const tagsStore = useTagsStore();
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const props = defineProps<{
-  tags: number[]
-  selected_tags: number[]
-  label: string
+  tags: Tag[];
+  selected_tagIds: number[];
+  label: string;
+  maxShown: number;
 }>();
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  (e: "update:selected_tagIds", v: number[]): void;
+  (e: "change"): void;
+}>();
 
-function onChange(v: number[]) {
-  emit("change", v)
+function printnow(a) {
+  console.log(a);
 }
 
-const selected_tags: Ref<Tag[]> = computed({
+const selected = computed({
   get() {
-    return tagsStore.getTagsFromIds(props.selected_tags);
+    return props.selected_tagIds;
   },
-  set(newTags) {
-    return newTags.map(tag => tag.id);
-  }
+  set(v) {
+    emit("update:selected_tagIds", v);
+    emit("change");
+  },
 });
 </script>

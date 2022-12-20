@@ -4,13 +4,6 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import prepages_table from "@/components/admin/prepages_table.vue";
-
-export default {
-  name: "Prepages",
-  components: {
-    prepages_table,
-  },
-};
 </script>

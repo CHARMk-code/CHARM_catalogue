@@ -9,10 +9,17 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="row in rows">
+      <tr v-if="rows.length === 0">
+        <td>No results</td>
+      </tr>
+      <tr v-for="row in rows" @click="$emit('clickRow', row)">
         <template v-for="column in tableColumns">
-          <td v-if="row[column.value] != undefined">
-            <slot :name="`col(${column.value})`" :value="row[column.value]">
+          <td>
+            <slot
+              :name="`col(${column.value})`"
+              :value="row[column.value]"
+              :item="row"
+            >
               {{ row[column.value] }}
             </slot>
           </td>
@@ -50,7 +57,7 @@
               />
             </v-dialog>
           </template>
-          <slot name="actions"></slot>
+          <slot name="actions" :item="row"></slot>
         </td>
       </tr>
     </tbody>
@@ -71,7 +78,7 @@
 <script lang="ts" setup>
 // This needs to be fixed in order to pass as the types in the stores
 export interface TableRow {
-  [key: string]: string | number | boolean;
+  [key: string]: string | number | boolean | Date | Set<number>;
 }
 
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
@@ -79,7 +86,7 @@ import tablePopup from "@/components/admin/table_popup.vue";
 import { computed, ref, useSlots, type Ref } from "vue";
 import type { TableColMeta } from "@/components/admin/table_edit_dialog.vue";
 
-interface TableColumns {
+export interface TableColumns {
   name: string; //display name
   value: string; //behind the scenes name
 }

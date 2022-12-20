@@ -53,7 +53,7 @@ const first_prepage = computed(() => {
   } else {
     return undefined;
   }
-})
+});
 </script>
 
 <style scoped>

@@ -4,21 +4,23 @@
   </v-card>
 </template>
 
-<script>
-import { mapStores } from "pinia";
+<script lang="ts" setup>
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { computed } from "vue";
 
-export default {
-  name: "Company_card_wrapper",
-  props: { name: String, flat: { type: Boolean, default: false } },
-  computed: {
-    ...mapStores(useSite_settingsStore),
-    isVisible() {
-      const visibleCards = this.site_settingsStore.company_view.cards;
-      return this.visibleCards.some((c) =>
-        c.name === this.name ? c.active : false
-      );
-    },
-  },
-};
+const props = withDefaults(
+  defineProps<{
+    name: string;
+    flat?: boolean;
+  }>(),
+  { flat: false }
+);
+
+const isVisible = computed(() => {
+  const site_settingsStore = useSite_settingsStore();
+  const visibleCards = site_settingsStore.settings.company_view.cards;
+  return visibleCards.some((card) =>
+    card.name === props.name ? card.active : false
+  );
+});
 </script>

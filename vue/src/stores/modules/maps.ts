@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-interface Company_Map {
+export interface Company_Map {
   id: number,
   name: string,
   image: string,

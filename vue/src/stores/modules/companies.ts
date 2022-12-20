@@ -28,7 +28,7 @@ export interface Company {
 
 
 interface State {
-  companies: Map<number,Company>,
+  companies: Map<number, Company>,
   load_wait: number
 }
 
@@ -45,7 +45,7 @@ export const useCompaniesStore = defineStore('companies', {
       this.companies.delete(id)
     },
     removeAllCompanies() {
-      this.companies = new Map();
+      this.companies.clear();
     },
     getCompanies() {
       return new Promise<void>((resolve, reject) => {
@@ -79,7 +79,7 @@ export const useCompaniesStore = defineStore('companies', {
     },
     updateCompany(company: Company) {
       return new Promise((resolve, reject) => {
-       this.axios
+        this.axios
           .put("/company", company)
           .then((resp: any) => {
             this.companies.set(company.id, company)
@@ -106,7 +106,10 @@ export const useCompaniesStore = defineStore('companies', {
   },
   getters: {
     companyByName: (state) => (name: string) => {
-      return Array.from(state.companies.values()).filter((c) => c.name == name);
+      const matching = Array.from(state.companies.values()).filter((c) => c.name == name);
+      if (matching.length > 0) {
+        return matching[0]
+      }
     },
   },
 });

@@ -8,14 +8,11 @@
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "Company_Contacts",
-  props: ["contacts", "contact_email"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  contacts: string;
+  contact_email: string;
+}>();
 </script>

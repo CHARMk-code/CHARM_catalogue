@@ -95,7 +95,6 @@ export const useLayoutsStore = defineStore('layouts', {
         const index = Math.floor(Math.random() * layouts.length);
         return layouts[index];
       }
-      return null
     }
   },
 });

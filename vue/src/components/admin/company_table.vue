@@ -1,135 +1,102 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveCompany"
-      @delete_row="deleteCompany"
-      name="Companies"
-      :headers="headers"
-      :data="companiesStore.companies"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.active="{ item }">
-        <v-simple-checkbox
-          disabled
-          on-icon="mdi-eye"
-          off-icon="mdi-eye-off"
-          v-model="item.active"
-        ></v-simple-checkbox>
-      </template>
+  <v-card>
+    <v-card-title>Companies</v-card-title>
+    <v-card-text>
+      <Table
+        @saveRow="(c) => companiesStore.updateCompany(c)"
+        @deleteRow="(c) => companiesStore.removeCompany(c)"
+        name="Companies"
+        :tableColumns="headers"
+        :rows="Array.from(companiesStore.companies.values())"
+        :colMeta="colMeta"
+        :editable="true"
+      >
+        <template #col(active)="{ value }">
+          <template v-if="value"><v-icon>mdi-eye</v-icon></template>
+          <template v-else><v-icon>mdi-eye-off</v-icon></template>
+        </template>
 
-      <template v-slot:extra_actions="{ item }">
-        <v-icon class="mr-2" @click="viewCompany(item)"> mdi-book-open </v-icon>
-      </template>
-
-      <template v-slot:item.divisions="{ item }">
-        <template v-for="tag in item.divisions">
-          <template v-if="tag.icon != ''">
-            <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
-              <v-img
-                max-height="32px"
-                max-width="32px"
-                :src="base_URL + tag.icon"
-              />
-            </v-avatar>
+        <template #col(divisions)="{ item }">
+          <template v-if="tagsStore.getDivisionsFromIds(item.tags).length < 1">
+            None
           </template>
-          <template v-else>
-            <v-chip small :key="tag.id">
-              {{ item.name }}
-            </v-chip>
+          <template
+            v-else
+            v-for="tag in tagsStore.getDivisionsFromIds(item.tags)"
+          >
+            <Tag :tag="tag"></Tag>
           </template>
         </template>
-      </template>
-      <template v-slot:item.completion="{ item }">
-        <template> {{ completed(item) }} </template>
-      </template>
-    </Table>
-  </v-container>
+
+        <!-- <template #col(completion)="{ item }">
+        {{ completed(item) }}
+      </template> -->
+
+        <template #actions="{ item }">
+          <v-btn
+            variant="plain"
+            size="small"
+            icon="mdi-book-open"
+            @click="router.push('/company/' + item.name)"
+          ></v-btn>
+        </template>
+      </Table>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts" setup>
 import Table from "@/components/table.vue";
-import axios from "@/plugins/axios"
+import Tag from "@/components/Tag.vue";
+import axios from "@/plugins/axios";
 import { computed } from "vue";
 import dayjs from "dayjs";
 import { useTagsStore } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
 import { useMapsStore } from "@/stores/modules/maps";
 import { useRouter } from "vue-router";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-const base_URL = axios.defaults.baseURL + "/manage/image/"
+const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const headers = [
-  { text: "Name", value: "name" },
-  { text: "Booth", value: "booth_number" },
-  { text: "Programs", value: "divisions" },
-  { text: "Completion", value: "completion", width: 120 },
-  { text: "Active", value: "active", width: 100 },
-  { text: "Last Updated", value: "last_updated", width: 170 },
-  {
-    text: "Actions",
-    value: "actions",
-    width: 130,
-    sortable: false,
-  },
-]
+  { name: "Name", value: "name" },
+  { name: "Booth", value: "booth_number" },
+  { name: "Programs", value: "divisions" },
+  // { name: "Completion", value: "completion" },
+  { name: "Active", value: "active" },
+  { name: "Last Updated", value: "last_updated" },
+];
 
-const tagsStore = useTagsStore()
-const companiesStore = useCompaniesStore()
-const mapsStore = useMapsStore()
+const tagsStore = useTagsStore();
+const companiesStore = useCompaniesStore();
+const mapsStore = useMapsStore();
 
-// const modified_companies = computed(() => {
-//   const companies = Array.from(companiesStore.companies.values());
-//   return companies.map((c) => ({
-//     ...c,
-//     divisions: tagsStore.getDivisionsFromIds(c.tags),
-//     languages: tagsStore.getLanguagesFromIds(c.tags),
-//     looking_for: tagsStore.getLookingForFromIds(c.tags),
-//     offering: tagsStore.getOfferingsFromIds(c.tags),
-//     business_area: tagsStore.getBusinessAreasFromIds(c.tags),
-//     last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
-//     tags: tagsStore.getTagsFromIds(c.tags),
-//     map_image: mapsStore.getMapFromId(c.map_image)
-//   }) )
-// });
+const router = useRouter();
 
-const saveCompany = (company: Company) => {
-  companiesStore.updateCompany(company)
-}
-const deleteCompany = (company: Company) => {
-  companiesStore.removeCompany(company);
-}
-const viewCompany = (company: Company) => {
-  useRouter().push("/company/" + company.name);
-}
+// const hasNonValidValue = (value: any): boolean => {
+//   return value === null || value === "" || value.length === 0 || value === -1;
+// };
 
-const hasNonValidValue = (value: any): boolean => {
-  return value === null
-    || value === ""
-    || value.length === 0
-    || value === -1
-}
+// const completed = (company: Company) => {
+//   let missing = 0;
+//   let total = 0;
+//   for (const key in Object.keys(company)) {
+//     if (hasNonValidValue(company[key])) {
+//       missing += 1;
+//     }
+//     total += 1;
+//   }
+//   return total - missing + "/" + total;
+// };
 
-
-const completed = (company: Company) => {
-  let missing = 0;
-  let total = 0;
-  for (const key in Object.keys(company)) {
-    if (hasNonValidValue(company[key])) {
-      missing += 1;
-    }
-    total += 1;
-  }
-
-  return total - missing + "/" + total;
-},
-const row_meta = computed(() => [
+const colMeta: TableColMeta[] = [
   {
     type: "checkbox",
     model: "active",
-    on_icon: "mdi-eye",
-    off_icon: "mdi-eye-off",
-    label: "Active (required for row to be visible)",
+    onIcon: "mdi-eye",
+    offIcon: "mdi-eye-off",
+    label: "Active (required for company to be visible)",
   },
   {
     type: "checkbox",
@@ -140,14 +107,17 @@ const row_meta = computed(() => [
     type: "text",
     model: "name",
     label: "Company name",
-    displayname: true,
   },
   {
     type: "number",
     model: "booth_number",
-    label: "Booth number"
+    label: "Booth number",
   },
-  { type: "image", model: "logo", label: "Company Logo" },
+  {
+    type: "image",
+    model: "logo",
+    label: "Company Logo",
+  },
   {
     type: "textarea",
     model: "description",
@@ -187,46 +157,60 @@ const row_meta = computed(() => [
     label: "Number of Employees in Sweden",
   },
   {
-    type: "single_select",
+    type: "single-select",
     model: "map_image",
-    items: Array.from(mapsStore.maps.values()).concat([{ name: "No Map", id: -1, image: "", ref: -1 }]),
+    items: Array.from(mapsStore.maps)
+      .map(([_, m]) => {
+        return { title: m.name, value: m.id };
+      })
+      .concat([{ title: "No Goto", value: -1 }]),
     label: "Map",
     hint: "Map for company location",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "divisions",
-    items: tagsStore.divisions,
+    items: tagsStore.divisions.map((t) => {
+      return { title: t.name, value: t.id };
+    }),
     label: "Divisions",
     hint: "Programs the company are interested in",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "looking_for",
-    items: tagsStore.looking_for,
+    items: tagsStore.looking_for.map((t) => {
+      return { title: t.name, value: t.id };
+    }),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "business_area",
-    items: tagsStore.business_areas,
+    items: tagsStore.business_areas.map((t) => {
+      return { title: t.name, value: t.id };
+    }),
     label: "Business areas",
     hint: "The companys' business areas",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "offering",
-    items: tagsStore.offering,
+    items: tagsStore.offering.map((t) => {
+      return { title: t.name, value: t.id };
+    }),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "languages",
-    items: tagsStore.languages,
+    items: tagsStore.languages.map((t) => {
+      return { title: t.name, value: t.id };
+    }),
     label: "Languages",
     hint: "Which languages does the company want",
   },
-]);
+];
 </script>

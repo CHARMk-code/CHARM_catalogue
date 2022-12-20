@@ -11,14 +11,12 @@
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "summer-job",
-  props: ["desc", "link", "deadline"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  desc: string;
+  link: string;
+  deadline: string;
+}>();
 </script>

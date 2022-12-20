@@ -10,20 +10,13 @@
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
+import axios from "@/plugins/axios";
 
-import Vue from "vue";
-export default {
-  name: "Company_logo",
-  components: {
-    company_card_wrapper,
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-  },
-  props: ["src"],
-};
+const props = defineProps<{
+  src: string;
+}>();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
 </script>

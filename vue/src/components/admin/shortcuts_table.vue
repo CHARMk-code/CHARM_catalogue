@@ -23,7 +23,6 @@ import { useShortcutsStore, type Shortcut } from "@/stores/modules/shortcuts";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const shortcutsStore = useShortcutsStore();
-// shortcutsStore.modifyShortcut({"name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
 const headers = [
   { name: "Id", value: "id" },
   { name: "Title", value: "name" },

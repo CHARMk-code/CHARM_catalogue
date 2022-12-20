@@ -18,20 +18,20 @@
         <v-card-title class="text-subtitle-1 ma-0 pa-0">
           Employees:
         </v-card-title>
-        <v-card-text> {{ sweden }} in sweden and {{ world }} in the world </v-card-text>
+        <v-card-text>
+          {{ sweden }} in sweden and {{ world }} in the world
+        </v-card-text>
       </v-card>
     </v-card-text>
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "Company_Trivia",
-  props: ["talk_to_us_about", "sweden", "world", "year"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  talk_to_us_about: string;
+  sweden: number;
+  world: number;
+}>();
 </script>

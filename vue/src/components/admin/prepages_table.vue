@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <Table
-      @save_edit="savePrepage"
-      @delete_row="deletePrepage"
+      @saveRow="(p) => prepagesStore.modifyPrepage(p)"
+      @deleteRow="(p) => prepagesStore.deletePrepage(p)"
       name="Prepage"
-      :headers="headers"
-      :data="Array.from(this.prepages)"
-      :row_meta="row_meta"
+      :tableColumns="headers"
+      :rows="Array.from(prepagesStore.prepages)"
+      :colMeta="colMeta"
       :editable="true"
     >
       <template v-slot:item.name="{ item }">
@@ -15,8 +15,13 @@
       <template v-slot:item.order="{ item }">
         {{ item.order }}
       </template>
-      <template v-slot:extra_actions="{ item }">
-        <v-icon class="mr-2" @click="viewPrepage(item)"> mdi-book-open </v-icon>
+      <template #actions="{ item }">
+        <v-btn
+          variant="plain"
+          size="small"
+          icon="mdi-book-open"
+          @click="router.push('/prepages/' + 1)"
+        ></v-btn>
       </template>
       <template v-slot:item.active="{ item }">
         <v-simple-checkbox
@@ -30,61 +35,25 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+import { usePrePagesStore } from "@/stores/modules/prepages";
+import { useRouter } from "vue-router";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "prepages_table",
-  components: {
-    Table,
-  },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Order",
-          value: "order",
-        },
-        { text: "Active", value: "active" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 130,
-          align: "center",
-          sortable: false,
-        },
-      ],
-      row_meta: [
-        { type: "image", model: "image", label: "page image" },
-        { type: "checkbox", model: "active", label: "Active" },
-        { type: "text", model: "order", label: "Order" },
-        { type: "text", model: "name", label: "Name", displayname: true },
+const prepagesStore = usePrePagesStore();
 
-        //{ type: "file",model: "icon",label: "Tag Icon",},
-      ],
-    };
-  },
-  computed: {
-    ...mapGetters({ prepages: "prepages/get" }),
-  },
-  methods: {
-    savePrepage(prepage) {
-      this.$store.dispatch("prepages/modifyPrepage", prepage);
-    },
-    deletePrepage(prepage) {
-      this.$store.dispatch("prepages/deletePrepage", prepage);
-    },
-    viewPrepage(prepage) {
-      this.$router.push("/prepages/" + (prepage.order - 1));
-    },
-  },
-  beforeMount() {
-    this.$store.dispatch("prepages/getPrepages");
-  },
-};
+const router = useRouter();
+
+const headers = [
+  { name: "Name", value: "name" },
+  { name: "Order", value: "order" },
+  { name: "Active", value: "active" },
+];
+const colMeta: TableColMeta[] = [
+  { type: "image", model: "image", label: "page image" },
+  { type: "checkbox", model: "active", label: "Active" },
+  { type: "text", model: "order", label: "Order" },
+  { type: "text", model: "name", label: "Name" },
+];
 </script>

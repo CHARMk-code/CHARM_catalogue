@@ -9,14 +9,10 @@
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "Company_website",
-  props: ["website"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  website: string;
+}>();
 </script>

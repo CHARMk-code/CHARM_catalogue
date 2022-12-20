@@ -16,7 +16,6 @@ const Company_view = () => import("@/views/company.vue");
 const Search_view = () => import("@/views/search.vue");
 const Login_view = () => import("@/views/login.vue");
 const Landing_view = () => import("@/views/Landing.vue");
-const CookieInfo_view = () => import("@/views/CookieInfo.vue");
 const Map_view = () => import("@/views/Map.vue");
 const Prepage_view = () => import("@/views/Prepage.vue");
 
@@ -159,7 +158,7 @@ router.beforeEach(async (to, from, next) => {
       .then(() => {
         useFilterStore().filterCompanies()
       })
-      .catch(() => {}); // add some error here in the future?
+      .catch(() => { }); // add some error here in the future?
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
     const authStore = useAuthStore();

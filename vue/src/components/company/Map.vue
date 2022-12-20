@@ -5,43 +5,32 @@
       <v-icon color="primary" large>mdi-map-marker</v-icon> Booth #{{
         booth_number
       }}
-      <v-card flat :to="'/maps/' + map_ref_object.name">
+      <v-card
+        v-if="props.map"
+        flat
+        :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
+      >
         <v-img
           class="ma-2"
           max-height="400px"
           contain
-          :src="base_URL + map_object.image"
+          :src="base_URL + props.map.image"
         />
       </v-card>
     </v-card-text>
   </company_card_wrapper>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
+import axios from "@/plugins/axios";
+import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 
-export default {
-  name: "Company_map",
-  components: {
-    company_card_wrapper,
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    map_object() {
-      return this.$store.getters["maps/get"].filter(
-        (t) => t.name == this.map
-      )[0];
-    },
-    map_ref_object() {
-      return this.$store.getters["maps/get"].filter(
-        (t) => t.id == this.map_object.ref
-      )[0];
-    },
-  },
+const props = defineProps<{
+  booth_number: number;
+  map: Company_Map | undefined;
+}>();
+const base_URL = axios.defaults.baseURL + "/manage/image/";
 
-  props: ["map", "booth_number"],
-};
+const mapsStore = useMapsStore();
 </script>
