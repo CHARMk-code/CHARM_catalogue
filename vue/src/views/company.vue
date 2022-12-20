@@ -1,7 +1,7 @@
 <template>
   <sideLayout
-    v-on:next="next"
-    v-on:prev="prev"
+    @next="next"
+    @prev="prev"
     v-bind:button_left="true"
     v-bind:button_right="currentIndex < maxIndex - 1"
   >
