@@ -69,10 +69,9 @@
           </template>
 
           <template v-if="col.type == 'radio'">
-            <v-radio-group v-model="row[col.model]" :key="row[col.model]">
+            <v-radio-group v-model="row[col.model]">
               <v-radio
                 v-for="radios in col.items"
-                :key="radios.value"
                 :label="radios.title"
                 :value="radios.value"
               />
@@ -119,7 +118,7 @@
 <script lang="ts" setup>
 import type { TableRow } from "@/components/table.vue";
 import axios from "@/plugins/axios";
-import { ref } from "vue";
+import { getTransitionRawChildren, ref, type Ref } from "vue";
 
 export interface TableColMeta {
   type:
@@ -153,42 +152,36 @@ const emit = defineEmits<{
   (e: "closeDialog"): void;
 }>();
 
-const files = ref({});
-const test = [];
+const files: Ref<{ [key: string]: File[] }> = ref({});
 
 async function save() {
-  if (props.colMeta.filter((r) => r.type === "image").length > 0) {
-    await uploadFiles(files);
-  }
-  emit("saveRow", props.row);
-  close();
+  Promise.all(
+    props.colMeta
+      .filter((col) => col.type === "image")
+      .map((col) => {
+        console.log("col", col);
+        return Promise.all(
+          files.value[col.model].map((file: File) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            return axios
+              .post("/manage/upload", formData)
+              .then((res) => {
+                console.log(props.row);
+                props.row[col.model] = file.name;
+              })
+              .catch((err) => {});
+          })
+        );
+      })
+  ).then(() => {
+    console.log("Done", props.row);
+    emit("saveRow", props.row);
+    close();
+  });
 }
 
 function close() {
   emit("closeDialog");
-}
-
-function uploadFiles(files) {
-  const file_models = Object.keys(files);
-
-  return Promise.all(
-    Object.values(files).map((f, index) => {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append("file", f);
-        axios
-          .post("/manage/upload", formData)
-          .then((res) => {
-            this.row[file_models[index]] = f.name;
-            console.log(res.data);
-            return resolve(res);
-          })
-          .catch((err) => {
-            console.log(err);
-            return reject(err);
-          });
-      });
-    })
-  );
 }
 </script>
