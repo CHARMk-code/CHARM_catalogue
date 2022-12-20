@@ -12,8 +12,11 @@
 <script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-const props = defineProps<{
-  title: string;
-  body: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    title?: string;
+    body: string;
+  }>(),
+  { title: "" }
+);
 </script>
