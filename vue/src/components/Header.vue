@@ -40,21 +40,16 @@
         <img class="logo" src="@/assets/CHARM_logo.png" />
       </router-link>
       <v-list nav dense>
-        <v-list-item-group v-model="group">
-          <v-list-item to="/">
-            <v-list-item-icon>
-              <v-icon>mdi-home</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item>
+        <v-list-item prepend-icon="mdi-home" to="/">
+          <v-list-item-title>Home</v-list-item-title>
+        </v-list-item>
 
-          <v-list-item to="/search">
-            <v-list-item-icon>
-              <v-icon>mdi-magnify</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Search</v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
+        <v-list-item prepend-icon="mdi-magnify" to="/search">
+          <v-list-item-title>Search</v-list-item-title>
+        </v-list-item>
+        <v-list-item v-if="this.isLoggedIn" prepend-icon="mdi-cog" to="/admin">
+          <v-list-item-title>Admin</v-list-item-title>
+        </v-list-item>
       </v-list>
 
       <v-btn
@@ -74,7 +69,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "@/stores/modules/auth"
+import { useAuthStore } from "@/stores/modules/auth";
 
 export default {
   name: "Header",
@@ -88,8 +83,8 @@ export default {
   },
   computed: {
     isLoggedIn() {
-      return useAuthStore().isLoggedIn
-    }
+      return useAuthStore().isLoggedIn;
+    },
   },
   methods: {
     logout() {
