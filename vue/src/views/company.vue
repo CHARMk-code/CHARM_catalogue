@@ -126,10 +126,14 @@ const mapsStore = useMapsStore();
 const route = useRoute();
 const router = useRouter();
 
-const company = companiesStore.companyByName(route.params.name);
+const company = computed(() => {
+  return companiesStore.companyByName(route.params.name);
+});
 
 const currentIndex = computed(() => {
-  return filterStore.filteredCompanies.map((x) => x.id).indexOf(company.id);
+  return filterStore.filteredCompanies
+    .map((x) => x.id)
+    .indexOf(company.value.id);
 });
 
 const maxIndex = filterStore.filteredCompanies.length;
