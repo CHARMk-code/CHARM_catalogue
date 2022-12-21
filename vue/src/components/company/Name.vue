@@ -7,9 +7,11 @@
             <v-checkbox
               v-bind="props"
               class="large"
+              hide-details
               v-model="favorite"
-              on-icon="mdi-star"
-              off-icon="mdi-star-outline"
+              true-icon="mdi-star"
+              false-icon="mdi-star-outline"
+              :color="favorite ? 'primary' : undefined"
             />
           </template>
           <span>
@@ -42,14 +44,28 @@ const favoritesStore = useFavoritesStore();
 
 const favorite = computed({
   get() {
-    return favoritesStore.isFavorite(props.id);
+    return useFavoritesStore().isFavorite(props.id);
   },
   set() {
     if (favoritesStore.isFavorite(props.id)) {
-      favoritesStore.addFavorite(props.id);
-    } else {
       favoritesStore.removeFavorite(props.id);
+    } else {
+      favoritesStore.addFavorite(props.id);
     }
   },
 });
 </script>
+
+<style scoped>
+.large {
+  font-size: 24px;
+}
+
+.large label {
+  padding-left: 24px;
+}
+
+.large [class*="__ripple"] {
+  left: 0;
+}
+</style>
