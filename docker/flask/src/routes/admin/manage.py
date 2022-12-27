@@ -2,6 +2,7 @@ from flask import Blueprint, send_from_directory, request, send_file, session
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import os,sys, datetime, math
+
 from ...models import Company, Layout, Prepage,  Tag, Map
 from flask_api import status
 from ... import db, config
@@ -150,7 +151,7 @@ def parseXlsx():
             tags_temp = []
             for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column):
                 if companies_sheet.cell(i,j).value:
-                    tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY])
+                    tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY -1 ]) # This is -1 is due to xlsx being 1 index and the tag list is 0 index
 
             metadata = companies_sheet[i][:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
