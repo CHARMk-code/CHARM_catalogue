@@ -13,49 +13,30 @@
           @clickRow="onRowClick"
         >
           <template #col(divisions)="{ item }">
-            <template
-              v-if="
-                item.tags.length > 0 &&
-                tagsStore.getDivisionsFromIds(item.tags).length > 0
-              "
-              v-for="tag in tagsStore.getDivisionsFromIds(item.tags)"
-            >
-              <TagComp :tag="tag"></TagComp>
-            </template>
+            <div class="ma-1">
+              <TagGroup
+                :tags="tagsStore.getDivisionsFromIds(item.tags)"
+              ></TagGroup>
+            </div>
           </template>
+
           <template #col(business_area)="{ item }">
-            <template
-              v-if="
-                item.tags.length > 0 &&
-                tagsStore.getBusinessAreasFromIds(item.tags).length > 0
-              "
-              v-for="tag in tagsStore.getBusinessAreasFromIds(item.tags)"
-            >
-              <TagComp :tag="tag"></TagComp>
-            </template>
+            <TagGroup :tags="tagsStore.getBusinessAreasFromIds(item.tags)">
+            </TagGroup>
           </template>
+
           <template #col(looking_for)="{ item }">
-            <template
-              v-if="
-                item.tags.length > 0 &&
-                tagsStore.getLookingForFromIds(item.tags).length > 0
-              "
-              v-for="tag in tagsStore.getLookingForFromIds(item.tags)"
-            >
-              <TagComp :tag="tag"></TagComp>
-            </template>
+            <TagGroup
+              :tags="tagsStore.getLookingForFromIds(item.tags)"
+            ></TagGroup>
           </template>
+
           <template #col(offering)="{ item }">
-            <template
-              v-if="
-                item.tags.length > 0 &&
-                tagsStore.getOfferingsFromIds(item.tags).length > 0
-              "
-              v-for="tag in tagsStore.getOfferingsFromIds(item.tags)"
-            >
-              <TagComp :tag="tag"></TagComp>
-            </template>
+            <TagGroup
+              :tags="tagsStore.getOfferingsFromIds(item.tags)"
+            ></TagGroup>
           </template>
+
           <template #col(liked)="{ item }">
             <v-checkbox
               disabled
@@ -95,6 +76,7 @@ import { useFavoritesStore } from "@/stores/modules/favorites";
 import type { Company } from "@/stores/modules/companies";
 import { computed } from "vue";
 import { useTagsStore } from "@/stores/modules/tags";
+import TagGroup from "@/components/Tag_group.vue";
 import TagComp from "@/components/Tag.vue";
 
 const site_settingsStore = useSite_settingsStore();
@@ -130,5 +112,9 @@ const router = useRouter();
 
 function onRowClick(company: Company) {
   router.push("/company/" + company.name);
+}
+
+function log(a, b) {
+  console.log(a, b);
 }
 </script>

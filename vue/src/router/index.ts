@@ -141,7 +141,7 @@ router.beforeEach(async (to, from, next) => {
     await Promise.all([
       mapsStore.getMaps(),
       useTagsStore().getTags(), // This one fails if db is empty, check why
-      useCompaniesStore().getCompanies(),
+      useCompaniesStore().fetchCompanies(),
       usePrePagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),
       useShortcutsStore().getShortcuts(),

@@ -1,38 +1,33 @@
 <template>
-  <v-container>
-    <Table
-      @saveRow="(p) => prepagesStore.modifyPrepage(p)"
-      @deleteRow="(p) => prepagesStore.deletePrepage(p)"
-      name="Prepage"
-      :tableColumns="headers"
-      :rows="Array.from(prepagesStore.prepages)"
-      :colMeta="colMeta"
-      :editable="true"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-      </template>
-      <template v-slot:item.order="{ item }">
-        {{ item.order }}
-      </template>
-      <template #actions="{ item }">
-        <v-btn
-          variant="plain"
-          size="small"
-          icon="mdi-book-open"
-          @click="router.push('/prepages/' + 1)"
-        ></v-btn>
-      </template>
-      <template v-slot:item.active="{ item }">
-        <v-simple-checkbox
-          disabled
-          on-icon="mdi-eye"
-          off-icon="mdi-eye-off"
-          v-model="item.active"
-        ></v-simple-checkbox>
-      </template>
-    </Table>
-  </v-container>
+  <v-card>
+    <v-card-title>Prepages</v-card-title>
+    <v-card-text>
+      <Table
+        @saveRow="(p) => prepagesStore.modifyPrepage(p)"
+        @deleteRow="(p) => prepagesStore.deletePrepage(p)"
+        name="Prepage"
+        :tableColumns="headers"
+        :rows="Array.from(prepagesStore.prepages)"
+        :colMeta="colMeta"
+        :editable="true"
+      >
+        <template #col(active)="{ value }">
+          <template v-if="value"
+            ><v-icon color="primary">mdi-eye</v-icon></template
+          >
+          <template v-else><v-icon color="grey">mdi-eye-off</v-icon></template>
+        </template>
+        <template #actions="{ item }">
+          <v-btn
+            variant="plain"
+            size="small"
+            icon="mdi-book-open"
+            @click="router.push('/prepages/' + 1)"
+          ></v-btn>
+        </template>
+      </Table>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts" setup>

@@ -10,8 +10,8 @@
             <v-checkbox
               large
               v-model="row[col.model]"
-              :on-icon="col.onIcon"
-              :off-icon="col.offIcon"
+              :true-icon="col.onIcon"
+              :false-icon="col.offIcon"
               :label="col.label"
             />
           </template>

@@ -7,7 +7,7 @@
         @deleteRow="(t) => tagsStore.removeTag(t)"
         name="Tags"
         :tableColumns="headers"
-        :rows="Array.from(tagsStore.tags.values())"
+        :rows="rows"
         :colMeta="colMeta"
         :editable="true"
       >
@@ -24,15 +24,23 @@
 </template>
 
 <script lang="ts" setup>
-import Table from "@/components/table.vue";
+import Table, { type TableRow } from "@/components/table.vue";
 import TagComp from "@/components/Tag.vue";
 import axios from "@/plugins/axios";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
+import { type Ref, ref, onMounted } from "vue";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const tagsStore = useTagsStore();
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+const rows: Ref<TableRow[]> = ref([]);
+
+onMounted(() => {
+  rows.value = Array.from(tagsStore.tags.values());
+});
+
 function categories(tag: Tag) {
   const categories = [];
   if (tag.business_area) categories.push("Business Area");

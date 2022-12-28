@@ -7,24 +7,25 @@
         @deleteRow="(c) => companiesStore.removeCompany(c)"
         name="Companies"
         :tableColumns="headers"
-        :rows="Array.from(companiesStore.companies.values())"
+        :rows="rows"
         :colMeta="colMeta"
         :editable="true"
       >
         <template #col(active)="{ value }">
-          <template v-if="value"><v-icon>mdi-eye</v-icon></template>
-          <template v-else><v-icon>mdi-eye-off</v-icon></template>
+          <template v-if="value"
+            ><v-icon color="primary">mdi-eye</v-icon></template
+          >
+          <template v-else><v-icon color="grey">mdi-eye-off</v-icon></template>
         </template>
 
         <template #col(divisions)="{ item }">
           <template v-if="tagsStore.getDivisionsFromIds(item.tags).length < 1">
             None
           </template>
-          <template
-            v-else
-            v-for="tag in tagsStore.getDivisionsFromIds(item.tags)"
-          >
-            <Tag :tag="tag"></Tag>
+          <template v-else>
+            <TagGroup
+              :tags="tagsStore.getDivisionsFromIds(item.tags)"
+            ></TagGroup>
           </template>
         </template>
 
@@ -46,10 +47,10 @@
 </template>
 
 <script lang="ts" setup>
-import Table from "@/components/table.vue";
-import Tag from "@/components/Tag.vue";
+import Table, { type TableRow } from "@/components/table.vue";
+import TagGroup from "@/components/Tag_group.vue";
 import axios from "@/plugins/axios";
-import { computed } from "vue";
+import { computed, onMounted, ref, type Ref } from "vue";
 import dayjs from "dayjs";
 import { useTagsStore } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
@@ -89,6 +90,11 @@ const router = useRouter();
 //   }
 //   return total - missing + "/" + total;
 // };
+const rows: Ref<TableRow[]> = ref([]);
+
+onMounted(() => {
+  rows.value = Array.from(companiesStore.companies.values());
+});
 
 const colMeta: TableColMeta[] = [
   {

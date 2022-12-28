@@ -1,9 +1,7 @@
 <template>
   <v-navigation-drawer app clipped permanent class="elevation-4">
     <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="text-h5"> Admin </v-list-item-title>
-      </v-list-item-content>
+      <v-list-item-title class="text-h5"> Admin </v-list-item-title>
     </v-list-item>
 
     <v-divider></v-divider>

@@ -47,7 +47,7 @@ export const useCompaniesStore = defineStore('companies', {
     removeAllCompanies() {
       this.companies.clear();
     },
-    getCompanies() {
+    fetchCompanies() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;

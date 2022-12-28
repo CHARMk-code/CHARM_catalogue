@@ -18,6 +18,7 @@ export interface Tag {
 interface State {
   tags: Map<number, Tag>,
   load_wait: number,
+  getter_uses: number
 }
 /*
 tagsStore.modifyTag({"name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
@@ -26,6 +27,7 @@ export const useTagsStore = defineStore('tags', {
   state: (): State => ({
     tags: new Map(),
     load_wait: 0,
+    getter_uses: 0,
   }),
   actions: {
     setAllTags(tags: Tag[]) {
@@ -90,18 +92,20 @@ export const useTagsStore = defineStore('tags', {
         .map((id) => state.tags.get(id))
     },
     getDivisionsFromIds: (state) => (ids: number[]) => {
-      return ids.map((id) => state.tags.get(id))
+      const a = ids.map((id) => state.tags.get(id))
         .filter((t) => t?.division)
+      return a
     },
     getBusinessAreasFromIds: (state) => (ids: number[]) => {
-      return ids
-        .map((id) => state.tags.get(id))
+      const a = ids.map((id) => state.tags.get(id))
         .filter((t) => t?.business_area)
+      return a
     },
     getLookingForFromIds: (state) => (ids: number[]) => {
-      return ids
+      const a = ids
         .map((id) => state.tags.get(id))
         .filter((t) => t?.looking_for)
+      return a
     },
     getOfferingsFromIds: (state) => (ids: number[]) => {
       return ids
