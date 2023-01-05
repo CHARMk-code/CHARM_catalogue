@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
+import type { LocationQuery } from "vue-router";
 import { useCompaniesStore, type Company } from "./companies";
 import { useFavoritesStore } from "./favorites";
+import { useTagsStore } from "./tags";
 
 interface Tags {
   divisions: number[],
@@ -20,9 +22,19 @@ interface Filters {
 }
 
 interface State {
-    filters: Filters,
-    filteredCompanies: Company[],
+  filters: Filters,
+  filteredCompanies: Company[],
 }
+
+interface Route_query {
+  q?: string;
+  tags?: string;
+  favorites?: string;
+  charmtalk?: string;
+  sweden?: string;
+  [key: string]: string | undefined;
+}
+
 
 export const useFilterStore = defineStore('filter', {
   state: (): State => ({
@@ -56,7 +68,6 @@ export const useFilterStore = defineStore('filter', {
         charmtalk: false,
         sweden: false,
       }
-      this.filterCompanies()
     },
     filterCompanies() {
       return new Promise<void>((resolve) => {
@@ -95,7 +106,7 @@ export const useFilterStore = defineStore('filter', {
             favoritesStore.favorites.has(c.id)
           );
         }
-
+        this.filteredCompanies = filteredCompanies
         // Filter on in sweden (no sweden attribute left)
         // if (state.filters.sweden) {
         //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);
@@ -108,5 +119,82 @@ export const useFilterStore = defineStore('filter', {
       const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
       this.filteredCompanies.sort(strategy);
     },
+    setFiltersFromRouteQuery(rQuery: LocationQuery) {
+      const filter = this.filters
+      this.resetFilter();
+
+      if (rQuery.q && typeof rQuery.q == "string") {
+        filter.query = rQuery.q;
+      }
+      if (rQuery.tags && typeof rQuery.tags == "string") {
+        const tagsStore = useTagsStore();
+        const allTags = rQuery.tags.split(",").map((s) => parseInt(s));
+
+        filter.tags.divisions = tagsStore
+          .getDivisionsFromIds(allTags)
+          .map((t) => t.id);
+
+        filter.tags.looking_for = tagsStore
+          .getLookingForFromIds(allTags)
+          .map((t) => t.id);
+
+        filter.tags.business_areas = tagsStore
+          .getBusinessAreasFromIds(allTags)
+          .map((t) => t.id);
+
+        filter.tags.languages = tagsStore
+          .getLanguagesFromIds(allTags)
+          .map((t) => t.id);
+
+        filter.tags.offerings = tagsStore
+          .getOfferingsFromIds(allTags)
+          .map((t) => t.id);
+      }
+
+      if (rQuery.favorites) {
+        filter.favorites = true;
+      }
+
+      if (rQuery.charmtalk) {
+        filter.charmtalk = true;
+      }
+
+      if (rQuery.sweden) {
+        filter.sweden = true;
+      }
+      this.filterCompanies().then(() => this.sortCompanies());
+
+
+    },
+    generateSearchRouteQuery() {
+      const filter = this.filters
+      let rQuery: LocationQuery = {};
+
+      if (filter.query.length > 0) rQuery.q = filter.query;
+
+      if (
+        filter.tags.divisions.length > 0 ||
+        filter.tags.business_areas.length > 0 ||
+        filter.tags.looking_for.length > 0 ||
+        filter.tags.languages.length > 0 ||
+        filter.tags.offerings.length > 0
+      ) {
+        rQuery.tags = [
+          filter.tags.business_areas,
+          filter.tags.looking_for,
+          filter.tags.languages,
+          filter.tags.divisions,
+          filter.tags.offerings,
+        ]
+          .reduce((res, tags) => res.concat(tags), [])
+          .toString();
+      }
+
+      if (filter.favorites) rQuery.favorites = "true";
+      if (filter.charmtalk) rQuery.charmtalk = "true";
+      if (filter.sweden) rQuery.sweden = "true";
+
+      return rQuery
+    }
   },
 });

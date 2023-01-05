@@ -1,16 +1,9 @@
 <template>
-  <v-container>
+  <q-page padding>
     <prepages_table />
-  </v-container>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
 import prepages_table from "@/components/admin/prepages_table.vue";
-
-export default {
-  name: "Prepages",
-  components: {
-    prepages_table,
-  },
-};
 </script>

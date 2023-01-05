@@ -1,135 +1,238 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveCompany"
-      @delete_row="deleteCompany"
-      name="Companies"
-      :headers="headers"
-      :data="companiesStore.companies"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.active="{ item }">
-        <v-simple-checkbox
-          disabled
-          on-icon="mdi-eye"
-          off-icon="mdi-eye-off"
-          v-model="item.active"
-        ></v-simple-checkbox>
-      </template>
-
-      <template v-slot:extra_actions="{ item }">
-        <v-icon class="mr-2" @click="viewCompany(item)"> mdi-book-open </v-icon>
-      </template>
-
-      <template v-slot:item.divisions="{ item }">
-        <template v-for="tag in item.divisions">
-          <template v-if="tag.icon != ''">
-            <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
-              <v-img
-                max-height="32px"
-                max-width="32px"
-                :src="base_URL + tag.icon"
-              />
-            </v-avatar>
-          </template>
-          <template v-else>
-            <v-chip small :key="tag.id">
-              {{ item.name }}
-            </v-chip>
-          </template>
+  <q-card>
+    <q-card-section class="text-h5">Companies</q-card-section>
+    <q-card-section>
+      <Table
+        @saveRow="(c) => companiesStore.updateCompany(c)"
+        @deleteRow="(c) => companiesStore.removeCompany(c)"
+        name="Companies"
+        :tableColumns="headers"
+        :rows="rows"
+        :colMeta="colMeta"
+        :editable="true"
+      >
+        <template #body-cell-Active="props">
+          <q-td :props="props">
+            <q-icon
+              v-if="props.value"
+              size="sm"
+              color="primary"
+              name="mdi-eye"
+            />
+            <q-icon
+              v-if="!props.value"
+              size="sm"
+              color="grey"
+              name="mdi-eye-off"
+            />
+          </q-td>
         </template>
-      </template>
-      <template v-slot:item.completion="{ item }">
-        <template> {{ completed(item) }} </template>
-      </template>
-    </Table>
-  </v-container>
+
+        <template #body-cell-Programs="props">
+          {{ log("program", props.value) }}
+          <q-td :props="props">
+            <template
+              v-if="
+                !props.value ||
+                tagsStore.getDivisionsFromIds(props.value).length < 1
+              "
+            >
+              None
+            </template>
+            <template v-else>
+              <TagGroup
+                :tags="tagsStore.getDivisionsFromIds(props.value)"
+              ></TagGroup>
+            </template>
+          </q-td>
+        </template>
+        <!-- <template #col(completion)="{ item }">
+          {{ completed(item) }}
+        </template> -->
+        <template #actions="{ row }">
+          <q-btn
+            v-if="row.active"
+            round
+            flat
+            size="sm"
+            icon="mdi-book-open"
+            :to="'/company/' + row.name"
+          ></q-btn>
+        </template>
+
+        <!-- <template #edit-divisions="{ row, colMeta }">
+          {{ log(row) }}
+          <q-select
+            filled
+            multiple
+            :model-value="tagsStore.getDivisionsFromIds(row.tags)"
+            @update:model-value="
+              (divisions) =>
+                updateTagsFromSelect(
+                  row,
+                  new Set(tagsStore.getDivisionsFromIds(row.tags)),
+                  new Set(divisions)
+                )
+            "
+            :options="colMeta.items"
+            :label="colMeta.label"
+            :hint="colMeta.hint"
+          >
+            <template #option="{ opt, itemProps }">
+              <q-item v-bind="itemProps">
+                <q-item-section avatar v-if="opt.icon && opt.icon.length > 0">
+                  <TagGroup :tags="[opt]"></TagGroup>
+                </q-item-section>
+                <q-item-section> {{ opt.name }}</q-item-section>
+              </q-item>
+            </template>
+
+            <template #selected-item="{ index, opt }">
+              <TagGroup :tags="[opt]"></TagGroup>
+            </template>
+          </q-select>
+        </template> -->
+      </Table>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
-import Table from "@/components/table.vue";
-import axios from "@/plugins/axios"
-import { computed } from "vue";
+import Table, { type TableRow } from "@/components/table.vue";
+import TagGroup from "@/components/Tag_group.vue";
+import axios from "@/plugins/axios";
+import { computed, onMounted, reactive, ref, watch, type Ref } from "vue";
 import dayjs from "dayjs";
-import { useTagsStore } from "@/stores/modules/tags";
+import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
 import { useMapsStore } from "@/stores/modules/maps";
 import { useRouter } from "vue-router";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-const base_URL = axios.defaults.baseURL + "/manage/image/"
+const base_URL = axios.defaults.baseURL + "/manage/image/";
 
+function log(a, b) {
+  console.log(a, b);
+}
 const headers = [
-  { text: "Name", value: "name" },
-  { text: "Booth", value: "booth_number" },
-  { text: "Programs", value: "divisions" },
-  { text: "Completion", value: "completion", width: 120 },
-  { text: "Active", value: "active", width: 100 },
-  { text: "Last Updated", value: "last_updated", width: 170 },
+  { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
   {
-    text: "Actions",
-    value: "actions",
-    width: 130,
-    sortable: false,
+    name: "Booth",
+    label: "Booth #",
+    field: "booth_number",
+    align: "left",
+    sortable: true,
   },
-]
+  {
+    name: "Programs",
+    label: "Programs",
+    field: (row) => row.tags,
+    align: "left",
+  },
+  // { name: "Completion", label: "Completion", field: "completion", align: "left" },
+  {
+    name: "Active",
+    label: "active",
+    field: "active",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "Last Updated",
+    label: "Last Updated",
+    field: "last_updated",
+    align: "left",
+    sortable: true,
+  },
+];
 
-const tagsStore = useTagsStore()
-const companiesStore = useCompaniesStore()
-const mapsStore = useMapsStore()
+const tagsStore = useTagsStore();
+const companiesStore = useCompaniesStore();
+const mapsStore = useMapsStore();
 
-// const modified_companies = computed(() => {
-//   const companies = Array.from(companiesStore.companies.values());
-//   return companies.map((c) => ({
-//     ...c,
-//     divisions: tagsStore.getDivisionsFromIds(c.tags),
-//     languages: tagsStore.getLanguagesFromIds(c.tags),
-//     looking_for: tagsStore.getLookingForFromIds(c.tags),
-//     offering: tagsStore.getOfferingsFromIds(c.tags),
-//     business_area: tagsStore.getBusinessAreasFromIds(c.tags),
-//     last_updated: dayjs(c.last_updated).format("YYYY-MM-DD, HH:mm:ss"),
-//     tags: tagsStore.getTagsFromIds(c.tags),
-//     map_image: mapsStore.getMapFromId(c.map_image)
-//   }) )
-// });
+// const hasNonValidValue = (value: any): boolean => {
+//   return value === null || value === "" || value.length === 0 || value === -1;
+// };
 
-const saveCompany = (company: Company) => {
-  companiesStore.updateCompany(company)
-}
-const deleteCompany = (company: Company) => {
-  companiesStore.removeCompany(company);
-}
-const viewCompany = (company: Company) => {
-  useRouter().push("/company/" + company.name);
-}
+// const completed = (company: Company) => {
+//   let missing = 0;
+//   let total = 0;
+//   for (const key in Object.keys(company)) {
+//     if (hasNonValidValue(company[key])) {
+//       missing += 1;
+//     }
+//     total += 1;
+//   }
+//   return total - missing + "/" + total;
+// };
 
-const hasNonValidValue = (value: any): boolean => {
-  return value === null
-    || value === ""
-    || value.length === 0
-    || value === -1
-}
+const rows = Array.from(companiesStore.companies.values()).map((row) => {
+  return reactive({
+    ...row,
+    divisions: tagsStore
+      .getDivisionsFromIds(row.tags)
+      .map((t) => ({ value: t.id, label: t })),
+    looking_for: tagsStore
+      .getLookingForFromIds(row.tags)
+      .map((t) => ({ value: t.id, label: t })),
+    business_areas: tagsStore
+      .getBusinessAreasFromIds(row.tags)
+      .map((t) => ({ value: t.id, label: t })),
+    offering: tagsStore
+      .getOfferingsFromIds(row.tags)
+      .map((t) => ({ value: t.id, label: t })),
+    language: tagsStore
+      .getLanguagesFromIds(row.tags)
+      .map((t) => ({ value: t.id, label: t })),
+  });
+});
 
+rows.forEach((row) => {
+  watch(
+    row,
+    (value, oldValue) => {
+      var allTags: number[] = [];
+      if (
+        value.tags !== oldValue.tags &&
+        (value.divisions ||
+          value.looking_for ||
+          value.business_areas ||
+          value.offering ||
+          value.language)
+      ) {
+        if (value.divisions) {
+          console.log(value.divisions);
+          var allTags = allTags.concat(value.divisions.map((v) => v.value));
+        }
+        if (value.looking_for) {
+          var allTags = allTags.concat(value.looking_for.map((v) => v.value));
+        }
+        if (value.business_areas) {
+          var allTags = allTags.concat(
+            value.business_areas.map((v) => v.value)
+          );
+        }
+        if (value.offering) {
+          var allTags = allTags.concat(value.offering.map((v) => v.value));
+        }
+        if (value.language) {
+          var allTags = allTags.concat(value.language.map((v) => v.value));
+        }
+        value.tags = new Set(allTags);
+        console.log(value, new Set(allTags));
+      }
+    },
+    { deep: true, flush: "pre" }
+  );
+});
 
-const completed = (company: Company) => {
-  let missing = 0;
-  let total = 0;
-  for (const key in Object.keys(company)) {
-    if (hasNonValidValue(company[key])) {
-      missing += 1;
-    }
-    total += 1;
-  }
-
-  return total - missing + "/" + total;
-},
-const row_meta = computed(() => [
+const colMeta: TableColMeta[] = [
   {
     type: "checkbox",
     model: "active",
-    on_icon: "mdi-eye",
-    off_icon: "mdi-eye-off",
-    label: "Active (required for row to be visible)",
+    onIcon: "mdi-eye",
+    offIcon: "mdi-eye-off",
+    label: "Active (required for company to be visible)",
   },
   {
     type: "checkbox",
@@ -140,14 +243,17 @@ const row_meta = computed(() => [
     type: "text",
     model: "name",
     label: "Company name",
-    displayname: true,
   },
   {
     type: "number",
     model: "booth_number",
-    label: "Booth number"
+    label: "Booth number",
   },
-  { type: "image", model: "logo", label: "Company Logo" },
+  {
+    type: "image",
+    model: "logo",
+    label: "Company Logo",
+  },
   {
     type: "textarea",
     model: "description",
@@ -187,46 +293,50 @@ const row_meta = computed(() => [
     label: "Number of Employees in Sweden",
   },
   {
-    type: "single_select",
+    type: "single-select",
     model: "map_image",
-    items: Array.from(mapsStore.maps.values()).concat([{ name: "No Map", id: -1, image: "", ref: -1 }]),
+    items: Array.from(mapsStore.maps)
+      .map(([_, m]) => {
+        return { title: m.name, value: m.id };
+      })
+      .concat([{ title: "No Goto", value: -1 }]),
     label: "Map",
     hint: "Map for company location",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "divisions",
-    items: tagsStore.divisions,
-    label: "Divisions",
+    items: tagsStore.divisions.map((t) => ({ value: t.id, label: t })),
+    label: "Programs",
     hint: "Programs the company are interested in",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "looking_for",
-    items: tagsStore.looking_for,
+    items: tagsStore.looking_for.map((t) => ({ value: t.id, label: t })),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
   },
   {
-    type: "select",
-    model: "business_area",
-    items: tagsStore.business_areas,
+    type: "multiple-select",
+    model: "business_areas",
+    items: tagsStore.business_areas.map((t) => ({ value: t.id, label: t })),
     label: "Business areas",
-    hint: "The companys' business areas",
+    hint: "The company's business areas",
   },
   {
-    type: "select",
+    type: "multiple-select",
     model: "offering",
-    items: tagsStore.offering,
+    items: tagsStore.offering.map((t) => ({ value: t.id, label: t })),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
   },
   {
-    type: "select",
-    model: "languages",
-    items: tagsStore.languages,
+    type: "multiple-select",
+    model: "language",
+    items: tagsStore.languages.map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
   },
-]);
+];
 </script>

@@ -1,75 +1,59 @@
 <template>
-  <v-autocomplete
+  <q-select
+    class="q-ma-sm"
+    filled
     multiple
-    chips
-    return-object
-    item-text="name"
-    item-value="id"
-    v-model="selected_tags"
-    @change="onChange"
+    :options="tags"
+    v-model="selected"
     :label="label"
-    :items="tags"
+    clearable
   >
-    <template v-slot:item="{ item /*, attrs */}">
-      <!--<v-simple-checkbox :value="attrs.inputValue" />-->
-      <template v-if="item.icon != ''">
-        <v-img
-          class="ml-2 mr-4"
-          contain
-          max-height="36px"
-          max-width="36px"
-          :src="base_URL + item.icon"
-        />
-      </template>
-      {{ item.name }}
+    <template #option="{ opt, itemProps }">
+      <q-item v-bind="itemProps">
+        <q-item-section avatar v-if="opt.icon && opt.icon.length > 0">
+          <Tag_group :tags="[opt]"></Tag_group>
+        </q-item-section>
+        <q-item-section> {{ opt.name }}</q-item-section>
+      </q-item>
     </template>
 
-    <template v-slot:selection="{ item }">
-      <template v-if="item.icon != ''">
-        <v-avatar>
-          <v-img
-            max-height="36px"
-            max-width="36px"
-            :src="base_URL + item.icon"
-          />
-        </v-avatar>
-      </template>
-      <template v-else>
-        <v-chip small>
-          {{ item.name }}
-        </v-chip>
-      </template>
+    <template #selected-item="{ index, opt }">
+      <Tag_group v-if="index < props.maxShown" :tags="[opt]"></Tag_group>
+      <span
+        v-if="index === props.maxShown"
+        class="text-grey text-caption align-self-center"
+        >(+ {{ selected.length - maxShown }} others)</span
+      >
     </template>
-  </v-autocomplete>
+  </q-select>
 </template>
 
 <script lang="ts" setup>
-import axios from '@/plugins/axios';
-import { useTagsStore, type Tag } from '@/stores/modules/tags';
-import { computed, type Ref } from 'vue';
+import axios from "@/plugins/axios";
+import { useTagsStore, type Tag } from "@/stores/modules/tags";
+import { onMounted, ref, watch, type Ref } from "vue";
+import Tag_group from "@/components/Tag_group.vue";
 
 const tagsStore = useTagsStore();
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const props = defineProps<{
-  tags: number[]
-  selected_tags: number[]
-  label: string
+  tags: Tag[];
+  selected_tags: Tag[];
+  label: string;
+  maxShown: number;
 }>();
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  (e: "update:selected_tags", v: Tag[]): void;
+  (e: "change"): void;
+}>();
 
-function onChange(v: number[]) {
-  emit("change", v)
-}
+const selected: Ref<Tag[]> = ref([]);
+selected.value = props.selected_tags;
 
-const selected_tags: Ref<Tag[]> = computed({
-  get() {
-    return tagsStore.getTagsFromIds(props.selected_tags);
-  },
-  set(newTags) {
-    return newTags.map(tag => tag.id);
-  }
+watch(selected, (tags: Tag[]) => {
+  emit("update:selected_tags", tags);
 });
 </script>

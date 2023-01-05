@@ -1,115 +1,158 @@
 <template>
-  <v-table>
-    <thead>
-      <tr>
-        <th v-for="column in tableColumns" class="text-left">
-          {{ column.name }}
-        </th>
-        <th v-if="hasActions" class="text-right">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="row in rows">
-        <template v-for="column in tableColumns">
-          <td v-if="row[column.value] != undefined">
-            <slot :name="`col(${column.value})`" :value="row[column.value]">
-              {{ row[column.value] }}
-            </slot>
-          </td>
+  <q-table
+    flat
+    :rows="rows"
+    :columns="editable || $slots.actions ? tableColumnsWAction : tableColumns"
+    :filter="rowFilter"
+    wrap-cells
+  >
+    <template #top-left>
+      <q-input
+        filled
+        dense
+        debounce="300"
+        v-model="rowFilter"
+        placeholder="Search"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
         </template>
-        <!-- actions -->
-        <td v-if="hasActions" class="text-right">
-          <template v-if="editable">
-            <v-btn
-              variant="plain"
-              size="small"
-              icon="mdi-pencil"
-              @click="editRow(row)"
-            >
-            </v-btn>
+      </q-input>
+    </template>
+    <template #top-right>
+      <q-btn
+        class="q-ml-md"
+        v-if="editable"
+        color="primary"
+        @click="createRow()"
+      >
+        Create new
+      </q-btn>
+    </template>
+    <template #body-cell-Actions="props">
+      <q-td style="white-space: normal !important">
+        <div class="text-right">
+          <slot name="actions" :row="props.value"></slot>
+          <q-btn
+            flat
+            round
+            size="sm"
+            icon="mdi-pencil"
+            @click="editRow(props.value)"
+          >
+          </q-btn>
+          <q-btn
+            flat
+            round
+            size="sm"
+            icon="mdi-delete"
+            @click="deleteRow(props.value)"
+          >
+          </q-btn>
+        </div>
+      </q-td>
+    </template>
 
-            <v-dialog persistent v-model="show_popup" max-width="500px">
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  variant="plain"
-                  size="small"
-                  icon="mdi-delete"
-                ></v-btn>
-              </template>
-              <tablePopup
-                @closePopup="show_popup = false"
-                @delete="
-                  () => {
-                    $emit('deleteRow', row);
-                    show_popup = false;
-                  }
-                "
-                :name="row.name ? row.name.toString() : props.name"
-                :title="props.name"
-              />
-            </v-dialog>
-          </template>
-          <slot name="actions"></slot>
-        </td>
-      </tr>
-    </tbody>
-  </v-table>
-
-  <v-dialog v-if="editable" v-model="dialog" max-width="900px">
+    <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
+      <slot v-if="!name.startsWith('edit-')" :name="name" v-bind="slotData" />
+    </template>
+  </q-table>
+  <q-dialog full-width full-height v-model="editDialog">
     <tableEditDialog
-      @closeDialog="closeDialog()"
-      @saveRow="$emit('saveRow', updatedRow)"
-      :name="props.name"
-      :row="updatedRow"
+      :name="name"
+      v-model:row="clickedRow"
       :colMeta="colMeta"
-      :newRow="false"
-    ></tableEditDialog>
-  </v-dialog>
+      :newRow="newRow"
+      @saveRow="
+        () => {
+          editDialog = false;
+          $emit('saveRow', clickedRow);
+        }
+      "
+    >
+      <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
+        <slot v-if="name.startsWith('edit-')" :name="name" v-bind="slotData" />
+      </template>
+    </tableEditDialog>
+  </q-dialog>
+  <q-dialog v-model="deleteDialog">
+    <q-card>
+      <q-card-section class="row items-center">
+        Are you sure you want to delete?
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn
+          flat
+          label="Delete"
+          color="primary"
+          @click="$emit('deleteRow', clickedRow)"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts" setup>
-// This needs to be fixed in order to pass as the types in the stores
-export interface TableRow {
-  [key: string]: string | number | boolean;
-}
-
-import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
-import tablePopup from "@/components/admin/table_popup.vue";
-import { computed, ref, useSlots, type Ref } from "vue";
+import { defineAsyncComponent, onMounted, ref } from "vue";
+import { computed, useSlots } from "vue";
 import type { TableColMeta } from "@/components/admin/table_edit_dialog.vue";
+import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 
-interface TableColumns {
-  name: string; //display name
-  value: string; //behind the scenes name
-}
-
-const props = defineProps<{
-  name: string;
-  editable: boolean;
-  tableColumns: TableColumns[];
-  rows: TableRow[];
-  colMeta: TableColMeta[];
-}>();
+export type TableRow = any;
 
 defineEmits<{
   (e: "saveRow", updatedRow: TableRow): void;
   (e: "deleteRow", row: TableRow): void;
+  (e: "clickRow", row: TableRow): void;
 }>();
 
-var dialog: Ref<boolean> = ref(false);
-var show_popup: Ref<boolean> = ref(false);
-// var search = ""
-var updatedRow: Ref<TableRow> = ref({});
-var hasActions = computed(() => useSlots().actions || props.editable);
+const props = defineProps<{
+  name: string;
+  editable: boolean;
+  tableColumns: any[];
+  rows: Iterable<TableRow>;
+  colMeta: TableColMeta[];
+}>();
 
-function editRow(row: TableRow) {
-  updatedRow.value = row;
-  dialog.value = true;
+const tableColumnsWAction = computed(() =>
+  props.tableColumns.concat([
+    {
+      name: "Actions",
+      label: "Actions",
+      field: (row: any) => row,
+      align: "right",
+    },
+  ])
+);
+const clickedRow = ref({});
+const rowFilter = ref("");
+const editDialog = ref(false);
+const deleteDialog = ref(false);
+const newRow = ref(false);
+
+function editRow(row) {
+  clickedRow.value = row;
+  newRow.value = false;
+  editDialog.value = true;
 }
 
-function closeDialog() {
-  dialog.value = false;
-  updatedRow.value = {};
+function deleteRow(row) {
+  clickedRow.value = row;
+  deleteDialog.value = true;
+}
+
+function createRow() {
+  clickedRow.value = {};
+  newRow.value = true;
+  editDialog.value = true;
+}
+
+var hasActions = computed(() => useSlots().actions || props.editable);
+
+function log(a: any) {
+  console.log(a);
 }
 </script>

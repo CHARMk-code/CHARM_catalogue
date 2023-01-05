@@ -1,7 +1,7 @@
 <template>
-  <v-container>
+  <q-page padding>
     <tags_table />
-  </v-container>
+  </q-page>
 </template>
 
 <script lang="ts" setup>

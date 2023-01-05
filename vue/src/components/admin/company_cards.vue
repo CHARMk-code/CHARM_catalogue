@@ -64,11 +64,11 @@ import {
   useSite_settingsStore,
   type Card,
 } from "@/stores/modules/site_settings";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
-let reset_popup = false;
+let reset_popup = ref(false);
 let search = "";
-let resetting = false;
+let resetting = ref(false);
 let error = "";
 
 let site_settingsStore = useSite_settingsStore();
@@ -97,15 +97,15 @@ const save = () => {
   useSite_settingsStore().saveCompanyCards();
 };
 const reset = () => {
-  resetting = true;
+  resetting.value = true;
   useSite_settingsStore()
     .resetCompanyCards()
     .then(() => {
-      resetting = false;
-      reset_popup = false;
+      resetting.value = false;
+      reset_popup.value = false;
     })
     .catch((err) => {
-      resetting = false;
+      resetting.value = false;
       error = err;
     });
 };

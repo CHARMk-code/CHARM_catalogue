@@ -17,7 +17,7 @@ interface State {
 }
 
 
-export const usePrePagesStore = defineStore('prepages', {
+export const usePrepagesStore = defineStore('prepages', {
   state: (): State => ({
     load_wait: 0,
     prepages: [],
@@ -62,6 +62,7 @@ export const usePrePagesStore = defineStore('prepages', {
     },
     modifyPrepage(prepage: Prepage) {
       return new Promise((resolve, reject) => {
+        console.log("prepage", prepage)
         this.axios
           .put("/prepage", prepage)
           .then((resp: any) => {

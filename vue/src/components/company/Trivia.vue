@@ -3,35 +3,30 @@
     name="didyouknow"
     v-if="!(talk_to_us_about == '' && sweden == -1 && world == -1)"
   >
-    <v-card-title> Did you know...</v-card-title>
-    <v-card-text>
-      <v-card flat v-if="talk_to_us_about != ''">
-        <v-card-title class="text-subtitle-1 ma-0 pa-0">
-          Talk to us about:
-        </v-card-title>
-        <v-card-text>
-          {{ talk_to_us_about }}
-        </v-card-text>
-      </v-card>
-
-      <v-card flat v-if="world != -1">
-        <v-card-title class="text-subtitle-1 ma-0 pa-0">
-          Employees:
-        </v-card-title>
-        <v-card-text> {{ sweden }} in sweden and {{ world }} in the world </v-card-text>
-      </v-card>
-    </v-card-text>
+    <q-card-section v-if="talk_to_us_about != ''">
+      <div class="text-h6">Did you know...</div>
+      <div class="q-pb-sm">
+        <span class="text-bold">Talk to us about:</span>
+        {{ talk_to_us_about }}
+      </div>
+      <div v-if="sweden != -1 || world != -1">
+        <span class="text-bold"> Employees: </span>
+        <span v-if="sweden != -1">{{ sweden }} in sweden</span>
+        <span v-if="sweden != -1 && world != -1"> and </span>
+        <span v-if="world != -1">{{ world }} in the world</span>
+        .
+      </div>
+    </q-card-section>
+    <q-card-section v-if="world != -1"> </q-card-section>
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "Company_Trivia",
-  props: ["talk_to_us_about", "sweden", "world", "year"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  talk_to_us_about: string;
+  sweden: number;
+  world: number;
+}>();
 </script>

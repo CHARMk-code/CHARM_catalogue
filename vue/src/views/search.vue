@@ -1,109 +1,125 @@
 <template>
-  <sideLayout>
-    <v-container>
-      <searchCard />
-      <Table
-        noSearch="true"
-        name="Results"
-        :headers="headers"
-        :data="filterStore.filteredCompanies"
-        :editable="false"
-        @click_row="onRowClick"
-      >
-        <template v-slot:item.tags="{ item }">
-          <template v-for="tag in item.tags" :key="tag.id">
-            <v-chip class="mr-1 mb-1" x-small>{{
-              tag.name
-            }}</v-chip>
+  <q-page padding>
+    <q-card>
+      <q-card-section>
+        <span class="block text-h6">Search</span>
+        <searchCard />
+      </q-card-section>
+      <q-card-section>
+        <span class="block text-h6">Results</span>
+        <q-table
+          flat
+          :rows="filterStore.filteredCompanies"
+          :columns="columns"
+          wrap-cells
+          @row-click="
+            (_event, row, _index) => router.push('/company/' + row.name)
+          "
+        >
+          <template #body-cell-Programs="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
-        </template>
-        <template v-slot:item.divisions="{ item }">
-          <template v-for="tag in item.divisions">
-            <template v-if="tag.icon != ''">
-              <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
-                <v-img
-                  max-height="32px"
-                  max-width="32px"
-                  :src="base_URL + tag.icon"
-                />
-              </v-avatar>
-            </template>
-            <template v-else>
-              <v-chip small :key="tag.id">
-                {{ item.name }}
-              </v-chip>
-            </template>
+
+          <template #body-cell-Business_areas="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
-        </template>
-        <template v-slot:item.looking_for="{ item }">
-          <template v-for="tag in item.looking_for" :key="tag.id">
-            <v-chip class="mr-1 mb-1" x-small>{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Looking_for="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
-        </template>
-        <template v-slot:item.offering="{ item }">
-          <template v-for="tag in item.offerings" :key="tag.id">
-            <v-chip class="mr-1 mb-1" x-small>{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Offering="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
-        </template>
-        <template v-slot:item.business_area="{ item }">
-          <template v-for="tag in item.business_area" :key="tag.id">
-            <v-chip class="mr-1 mb-1" x-small>{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Favorites="props">
+            <q-td :props="props">
+              <q-icon
+                v-if="props.value"
+                size="sm"
+                name="mdi-star"
+                color="primary"
+              ></q-icon>
+              <q-icon
+                v-else
+                size="sm"
+                name="mdi-star-outline"
+                color="grey"
+              ></q-icon>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.id="{ item }">
-          <v-checkbox
-            :input-value="favoritesStore.favorites.has(item.id)"
-            disabled
-            on-icon="mdi-star"
-            off-icon="mdi-star-outline"
-          />
-          <!--  TODO: Should make start clickable to changes status-->
-        </template>
-      </Table>
-    </v-container>
-  </sideLayout>
+        </q-table>
+      </q-card-section>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
-import sideLayout from "@/views/sideLayout.vue";
 import searchCard from "@/components/search/search_card.vue";
-import Table from "@/components/table.vue";
 import axios from "@/plugins/axios";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
-import { useRouter } from "vue-router";
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { useFavoritesStore } from "@/stores/modules/favorites";
 import type { Company } from "@/stores/modules/companies";
+import { computed } from "vue";
+import { useTagsStore } from "@/stores/modules/tags";
+import TagGroup from "@/components/Tag_group.vue";
 
 const site_settingsStore = useSite_settingsStore();
 const filterStore = useFilterStore();
 const favoritesStore = useFavoritesStore();
+const tagsStore = useTagsStore();
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
+const visibleCards = site_settingsStore.settings.company_view.cards.filter(
+  (card) => card.active
+);
 
-const visibleCards = site_settingsStore.settings.company_view.cards.filter((card) => card.active)
-
-const isVisible = (name: string) => visibleCards.some((c) => c.name === name)
-
-const headers = [
-    isVisible("name") ? { text: "Name", value: "name" } : null,
-    isVisible("tag_divisions") ? { text: "Programs", value: "divisions" } : null,
-    isVisible("tag_business_areas") ? { text: "Business areas", value: "business_area" } : null,
-    isVisible("tag_looking_for") ? { text: "Looking for", value: "looking_for" } : null,
-    isVisible("tag_offering") ? { text: "Offering", value: "offering" } : null,
-    isVisible("name") ? { text: "Liked", value: "id", width: "80" } : null,
-  ].filter(a => a !== null)
-
-const router = useRouter();
-
-function onRowClick(company: Company) {
-  router.push("/company/" + company.name);
+function isVisible(name: string): boolean {
+  return visibleCards.some((c) => c.name === name);
 }
+const columns = [
+  { name: "Name", label: "Name", field: "name", align: "left" },
+  {
+    name: "Programs",
+    label: "Programs",
+    field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Business_areas",
+    label: "Business areas",
+    field: (row: Company) => tagsStore.getBusinessAreasFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Looking_for",
+    label: "Looking for",
+    field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Offering",
+    label: "Offering",
+    field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Favorites",
+    label: "Favorites",
+    field: (row: Company) => favoritesStore.favorites.has(row.id),
+    align: "center",
+  },
+];
+const router = useRouter();
 </script>

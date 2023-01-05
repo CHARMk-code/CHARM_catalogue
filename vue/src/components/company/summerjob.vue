@@ -1,24 +1,25 @@
 <template>
   <company_card_wrapper name="summerjob">
-    <v-card-title> Summer Jobs</v-card-title>
+    <q-card-section>
+      <div class="text-h6">Summer Jobs</div>
 
-    <v-card-text> {{ desc }}</v-card-text>
-    <v-card-text> Apply before: {{ deadline }}</v-card-text>
+      <div>{{ desc }}</div>
+    </q-card-section>
 
-    <v-card-actions>
-      <v-btn :href="link"> Apply here </v-btn>
-    </v-card-actions>
+    <q-card-actions>
+      <q-btn color="primary" target="_blank" :href="link">
+        Apply here before: {{ deadline }}
+      </q-btn>
+    </q-card-actions>
   </company_card_wrapper>
 </template>
 
-<script>
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-export default {
-  name: "summer-job",
-  props: ["desc", "link", "deadline"],
-  components: {
-    company_card_wrapper,
-  },
-};
+const props = defineProps<{
+  desc: string;
+  link: string;
+  deadline: string;
+}>();
 </script>

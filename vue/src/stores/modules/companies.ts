@@ -28,7 +28,7 @@ export interface Company {
 
 
 interface State {
-  companies: Map<number,Company>,
+  companies: Map<number, Company>,
   load_wait: number
 }
 
@@ -45,9 +45,9 @@ export const useCompaniesStore = defineStore('companies', {
       this.companies.delete(id)
     },
     removeAllCompanies() {
-      this.companies = new Map();
+      this.companies.clear();
     },
-    getCompanies() {
+    fetchCompanies() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
@@ -55,13 +55,13 @@ export const useCompaniesStore = defineStore('companies', {
             .get("/company")
             .then((resp: any) => { //TODO Remove this any and replace with actual type
               this.removeAllCompanies()
-              resp.data.tags = new Set(resp.data.tags)
               const companies: Company[] = resp.data;
 
               // Work around to get summer job deadline in correct format
               companies.forEach(comp => {
                 comp.summer_job_deadline =
                   dayjs(comp.summer_job_deadline, "DD MMM YYYY HH:mm:ss", false).format("YYYY-MM-DD");
+                comp.tags = new Set(comp.tags)
               });
 
               if (companies.length > 0) {
@@ -79,7 +79,7 @@ export const useCompaniesStore = defineStore('companies', {
     },
     updateCompany(company: Company) {
       return new Promise((resolve, reject) => {
-       this.axios
+        this.axios
           .put("/company", company)
           .then((resp: any) => {
             this.companies.set(company.id, company)
@@ -106,7 +106,10 @@ export const useCompaniesStore = defineStore('companies', {
   },
   getters: {
     companyByName: (state) => (name: string) => {
-      return Array.from(state.companies.values()).filter((c) => c.name == name);
+      const matching = Array.from(state.companies.values()).filter((c) => c.name == name);
+      if (matching.length > 0) {
+        return matching[0]
+      }
     },
   },
 });

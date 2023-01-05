@@ -1,114 +1,67 @@
 <template>
-  <sideLayout
-    v-on:next="next"
-    v-on:prev="prev"
-    v-bind:button_left="true"
-    v-bind:button_right="currentIndex < maxIndex - 1"
-  >
-    <v-container
-      v-if="company != undefined && company.active == true"
-      v-touch="{
-        right: () => prev(),
-        left: () => next(),
-      }"
-    >
-      <!-- Edit Company -->
-      <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
-        Edit
-      </v-btn>
-      <v-dialog persistent v-model="dialog" max-width="900px">
-        <tableEditDialog
-          @close_dialog="closeDialog()"
-          @save_row="saveRow"
-          name="Company"
-          :row="company"
-          :row_meta="row_meta"
-        />
-      </v-dialog>
+  <q-page padding v-if="company != undefined && company.active">
+    <div class="row">
+      <Logo class="col-12 col-md-6" :src="company.logo" />
 
-      <v-row>
-        <v-col align="center" xs="12" sm="12" md="auto">
-          <Logo :src="company.logo" />
-        </v-col>
-        <v-col align-content="start">
-          <Name :name="company.name" :id="company.id" />
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col>
-          <Textblock :body="company.description" class="mb-6" />
-          <Textblock :body="company.unique_selling_point" title="What Makes Us Special" class="mb-6" />
-          <Summerjob
-            name="summerjob"
-            :desc="company.summer_job_description"
-            :link="company.summer_job_link"
-            :deadline="company.summer_job_deadline"
-            class="mb-6"
-          />
-          <Layout class="mb-6" />
-          <v-row>
-            <v-col
-              class="pa-0 mb-0 d-flex flex-wrap justify-space-between"
-              style="margin: 0 -3px"
-            >
-              <Tags
-                :tags="company.tags"
-                name="tag_divisions"
-                title="Divisions"
-                getter_target="tags/getDivisionsFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_looking_for"
-                title="Looking For"
-                getter_target="tags/getLookingForFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_offering"
-                title="Offering"
-                getter_target="tags/getOffersFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_business_areas"
-                title="Business Areas"
-                getter_target="tags/getBusinessAreasFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-            </v-col>
-          </v-row>
-          <Website :website="company.website" class="mb-6" />
-          <Contacts
-            :contacts="company.contacts"
-            :contact_email="company.contact_email"
-          />
-        </v-col>
-        <v-col>
-          <Map
-            :map="company.map_image"
-            :booth_number="company.booth_number"
-            class="mb-6"
-          />
-          <Trivia
-            :talk_to_us_about="company.talk_to_us_about"
-            :sweden="company.employees_sweden"
-            :world="company.employees_world"
-            :year="company.founded"
-            class="mb-6"
-          />
-          <Note :id="company.id" class="mb-6" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </sideLayout>
+      <Name class="col-12 col-md-6" :name="company.name" :id="company.id" />
+    </div>
+    <div :class="$q.screen.lt.md ? 'row' : 'column'">
+      <div class="flex-break hidden"></div>
+      <Textblock :body="company.description" />
+      <Textblock
+        :body="company.unique_selling_point"
+        title="What Makes Us Special"
+      />
+      <Summerjob
+        name="summerjob"
+        :desc="company.summer_job_description"
+        :link="company.summer_job_link"
+        :deadline="company.summer_job_deadline"
+      />
+      <Layout />
+      <Tags
+        :tags="tagsStore.getDivisionsFromIds(company.tags)"
+        name="tag_divisions"
+        title="Divisions"
+      />
+      <Tags
+        :tags="tagsStore.getLookingForFromIds(company.tags)"
+        name="tag_looking_for"
+        title="Looking For"
+        getter_target="tags/getLookingForFromIds"
+      />
+      <Tags
+        :tags="tagsStore.getOfferingsFromIds(company.tags)"
+        name="tag_offering"
+        title="Offering"
+        getter_target="tags/getOffersFromIds"
+      />
+      <Tags
+        :tags="tagsStore.getBusinessAreasFromIds(company.tags)"
+        name="tag_business_areas"
+        title="Business Areas"
+        getter_target="tags/getBusinessAreasFromIds"
+      />
+      <Website :website="company.website" />
+      <Contacts
+        :contacts="company.contacts"
+        :contact_email="company.contact_email"
+      />
+      <Map
+        :map="mapsStore.getMapFromId(company.map_image)"
+        :booth_number="company.booth_number"
+      />
+      <Trivia
+        :talk_to_us_about="company.talk_to_us_about"
+        :sweden="company.employees_sweden"
+        :world="company.employees_world"
+      />
+      <Note :id="company.id" />
+    </div>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Logo from "@/components/company/Logo.vue";
 import Name from "@/components/company/Name.vue";
 import Trivia from "@/components/company/Trivia.vue";
@@ -116,182 +69,105 @@ import Contacts from "@/components/company/Contacts.vue";
 import Textblock from "@/components/company/Textblock.vue";
 import Website from "@/components/company/Website.vue";
 import Tags from "@/components/company/Tags.vue";
-import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import sideLayout from "@/views/sideLayout.vue";
-import { mapGetters } from "vuex";
+import { computed, onMounted, onUnmounted } from "vue";
+import { useFilterStore } from "@/stores/modules/filter";
+import { useRoute, useRouter } from "vue-router";
+import { usePrepagesStore } from "@/stores/modules/prepages";
+import { useCompaniesStore } from "@/stores/modules/companies";
+import { useTagsStore } from "@/stores/modules/tags";
+import { useMapsStore } from "@/stores/modules/maps";
 
-export default {
-  name: "Company_View",
-  data() {
-    return { dialog: false };
-  },
-  components: {
-    sideLayout,
-    Name,
-    Logo,
-    Trivia, //Did you know...
-    Contacts, //name, email, position?
-    Textblock, //Company description
-    Website, //Company website
-    Tags, //Tags
-    tableEditDialog,
-    Note,
-    Map,
-    Summerjob,
-    Layout,
-  },
-  watch: {
-    filteredCompanies: function (val) {
-      this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
-    },
-  },
-  created() {
-    window.addEventListener("keydown", this.arrowKeyHandler);
-  },
-  beforeDestroy() {
-    window.removeEventListener("keydown", this.arrowKeyHandler);
-  },
-  computed: {
-    ...mapGetters({
-      isLoggedIn: "auth/isLoggedIn",
-      filteredCompanies: "filter/filteredCompanies",
-      divisions: "tags/divisions",
-      looking_for: "tags/looking_fors",
-      business_areas: "tags/business_areas",
-      offerings: "tags/offers",
-      isInFavorites: "favorites/isInFavorites",
-      prepages: "prepages/getActive",
-    }),
-    company() {
-      const matching_companies = this.$store.getters["companies/companyByName"](
-        this.$route.params.name
+const filterStore = useFilterStore();
+const prepagesStore = usePrepagesStore();
+const companiesStore = useCompaniesStore();
+const tagsStore = useTagsStore();
+const mapsStore = useMapsStore();
+
+const route = useRoute();
+const router = useRouter();
+
+const company = computed(() => {
+  return companiesStore.companyByName(route.params.name);
+});
+
+const currentIndex = computed(() => {
+  return filterStore.filteredCompanies
+    .map((x) => x.id)
+    .indexOf(company.value.id);
+});
+
+const maxIndex = filterStore.filteredCompanies.length;
+
+onMounted(() => {
+  window.addEventListener("keydown", arrowKeyHandler);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", arrowKeyHandler);
+});
+
+function arrowKeyHandler(e: any) {
+  if (e.key == "ArrowRight") {
+    next();
+  } else if (e.key == "ArrowLeft") {
+    prev();
+  }
+}
+
+function next() {
+  // this.$store.commit("layouts/updateCenter");
+  const index = currentIndex.value + 1;
+  if (index < filterStore.filteredCompanies.length) {
+    router.push("/company/" + filterStore.filteredCompanies[index].name);
+  }
+}
+
+function prev() {
+  // this.$store.commit("layouts/updateCenter");
+  const index = currentIndex.value - 1;
+  if (index >= 0) {
+    return router.push("/company/" + filterStore.filteredCompanies[index].name);
+  } else {
+    if (prepagesStore.active_prepages.length !== 0) {
+      return router.push(
+        "/prepage/" + (prepagesStore.active_prepages.length - 1)
       );
-      if (matching_companies.length == 1) {
-        return matching_companies[0];
-      } else {
-        return undefined;
-      }
-    },
-    currentIndex() {
-      return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
-    },
-    maxIndex() {
-      return this.filteredCompanies.length;
-    },
-    tags() {
-      return this.company.tags;
-    },
-    row_meta() {
-      return [
-        {
-          type: "checkbox",
-          model: "active",
-          on_icon: "mdi-eye",
-          off_icon: "mdi-eye-off",
-          label: "Active (required for row to be visible)",
-        },
-        {
-          type: "text",
-          model: "name",
-          label: "Company name",
-          displayname: true,
-        },
-        { type: "image", model: "logo", label: "Company Logo" },
-        {
-          type: "textarea",
-          model: "description",
-          label: "Company description",
-        },
-        { type: "text", model: "founded", label: "Founded" },
-        { type: "text", model: "Contacts", label: "Contacts" },
-        { type: "text", model: "website", label: "Website" },
-        {
-          type: "text",
-          model: "employees_sweden",
-          label: "Number of Employees in Sweden",
-        },
-        {
-          type: "text",
-          model: "employees_world",
-          label: "Number of Employees in the whole world",
-        },
-        { type: "text", model: "trivia", label: "Trivia" },
-        {
-          type: "select",
-          model: "divisions",
-          items: this.divisions,
-          label: "Divisions",
-          hint: "Programs the company are interested in",
-        },
-        {
-          type: "select",
-          model: "looking_for",
-          items: this.looking_for,
-          label: "Looking For",
-          hint: "Which level of education the company is looking for",
-        },
-        {
-          type: "select",
-          model: "business_area",
-          items: this.business_areas,
-          label: "Business areas",
-          hint: "The companys business areas",
-        },
-        {
-          type: "select",
-          model: "offering",
-          items: this.offerings,
-          label: "offering",
-          hint: "Which type of jobs the company is offering",
-        },
-      ];
-    },
-  },
-  methods: {
-    editRow(row) {
-      this.editedRow = row;
-      this.creating = false;
-      this.dialog = true;
-    },
-    closeDialog() {
-      this.dialog = false;
-      this.creating = true;
-      this.editedRow = {};
-    },
-    saveRow(row) {
-      this.$store.dispatch("companies/modifyCompany", row);
-    },
-    arrowKeyHandler(e) {
-      if (e.key == "ArrowRight") {
-        this.next();
-      } else if (e.key == "ArrowLeft") {
-        this.prev();
-      }
-    },
-    next() {
-      this.$store.commit("layouts/updateCenter");
-      const index = this.currentIndex + 1;
-      if (index < this.filteredCompanies.length) {
-        this.$router.push("/company/" + this.filteredCompanies[index].name);
-      }
-    },
-    prev() {
-      this.$store.commit("layouts/updateCenter");
-      const index = this.currentIndex - 1;
-      if (index >= 0) {
-        return this.$router.push(
-          "/company/" + this.filteredCompanies[index].name
-        );
-      } else {
-        if (this.prepages.length !== 0) {
-          return this.$router.push("/prepages/" + (this.prepages.length - 1));
-        }
-      }
-    },
-  },
-};
+    }
+  }
+}
 </script>
+
+<style lang="sass" scoped>
+@media (max-width: $breakpoint-md-min)
+  .row > *
+    width: 100%
+    margin: 6px
+
+  .logo
+    width: 100%
+
+
+@media (min-width: $breakpoint-md-min)
+  $x: 2
+  .column > *
+    width: 50%
+    margin: 6px
+  .flex-break
+    flex: 1 0 100% !important
+    width: 0!important
+
+  @for $i from 1 through ($x - 1)
+    .column > div:nth-child(#{$x}n + #{$i})
+      order: #{$i}
+
+  .column > div:nth-child(#{$x}n)
+    order: #{$x}
+  .column
+    height: 100vh
+    margin-left: -24px
+    padding: 16px
+</style>

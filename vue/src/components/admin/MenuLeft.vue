@@ -1,9 +1,7 @@
 <template>
   <v-navigation-drawer app clipped permanent class="elevation-4">
     <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="text-h5"> Admin </v-list-item-title>
-      </v-list-item-content>
+      <v-list-item-title class="text-h5"> Admin </v-list-item-title>
     </v-list-item>
 
     <v-divider></v-divider>
@@ -12,26 +10,23 @@
       <v-list-item
         v-for="link in links"
         :key="link.name"
-        :to="routepath + link.name"
+        :to="props.baseRoute + link.name"
+        :prepend-icon="link.icon"
       >
-        <v-list-item-icon>
-          <v-icon>{{ link.icon }}</v-icon>
-        </v-list-item-icon>
-
-        <v-list-item-content>
-          <v-list-item-title>{{ link.name }}</v-list-item-title>
-        </v-list-item-content>
+        <v-list-item-title>{{ link.name }}</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
 
-<script>
-export default {
-  name: "MenuLeft",
-  components: {},
-  props: ["links", "routepath"],
-};
+<script lang="ts" setup>
+const props = defineProps<{
+  links: {
+    name: string;
+    icon: string;
+  }[];
+  baseRoute: string;
+}>();
 </script>
 
 <style scoped></style>

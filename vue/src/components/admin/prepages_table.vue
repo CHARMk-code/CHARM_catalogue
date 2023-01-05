@@ -1,90 +1,81 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="savePrepage"
-      @delete_row="deletePrepage"
-      name="Prepage"
-      :headers="headers"
-      :data="Array.from(this.prepages)"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-      </template>
-      <template v-slot:item.order="{ item }">
-        {{ item.order }}
-      </template>
-      <template v-slot:extra_actions="{ item }">
-        <v-icon class="mr-2" @click="viewPrepage(item)"> mdi-book-open </v-icon>
-      </template>
-      <template v-slot:item.active="{ item }">
-        <v-simple-checkbox
-          disabled
-          on-icon="mdi-eye"
-          off-icon="mdi-eye-off"
-          v-model="item.active"
-        ></v-simple-checkbox>
-      </template>
-    </Table>
-  </v-container>
+  <q-card>
+    <q-card-section class="text-h5">Prepages</q-card-section>
+    <q-card-section>
+      <Table
+        @saveRow="(p) => prepagesStore.modifyPrepage(p)"
+        @deleteRow="(p) => prepagesStore.deletePrepage(p)"
+        name="Prepage"
+        :tableColumns="headers"
+        :rows="prepagesStore.prepages"
+        :colMeta="colMeta"
+        :editable="true"
+      >
+        <template #body-cell-Active="props">
+          <q-td :props="props">
+            <q-icon
+              v-if="props.value"
+              size="sm"
+              color="primary"
+              name="mdi-eye"
+            />
+            <q-icon
+              v-if="!props.value"
+              size="sm"
+              color="grey"
+              name="mdi-eye-off"
+            />
+          </q-td>
+        </template>
+        <!-- <template #body-cell-All="props">
+          <q-td :props="props">
+            {{ props.value }}
+          </q-td>
+        </template> -->
+        <template #actions="{ row }">
+          <q-btn
+            v-if="row.active"
+            round
+            flat
+            size="sm"
+            icon="mdi-book-open"
+            :to="'/prepage/' + row.order"
+          ></q-btn>
+        </template>
+      </Table>
+    </q-card-section>
+  </q-card>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+import { usePrepagesStore } from "@/stores/modules/prepages";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "prepages_table",
-  components: {
-    Table,
-  },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Order",
-          value: "order",
-        },
-        { text: "Active", value: "active" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 130,
-          align: "center",
-          sortable: false,
-        },
-      ],
-      row_meta: [
-        { type: "image", model: "image", label: "page image" },
-        { type: "checkbox", model: "active", label: "Active" },
-        { type: "text", model: "order", label: "Order" },
-        { type: "text", model: "name", label: "Name", displayname: true },
+const prepagesStore = usePrepagesStore();
 
-        //{ type: "file",model: "icon",label: "Tag Icon",},
-      ],
-    };
+const headers = [
+  { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
+  {
+    name: "Order",
+    label: "Order",
+    field: "order",
+    align: "left",
+    sortable: true,
   },
-  computed: {
-    ...mapGetters({ prepages: "prepages/get" }),
+  {
+    name: "Active",
+    label: "Active",
+    field: "active",
+    align: "left",
+    sortable: true,
   },
-  methods: {
-    savePrepage(prepage) {
-      this.$store.dispatch("prepages/modifyPrepage", prepage);
-    },
-    deletePrepage(prepage) {
-      this.$store.dispatch("prepages/deletePrepage", prepage);
-    },
-    viewPrepage(prepage) {
-      this.$router.push("/prepages/" + (prepage.order - 1));
-    },
-  },
-  beforeMount() {
-    this.$store.dispatch("prepages/getPrepages");
-  },
-};
+  // { name: "All", label: "All", field: (row: any) => row },
+];
+const colMeta: TableColMeta[] = [
+  { type: "text", model: "name", label: "Name" },
+  { type: "text", model: "order", label: "Order" },
+  { type: "checkbox", model: "active", label: "Active" },
+  { type: "image", model: "image", label: "page image" },
+];
 </script>

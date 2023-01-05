@@ -16,7 +16,7 @@ export interface Tag {
   language: boolean,
 }
 interface State {
-  tags: Tag[],
+  tags: Map<number, Tag>,
   load_wait: number,
 }
 /*
@@ -24,10 +24,19 @@ tagsStore.modifyTag({"name": "test", "desc": "testarmycket", "link": "https://co
 */
 export const useTagsStore = defineStore('tags', {
   state: (): State => ({
-    tags: [],
+    tags: new Map(),
     load_wait: 0,
   }),
   actions: {
+    setAllTags(tags: Tag[]) {
+      this.tags = new Map(tags.map(t => [t.id, t]))
+    },
+    removeTagById(id: number) {
+      this.tags.delete(id);
+    },
+    removeAllTags() {
+      this.tags = new Map();
+    },
     getTags() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
@@ -35,20 +44,9 @@ export const useTagsStore = defineStore('tags', {
           this.axios
             .get("/tag")
             .then((resp: any) => {
-              this.tags = []
-              const tags: Tag[] = resp.data;
-              if (tags.length > 0) {
-                this.tags = tags.filter(
-                  (t) =>
-                    !(
-                      t.business_area ||
-                      t.division ||
-                      t.looking_for ||
-                      t.offering ||
-                      t.language
-                    )
-                );
-              }
+              const tags = resp.data;
+              if (tags.length > 0)
+                this.setAllTags(tags)
               resolve(resp);
             })
             .catch((err: any) => {
@@ -59,12 +57,12 @@ export const useTagsStore = defineStore('tags', {
         }
       });
     },
-    modifyTag(tag: Tag) {
+    updateTag(tag: Tag) {
       return new Promise((resolve, reject) => {
         this.axios
           .put("/tag", tag)
           .then((resp: any) => {
-            this.tags.filter((t) => t.id != tag.id)
+            this.tags.set(tag.id, tag)
             resolve(resp);
           })
           .catch((err: any) => {
@@ -72,12 +70,12 @@ export const useTagsStore = defineStore('tags', {
           });
       });
     },
-    deleteTag(tag: Tag) {
+    removeTag(tag: Tag) {
       return new Promise((resolve, reject) => {
         this.axios
           .delete("/tag/" + tag.id)
           .then((resp: any) => {
-            this.tags = this.tags.filter((t) => t.id != tag.id);
+            this.removeTagById(tag.id)
             resolve(resp);
           })
           .catch((err: any) => {
@@ -87,58 +85,85 @@ export const useTagsStore = defineStore('tags', {
     },
   },
   getters: {
-    getTagFromId: (state) => (id: number) => {
-      if (state.tags.length > 0) {
-        const result = state.tags.filter((t) => t.id == id);
-        if (result.length > 0) {
-          return result[0];
+    getTagsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag) {
+          result.push(tag)
         }
       }
-      return [];
+      return result
     },
-    getTagsFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => ids.indexOf(t.id) != -1);
+    getDivisionsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.division) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getDivisionsFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => t.division)
-        .filter((t) => ids.indexOf(t.id) != -1);
+    getBusinessAreasFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.business_area) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getBusinessAreasFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => t.business_area)
-        .filter((t) => ids.indexOf(t.id) != -1);
+    getLookingForFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.looking_for) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getLookingForFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => t.looking_for)
-        .filter((t) => ids.indexOf(t.id) != -1);
+    getOfferingsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.offering) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getOfferingsFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => t.offering)
-        .filter((t) => ids.indexOf(t.id) != -1);
-    },
-    getLanguagesFromIds: (state) => (ids: number[]) => {
-      return state.tags
-        .filter((t) => t.language)
-        .filter((t) => ids.indexOf(t.id) != -1);
+    getLanguagesFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.language) {
+          result.push(tag)
+        }
+      }
+      return result
     },
     divisions: (state) => {
-      return state.tags.filter((t) => t.division);
+      return Array.from(state.tags.values())
+        .filter((t) => t.division);
     },
     business_areas: (state) => {
-      return state.tags.filter((t) => t.business_area);
+      return Array.from(state.tags.values())
+        .filter((t) => t.business_area);
     },
     looking_for: (state) => {
-      return state.tags.filter((t) => t.looking_for);
+      return Array.from(state.tags.values())
+        .filter((t) => t.looking_for);
     },
     offering: (state) => {
-      return state.tags.filter((t) => t.offering);
+      return Array.from(state.tags.values())
+        .filter((t) => t.offering);
     },
     languages: (state) => {
-      return state.tags.filter((t) => t.language);
+      return Array.from(state.tags.values())
+        .filter((t) => t.language);
     },
   },
 });

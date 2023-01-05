@@ -1,131 +1,164 @@
 <template>
-  <v-card>
-    <v-card-title>{{
+  <q-card>
+    <q-card-section class="text-h5 text-left">{{
       (newRow ? "Create " : "Update ") + name.toLowerCase()
-    }}</v-card-title>
-    <v-card-text>
-      <v-form>
+    }}</q-card-section>
+    <q-card-section>
+      <q-form class="q-gutter-md">
         <template v-for="col in colMeta">
           <template v-if="col.type == 'checkbox'">
-            <v-checkbox
+            <q-checkbox
+              filled
               large
-              v-model="row[col.model]"
-              :on-icon="col.onIcon"
-              :off-icon="col.offIcon"
+              v-model="rawRow[col.model]"
+              :checked-icon="col.onIcon"
+              :unchecked-icon="col.offIcon"
               :label="col.label"
             />
           </template>
 
           <template v-if="col.type == 'text'">
-            <v-text-field v-model="row[col.model]" :label="col.label" />
+            <q-input filled v-model="rawRow[col.model]" :label="col.label" />
           </template>
 
           <template v-if="col.type == 'number'">
-            <v-text-field v-model.number="row[col.model]" :label="col.label" />
+            <q-input filled v-model="rawRow[col.model]" :label="col.label" />
+          </template>
+
+          <template v-if="col.type == 'icon'">
+            <q-input filled v-model="rawRow[col.model]" :label="col.label">
+              <template #before>
+                <q-icon size="lg" :name="rawRow[col.model]" />
+              </template>
+            </q-input>
           </template>
 
           <template v-if="col.type == 'textarea'">
-            <v-textarea v-model="row[col.model]" :label="col.label" />
+            <q-input
+              filled
+              type="textarea"
+              v-model="rawRow[col.model]"
+              :label="col.label"
+            />
           </template>
 
           <template v-if="col.type == 'single-select'">
-            <v-autocomplete
-              v-model="row[col.model]"
-              :items="col.items"
+            <q-select
+              filled
+              v-model="rawRow[col.model]"
+              :options="col.items"
               :label="col.label"
               :hint="col.hint"
             >
-            </v-autocomplete>
+            </q-select>
           </template>
 
           <template v-if="col.type == 'multiple-select'">
-            <v-autocomplete
+            <slot
+              v-if="col.slot"
+              :name="'edit-' + col.model"
+              :row="rawRow"
+              :colMeta="col"
+            />
+            <q-select
+              v-else
+              filled
               multiple
-              closable-chips
-              chips
-              :key="col.model"
-              v-model="row[col.model]"
-              :items="col.items"
+              v-model="rawRow[col.model]"
+              :options="col.items"
               :label="col.label"
               :hint="col.hint"
             >
-              <template v-slot:selection="{ item }">
-                <template v-if="item.icon != ''">
-                  <v-avatar>
-                    <v-img
-                      max-height="32px"
-                      max-width="32px"
-                      :src="base_URL + item.icon"
-                    />
-                  </v-avatar>
-                </template>
-                <template v-else>
-                  <v-chip small>
-                    {{ item.name }}
-                  </v-chip>
-                </template>
+              <template #option="{ opt, itemProps }">
+                <q-item v-bind="itemProps">
+                  <q-item-section
+                    avatar
+                    v-if="opt.label.icon && opt.label.icon.length > 0"
+                  >
+                    <Tag_group :tags="[opt.label]"></Tag_group>
+                  </q-item-section>
+                  <q-item-section> {{ opt.label.name }}</q-item-section>
+                </q-item>
               </template>
-            </v-autocomplete>
+
+              <template #selected-item="{ index, opt }">
+                <Tag_group :tags="[opt.label]"></Tag_group>
+              </template>
+            </q-select>
           </template>
 
-          <template v-if="col.type == 'radio'">
-            <v-radio-group v-model="row[col.model]" :key="row[col.model]">
-              <v-radio
-                v-for="radios in col.items"
-                :key="radios.value"
-                :label="radios.title"
-                :value="radios.value"
-              />
-            </v-radio-group>
+          <template class="col-12" v-if="col.type == 'radio'">
+            <q-option-group
+              filled
+              type="radio"
+              v-model="rawRow[col.model]"
+              :options="col.items"
+            ></q-option-group>
           </template>
 
           <template v-if="col.type == 'image'">
-            <v-container :key="col.model">
-              <v-row>
-                <v-col>
-                  <v-img
-                    v-if="row[col.model] != undefined"
-                    :src="base_URL + row[col.model]"
-                    max-height="100"
-                    max-width="300"
-                    contain
-                  />
-                </v-col>
-                <v-col>
-                  <template v-if="row[col.model] != ''"> Replace </template>
+            <div class="row q-col-gutter-md">
+              <div class="col-6">
+                <q-img
+                  v-if="rawRow[col.model] != undefined"
+                  :src="base_URL + rawRow[col.model]"
+                  height="300px"
+                  fit="contain"
+                >
+                </q-img>
+              </div>
+              <div class="col-6">
+                <div class="">
+                  <template
+                    v-if="
+                      typeof rawRow[col.model] === 'string' &&
+                      rawRow[col.model].length > 0
+                    "
+                  >
+                    Replace
+                  </template>
                   <template v-else> Add </template>
                   {{ col.label }}
 
-                  <v-file-input
+                  <q-file
                     v-model="files[col.model]"
-                    type="file"
+                    filled
+                    accept="image/*"
                     clearable
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
+                    :label="col.label"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="attach_file" />
+                    </template>
+                  </q-file>
+                </div>
+              </div>
+            </div>
           </template>
         </template>
-      </v-form>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn variant="flat" color="primary" @click="save()"> Save </v-btn>
+      </q-form>
+    </q-card-section>
+    <q-card-actions>
+      <q-btn color="primary" @click="save()"> Save </q-btn>
 
-      <v-btn @click="close()"> Cancel </v-btn>
-    </v-card-actions>
-  </v-card>
+      <q-btn v-close-popup> Cancel </q-btn>
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
 import type { TableRow } from "@/components/table.vue";
+import Tag_group from "@/components/Tag_group.vue";
 import axios from "@/plugins/axios";
-import { ref } from "vue";
+import { reactive, ref, type Ref } from "vue";
+import { deepUnref } from "vue-deepunref";
 
 export interface TableColMeta {
   type:
     | "checkbox"
     | "text"
     | "number"
+    | "icon"
     | "textarea"
     | "single-select"
     | "multiple-select"
@@ -135,8 +168,9 @@ export interface TableColMeta {
   label: string;
   onIcon?: string;
   offIcon?: string;
-  items?: { title: string; value: string | number }[];
+  items?: any[];
   hint?: string;
+  slot?: boolean;
 }
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
@@ -148,47 +182,39 @@ const props = defineProps<{
   newRow: boolean;
 }>();
 
+const rawRow = reactive(deepUnref(props.row));
+
 const emit = defineEmits<{
-  (e: "saveRow", row: TableRow): void;
-  (e: "closeDialog"): void;
+  (e: "saveRow"): void;
 }>();
 
-const files = ref({});
-const test = [];
+const files: Ref<{ [key: string]: File }> = ref({});
 
 async function save() {
-  if (props.colMeta.filter((r) => r.type === "image").length > 0) {
-    await uploadFiles(files);
-  }
-  emit("saveRow", props.row);
-  close();
-}
+  Promise.all(
+    props.colMeta
+      .filter((col) => col.type === "image")
+      .map((col) => {
+        if (!files.value[col.model]) return true;
 
-function close() {
-  emit("closeDialog");
-}
-
-function uploadFiles(files) {
-  const file_models = Object.keys(files);
-
-  return Promise.all(
-    Object.values(files).map((f, index) => {
-      return new Promise((resolve, reject) => {
+        const file = files.value[col.model];
         const formData = new FormData();
-        formData.append("file", f);
-        axios
+        formData.append("file", file);
+        return axios
           .post("/manage/upload", formData)
-          .then((res) => {
-            this.row[file_models[index]] = f.name;
-            console.log(res.data);
-            return resolve(res);
+          .then(() => {
+            rawRow[col.model] = file.name;
+            console.log("filenamed", rawRow, file.name);
           })
-          .catch((err) => {
-            console.log(err);
-            return reject(err);
-          });
-      });
-    })
-  );
+          .catch(() => {});
+      })
+  ).then(() => {
+    for (const [key, val] of Object.entries(rawRow)) {
+      props.row[key] = val;
+    }
+    console.log("about to emit");
+    emit("saveRow");
+    console.log("emitted", rawRow, props.row);
+  });
 }
 </script>
