@@ -14,6 +14,7 @@ export interface Tag {
   looking_for: boolean,
   offering: boolean,
   language: boolean,
+  fair_area: boolean,
 }
 interface State {
   tags: Map<number, Tag>,
@@ -145,6 +146,16 @@ export const useTagsStore = defineStore('tags', {
       }
       return result
     },
+    getFairAreasFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.area) {
+          result.push(tag)
+        }
+      }
+      return result
+    },
     divisions: (state) => {
       return Array.from(state.tags.values())
         .filter((t) => t.division);
@@ -164,6 +175,10 @@ export const useTagsStore = defineStore('tags', {
     languages: (state) => {
       return Array.from(state.tags.values())
         .filter((t) => t.language);
+    },
+    fair_areas: (state) => {
+      return Array.from(state.tags.values())
+        .filter((t) => t.fair_area);
     },
   },
 });

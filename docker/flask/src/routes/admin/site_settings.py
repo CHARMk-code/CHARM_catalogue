@@ -61,11 +61,12 @@ def reset_company_view():
         { 'text': "Notes", 'name': "notes", 'active': True },
         { 'text': "CHARMtalks", 'name': "CHARMtalks", 'active': True },
         { 'text': "Language", 'name': "language", 'active': True },
+        { 'text': "Fair Areas", 'name': "fair_area", 'active': True },
     ]
     cards = Company_card.query.all()
-    for card in cards: 
+    for card in cards:
         card.delete()
     status = map(lambda card: Company_card.create(**card), default_cards)
     return send_status(all(status))
-    
-    
+
+

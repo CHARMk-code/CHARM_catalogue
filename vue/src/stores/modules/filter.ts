@@ -46,6 +46,7 @@ export const useFilterStore = defineStore('filter', {
         business_areas: [],
         offerings: [],
         languages: [],
+        fair_areas: [],
       },
       favorites: false,
       charmtalk: false,
@@ -63,6 +64,7 @@ export const useFilterStore = defineStore('filter', {
           business_areas: [],
           offerings: [],
           languages: [],
+          fair_areas: [],
         },
         favorites: false,
         charmtalk: false,
@@ -149,6 +151,10 @@ export const useFilterStore = defineStore('filter', {
         filter.tags.offerings = tagsStore
           .getOfferingsFromIds(allTags)
           .map((t) => t.id);
+
+        filter.tags.fair_areas = tagsStore
+          .getFairAreasFromIds(allTags)
+          .map((t) => t.id);
       }
 
       if (rQuery.favorites) {
@@ -177,7 +183,8 @@ export const useFilterStore = defineStore('filter', {
         filter.tags.business_areas.length > 0 ||
         filter.tags.looking_for.length > 0 ||
         filter.tags.languages.length > 0 ||
-        filter.tags.offerings.length > 0
+        filter.tags.offerings.length > 0 ||
+        filter.tags.fair_areas.length > 0
       ) {
         rQuery.tags = [
           filter.tags.business_areas,
@@ -185,6 +192,7 @@ export const useFilterStore = defineStore('filter', {
           filter.tags.languages,
           filter.tags.divisions,
           filter.tags.offerings,
+          filter.tags.fair_areas,
         ]
           .reduce((res, tags) => res.concat(tags), [])
           .toString();

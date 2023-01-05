@@ -64,6 +64,13 @@
             label="Language"
             :maxShown="2"
           />
+          <tagSelector
+            v-if="isVisible('fair_area')"
+            :tags="tagsStore.fair_areas"
+            v-model:selected_tags="selectedFairAreas"
+            label="Fair Areas"
+            :maxShown="2"
+          />
           <q-option-group
             v-model="checkboxes"
             :options="checkbox_options"
@@ -217,6 +224,18 @@ const selectedLanguages = computed({
       filterStore.filters.tags.languages = v.map((t: Tag) => t.id);
     } else {
       filterStore.filters.tags.languages = [];
+    }
+  },
+});
+const selectedFairAreas = computed({
+  get() {
+    return tagsStore.getFairAreasFromIds(filterStore.filters.tags.fair_areas);
+  },
+  set(v) {
+    if (v) {
+      filterStore.filters.tags.fair_areas = v.map((t: Tag) => t.id);
+    } else {
+      filterStore.filters.tags.fair_areas = [];
     }
   },
 });

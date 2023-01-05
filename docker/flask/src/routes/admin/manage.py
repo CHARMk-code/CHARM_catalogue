@@ -12,7 +12,7 @@ import openpyxl
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
 NUMBER_OF_METADATA_COLS_COMPANY = 17
-NUMBER_OF_METADATA_COLS_TAG = 6
+NUMBER_OF_METADATA_COLS_TAG = 7
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])

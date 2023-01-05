@@ -128,7 +128,7 @@ class Company(db.Model):
         return True
 
     def update(self, name, active, charmtalk, description, unique_selling_point,
-               summer_job_description, summer_job_link, summer_job_deadline, contacts, 
+               summer_job_description, summer_job_link, summer_job_deadline, contacts,
                contact_email, employees_world, employees_sweden, website,
             talk_to_us_about,logo, map_image, booth_number, tags):
 
@@ -206,9 +206,10 @@ class Tag(db.Model):
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
     language = db.Column(db.Boolean)
+    fair_area = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -223,7 +224,8 @@ class Tag(db.Model):
                 business_area = business_area,
                 looking_for = looking_for,
                 offering = offering,
-                language = language
+                language = language,
+                fair_area = fair_area,
             )
             db.session.add(new_tag)
             db.session.commit()
@@ -231,7 +233,7 @@ class Tag(db.Model):
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
@@ -244,6 +246,7 @@ class Tag(db.Model):
             self.looking_for = test_and_set(self.looking_for, looking_for)
             self.offering = test_and_set(self.offering, offering)
             self.language = test_and_set(self.language, language)
+            self.fair_area = test_and_set(self.fair_area, fair_area)
             db.session.commit()
             return True
         except:
@@ -270,7 +273,8 @@ class Tag(db.Model):
             'business_area': self.business_area,
             'looking_for': self.looking_for,
             'offering': self.offering,
-            'language': self.language
+            'language': self.language,
+            'fair_area': self.fair_area
         }
 
 class Tag_company(db.Model):

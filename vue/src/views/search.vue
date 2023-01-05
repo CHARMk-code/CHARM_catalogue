@@ -40,6 +40,12 @@
             ></q-td>
           </template>
 
+          <template #body-cell-Fair_areas="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
+          </template>
+
           <template #body-cell-Favorites="props">
             <q-td :props="props">
               <q-icon
@@ -112,6 +118,12 @@ const columns = [
     name: "Offering",
     label: "Offering",
     field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Fair_area",
+    label: "Fair Area",
+    field: (row: Company) => tagsStore.getFairAreasFromIds(row.tags),
     align: "left",
   },
   {

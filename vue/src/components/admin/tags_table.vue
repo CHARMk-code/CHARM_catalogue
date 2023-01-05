@@ -52,6 +52,7 @@ const headers = [
       if (row.looking_for) categories.push("Looking for");
       if (row.offering) categories.push("Offering");
       if (row.language) categories.push("Language");
+      if (row.fair_area) categories.push("Fair Area");
       return categories.join(", ");
     },
     align: "left",
@@ -67,5 +68,6 @@ const colMeta: TableColMeta[] = [
   { type: "checkbox", model: "looking_for", label: "Looking for" },
   { type: "checkbox", model: "offering", label: "Offering" },
   { type: "checkbox", model: "language", label: "Language" },
+  { type: "checkbox", model: "fair_area", label: "Fair Area" },
 ];
 </script>
