@@ -1,10 +1,12 @@
 <template>
   <company_card_wrapper name="contacts" v-if="contacts != ''">
-    <v-card-title> Contact information </v-card-title>
-    <v-card-text v-if="contacts.includes('https://')">
-      <a :href="contacts"> {{ contacts }} </a>
-    </v-card-text>
-    <v-card-text v-else>{{ contacts }} ({{ contact_email }}) </v-card-text>
+    <q-card-section>
+      <div class="text-h6">Contact information</div>
+      <div v-if="contacts.includes('https://')">
+        <a :href="contacts"> {{ contacts }} </a>
+      </div>
+      <div v-else>{{ contacts }} ({{ contact_email }})</div>
+    </q-card-section>
   </company_card_wrapper>
 </template>
 

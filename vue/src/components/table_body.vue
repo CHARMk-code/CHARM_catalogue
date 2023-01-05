@@ -67,12 +67,12 @@ import tablePopup from "@/components/admin/table_popup.vue";
 import { useTagsStore } from "@/stores/modules/tags";
 import { computed, ref, useSlots, watch, type Ref } from "vue";
 import type { TableColMeta } from "./admin/table_edit_dialog.vue";
-import type { TableColumns, TableRow } from "./table.vue";
+import type { TableRow } from "./table.vue";
 
 const props = defineProps<{
   name: string;
   editable: boolean;
-  tableColumns: TableColumns[];
+  tableColumns: any[];
   rows: Iterable<TableRow>;
   colMeta: TableColMeta[];
 }>();

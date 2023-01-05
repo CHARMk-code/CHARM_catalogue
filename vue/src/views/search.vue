@@ -1,83 +1,78 @@
 <template>
-  <sideLayout>
-    <v-container>
-      <v-card>
+  <q-page padding>
+    <q-card>
+      <q-card-section>
+        <span class="block text-h6">Search</span>
         <searchCard />
-        <v-card-subtitle>Results</v-card-subtitle>
-        <Table
-          name="Results"
-          :tableColumns="headers"
+      </q-card-section>
+      <q-card-section>
+        <span class="block text-h6">Results</span>
+        <q-table
+          flat
           :rows="filterStore.filteredCompanies"
-          :editable="false"
-          :colMeta="[]"
-          @clickRow="onRowClick"
+          :columns="columns"
+          wrap-cells
+          @row-click="
+            (_event, row, _index) => router.push('/company/' + row.name)
+          "
         >
-          <template #col(divisions)="{ item }">
-            <div class="ma-1">
-              <TagGroup
-                :tags="tagsStore.getDivisionsFromIds(item.tags)"
-              ></TagGroup>
-            </div>
+          <template #body-cell-Programs="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
 
-          <template #col(business_area)="{ item }">
-            <TagGroup :tags="tagsStore.getBusinessAreasFromIds(item.tags)">
-            </TagGroup>
+          <template #body-cell-Business_areas="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
 
-          <template #col(looking_for)="{ item }">
-            <TagGroup
-              :tags="tagsStore.getLookingForFromIds(item.tags)"
-            ></TagGroup>
+          <template #body-cell-Looking_for="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
 
-          <template #col(offering)="{ item }">
-            <TagGroup
-              :tags="tagsStore.getOfferingsFromIds(item.tags)"
-            ></TagGroup>
+          <template #body-cell-Offering="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup
+            ></q-td>
           </template>
 
-          <template #col(liked)="{ item }">
-            <v-checkbox
-              disabled
-              true-icon="mdi-star"
-              false-icon="mdi-star-outline"
-              :value="favoritesStore.favorites.has(item.id)"
-            ></v-checkbox>
+          <template #body-cell-Favorites="props">
+            <q-td :props="props">
+              <q-icon
+                v-if="props.value"
+                size="sm"
+                name="mdi-star"
+                color="primary"
+              ></q-icon>
+              <q-icon
+                v-else
+                size="sm"
+                name="mdi-star-outline"
+                color="grey"
+              ></q-icon>
+            </q-td>
           </template>
-          <!--
-            <template
-            <template
-            v-slot:item.id="{ item }"
-          >
-            <v-checkbox
-              :input-value="favoritesStore.favorites.has(item.id)"
-              disabled
-              on-icon="mdi-star"
-              off-icon="mdi-star-outline"
-            />
-          </template>
-          -->
-        </Table>
-      </v-card>
-    </v-container>
-  </sideLayout>
+        </q-table>
+      </q-card-section>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
-import sideLayout from "@/views/sideLayout.vue";
 import searchCard from "@/components/search/search_card.vue";
-import Table from "@/components/table.vue";
 import axios from "@/plugins/axios";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
-import { useRouter } from "vue-router";
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { useFavoritesStore } from "@/stores/modules/favorites";
 import type { Company } from "@/stores/modules/companies";
 import { computed } from "vue";
 import { useTagsStore } from "@/stores/modules/tags";
 import TagGroup from "@/components/Tag_group.vue";
-import TagComp from "@/components/Tag.vue";
 
 const site_settingsStore = useSite_settingsStore();
 const filterStore = useFilterStore();
@@ -93,28 +88,38 @@ const visibleCards = site_settingsStore.settings.company_view.cards.filter(
 function isVisible(name: string): boolean {
   return visibleCards.some((c) => c.name === name);
 }
-
-const headers = computed(() => {
-  const temp = [];
-  if (isVisible("name")) temp.push({ name: "Name", value: "name" });
-  if (isVisible("tag_divisions"))
-    temp.push({ name: "Programs", value: "divisions" });
-  if (isVisible("tag_business_areas"))
-    temp.push({ name: "Business areas", value: "business_area" });
-  if (isVisible("tag_looking_for"))
-    temp.push({ name: "Looking for", value: "looking_for" });
-  if (isVisible("tag_offering"))
-    temp.push({ name: "Offering", value: "offering" });
-  if (isVisible("name")) temp.push({ name: "Liked", value: "liked" });
-  return temp;
-});
+const columns = [
+  { name: "Name", label: "Name", field: "name", align: "left" },
+  {
+    name: "Programs",
+    label: "Programs",
+    field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Business_areas",
+    label: "Business areas",
+    field: (row: Company) => tagsStore.getBusinessAreasFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Looking_for",
+    label: "Looking for",
+    field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Offering",
+    label: "Offering",
+    field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+    align: "left",
+  },
+  {
+    name: "Favorites",
+    label: "Favorites",
+    field: (row: Company) => favoritesStore.favorites.has(row.id),
+    align: "center",
+  },
+];
 const router = useRouter();
-
-function onRowClick(company: Company) {
-  router.push("/company/" + company.name);
-}
-
-function log(a, b) {
-  console.log(a, b);
-}
 </script>

@@ -1,7 +1,7 @@
 <template>
-  <v-card>
-    <v-card-title>Maps</v-card-title>
-    <v-card-text>
+  <q-card>
+    <q-card-section class="text-h5">Maps</q-card-section>
+    <q-card-section>
       <Table
         @saveEdit="(m) => mapsStore.updateMap(m)"
         @deleteRow="(m) => mapsStore.removeMap(m)"
@@ -11,12 +11,14 @@
         :colMeta="colMeta"
         :editable="true"
       >
-        <template #col(ref)="{ value }">
-          {{ (mapsStore.getMapFromId(value) || { name: "None" }).name }}
+        <template #body-cell-Parent="props">
+          <q-td :props="props">
+            {{ (mapsStore.getMapFromId(props.value) || { name: "None" }).name }}
+          </q-td>
         </template>
       </Table>
-    </v-card-text>
-  </v-card>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
@@ -27,9 +29,21 @@ import type { TableColMeta } from "./table_edit_dialog.vue";
 const mapsStore = useMapsStore();
 
 const headers = [
-  { name: "Name", value: "name" },
-  { name: "Image", value: "image" },
-  { name: "Parent", value: "ref" },
+  { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
+  {
+    name: "Image",
+    label: "Image",
+    field: "image",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "Parent",
+    label: "Parent",
+    field: "ref",
+    align: "left",
+    sortable: true,
+  },
 ];
 
 const colMeta: TableColMeta[] = [

@@ -2,16 +2,37 @@
   <q-layout view="hhh LpR fFf">
     <q-header reveal elevated class="bg-white text-primary">
       <q-toolbar>
+        <q-btn
+          dense
+          flat
+          round
+          icon="menu"
+          @click="leftDrawerOpen = !leftDrawerOpen"
+        />
+
         <q-btn to="/" flat>
           <q-toolbar-title>
             <img class="logo" src="@/assets/CHARM_logo.png" />
           </q-toolbar-title>
         </q-btn>
         <q-space></q-space>
+        <q-btn
+          flat
+          color="primary"
+          icon-right="mdi-magnify"
+          label="Search"
+          to="/search"
+        ></q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer persistent side="left" bordered :modelValue="true" :width="200">
+    <q-drawer
+      v-model="leftDrawerOpen"
+      side="left"
+      overlay
+      bordered
+      :width="200"
+    >
       <q-list>
         <q-separator></q-separator>
         <q-item
@@ -29,6 +50,12 @@
           </q-item-section>
         </q-item>
         <q-separator v-if="authStore.isLoggedIn"></q-separator>
+        <q-item v-if="authStore.isLoggedIn" clickable v-ripple to="/admin">
+          <q-item-section avatar>
+            <q-icon name="mdi-cog"></q-icon>
+          </q-item-section>
+          <q-item-section> Admin </q-item-section>
+        </q-item>
         <q-item v-if="authStore.isLoggedIn">
           <q-item-section>
             <q-btn color="primary" text-color="white" @click="logout"
@@ -37,6 +64,42 @@
           </q-item-section>
         </q-item>
       </q-list>
+    </q-drawer>
+
+    <q-drawer :width="200" side="left" persistent show-if-above>
+      <div class="navigation">
+        <q-btn
+          elevation="4"
+          v-on:click="$emit('prev')"
+          icon="mdi-arrow-left"
+          size="lg"
+          round
+        ></q-btn>
+      </div>
+      <q-img
+        class="ma-0 pa-0"
+        height="100%"
+        v-if="leftLayout"
+        :src="base_URL + leftLayout.image"
+      />
+    </q-drawer>
+
+    <q-drawer :width="200" side="right" persistent show-if-above>
+      <div class="navigation">
+        <q-btn
+          elevation="4"
+          v-on:click="$emit('next')"
+          icon="mdi-arrow-right"
+          size="lg"
+          round
+        ></q-btn>
+      </div>
+      <q-img
+        class="ma-0 pa-0"
+        height="100%"
+        v-if="rightLayout"
+        :src="base_URL + rightLayout.image"
+      />
     </q-drawer>
 
     <q-page-container>
@@ -66,19 +129,9 @@ const leftDrawerOpen = ref(false);
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
-const links: { name: string; route: string; icon: string }[] = [
-  {
-    name: "prepages",
-    route: "/admin/prepages",
-    icon: "mdi-book-open-page-variant",
-  },
-  { name: "companies", route: "/admin/companies", icon: "mdi-account-group" },
-  { name: "Tags", route: "/admin/tags", icon: "mdi-tag-heart-outline" },
-  { name: "maps", route: "/admin/maps", icon: "mdi-map" },
-  { name: "layout", route: "/admin/layout", icon: "mdi-human-male-board" },
-  { name: "shortcuts", route: "/admin/shortcuts", icon: "mdi-star" },
-  { name: "batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
-  { name: "account", route: "/admin/account", icon: "mdi-account" },
+const links = [
+  { name: "Home", route: "/", icon: "mdi-home" },
+  { name: "Search", route: "/search", icon: "mdi-magnify" },
 ];
 
 const leftLayout = computed(() => layoutsStore.getSide("left"));
@@ -90,6 +143,7 @@ function logout() {
 }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .logo {
   height: 40px;

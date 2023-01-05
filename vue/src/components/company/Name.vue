@@ -1,32 +1,22 @@
 <template>
   <company_card_wrapper name="name" flat>
-    <div class="d-flex flex-row-reverse">
-      <div class="pl-6">
-        <v-tooltip right max-width="300px">
-          <template v-slot:activator="{ props }">
-            <v-checkbox
-              v-bind="props"
-              class="large"
-              hide-details
-              v-model="favorite"
-              true-icon="mdi-star"
-              false-icon="mdi-star-outline"
-              :color="favorite ? 'primary' : undefined"
-            />
-          </template>
-          <span>
-            Save as favorite (This is only stored in your browser and will not
-            be transferred between browsers)
-          </span>
-        </v-tooltip>
-      </div>
-      <div
-        class="text-h5 text-md-h3 font-weight-regular"
-        style="align-self: center"
+    <q-card-section style="height: 150px">
+      <q-checkbox
+        class="absolute-right"
+        checked-icon="mdi-star"
+        unchecked-icon="mdi-star-outline"
+        v-model="favorite"
+        :color="favorite ? 'primary' : 'grey'"
+        size="xl"
+        left-label
       >
-        {{ name }}
-      </div>
-    </div>
+        <span class="text-h3">{{ name }}</span>
+        <q-tooltip>
+          Save as favorite (This is only stored in your browser and will not be
+          transferred between browsers)
+        </q-tooltip>
+      </q-checkbox>
+    </q-card-section>
   </company_card_wrapper>
 </template>
 
@@ -46,26 +36,12 @@ const favorite = computed({
   get() {
     return useFavoritesStore().isFavorite(props.id);
   },
-  set() {
-    if (favoritesStore.isFavorite(props.id)) {
-      favoritesStore.removeFavorite(props.id);
-    } else {
+  set(v) {
+    if (v) {
       favoritesStore.addFavorite(props.id);
+    } else {
+      favoritesStore.removeFavorite(props.id);
     }
   },
 });
 </script>
-
-<style scoped>
-.large {
-  font-size: 24px;
-}
-
-.large label {
-  padding-left: 24px;
-}
-
-.large [class*="__ripple"] {
-  left: 0;
-}
-</style>

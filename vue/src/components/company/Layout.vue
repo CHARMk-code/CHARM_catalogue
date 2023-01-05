@@ -1,5 +1,7 @@
 <template>
-  <v-img v-if="layout != undefined" :src="base_URL + layout.image" contain />
+  <div v-if="layout != undefined">
+    <q-img :src="base_URL + layout.image" fit="contain" />
+  </div>
 </template>
 
 <script lang="ts" setup>

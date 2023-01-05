@@ -1,10 +1,9 @@
 <template>
-  <v-container>
+  <q-page padding>
     <shortcuts_table />
-  </v-container>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
 import shortcuts_table from "@/components/admin/shortcuts_table.vue";
-
 </script>

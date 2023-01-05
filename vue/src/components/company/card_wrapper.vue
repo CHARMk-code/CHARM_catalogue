@@ -1,7 +1,7 @@
 <template>
-  <v-card min-width="296px" v-if="isVisible" :flat="flat">
+  <q-card v-if="isVisible" :flat="flat">
     <slot />
-  </v-card>
+  </q-card>
 </template>
 
 <script lang="ts" setup>

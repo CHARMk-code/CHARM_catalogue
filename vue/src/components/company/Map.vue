@@ -1,23 +1,25 @@
 <template>
-  <company_card_wrapper class="mb-6" name="map">
-    <v-card-title> Location </v-card-title>
-    <v-card-text class="text-subtitle-1 text-center">
-      <v-icon color="primary" large>mdi-map-marker</v-icon> Booth #{{
-        booth_number
-      }}
-      <v-card
-        v-if="props.map"
-        flat
-        :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
-      >
-        <v-img
-          class="ma-2"
-          max-height="400px"
-          contain
-          :src="base_URL + props.map.image"
-        />
-      </v-card>
-    </v-card-text>
+  <company_card_wrapper name="map">
+    <q-card-section>
+      <div class="text-h6">Location</div>
+    </q-card-section>
+    <q-card-section class="text-subtitle-1 text-center">
+      <q-icon color="primary" name="mdi-map-marker"></q-icon>
+      Booth #{{ booth_number }}
+    </q-card-section>
+    <q-card-section
+      v-if="props.map"
+      flat
+      :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
+    >
+      <q-img
+        class="ma-2"
+        height="400px"
+        width="400px"
+        fit="contain"
+        :src="base_URL + props.map.image"
+      />
+    </q-card-section>
   </company_card_wrapper>
 </template>
 

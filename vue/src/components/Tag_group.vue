@@ -1,36 +1,20 @@
 <template>
-  <template v-for="tag in props.tags">
-    <template v-if="tag.icon && tag.icon.length > 0">
-      <v-tooltip bottom>
-        <template v-slot:activator="{ props }">
-          <v-avatar
-            style="margin: 2px"
-            density="compact"
-            size="small"
-            v-bind="props"
-          >
-            <img
-              :src="base_URL + tag.icon"
-              style="
-                object-fit: cover;
-                position: absolute;
-                width: 100%;
-                height: 100%;
-              "
-            />
-          </v-avatar>
-        </template>
-        <span>
+  <div class="">
+    <template v-for="(tag, index) in props.tags">
+      <template v-if="tag.icon && tag.icon.length > 0">
+        <q-avatar size="md" v-bind="props">
+          <img :src="base_URL + tag.icon" cover />
+          <q-tooltip> {{ tag.name }} </q-tooltip>
+        </q-avatar>
+      </template>
+
+      <template v-else>
+        <q-chip size="sm" class="ma-1">
           {{ tag.name }}
-        </span>
-      </v-tooltip>
+        </q-chip>
+      </template>
     </template>
-    <template v-else>
-      <v-chip size="small" class="ma-1">
-        {{ tag.name }}
-      </v-chip>
-    </template>
-  </template>
+  </div>
 </template>
 
 <script lang="ts" setup>

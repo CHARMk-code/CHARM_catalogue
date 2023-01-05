@@ -1,49 +1,55 @@
 <template>
-  <sideLayout>
-    <v-container>
-      <v-row style="justify-content: center">
-        <v-col full-width xs="12" md="6">
-          <div class="mx-auto mb-4 text-center text-h5 text-md-h3">
-            Browse the catalogue
-          </div>
-          <hoverCard
-            v-if="first_prepage"
-            class="mx-auto"
-            to="/prepages/0"
-            :background_image="base_URL + first_prepage.image"
+  <q-page padding>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <q-card
+          class="q-mx-auto"
+          :style="{ width: $q.screen.lt.md ? '75%' : '100%' }"
+          v-if="first_prepage"
+        >
+          <q-img
+            :height="$q.screen.lt.md ? '400px' : ''"
+            fit="contain"
+            :src="base_URL + first_prepage.image"
           />
-        </v-col>
-        <v-col xs="12" md="6">
-          <div class="mx-auto mb-4 d-block text-center text-h5 text-md-h3">
-            Shortcuts
-          </div>
-          <v-container class="ma-0 pa-0 d-flex flex-wrap" style="gap: 16px">
+          <q-card-actions :align="'center'" class="text-h5 text-center">
+            <q-btn
+              no-caps
+              color="primary"
+              size="lg"
+              label="Browse the catalogue"
+              to="/prepage/0"
+            ></q-btn>
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="col-12 col-md-6">
+        <span class="text-h4 text-center block full-width">Shortcuts</span>
+        <template v-for="shortcut in shortcutsStore.shortcuts">
+          <div class="q-pa-sm full-width">
             <shortcut
-              v-for="shortcut in shortcutsStore.shortcuts"
-              :key="shortcut.name"
               :icon="shortcut.icon"
               :name="shortcut.name"
               :desc="shortcut.desc"
               :link="shortcut.link"
             />
-          </v-container>
-        </v-col>
-      </v-row>
-    </v-container>
-  </sideLayout>
+          </div>
+        </template>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
-import sideLayout from "@/views/sideLayout.vue";
 import hoverCard from "@/components/landing/hoverCard.vue";
 import shortcut from "@/components/landing/shortcut.vue";
 import axios from "@/plugins/axios";
 import { computed } from "vue";
-import { usePrePagesStore } from "@/stores/modules/prepages";
+import { usePrepagesStore } from "@/stores/modules/prepages";
 import { useShortcutsStore } from "@/stores/modules/shortcuts";
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
-const prepagesStore = usePrePagesStore();
+const prepagesStore = usePrepagesStore();
 const shortcutsStore = useShortcutsStore();
 
 const first_prepage = computed(() => {

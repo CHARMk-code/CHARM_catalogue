@@ -1,42 +1,38 @@
 <template>
-  <v-autocomplete
+  <q-select
+    class="q-ma-sm"
+    filled
     multiple
-    chips
-    item-title="name"
-    item-value="id"
+    :options="tags"
     v-model="selected"
     :label="label"
-    :items="tags"
-    :maxWidth="400"
-    :menuProps="{ maxHeight: 300 }"
     clearable
-    persistent-clear
-    variant="outlined"
   >
-    <template v-slot:item="{ item, props }">
-      <v-list-item v-bind="props">
-        <template v-if="item.raw.icon" #prepend>
-          <TagComp :tag="item.raw"></TagComp>
-        </template>
-      </v-list-item>
+    <template #option="{ opt, itemProps }">
+      <q-item v-bind="itemProps">
+        <q-item-section avatar v-if="opt.icon && opt.icon.length > 0">
+          <Tag_group :tags="[opt]"></Tag_group>
+        </q-item-section>
+        <q-item-section> {{ opt.name }}</q-item-section>
+      </q-item>
     </template>
 
-    <template v-slot:chip="{ index, item }">
-      <TagComp v-if="index < props.maxShown" :tag="item.raw"></TagComp>
+    <template #selected-item="{ index, opt }">
+      <Tag_group v-if="index < props.maxShown" :tags="[opt]"></Tag_group>
       <span
         v-if="index === props.maxShown"
         class="text-grey text-caption align-self-center"
-        >(+ {{ selected_tagIds.length - maxShown }} others)</span
+        >(+ {{ selected.length - maxShown }} others)</span
       >
     </template>
-  </v-autocomplete>
+  </q-select>
 </template>
 
 <script lang="ts" setup>
 import axios from "@/plugins/axios";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
-import { computed, isReadonly, readonly, ref, type Ref } from "vue";
-import TagComp from "@/components/Tag.vue";
+import { onMounted, ref, watch, type Ref } from "vue";
+import Tag_group from "@/components/Tag_group.vue";
 
 const tagsStore = useTagsStore();
 
@@ -44,27 +40,20 @@ const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const props = defineProps<{
   tags: Tag[];
-  selected_tagIds: number[];
+  selected_tags: Tag[];
   label: string;
   maxShown: number;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selected_tagIds", v: number[]): void;
+  (e: "update:selected_tags", v: Tag[]): void;
   (e: "change"): void;
 }>();
 
-function printnow(a) {
-  console.log(a);
-}
+const selected: Ref<Tag[]> = ref([]);
+selected.value = props.selected_tags;
 
-const selected = computed({
-  get() {
-    return props.selected_tagIds;
-  },
-  set(v) {
-    emit("update:selected_tagIds", v);
-    emit("change");
-  },
+watch(selected, (tags: Tag[]) => {
+  emit("update:selected_tags", tags);
 });
 </script>

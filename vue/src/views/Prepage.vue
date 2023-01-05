@@ -1,37 +1,28 @@
 <template>
-  <sideLayout
-    v-on:next="next"
-    v-on:prev="prev"
-    v-bind:button_left="page > 0"
-    v-bind:button_right="true"
-  >
-    <v-sheet
-      class="prepage-sheet"
-      v-touch="{ right: () => prev(), left: () => next() }"
-    >
-      <v-img
-        class="prepage"
-        contain
-        max-width="100%"
-        max-height="90vh"
-        :src="base_URL + prepagesStore.active_prepages[page].image"
-      />
-    </v-sheet>
-  </sideLayout>
+  <q-page>
+    <q-img
+      class="prepage"
+      fit="contain"
+      width="100%"
+      position="50% top"
+      :draggable="false"
+      :src="base_URL + prepagesStore.active_prepages[page].image"
+      v-touch-swipe="handleSwipe"
+    />
+  </q-page>
 </template>
 
 <script lang="ts" setup>
 import axios from "@/plugins/axios";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useFilterStore } from "@/stores/modules/filter";
-import { usePrePagesStore } from "@/stores/modules/prepages";
-import sideLayout from "@/views/sideLayout.vue";
+import { usePrepagesStore } from "@/stores/modules/prepages";
 import { onMounted, onUnmounted, computed, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const companiesStore = useCompaniesStore();
 const filtersStore = useFilterStore();
-const prepagesStore = usePrePagesStore();
+const prepagesStore = usePrepagesStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -58,21 +49,34 @@ const arrowKeyHandler = (e: { key: string }) => {
 };
 
 const page = computed(() => {
-  return parseInt(route.params.page[0]);
+  return parseInt(route.params.page[0]) - 1;
 });
+
+function handleSwipe({ direction }) {
+  if (direction === "right") {
+    prev();
+  } else if (direction === "left") {
+    next();
+  }
+}
 
 const next = () => {
   if (page.value + 1 >= prepagesStore.active_prepages.length) {
     filtersStore.filterCompanies();
     router.push("/company/" + filtersStore.filteredCompanies[0].name);
   } else {
-    router.push("/prepages/" + (page.value + 1));
+    router.push("/prepage/" + (page.value + 1));
   }
 };
 const prev = () => {
   const next_index = page.value - 1;
   if (next_index >= 0) {
-    router.push("/prepages/" + next_index);
+    router.push("/prepage/" + next_index);
   }
 };
 </script>
+
+<style scoped lang="sass">
+.prepage
+  height: calc(100vh - 53px)
+</style>

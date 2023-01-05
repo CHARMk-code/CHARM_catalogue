@@ -18,7 +18,6 @@ export interface Tag {
 interface State {
   tags: Map<number, Tag>,
   load_wait: number,
-  getter_uses: number
 }
 /*
 tagsStore.modifyTag({"name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
@@ -27,7 +26,6 @@ export const useTagsStore = defineStore('tags', {
   state: (): State => ({
     tags: new Map(),
     load_wait: 0,
-    getter_uses: 0,
   }),
   actions: {
     setAllTags(tags: Tag[]) {
@@ -87,35 +85,65 @@ export const useTagsStore = defineStore('tags', {
     },
   },
   getters: {
-    getTagsFromIds: (state) => (ids: number[]) => {
-      return ids
-        .map((id) => state.tags.get(id))
+    getTagsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getDivisionsFromIds: (state) => (ids: number[]) => {
-      const a = ids.map((id) => state.tags.get(id))
-        .filter((t) => t?.division)
-      return a
+    getDivisionsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.division) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getBusinessAreasFromIds: (state) => (ids: number[]) => {
-      const a = ids.map((id) => state.tags.get(id))
-        .filter((t) => t?.business_area)
-      return a
+    getBusinessAreasFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.business_area) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getLookingForFromIds: (state) => (ids: number[]) => {
-      const a = ids
-        .map((id) => state.tags.get(id))
-        .filter((t) => t?.looking_for)
-      return a
+    getLookingForFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.looking_for) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getOfferingsFromIds: (state) => (ids: number[]) => {
-      return ids
-        .map((id) => state.tags.get(id))
-        .filter((t) => t?.offering)
+    getOfferingsFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.offering) {
+          result.push(tag)
+        }
+      }
+      return result
     },
-    getLanguagesFromIds: (state) => (ids: number[]) => {
-      return ids
-        .map((id) => state.tags.get(id))
-        .filter((t) => t?.language)
+    getLanguagesFromIds: (state) => (ids: Iterable<number>) => {
+      const result: Tag[] = []
+      for (const id of ids) {
+        const tag = state.tags.get(id)
+        if (tag && tag.language) {
+          result.push(tag)
+        }
+      }
+      return result
     },
     divisions: (state) => {
       return Array.from(state.tags.values())

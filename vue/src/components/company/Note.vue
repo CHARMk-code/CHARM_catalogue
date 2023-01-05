@@ -1,9 +1,9 @@
 <template>
   <company_card_wrapper name="notes">
-    <v-card-title> Your Notes </v-card-title>
-    <v-card-text>
-      <v-text-field v-model="note" />
-    </v-card-text>
+    <q-card-section>
+      <div class="text-h6">Your Notes</div>
+      <q-input v-model="note" filled autogrow />
+    </q-card-section>
   </company_card_wrapper>
 </template>
 

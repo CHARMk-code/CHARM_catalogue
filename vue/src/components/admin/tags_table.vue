@@ -1,59 +1,62 @@
 <template>
-  <v-card>
-    <v-card-title>Tags</v-card-title>
-    <v-card-text>
+  <q-card>
+    <q-card-section class="text-h5">Tags</q-card-section>
+    <q-card-section>
       <Table
         @saveRow="(t) => tagsStore.updateTag(t)"
         @deleteRow="(t) => tagsStore.removeTag(t)"
         name="Tags"
         :tableColumns="headers"
-        :rows="rows"
+        :rows="Array.from(tagsStore.tags.values())"
         :colMeta="colMeta"
         :editable="true"
       >
-        <template #col(icon)="{ item }">
-          <TagComp :tag="item"></TagComp>
+        <template #body-cell-Icon="props">
+          <q-td :props="props">
+            <Tags :tags="[props.value]"></Tags>
+          </q-td>
         </template>
 
-        <template #col(categories)="{ item }">
-          {{ categories(item) }}
+        <template #body-cell-Categories="props">
+          <q-td :props="props">
+            {{ props.value }}
+          </q-td>
         </template>
       </Table>
-    </v-card-text>
-  </v-card>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
 import Table, { type TableRow } from "@/components/table.vue";
-import TagComp from "@/components/Tag.vue";
+import Tags from "@/components/Tag_group.vue";
 import axios from "@/plugins/axios";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { type Ref, ref, onMounted } from "vue";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const tagsStore = useTagsStore();
-
+console.log(tagsStore.tags.values());
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
-const rows: Ref<TableRow[]> = ref([]);
-
-onMounted(() => {
-  rows.value = Array.from(tagsStore.tags.values());
-});
-
-function categories(tag: Tag) {
-  const categories = [];
-  if (tag.business_area) categories.push("Business Area");
-  if (tag.division) categories.push("Program");
-  if (tag.looking_for) categories.push("Looking for");
-  if (tag.offering) categories.push("Offering");
-  if (tag.language) categories.push("Language");
-  return categories.join(", ");
-}
 const headers = [
-  { name: "Icon", value: "icon" },
-  { name: "Name", value: "name" },
-  { name: "Categories", value: "categories" },
+  { name: "Icon", label: "Icon", field: (row) => row, align: "left" },
+  { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
+  {
+    name: "Categories",
+    label: "Categories",
+    field: (row: Tag) => {
+      const categories = [];
+      if (row.business_area) categories.push("Business Area");
+      if (row.division) categories.push("Program");
+      if (row.looking_for) categories.push("Looking for");
+      if (row.offering) categories.push("Offering");
+      if (row.language) categories.push("Language");
+      return categories.join(", ");
+    },
+    align: "left",
+    sortable: true,
+  },
 ];
 
 const colMeta: TableColMeta[] = [

@@ -1,11 +1,9 @@
 <template>
   <company_card_wrapper name="desc" v-if="body != ''">
-    <v-card-title>
-      {{ title }}
-    </v-card-title>
-    <v-card-text>
+    <q-card-section>
+      <div class="text-h6">{{ title }}</div>
       {{ body }}
-    </v-card-text>
+    </q-card-section>
   </company_card_wrapper>
 </template>
 

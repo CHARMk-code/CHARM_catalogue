@@ -1,53 +1,68 @@
 <template>
-  <v-main>
-    <v-card class="mb-8" width="500px" align="center">
-      <v-card-title> Upload data or resources </v-card-title>
-
-      <v-card-subtitle v-if="feedback">{{ feedback }}</v-card-subtitle>
-
-      <v-card-text>
-        <v-file-input
-          accept="image/*, .xlsx, .zip, .tar.gz"
-          v-model="selectedFile"
-        ></v-file-input>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn
-          href="https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY"
-          variant="flat"
-        >
-          Example file
-        </v-btn>
-        <v-btn
-          @click="onUploadFile"
-          variant="flat"
-          color="primary"
-          :disabled="!selectedFile"
-        >
-          Upload file
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-card width="500px" align="center">
-      <v-card-title> Download snapshot </v-card-title>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="download" variant="flat" color="primary">
-          download
-        </v-btn>
-        <v-spacer></v-spacer>
-      </v-card-actions>
-    </v-card>
-  </v-main>
+  <q-page padding>
+    <q-card class="q-mx-auto q-mb-md" style="width: 500px">
+      <q-card-section class="text-h5">
+        Upload data or resources
+      </q-card-section>
+      <q-card-section>
+        Upload a .zip containing a full configuration. Look at the example file
+        for instructions on how it should look
+      </q-card-section>
+      <q-card-section v-if="feedback">
+        <span class="text-bold">File Upload result:</span> {{ feedback }}
+      </q-card-section>
+      <q-form>
+        <q-card-section>
+          <q-file
+            filled
+            accept="image/*, .xlsx, .zip, .tar.gz"
+            v-model="selectedFile"
+          >
+            <template v-slot:prepend>
+              <q-icon name="attach_file" />
+            </template>
+          </q-file>
+        </q-card-section>
+        <q-card-actions :align="'right'">
+          <q-btn
+            href="https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY"
+            variant="flat"
+          >
+            Example file
+          </q-btn>
+          <q-btn
+            @click="onUploadFile"
+            variant="flat"
+            color="primary"
+            :disabled="!selectedFile"
+          >
+            Upload file
+          </q-btn>
+        </q-card-actions>
+      </q-form>
+    </q-card>
+    <q-card class="q-mx-auto" style="width: 500px">
+      <q-card-section class="text-h5"> Download snapshot </q-card-section>
+      <q-card-section>
+        Download a snapshot of the current configuration. The configuration is
+        put into a .zip file containing .xlsx with the configuration and all
+        uploaded images used. if the .zip file is uploaded the system will be
+        restored to the state from when it was downloaded. same state
+      </q-card-section>
+      <q-card-actions :align="'right'">
+        <q-btn @click="download" variant="flat" color="primary">
+          Download snapshot
+        </q-btn>
+      </q-card-actions>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
 import { ref, type Ref } from "vue";
 import axios from "@/plugins/axios";
 
-let selectedFile: Ref<File[] | undefined> = ref();
+let selectedFile: Ref<File | undefined> = ref();
 let feedback = ref("");
 
 function onUploadFile() {
@@ -56,7 +71,7 @@ function onUploadFile() {
 
   const formData = new FormData();
 
-  formData.append("file", selectedFile.value[0]); // appending file
+  formData.append("file", selectedFile.value); // appending file
 
   // sending file to the backend
   axios

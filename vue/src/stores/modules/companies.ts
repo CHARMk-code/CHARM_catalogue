@@ -55,13 +55,13 @@ export const useCompaniesStore = defineStore('companies', {
             .get("/company")
             .then((resp: any) => { //TODO Remove this any and replace with actual type
               this.removeAllCompanies()
-              resp.data.tags = new Set(resp.data.tags)
               const companies: Company[] = resp.data;
 
               // Work around to get summer job deadline in correct format
               companies.forEach(comp => {
                 comp.summer_job_deadline =
                   dayjs(comp.summer_job_deadline, "DD MMM YYYY HH:mm:ss", false).format("YYYY-MM-DD");
+                comp.tags = new Set(comp.tags)
               });
 
               if (companies.length > 0) {

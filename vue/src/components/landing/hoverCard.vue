@@ -1,14 +1,12 @@
 <template>
-    <v-card elevation="4" center :to="to">
-      <v-img contain center :src="background_image"/>
-    </v-card>
+  <q-card elevation="4" center :to="to"> </q-card>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps<{
-  to: string
-  background_image: string
-}>()
+  to: string;
+  background_image: string;
+}>();
 </script>
 
 <style scoped>
