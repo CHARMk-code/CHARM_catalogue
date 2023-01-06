@@ -1,7 +1,9 @@
 <template>
-  <v-card>
-    <v-card-title>Layouts</v-card-title>
-    <v-card-text>
+  <q-card>
+    <q-card-section>
+      <div class="text-h5">Graphics</div>
+    </q-card-section>
+    <q-card-section>
       <Table
         @saveRow="(l: Layout) => layoutsStore.modifyLayout(l)"
         @deleteRow="(l: Layout) => layoutsStore.deleteLayout(l)"
@@ -11,19 +13,33 @@
         :rows="layoutsStore.layouts"
         :editable="true"
       >
-        <template #col(placement)="{ value }">
-          <template v-if="value == 0"> Company page</template>
-          <template v-else-if="value == 1"> Page Left </template>
-          <template v-else-if="value == 2"> Page Right </template>
+        <template #body-cell-Placement="props">
+          <q-td :props="props">
+            <template v-if="props.value == 0">On Company Page</template>
+            <template v-else-if="props.value == 1">Left side</template>
+            <template v-else-if="props.value == 2">Right side</template>
+          </q-td>
         </template>
 
-        <template #col(active)="{ value }">
-          <v-icon v-if="value">mdi-eye</v-icon>
-          <v-icon v-else>mdi-eye-off</v-icon>
+        <template #body-cell-Active="props">
+          <q-td :props="props">
+            <q-icon
+              v-if="props.value"
+              size="sm"
+              color="primary"
+              name="mdi-eye"
+            />
+            <q-icon
+              v-if="!props.value"
+              size="sm"
+              color="grey"
+              name="mdi-eye-off"
+            />
+          </q-td>
         </template>
       </Table>
-    </v-card-text>
-  </v-card>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
@@ -33,9 +49,27 @@ import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const layoutsStore = useLayoutsStore();
 const headers = [
-  { name: "Placement", value: "placement" },
-  { name: "Image", value: "image" },
-  { name: "Active", value: "active" },
+  {
+    name: "Placement",
+    label: "Placement",
+    field: "placement",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "Image",
+    label: "Image",
+    field: "image",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "Active",
+    label: "Active",
+    field: "active",
+    align: "left",
+    sortable: true,
+  },
 ];
 
 const colMeta: TableColMeta[] = [

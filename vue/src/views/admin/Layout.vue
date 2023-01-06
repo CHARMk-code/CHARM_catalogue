@@ -1,8 +1,12 @@
 <template>
-  <v-container>
-    <company_cards />
-    <layouts_table />
-  </v-container>
+  <q-page padding class="column q-col-gutter-md">
+    <div class="col-12-auto">
+      <company_cards />
+    </div>
+    <div class="col-12-auto">
+      <layouts_table />
+    </div>
+  </q-page>
 </template>
 
 <script lang="ts" setup>

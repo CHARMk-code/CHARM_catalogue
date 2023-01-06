@@ -86,7 +86,7 @@ export const useLayoutsStore = defineStore('layouts', {
   getters: {
     getSide: (state) => (side: "left" | "right") => {
       const side_number = side === "left" ? 1 : 2
-      const layout = state.layouts.filter((t) => t.placement === side_number);
+      const layout = state.layouts.filter((t) => t.placement === side_number && t.active);
       return layout.length === 0 ? undefined : layout[0];
     },
     getCenter: (state) => {

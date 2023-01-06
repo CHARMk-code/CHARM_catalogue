@@ -1,62 +1,57 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title> Visible Company Cards</v-card-title>
-      <v-card-text>
-        <v-combobox
-          v-model="selected"
-          :filter="filter"
-          :items="company_cards"
-          item-title="text"
-          item-value="id"
-          label="Select the elements that should be visible for users"
-          multiple
-        >
-          <!-- <template #selection="{ item }">
-            <v-chip>{{ item.value.text }} </v-chip>
-          </template>
-          <template #item="{ props, item }">
-            <v-list-item v-bind="props"
-              ><v-chip
-                >{{ props.value.active }}{{ item.value.text }}</v-chip
-              ></v-list-item
-            >
-          </template> -->
-          <template v-slot:no-data>
-            <v-list-item>
-              <span class="subheading">All cards are activated</span>
-            </v-list-item>
-          </template>
-        </v-combobox>
-      </v-card-text>
+  <q-card>
+    <q-card-section>
+      <div class="text-h5">Company Page Layout</div>
+      <div>
+        Choose which cards should be displayed when looking at companies as a
+        user
+      </div>
+    </q-card-section>
+    <q-card-section>
+      <q-select
+        filled
+        v-model="selected"
+        :options="company_cards"
+        option-label="name"
+        option-value="id"
+        label="Select the elements that should be visible for users"
+        multiple
+        use-chips
+      >
+      </q-select>
+    </q-card-section>
 
-      <v-card-actions>
-        <v-spacer />
-        <v-btn large text @click="reset_popup = !reset_popup"> Reset </v-btn>
-        <v-dialog persistent v-model="reset_popup" max-width="500px">
-          <v-card absolute>
-            <v-card-title> Reset to Default </v-card-title>
-            <v-card-text>
+    <q-card-actions>
+      <q-btn label="Reset" @click="reset_popup = !reset_popup">
+        <q-dialog v-model="reset_popup" width="500px">
+          <q-card>
+            <q-card-section class="row items-center">
+              <div class="text-h5">Reset Company Page Layout?</div>
               This will reset which company cards are shown to user to the
-              default settings
-              <v-card color="red lighten-4" v-if="error.length > 0">
-                <v-card-title> Error: while resetting </v-card-title>
-                <v-card-text> {{ error }} </v-card-text>
-              </v-card>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="primary" :loading="resetting" @click="reset()">
-                Reset
-              </v-btn>
+              default settings. Are you sure?
 
-              <v-btn @click="reset_popup = false"> Cancel </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-btn class="mx-2" large color="primary" @click="save()"> Save </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
+              <div color="error" v-if="error.length > 0">
+                <div class="text-bold">Error: while resetting</div>
+                {{ error }}
+              </div>
+            </q-card-section>
+
+            <q-card-actions :align="'right'">
+              <q-btn flat label="Cancel" v-close-popup />
+              <q-btn
+                flat
+                label="Reset"
+                color="primary"
+                @click="reset()"
+                :loading="resetting"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+      </q-btn>
+      <q-btn color="primary" label="Save" @click="save()" />
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
@@ -75,9 +70,10 @@ let site_settingsStore = useSite_settingsStore();
 
 const company_cards = site_settingsStore.settings.company_view.cards;
 
+// const selected = ref([]);
 const selected = computed<Card[]>({
   get: () => company_cards.filter((c) => c.active),
-  set: (new_cards) => site_settingsStore.setCompanyCards(new_cards),
+  set: (active_cards) => site_settingsStore.setCompanyCards(active_cards),
 });
 
 const filter = (item, queryText, itemText) => {

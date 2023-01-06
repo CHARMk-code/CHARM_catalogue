@@ -49,16 +49,17 @@ export const useSite_settingsStore = defineStore('site_settings', {
         }
       });
     },
-    setCompanyCards(cards: Card[]) {
+    setCompanyCards(active_cards: Card[]) {
       return new Promise<void>((resolve) => {
         const all_cards = this.settings.company_view.cards;
+        all_cards.forEach((card) => {
+          if (active_cards.some(active_card => active_card.id === card.id)) {
+            card.active = true
+          } else {
+            card.active = false
+          }
+        })
 
-        const new_cards = all_cards.map((ac) => ({
-          ...ac,
-          active: cards.some((c) => ac.name === c.name) ? true : false,
-        }));
-
-        this.settings.company_view.cards = new_cards;
         resolve();
       });
     },
