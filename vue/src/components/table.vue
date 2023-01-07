@@ -38,7 +38,7 @@
             round
             size="sm"
             icon="mdi-pencil"
-            @click="editRow(props.value)"
+            @click="editRow(props.key - 1)"
           >
           </q-btn>
           <q-btn
@@ -46,7 +46,7 @@
             round
             size="sm"
             icon="mdi-delete"
-            @click="deleteRow(props.value)"
+            @click="deleteRow(props.key - 1)"
           >
           </q-btn>
         </div>
@@ -60,15 +60,17 @@
   <q-dialog full-width full-height v-model="editDialog">
     <tableEditDialog
       :name="name"
-      v-model:row="clickedRow"
+      v-model:row="clickedRow.row"
       :colMeta="colMeta"
       :newRow="newRow"
+      :metaRow="clickedRow.meta"
       @saveRow="
         () => {
           editDialog = false;
-          $emit('saveRow', clickedRow);
+          $emit('saveRow', clickedRow.row);
         }
       "
+      :metaModelCallback="metaModelCallback"
     >
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
         <slot v-if="name.startsWith('edit-')" :name="name" v-bind="slotData" />
@@ -81,13 +83,13 @@
         Are you sure you want to delete?
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-card-actions :align="'right'">
         <q-btn flat label="Cancel" v-close-popup />
         <q-btn
           flat
           label="Delete"
           color="primary"
-          @click="$emit('deleteRow', clickedRow)"
+          @click="$emit('deleteRow', clickedRow.row)"
           v-close-popup
         />
       </q-card-actions>
@@ -96,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, ref } from "vue";
+import { ref, type Ref } from "vue";
 import { computed, useSlots } from "vue";
 import type { TableColMeta } from "@/components/admin/table_edit_dialog.vue";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
@@ -113,8 +115,10 @@ const props = defineProps<{
   name: string;
   editable: boolean;
   tableColumns: any[];
-  rows: Iterable<TableRow>;
+  rows: TableRow[];
+  metaRows: any[];
   colMeta: TableColMeta[];
+  metaModelCallback?: (meta: any, row: TableRow) => void;
 }>();
 
 const tableColumnsWAction = computed(() =>
@@ -127,25 +131,30 @@ const tableColumnsWAction = computed(() =>
     },
   ])
 );
-const clickedRow = ref({});
+const clickedRow: Ref<{ row: TableRow; meta: any }> = ref({
+  row: {},
+  meta: {},
+});
 const rowFilter = ref("");
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const newRow = ref(false);
 
-function editRow(row) {
-  clickedRow.value = row;
+function editRow(index: number) {
+  clickedRow.value.row = props.rows[index];
+  clickedRow.value.meta = props.metaRows ? props.metaRows[index] : {};
   newRow.value = false;
   editDialog.value = true;
 }
 
-function deleteRow(row) {
-  clickedRow.value = row;
+function deleteRow(index: number) {
+  clickedRow.value.row = props.rows[index];
+  clickedRow.value.meta = props.metaRows ? props.metaRows[index] : {};
   deleteDialog.value = true;
 }
 
 function createRow() {
-  clickedRow.value = {};
+  clickedRow.value = { row: {}, meta: {} };
   newRow.value = true;
   editDialog.value = true;
 }

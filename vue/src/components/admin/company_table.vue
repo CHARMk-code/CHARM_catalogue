@@ -8,8 +8,10 @@
         name="Companies"
         :tableColumns="headers"
         :rows="rows"
+        :metaRows="metaRows"
         :colMeta="colMeta"
         :editable="true"
+        :metaModelCallback="updateWithMetaModels"
       >
         <template #body-cell-Active="props">
           <q-td :props="props">
@@ -105,7 +107,7 @@ import { computed, onMounted, reactive, ref, watch, type Ref } from "vue";
 import dayjs from "dayjs";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
-import { useMapsStore } from "@/stores/modules/maps";
+import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 import { useRouter } from "vue-router";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
@@ -166,65 +168,90 @@ const mapsStore = useMapsStore();
 //   return total - missing + "/" + total;
 // };
 
-const rows = Array.from(companiesStore.companies.values()).map((row) => {
-  return reactive({
-    ...row,
-    divisions: tagsStore
-      .getDivisionsFromIds(row.tags)
-      .map((t) => ({ value: t.id, label: t })),
-    looking_for: tagsStore
-      .getLookingForFromIds(row.tags)
-      .map((t) => ({ value: t.id, label: t })),
-    business_areas: tagsStore
-      .getBusinessAreasFromIds(row.tags)
-      .map((t) => ({ value: t.id, label: t })),
-    offering: tagsStore
-      .getOfferingsFromIds(row.tags)
-      .map((t) => ({ value: t.id, label: t })),
-    language: tagsStore
-      .getLanguagesFromIds(row.tags)
-      .map((t) => ({ value: t.id, label: t })),
-  });
-});
+const rows = Array.from(companiesStore.companies.values());
 
-rows.forEach((row) => {
-  watch(
-    row,
-    (value, oldValue) => {
-      var allTags: number[] = [];
-      if (
-        value.tags !== oldValue.tags &&
-        (value.divisions ||
-          value.looking_for ||
-          value.business_areas ||
-          value.offering ||
-          value.language)
-      ) {
-        if (value.divisions) {
-          console.log(value.divisions);
-          var allTags = allTags.concat(value.divisions.map((v) => v.value));
-        }
-        if (value.looking_for) {
-          var allTags = allTags.concat(value.looking_for.map((v) => v.value));
-        }
-        if (value.business_areas) {
-          var allTags = allTags.concat(
-            value.business_areas.map((v) => v.value)
-          );
-        }
-        if (value.offering) {
-          var allTags = allTags.concat(value.offering.map((v) => v.value));
-        }
-        if (value.language) {
-          var allTags = allTags.concat(value.language.map((v) => v.value));
-        }
-        value.tags = new Set(allTags);
-        console.log(value, new Set(allTags));
-      }
-    },
-    { deep: true, flush: "pre" }
-  );
-});
+type metaRow = {
+  divisions: selectedTag[];
+  looking_for: selectedTag[];
+  business_areas: selectedTag[];
+  offering: selectedTag[];
+  language: selectedTag[];
+  meta_map_image: { label: Company_Map; value: number };
+};
+
+const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
+  (row) => {
+    const map_image_obj = mapsStore.getMapFromId(row.map_image);
+    const meta_map_image = map_image_obj
+      ? { label: map_image_obj, value: map_image_obj.id }
+      : { label: { name: "None" }, value: -1 };
+    console.log(
+      "init metaTows",
+      mapsStore.maps,
+      row.map_image,
+      typeof row.map_image,
+      map_image_obj,
+      meta_map_image
+    );
+    return reactive({
+      meta_map_image,
+      divisions: tagsStore
+        .getDivisionsFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      looking_for: tagsStore
+        .getLookingForFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      business_areas: tagsStore
+        .getBusinessAreasFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      offering: tagsStore
+        .getOfferingsFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      language: tagsStore
+        .getLanguagesFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+    });
+  }
+);
+
+type selectedTag = {
+  label: Tag;
+  value: number;
+};
+
+function updateWithMetaModels(meta: metaRow, row: Company) {
+  console.log("updateTags running");
+  var allTags: number[] = [];
+  if (
+    meta.divisions ||
+    meta.looking_for ||
+    meta.business_areas ||
+    meta.offering ||
+    meta.language
+  ) {
+    console.log("contains tag categories");
+    if (meta.divisions) {
+      console.log("meta divisions", meta.divisions);
+      var allTags = allTags.concat(meta.divisions.map((v) => v.value));
+    }
+    if (meta.looking_for) {
+      var allTags = allTags.concat(meta.looking_for.map((v) => v.value));
+    }
+    if (meta.business_areas) {
+      console.log("meta business areas", meta.business_areas);
+      var allTags = allTags.concat(meta.business_areas.map((v) => v.value));
+    }
+    if (meta.offering) {
+      var allTags = allTags.concat(meta.offering.map((v) => v.value));
+    }
+    if (meta.language) {
+      var allTags = allTags.concat(meta.language.map((v) => v.value));
+    }
+    row.tags = new Set(allTags);
+    console.log("meta", new Set(allTags));
+  }
+  row.map_image = meta.meta_map_image.value;
+}
 
 const colMeta: TableColMeta[] = [
   {
@@ -280,7 +307,11 @@ const colMeta: TableColMeta[] = [
     label: "Talk to us about",
   },
   { type: "text", model: "contacts", label: "Contacts" },
-  { type: "text", model: "contact_email", label: "Contacts email" },
+  {
+    type: "text",
+    model: "contact_email",
+    label: "Contacts email",
+  },
   { type: "text", model: "website", label: "Website" },
   {
     type: "number",
@@ -294,14 +325,16 @@ const colMeta: TableColMeta[] = [
   },
   {
     type: "single-select",
-    model: "map_image",
-    items: Array.from(mapsStore.maps)
-      .map(([_, m]) => {
-        return { title: m.name, value: m.id };
-      })
-      .concat([{ title: "No Goto", value: -1 }]),
+    model: "meta_map_image",
+    items: [{ label: { name: "None" }, value: -1 }].concat(
+      Array.from(mapsStore.maps.values()).map((m) => ({
+        label: m,
+        value: m.id,
+      }))
+    ),
     label: "Map",
     hint: "Map for company location",
+    meta: true,
   },
   {
     type: "multiple-select",
@@ -309,6 +342,7 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.divisions.map((t) => ({ value: t.id, label: t })),
     label: "Programs",
     hint: "Programs the company are interested in",
+    meta: true,
   },
   {
     type: "multiple-select",
@@ -316,6 +350,7 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.looking_for.map((t) => ({ value: t.id, label: t })),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
+    meta: true,
   },
   {
     type: "multiple-select",
@@ -323,6 +358,7 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.business_areas.map((t) => ({ value: t.id, label: t })),
     label: "Business areas",
     hint: "The company's business areas",
+    meta: true,
   },
   {
     type: "multiple-select",
@@ -330,6 +366,7 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.offering.map((t) => ({ value: t.id, label: t })),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
+    meta: true,
   },
   {
     type: "multiple-select",
@@ -337,6 +374,7 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.languages.map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
+    meta: true,
   },
 ];
 </script>

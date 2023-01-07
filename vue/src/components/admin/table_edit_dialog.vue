@@ -50,6 +50,22 @@
               :label="col.label"
               :hint="col.hint"
             >
+              <template #option="{ opt, itemProps }">
+                <q-item v-bind="itemProps">
+                  <q-item-section
+                    avatar
+                    v-if="opt.label.icon && opt.label.icon.length > 0"
+                  >
+                    <Tag_group :tags="[opt.label]"></Tag_group>
+                  </q-item-section>
+                  <q-item-section> {{ opt.label.name }}</q-item-section>
+                </q-item>
+              </template>
+
+              <template #selected-item="{ index, opt }">
+                {{ log("itemProps", opt) }}
+                <Tag_group :tags="[opt.label]"></Tag_group>
+              </template>
             </q-select>
           </template>
 
@@ -71,6 +87,7 @@
             >
               <template #option="{ opt, itemProps }">
                 <q-item v-bind="itemProps">
+                  <!-- {{ log("itemProps", itemProps) }} -->
                   <q-item-section
                     avatar
                     v-if="opt.label.icon && opt.label.icon.length > 0"
@@ -150,7 +167,8 @@
 import type { TableRow } from "@/components/table.vue";
 import Tag_group from "@/components/Tag_group.vue";
 import axios from "@/plugins/axios";
-import { reactive, ref, type Ref } from "vue";
+import { colors } from "quasar";
+import { reactive, ref, unref, type Ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 
 export interface TableColMeta {
@@ -170,7 +188,7 @@ export interface TableColMeta {
   offIcon?: string;
   items?: any[];
   hint?: string;
-  slot?: boolean;
+  meta?: boolean;
 }
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
@@ -178,11 +196,13 @@ const base_URL = axios.defaults.baseURL + "/manage/image/";
 const props = defineProps<{
   name: string;
   row: TableRow;
+  metaRow: any;
   colMeta: TableColMeta[];
   newRow: boolean;
+  metaModelCallback?: (meta: any, row: TableRow) => void;
 }>();
 
-const rawRow = reactive(deepUnref(props.row));
+const rawRow = reactive({ ...deepUnref(props.row), ...props.metaRow });
 
 const emit = defineEmits<{
   (e: "saveRow"): void;
@@ -209,12 +229,20 @@ async function save() {
           .catch(() => {});
       })
   ).then(() => {
-    for (const [key, val] of Object.entries(rawRow)) {
-      props.row[key] = val;
+    for (const col of props.colMeta) {
+      console.log(col.model);
+      if (!col.meta && rawRow[col.model])
+        props.row[col.model] = rawRow[col.model];
     }
+    if (props.metaModelCallback) props.metaModelCallback(rawRow, props.row);
+
     console.log("about to emit");
     emit("saveRow");
     console.log("emitted", rawRow, props.row);
   });
+}
+
+function log(a, b) {
+  console.log(a, b);
 }
 </script>

@@ -79,8 +79,10 @@ export const useCompaniesStore = defineStore('companies', {
     },
     updateCompany(company: Company) {
       return new Promise((resolve, reject) => {
+        //changes tags in to array in order to send to backend
+        const sendableTags = Array.from(company.tags)
         this.axios
-          .put("/company", company)
+          .put("/company", { ...company, tags: sendableTags })
           .then((resp: any) => {
             this.companies.set(company.id, company)
             resolve(resp);

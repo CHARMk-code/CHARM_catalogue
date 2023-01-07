@@ -83,7 +83,7 @@ class Company(db.Model):
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
-    map_image = db.Column(db.String(100))
+    map_image = db.Column(db.Integer)
     booth_number = db.Column(db.Integer)
     tags = db.relationship(
         'Tag',
@@ -128,7 +128,7 @@ class Company(db.Model):
         return True
 
     def update(self, name, active, charmtalk, description, unique_selling_point,
-               summer_job_description, summer_job_link, summer_job_deadline, contacts, 
+               summer_job_description, summer_job_link, summer_job_deadline, contacts,
                contact_email, employees_world, employees_sweden, website,
             talk_to_us_about,logo, map_image, booth_number, tags):
 

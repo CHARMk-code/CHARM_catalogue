@@ -3,13 +3,15 @@
     <q-card-section class="text-h5">Maps</q-card-section>
     <q-card-section>
       <Table
-        @saveEdit="(m) => mapsStore.updateMap(m)"
+        @saveRow="(m) => mapsStore.updateMap(m)"
         @deleteRow="(m) => mapsStore.removeMap(m)"
-        name="Map (Do NOT modify this table it will corrupt the data)"
+        name="Map"
         :tableColumns="headers"
-        :rows="Array.from(mapsStore.maps.values())"
+        :rows="rows"
+        :metaRows="metaRows"
         :colMeta="colMeta"
         :editable="true"
+        :metaModelCallback="updateMapParent"
       >
         <template #body-cell-Parent="props">
           <q-td :props="props">
@@ -23,7 +25,7 @@
 
 <script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { useMapsStore } from "@/stores/modules/maps";
+import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const mapsStore = useMapsStore();
@@ -46,17 +48,38 @@ const headers = [
   },
 ];
 
+const rows = Array.from(mapsStore.maps.values());
+const metaRows = Array.from(mapsStore.maps.values()).map((map) => {
+  const ref = mapsStore.getMapFromId(map.ref);
+  const parent = ref
+    ? { label: ref, value: ref.id }
+    : { label: { name: "None" }, value: -1 };
+  console.log("metaRow, map", map, parent);
+  return {
+    parent,
+  };
+});
+
+function updateMapParent(
+  meta: { parent: { label: Company_Map; value: number } },
+  row: Company_Map
+) {
+  console.log("updatingMapParent", meta);
+  row.ref = meta.parent.value;
+}
+
 const colMeta: TableColMeta[] = [
   { type: "image", model: "image", label: "Map image" },
   {
     type: "single-select",
-    model: "ref",
+    model: "parent",
     label: "Parent",
-    items: Array.from(mapsStore.maps)
-      .map(([_, m]) => {
-        return { title: m.name, value: m.id };
-      })
-      .concat([{ title: "No Goto", value: -1 }]),
+    items: Array.from(mapsStore.maps.values()).map((m) => {
+      console.log(m);
+      return { label: m, value: m.id };
+    }),
+    // .concat([{ title: "No Goto", value: -1 }]),
+    meta: true,
   },
   { type: "text", model: "name", label: "Name" },
 ];
