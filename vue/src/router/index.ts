@@ -55,6 +55,7 @@ const router = createRouter({
           component: Company_view,
           meta: {
             noAuth: true,
+            navigation: true,
           },
         },
         {
@@ -95,6 +96,7 @@ const router = createRouter({
           component: Prepage_view,
           meta: {
             noAuth: true,
+            navigation: true,
           },
         }],
     },

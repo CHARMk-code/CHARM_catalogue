@@ -73,13 +73,14 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, watchEffect } from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
 import { usePrepagesStore } from "@/stores/modules/prepages";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useTagsStore } from "@/stores/modules/tags";
 import { useMapsStore } from "@/stores/modules/maps";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
 
 const filterStore = useFilterStore();
 const prepagesStore = usePrepagesStore();
@@ -118,26 +119,43 @@ function arrowKeyHandler(e: any) {
   }
 }
 
-function next() {
-  // this.$store.commit("layouts/updateCenter");
-  const index = currentIndex.value + 1;
-  if (index < filterStore.filteredCompanies.length) {
-    router.push("/company/" + filterStore.filteredCompanies[index].name);
+const settingsStore = useSite_settingsStore();
+
+watchEffect(() => {
+  if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
+    settingsStore.settings.navigation.next =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value + 1].name;
+  }
+
+  if (currentIndex.value > 0) {
+    settingsStore.settings.navigation.prev =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value - 1].name;
+  } else {
+    if (prepagesStore.active_prepages.length !== 0) {
+      settingsStore.settings.navigation.prev =
+        "/prepage/" + prepagesStore.active_prepages.length;
+    } else {
+      settingsStore.settings.navigation.prev = undefined;
+    }
+  }
+});
+
+function handleSwipe({ direction }) {
+  if (direction === "right") {
+    prev();
+  } else if (direction === "left") {
+    next();
   }
 }
 
+function next() {
+  const maybeNext: string | undefined = settingsStore.consumeNext();
+  if (maybeNext) router.push(maybeNext);
+}
+
 function prev() {
-  // this.$store.commit("layouts/updateCenter");
-  const index = currentIndex.value - 1;
-  if (index >= 0) {
-    return router.push("/company/" + filterStore.filteredCompanies[index].name);
-  } else {
-    if (prepagesStore.active_prepages.length !== 0) {
-      return router.push(
-        "/prepage/" + (prepagesStore.active_prepages.length - 1)
-      );
-    }
-  }
+  const maybePrev: string | undefined = settingsStore.consumePrev();
+  if (maybePrev) router.push(maybePrev);
 }
 </script>
 
