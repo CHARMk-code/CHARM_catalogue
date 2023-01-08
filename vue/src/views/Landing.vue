@@ -18,7 +18,7 @@
               color="primary"
               size="lg"
               label="Browse the catalogue"
-              to="/prepage/0"
+              to="/prepage/1"
             ></q-btn>
           </q-card-actions>
         </q-card>

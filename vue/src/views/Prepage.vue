@@ -17,7 +17,15 @@ import axios from "@/plugins/axios";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useFilterStore } from "@/stores/modules/filter";
 import { usePrepagesStore } from "@/stores/modules/prepages";
-import { onMounted, onUnmounted, computed, onBeforeMount } from "vue";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import {
+  onMounted,
+  onUnmounted,
+  computed,
+  onBeforeMount,
+  watch,
+  watchEffect,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const companiesStore = useCompaniesStore();
@@ -49,7 +57,24 @@ const arrowKeyHandler = (e: { key: string }) => {
 };
 
 const page = computed(() => {
-  return parseInt(route.params.page[0]) - 1;
+  if (route.params.page) return parseInt(route.params.page[0]) - 1;
+  else return 0;
+});
+
+const settingsStore = useSite_settingsStore();
+
+watchEffect(() => {
+  if (page.value + 1 >= prepagesStore.active_prepages.length) {
+    filtersStore.filterCompanies();
+    settingsStore.settings.navigation.next =
+      "/company/" + filtersStore.filteredCompanies[0].name;
+  } else {
+    settingsStore.settings.navigation.next = "/prepage/" + (page.value + 2);
+  }
+
+  if (page.value > 0) {
+    settingsStore.settings.navigation.prev = "/prepage/" + page.value;
+  }
 });
 
 function handleSwipe({ direction }) {
@@ -60,20 +85,15 @@ function handleSwipe({ direction }) {
   }
 }
 
-const next = () => {
-  if (page.value + 1 >= prepagesStore.active_prepages.length) {
-    filtersStore.filterCompanies();
-    router.push("/company/" + filtersStore.filteredCompanies[0].name);
-  } else {
-    router.push("/prepage/" + (page.value + 1));
-  }
-};
-const prev = () => {
-  const next_index = page.value - 1;
-  if (next_index >= 0) {
-    router.push("/prepage/" + next_index);
-  }
-};
+function next() {
+  const maybeNext: string | undefined = settingsStore.consumeNext();
+  if (maybeNext) router.push(maybeNext);
+}
+
+function prev() {
+  const maybePrev: string | undefined = settingsStore.consumePrev();
+  if (maybePrev) router.push(maybePrev);
+}
 </script>
 
 <style scoped lang="sass">

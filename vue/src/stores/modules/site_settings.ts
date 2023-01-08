@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { unref } from "vue";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
@@ -14,6 +15,10 @@ interface State {
   settings: {
     company_view: {
       cards: Card[]
+    },
+    navigation: {
+      next: string | undefined;
+      prev: string | undefined;
     }
   },
   load_wait: number,
@@ -25,6 +30,10 @@ export const useSite_settingsStore = defineStore('site_settings', {
     settings: {
       company_view: {
         cards: [],
+      },
+      navigation: {
+        next: undefined,
+        prev: undefined,
       },
     },
     load_wait: 0,
@@ -88,5 +97,16 @@ export const useSite_settingsStore = defineStore('site_settings', {
           });
       });
     },
+    consumeNext() {
+      const temp = unref(this.settings.navigation.next)
+      this.settings.navigation.next = undefined
+      console.log("consumedNext", this.settings.navigation.next)
+      return temp
+    },
+    consumePrev() {
+      const temp = unref(this.settings.navigation.prev)
+      this.settings.navigation.prev = undefined
+      return temp
+    }
   },
 });

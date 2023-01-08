@@ -69,8 +69,9 @@
     <q-drawer :width="200" side="left" persistent show-if-above>
       <div class="navigation">
         <q-btn
+          v-if="hasPrev && $route.meta.navigation"
           elevation="4"
-          v-on:click="$emit('prev')"
+          v-on:click="prev()"
           icon="mdi-arrow-left"
           size="lg"
           round
@@ -87,8 +88,9 @@
     <q-drawer :width="200" side="right" persistent show-if-above>
       <div class="navigation">
         <q-btn
+          v-if="hasNext && $route.meta.navigation"
           elevation="4"
-          v-on:click="$emit('next')"
+          v-on:click="next()"
           icon="mdi-arrow-right"
           size="lg"
           round
@@ -112,18 +114,15 @@
 import axios from "@/plugins/axios";
 import { useAuthStore } from "@/stores/modules/auth";
 import { useLayoutsStore } from "@/stores/modules/layouts";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
-const emit = defineEmits<{
-  (e: "next"): void;
-  (e: "prev"): void;
-}>();
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const layoutsStore = useLayoutsStore();
+const site_settingsStore = useSite_settingsStore();
 
 const leftDrawerOpen = ref(false);
 
@@ -136,6 +135,23 @@ const links = [
 
 const leftLayout = computed(() => layoutsStore.getSide("left"));
 const rightLayout = computed(() => layoutsStore.getSide("right"));
+const hasNext = computed(
+  () => site_settingsStore.settings.navigation.next !== undefined
+);
+
+const hasPrev = computed(
+  () => site_settingsStore.settings.navigation.prev !== undefined
+);
+
+function next() {
+  const maybeNext: string | undefined = site_settingsStore.consumeNext();
+  if (maybeNext) router.push(maybeNext);
+}
+
+function prev() {
+  const maybePrev: string | undefined = site_settingsStore.consumePrev();
+  if (maybePrev) router.push(maybePrev);
+}
 
 function logout() {
   useAuthStore().logout();
