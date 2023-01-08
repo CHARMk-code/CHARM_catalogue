@@ -5,8 +5,7 @@
         filled
         v-model="filterStore.filters.query"
         clearable
-        @clear="search()"
-        @blur="search()"
+        @update:model-value="search()"
       >
         <template #prepend> <q-icon name="mdi-magnify"></q-icon> </template>
         <template #after>
@@ -70,6 +69,19 @@
             type="checkbox"
           >
           </q-option-group>
+          <!-- <q-btn
+            label="Clear filters"
+            noCaps
+            @click="filterStore.resetFilter()"
+          ></q-btn> -->
+          <q-btn
+            label="Apply filters"
+            noCaps
+            color="primary"
+            @click="search()"
+            class="q-mt-sm q-ml-sm"
+          >
+          </q-btn>
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -144,10 +156,11 @@ function search() {
   console.log("search");
   filterStore.filterCompanies().then(() => {
     filterStore.sortCompanies();
-    console.log("generatedSRQ", filterStore.generateSearchRouteQuery());
+    const searchQuery = filterStore.generateSearchRouteQuery();
+    console.log("generatedSRQ", searchQuery);
     router.replace({
       path: "/search",
-      query: { ...filterStore.generateSearchRouteQuery(), g: null },
+      query: searchQuery,
     });
   });
 }

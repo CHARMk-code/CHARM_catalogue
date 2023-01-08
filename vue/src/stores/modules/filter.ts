@@ -71,6 +71,7 @@ export const useFilterStore = defineStore('filter', {
     },
     filterCompanies() {
       return new Promise<void>((resolve) => {
+        console.log("about to filter")
         const companiesStore = useCompaniesStore();
         var filteredCompanies = Array.from(companiesStore.companies.values());
 
@@ -120,49 +121,49 @@ export const useFilterStore = defineStore('filter', {
       this.filteredCompanies.sort(strategy);
     },
     setFiltersFromRouteQuery(rQuery: LocationQuery) {
-      const filter = this.filters
       this.resetFilter();
 
       if (rQuery.q && typeof rQuery.q == "string") {
-        filter.query = rQuery.q;
+        this.filters.query = rQuery.q;
       }
       if (rQuery.tags && typeof rQuery.tags == "string") {
         const tagsStore = useTagsStore();
         const allTags = rQuery.tags.split(",").map((s) => parseInt(s));
 
-        filter.tags.divisions = tagsStore
+        this.filters.tags.divisions = tagsStore
           .getDivisionsFromIds(allTags)
           .map((t) => t.id);
 
-        filter.tags.looking_for = tagsStore
+        this.filters.tags.looking_for = tagsStore
           .getLookingForFromIds(allTags)
           .map((t) => t.id);
 
-        filter.tags.business_areas = tagsStore
+        this.filters.tags.business_areas = tagsStore
           .getBusinessAreasFromIds(allTags)
           .map((t) => t.id);
 
-        filter.tags.languages = tagsStore
+        this.filters.tags.languages = tagsStore
           .getLanguagesFromIds(allTags)
           .map((t) => t.id);
 
-        filter.tags.offerings = tagsStore
+        this.filters.tags.offerings = tagsStore
           .getOfferingsFromIds(allTags)
           .map((t) => t.id);
       }
 
       if (rQuery.favorites) {
-        filter.favorites = true;
+        this.filters.favorites = true;
       }
 
       if (rQuery.charmtalk) {
-        filter.charmtalk = true;
+        this.filters.charmtalk = true;
       }
 
       if (rQuery.sweden) {
-        filter.sweden = true;
+        this.filters.sweden = true;
       }
-      this.filterCompanies().then(() => this.sortCompanies());
+      console.log(this.filters)
+      this.filterCompanies();
 
 
     },

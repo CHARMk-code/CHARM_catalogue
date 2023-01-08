@@ -64,22 +64,24 @@ const router = createRouter({
           component: Search_view,
           meta: {
             noAuth: true,
+            generated: false,
           },
           beforeEnter: (to, from) => {
-            if (to.query.g) return
-
-            console.log("beforeSearch", to.query, Object.keys(to.query).length)
+            console.log("beforeSearch", to.meta.generated, to.query, Object.keys(to.query).length)
 
             const filterStore = useFilterStore()
-            if (Object.keys(to.query).length > 0) {
+            if (!to.meta.generated || Object.keys(to.query).length > 0) {
               filterStore.setFiltersFromRouteQuery(to.query)
               console.log("beforeEnter Filters", filterStore.filters)
-            } else {
-              to.query = filterStore.generateSearchRouteQuery()
-              to.query.g = null
-              console.log(to.query)
-              return to
+              to.meta.generated = true
+              return
             }
+            if (to.meta.generated) { return }
+
+            to.query = filterStore.generateSearchRouteQuery()
+            to.meta.generated = true;
+            return to
+
           }
         },
         {
