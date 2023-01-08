@@ -8,6 +8,7 @@ from ... import db, config
 from ...helper_functions import *
 import shutil
 import openpyxl
+import urllib.parse
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
@@ -19,7 +20,7 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 
 @blueprint.route("/image/<filename>", methods = ["GET"])
 def imageSend(filename):
-    return send_from_directory(config['flask']['static_folder'], secure_filename(filename))
+    return send_from_directory(config['flask']['static_folder'], (filename))
 
 
 def imageLoad(request):
@@ -27,8 +28,9 @@ def imageLoad(request):
     filename = file.filename
     if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
         return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-    file.save(os.path.join(config['flask']['static_folder'], secure_filename(filename)))
 
+    urlEncodeFilename = urllib.parse.unquote_plus(filename)
+    file.save(os.path.join(config['flask']['static_folder'], filename))
     return "All files uploaded", status.HTTP_200_OK
 
 

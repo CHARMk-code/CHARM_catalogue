@@ -6,7 +6,7 @@
       width="100%"
       position="50% top"
       :draggable="false"
-      :src="base_URL + prepagesStore.active_prepages[page].image"
+      :src="base_URL + encodeURIComponent(prepagesStore.active_prepages[page].image))"
       v-touch-swipe="handleSwipe"
     />
   </q-page>

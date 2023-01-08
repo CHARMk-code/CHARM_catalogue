@@ -74,11 +74,12 @@ const colMeta: TableColMeta[] = [
     type: "single-select",
     model: "parent",
     label: "Parent",
-    items: Array.from(mapsStore.maps.values()).map((m) => {
-      console.log(m);
-      return { label: m, value: m.id };
-    }),
-    // .concat([{ title: "No Goto", value: -1 }]),
+    items: [{ label: { name: "None" }, value: -1 }].concat(
+      Array.from(mapsStore.maps.values()).map((m) => ({
+        label: m,
+        value: m.id,
+      }))
+    ),
     meta: true,
   },
   { type: "text", model: "name", label: "Name" },

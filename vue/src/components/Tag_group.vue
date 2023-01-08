@@ -3,7 +3,7 @@
     <template v-for="(tag, index) in props.tags">
       <template v-if="tag.icon && tag.icon.length > 0">
         <q-avatar size="md" v-bind="props">
-          <img :src="base_URL + tag.icon" cover />
+          <Image :imageName="tag.icon" cover />
           <q-tooltip> {{ tag.name }} </q-tooltip>
         </q-avatar>
       </template>
@@ -18,10 +18,8 @@
 </template>
 
 <script lang="ts" setup>
-import axios from "@/plugins/axios";
 import type { Tag } from "@/stores/modules/tags";
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
+import Image from "@/components/utils/Image.vue";
 
 const props = defineProps<{
   tags: Tag[];
