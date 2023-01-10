@@ -60,9 +60,9 @@ def parseXlsx():
     # Prepages
     prepages_sheet = workbook["Prepages"]
     for i in range(2,prepages_sheet.max_row + 1):
-        prepage = Prepage.query.filter_by(name=prepages_sheet.cell(i,1)).first()
-
         data = list(map(lambda x: x.value, prepages_sheet[i]))
+        prepage = Prepage.query.filter_by(name=data[0]).first()
+
         if not prepage:
             Prepage.create(*data)
         else:

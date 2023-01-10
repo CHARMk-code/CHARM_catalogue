@@ -196,7 +196,7 @@ const base_URL = axios.defaults.baseURL + "/manage/image/";
 const props = defineProps<{
   name: string;
   row: TableRow;
-  metaRow: any;
+  metaRow?: any;
   colMeta: TableColMeta[];
   newRow: boolean;
   metaModelCallback?: (meta: any, row: TableRow) => void;
@@ -205,7 +205,7 @@ const props = defineProps<{
 const rawRow = reactive({ ...deepUnref(props.row), ...props.metaRow });
 
 const emit = defineEmits<{
-  (e: "saveRow"): void;
+  (e: "saveRow", rawRow: any): void;
 }>();
 
 const files: Ref<{ [key: string]: File }> = ref({});
@@ -230,15 +230,12 @@ async function save() {
       })
   ).then(() => {
     for (const col of props.colMeta) {
-      console.log(col.model);
       if (!col.meta && rawRow[col.model])
         props.row[col.model] = rawRow[col.model];
     }
     if (props.metaModelCallback) props.metaModelCallback(rawRow, props.row);
 
-    console.log("about to emit");
-    emit("saveRow");
-    console.log("emitted", rawRow, props.row);
+    emit("saveRow", rawRow);
   });
 }
 
