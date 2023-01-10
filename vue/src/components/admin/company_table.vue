@@ -176,6 +176,7 @@ type metaRow = {
   business_areas: selectedTag[];
   offering: selectedTag[];
   language: selectedTag[];
+  fair_area: selectedTag[];
   meta_map_image: { label: Company_Map; value: number };
 };
 
@@ -209,6 +210,9 @@ const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
         .map((t) => ({ value: t.id, label: t })),
       language: tagsStore
         .getLanguagesFromIds(row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      fair_area: tagsStore
+        .getFairAreasFromIds(row.tags)
         .map((t) => ({ value: t.id, label: t })),
     });
   }
@@ -246,6 +250,9 @@ function updateWithMetaModels(meta: metaRow, row: Company) {
     }
     if (meta.language) {
       var allTags = allTags.concat(meta.language.map((v) => v.value));
+    }
+    if (meta.fair_area) {
+      var allTags = allTags.concat(meta.fair_area.map((v) => v.value));
     }
     row.tags = new Set(allTags);
     console.log("meta", new Set(allTags));
@@ -374,6 +381,14 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.languages.map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
+    meta: true,
+  },
+  {
+    type: "multiple-select",
+    model: "fair_area",
+    items: tagsStore.fair_areas.map((t) => ({ value: t.id, label: t })),
+    label: "Fair Area",
+    hint: "Which Fair Area is the company on",
     meta: true,
   },
 ];

@@ -152,7 +152,7 @@ export const useFilterStore = defineStore('filter', {
           .getOfferingsFromIds(allTags)
           .map((t) => t.id);
 
-        filter.tags.fair_areas = tagsStore
+        this.filters.tags.fair_areas = tagsStore
           .getFairAreasFromIds(allTags)
           .map((t) => t.id);
       }

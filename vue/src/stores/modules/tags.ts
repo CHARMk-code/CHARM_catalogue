@@ -150,7 +150,7 @@ export const useTagsStore = defineStore('tags', {
       const result: Tag[] = []
       for (const id of ids) {
         const tag = state.tags.get(id)
-        if (tag && tag.area) {
+        if (tag && tag.fair_area) {
           result.push(tag)
         }
       }
