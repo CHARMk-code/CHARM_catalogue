@@ -66,7 +66,13 @@
       </q-list>
     </q-drawer>
 
-    <q-drawer :width="200" side="left" persistent show-if-above>
+    <q-drawer
+      :width="200"
+      side="left"
+      persistent
+      show-if-above
+      v-if="$q.screen.gt.sm"
+    >
       <div class="navigation">
         <q-btn
           v-if="hasPrev && $route.meta.navigation"
@@ -85,7 +91,13 @@
       />
     </q-drawer>
 
-    <q-drawer :width="200" side="right" persistent show-if-above>
+    <q-drawer
+      :width="200"
+      side="right"
+      persistent
+      show-if-above
+      v-if="$q.screen.gt.sm"
+    >
       <div class="navigation">
         <q-btn
           v-if="hasNext && $route.meta.navigation"
