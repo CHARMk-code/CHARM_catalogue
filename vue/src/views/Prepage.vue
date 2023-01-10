@@ -135,8 +135,10 @@ function setNextRoute() {
   }
   if (page.value + 1 >= Object.values(prepagesStore.pageGroups).length) {
     filtersStore.filterCompanies();
-    settingsStore.settings.navigation.next =
-      "/company/" + filtersStore.filteredCompanies[0].name;
+    if (filtersStore.filteredCompanies.length > 0) {
+      settingsStore.settings.navigation.next =
+        "/company/" + filtersStore.filteredCompanies[0].name;
+    }
   } else {
     settingsStore.settings.navigation.next = "/prepage/" + (page.value + 2);
   }
