@@ -10,7 +10,7 @@ import shutil
 import openpyxl
 
 
-ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"] 
+ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
 NUMBER_OF_METADATA_COLS_COMPANY = 17
 NUMBER_OF_METADATA_COLS_TAG = 6
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
@@ -59,9 +59,9 @@ def parseXlsx():
     # Prepages
     prepages_sheet = workbook["Prepages"]
     for i in range(2,prepages_sheet.max_row + 1):
-        prepage = Prepage.query.filter_by(name=prepages_sheet.cell(i,1)).first()
-
         data = list(map(lambda x: x.value, prepages_sheet[i]))
+        prepage = Prepage.query.filter_by(name=data[0]).first()
+
         if not prepage:
             Prepage.create(*data)
         else:
@@ -272,11 +272,11 @@ def download():
                 row_data[2] = Map.query.filter_by(id=row_data[2]).first().name
             worksheet.write_row(row_num,0, row_data)
             row_num += 1
-    
+
 
     # Special case for companies
     worksheet = workbook.add_worksheet("Companies")
-    
+
     # Set object based labels
     labels=["Name","Active","CHARMTALK","Summer job description", "Summer job link","Description","Contact","Contact email", "Employees worldwide","Website","Talk to us about", "Logo","Map","Booth number"]
     worksheet.write_row(0,0, labels)
@@ -301,9 +301,9 @@ def download():
         for id_to_test in id_for_all_tags:
             worksheet.write(row_num,NUMBER_OF_METADATA_COLS_COMPANY+offset, id_to_test in company_tag_ids)
             offset +=1
-        
+
         row_num += 1
-    
+
 
     workbook.close()
     # Pack and send result

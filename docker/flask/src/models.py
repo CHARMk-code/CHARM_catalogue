@@ -381,32 +381,40 @@ class Prepage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     image = db.Column(db.String(100))
-    order = db.Column(db.Integer)
     active = db.Column(db.Boolean)
+    mobile = db.Column(db.Boolean)
+    side = db.Column(db.String(5))
+    page = db.Column(db.Integer)
 
     @staticmethod
-    def create( name,active,image, order ):
+    def create(name,active,image,mobile,side,page):
+
         try:
             if Prepage.query.filter_by(image=image).first():
                 return False
             new_prepage = Prepage(
                 name = name,
                 image = image,
-                order = order,
-                active = active
+                active = active,
+                mobile = mobile,
+                side = side,
+                page = page
             )
 
             db.session.add(new_prepage)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
-    def update(self, name, active,image, order,):
+    def update(self,name,active,image,mobile,side,page):
         self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active, active)
         self.image = test_and_set(self.image, image)
-        self.order = test_and_set(self.order, order)
+        self.mobile = test_and_set(self.mobile, mobile)
+        self.side = test_and_set(self.side, side)
+        self.page = test_and_set(self.page, page)
         db.session.commit()
         return True
 
@@ -421,8 +429,10 @@ class Prepage(db.Model):
             'id': self.id,
             'name': self.name,
             'image': self.image,
-            'order': self.order,
-            'active': self.active
+            'active': self.active,
+            'mobile': self.mobile,
+            'side': self.side,
+            'page': self.page
         }
 
 class Layout(db.Model):

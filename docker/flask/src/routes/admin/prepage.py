@@ -26,13 +26,15 @@ def prepage_put():
     name = get_if_exist(request_data,"name")
     active = get_if_exist(request_data, "active")
     image = get_if_exist(request_data, "image")
-    order = get_if_exist(request_data, "order")
+    mobile = get_if_exist(request_data, "mobile")
+    side = get_if_exist(request_data, "side")
+    page = get_if_exist(request_data, "page")
 
     prepage = Prepage.query.get(id)
     if not prepage:
 
-        return send_status(Prepage.create(name,active, image,order))
-    return send_status(prepage.update(name,active, image,order))
+        return send_status(Prepage.create(name,active, image,mobile,side,page))
+    return send_status(prepage.update(name,active, image,mobile,side,page))
 
 @blueprint.route("<id>", methods=["DELETE"])
 def prepage_delete(id):
