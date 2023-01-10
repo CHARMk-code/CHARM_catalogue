@@ -53,7 +53,8 @@ const prepagesStore = usePrepagesStore();
 const shortcutsStore = useShortcutsStore();
 
 const first_prepage = computed(() => {
-  return prepagesStore.pageGroups[1].pages[0];
+  if (Object.values(prepagesStore.pageGroups).length > 1)
+    return prepagesStore.pageGroups[1].pages[0];
 });
 </script>
 
