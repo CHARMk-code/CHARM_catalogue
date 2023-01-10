@@ -149,7 +149,7 @@ def parseXlsx():
 
         for i in range(2,companies_sheet.max_row ):
             tags_temp = []
-            for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column):
+            for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column + 1):
 
                 if companies_sheet.cell(i,j).value:
                     tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY -1 ]) # This is -1 is due to xlsx being 1 index and the tag list is 0 index
