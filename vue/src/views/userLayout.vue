@@ -83,11 +83,11 @@
           round
         ></q-btn>
       </div>
-      <q-img
+      <Image
         class="ma-0 pa-0"
         height="100%"
         v-if="leftLayout"
-        :src="base_URL + leftLayout.image"
+        :imageName="leftLayout.image"
       />
     </q-drawer>
 
@@ -108,11 +108,11 @@
           round
         ></q-btn>
       </div>
-      <q-img
+      <Image
         class="ma-0 pa-0"
         height="100%"
         v-if="rightLayout"
-        :src="base_URL + rightLayout.image"
+        :imageName="rightLayout.image"
       />
     </q-drawer>
 
@@ -123,6 +123,7 @@
 </template>
 
 <script lang="ts" setup>
+import Image from "@/components/utils/Image.vue";
 import axios from "@/plugins/axios";
 import { useAuthStore } from "@/stores/modules/auth";
 import { useLayoutsStore } from "@/stores/modules/layouts";
@@ -137,8 +138,6 @@ const layoutsStore = useLayoutsStore();
 const site_settingsStore = useSite_settingsStore();
 
 const leftDrawerOpen = ref(false);
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const links = [
   { name: "Home", route: "/", icon: "mdi-home" },
