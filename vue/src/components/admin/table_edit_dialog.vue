@@ -230,8 +230,9 @@ async function save() {
       })
   ).then(() => {
     for (const col of props.colMeta) {
-      if (!col.meta && rawRow[col.model])
+      if (!col.meta && col.model in rawRow) {
         props.row[col.model] = rawRow[col.model];
+      }
     }
     if (props.metaModelCallback) props.metaModelCallback(rawRow, props.row);
 
