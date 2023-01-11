@@ -32,7 +32,7 @@
       overlay
       bordered
       :width="200"
-      class="full-height column"
+      class="column"
     >
       <q-list>
         <q-separator></q-separator>
