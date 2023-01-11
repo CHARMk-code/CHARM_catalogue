@@ -1,5 +1,5 @@
 <template>
-  <q-page padding v-touch-swipe="handleSwipe">
+  <q-page padding v-touch-swipe.left.right="handleSwipe">
     <div class="row" v-if="company != undefined && company.active">
       <Logo class="col-12 col-md-6" :src="company.logo" />
 
