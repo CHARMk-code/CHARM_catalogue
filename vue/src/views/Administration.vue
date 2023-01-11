@@ -77,6 +77,7 @@ const links: { name: string; route: string; icon: string }[] = [
   { name: "maps", route: "/admin/maps", icon: "mdi-map" },
   { name: "layout", route: "/admin/layout", icon: "mdi-human-male-board" },
   { name: "shortcuts", route: "/admin/shortcuts", icon: "mdi-star" },
+  { name: "feedback", route: "/admin/feedback", icon: "mdi-forum" },
   { name: "batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
   { name: "account", route: "/admin/account", icon: "mdi-account" },
 ];

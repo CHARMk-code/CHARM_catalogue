@@ -10,7 +10,7 @@ import { useShortcutsStore } from "@/stores/modules/shortcuts";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useFavoritesStore } from "@/stores/modules/favorites";
-import { mapStores } from "pinia";
+import { useFeedbackStore } from "@/stores/modules/feedback";
 
 const UserLayout = () => import("@/views/userLayout.vue");
 const Company_view = () => import("@/views/company.vue");
@@ -29,6 +29,7 @@ const Map_admin = () => import("@/views/admin/Map.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
+const Feedback_admin = () => import("@/views/admin/Feedback.vue")
 
 const router = createRouter({
   history: createWebHistory(),
@@ -106,6 +107,9 @@ const router = createRouter({
       path: "/Admin",
       name: "Admin",
       component: Admin_view,
+      beforeEnter: () => {
+        useFeedbackStore().fetchFeedback()
+      },
       children: [
         {
           path: "prepages",
@@ -136,6 +140,11 @@ const router = createRouter({
           path: "layout",
           name: "Admin/Layout",
           component: Layout_admin,
+        },
+        {
+          path: "feedback",
+          name: "Admin/feedback",
+          component: Feedback_admin,
         },
         {
           path: "batch",
