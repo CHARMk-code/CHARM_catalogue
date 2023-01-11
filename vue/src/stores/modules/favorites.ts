@@ -25,6 +25,13 @@ export const useFavoritesStore = defineStore('favorites', {
         JSON.stringify(Array.from(this.favorites.values()))
       );
     },
+    toggleFavorite(id: number) {
+      if (!this.isFavorite(id)) {
+        this.addFavorite(id)
+      } else {
+        this.removeFavorite(id)
+      }
+    },
     loadFromStorage() {
       const stored_favorites = localStorage.getItem("favorites") || "[]"
       if (stored_favorites == "{}") {

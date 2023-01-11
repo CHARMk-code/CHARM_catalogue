@@ -16,13 +16,13 @@
             (_event, row, _index) => router.push('/company/' + row.name)
           "
         >
-          <template #body-cell-Programs="props">
+          <template #body-cell-Logo="props">
             <q-td :props="props">
-              <TagGroup :tags="props.value"></TagGroup
-            ></q-td>
+              <Image :imageName="props.value"></Image>
+            </q-td>
           </template>
 
-          <template #body-cell-Business_areas="props">
+          <template #body-cell-Programs="props">
             <q-td :props="props">
               <TagGroup :tags="props.value"></TagGroup
             ></q-td>
@@ -47,18 +47,20 @@
           </template>
 
           <template #body-cell-Favorites="props">
-            <q-td :props="props">
+            <q-td :props="props" auto-width>
               <q-icon
                 v-if="props.value"
                 size="sm"
                 name="mdi-star"
                 color="primary"
+                @click.stop="favoritesStore.removeFavorite(props.row.id)"
               ></q-icon>
               <q-icon
                 v-else
                 size="sm"
                 name="mdi-star-outline"
                 color="grey"
+                @click.stop="favoritesStore.addFavorite(props.row.id)"
               ></q-icon>
             </q-td>
           </template>
@@ -79,6 +81,8 @@ import type { Company } from "@/stores/modules/companies";
 import { computed } from "vue";
 import { useTagsStore } from "@/stores/modules/tags";
 import TagGroup from "@/components/Tag_group.vue";
+import Image from "@/components/utils/Image.vue";
+import { useQuasar } from "quasar";
 
 const site_settingsStore = useSite_settingsStore();
 const filterStore = useFilterStore();
@@ -94,44 +98,61 @@ const visibleCards = site_settingsStore.settings.company_view.cards.filter(
 function isVisible(name: string): boolean {
   return visibleCards.some((c) => c.name === name);
 }
-const columns = [
-  { name: "Name", label: "Name", field: "name", align: "left" },
-  {
-    name: "Programs",
-    label: "Programs",
-    field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
-    align: "left",
-  },
-  {
-    name: "Business_areas",
-    label: "Business areas",
-    field: (row: Company) => tagsStore.getBusinessAreasFromIds(row.tags),
-    align: "left",
-  },
-  {
-    name: "Looking_for",
-    label: "Looking for",
-    field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
-    align: "left",
-  },
-  {
-    name: "Offering",
-    label: "Offering",
-    field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
-    align: "left",
-  },
-  {
-    name: "Fair_area",
-    label: "Fair Area",
-    field: (row: Company) => tagsStore.getFairAreasFromIds(row.tags),
-    align: "left",
-  },
-  {
-    name: "Favorites",
-    label: "Favorites",
-    field: (row: Company) => favoritesStore.favorites.has(row.id),
-    align: "center",
-  },
-];
+
+const initialPagination = {
+  sortBy: "desc",
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+};
+
+const $q = useQuasar();
+const columns = computed(() => {
+  const tempCols = [
+    { name: "Logo", label: "Logo", field: "logo", align: "left", mobile: true },
+    { name: "Name", label: "Name", field: "name", align: "left", mobile: true },
+    {
+      name: "Programs",
+      label: "Programs",
+      field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Looking_for",
+      label: "Looking for",
+      field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Offering",
+      label: "Offering",
+      field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Fair_area",
+      label: "Fair Area",
+      field: (row: Company) => tagsStore.getFairAreasFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Favorites",
+      label: "Favorites",
+      field: (row: Company) => favoritesStore.favorites.has(row.id),
+      align: "center",
+      mobile: true,
+    },
+  ];
+  if ($q.screen.lt.md) {
+    return tempCols
+      .filter((col) => col.mobile)
+      .map((col) => {
+        delete col.mobile;
+        return col;
+      });
+  } else {
+    return tempCols;
+  }
+});
 const router = useRouter();
 </script>
