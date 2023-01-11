@@ -11,7 +11,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer persistent side="left" bordered :modelValue="true" :width="200">
+    <q-drawer
+      persistent
+      side="left"
+      class="column"
+      bordered
+      :modelValue="true"
+      :width="200"
+    >
       <q-list>
         <q-separator></q-separator>
         <q-item
@@ -34,6 +41,22 @@
             <q-btn color="primary" text-color="white" @click="logout"
               >Logout</q-btn
             >
+          </q-item-section>
+        </q-item>
+      </q-list>
+      <q-space />
+      <q-list>
+        <q-item
+          flat
+          class="q-mb-md text-primary"
+          icon="mdi-forum"
+          clickable
+          @click="$q.dialog({ component: feedback })"
+        >
+          <q-item-section avatar> <q-icon name="mdi-forum" /> </q-item-section>
+          <q-item-section>
+            <div>Report a problem</div>
+            <div>or give feedback</div>
           </q-item-section>
         </q-item>
       </q-list>
@@ -77,6 +100,7 @@ const links: { name: string; route: string; icon: string }[] = [
   { name: "maps", route: "/admin/maps", icon: "mdi-map" },
   { name: "layout", route: "/admin/layout", icon: "mdi-human-male-board" },
   { name: "shortcuts", route: "/admin/shortcuts", icon: "mdi-star" },
+  { name: "feedback", route: "/admin/feedback", icon: "mdi-forum" },
   { name: "batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
   { name: "account", route: "/admin/account", icon: "mdi-account" },
 ];

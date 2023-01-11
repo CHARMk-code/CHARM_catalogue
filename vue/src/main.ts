@@ -13,7 +13,7 @@ import router from "@/router";
 // import * as components from 'vuetify/components'
 // import * as directives from 'vuetify/directives'
 
-import { Quasar } from "quasar"
+import { Dialog, Quasar } from "quasar"
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -24,7 +24,9 @@ import 'quasar/src/css/index.sass'
 const app = createApp(App)
 
 app.use(Quasar, {
-    plugins: {}, // import Quasar plugins and add here
+    plugins: {
+        Dialog
+    }, // import Quasar plugins and add here
 })
 
 

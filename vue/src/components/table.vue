@@ -116,7 +116,7 @@ const props = defineProps<{
   editable: boolean;
   tableColumns: any[];
   rows: TableRow[];
-  metaRows: any[];
+  metaRows?: any[];
   colMeta: TableColMeta[];
   metaModelCallback?: (meta: any, row: TableRow) => void;
 }>();

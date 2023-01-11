@@ -575,3 +575,50 @@ class Company_card(db.Model):
             'text': self.text,
             'active': self.active,
         }
+
+class Feedback(db.Model):
+    __tablename__ = "feedback"
+    id = db.Column(db.Integer, primary_key=True)
+
+    title = db.Column(db.String(50))
+    text = db.Column(db.String(1000))
+    meta = db.Column(db.String(1000))
+    received = db.Column(db.DateTime)
+
+    @staticmethod
+    def create(title, text, meta=""):
+        try:
+            new_feedback = Feedback(
+                title=title,
+                text=text,
+                meta=meta,
+                received=datetime.datetime.now()
+            )
+
+            db.session.add(new_feedback)
+            db.session.commit()
+        except Exception as e:
+            return False
+        return True
+
+    def update(self, title, text, meta):
+        self.title = test_and_set(self.title, title)
+        self.text = test_and_set(self.text, text)
+        self.meta = test_and_set(self.meta, meta)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'text': self.text,
+            'meta': self.meta,
+            'received': self.received
+        }

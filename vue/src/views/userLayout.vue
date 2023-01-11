@@ -32,6 +32,7 @@
       overlay
       bordered
       :width="200"
+      class="column"
     >
       <q-list>
         <q-separator></q-separator>
@@ -61,6 +62,22 @@
             <q-btn color="primary" text-color="white" @click="logout"
               >Logout</q-btn
             >
+          </q-item-section>
+        </q-item>
+      </q-list>
+      <q-space />
+      <q-list>
+        <q-item
+          flat
+          class="q-mb-md text-primary"
+          icon="mdi-forum"
+          clickable
+          @click="$q.dialog({ component: feedback })"
+        >
+          <q-item-section avatar> <q-icon name="mdi-forum" /> </q-item-section>
+          <q-item-section>
+            <div>Report a problem</div>
+            <div>or give feedback</div>
           </q-item-section>
         </q-item>
       </q-list>
@@ -130,6 +147,12 @@ import { useLayoutsStore } from "@/stores/modules/layouts";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import feedback from "@/components/feedback.vue";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
+
+console.log($q);
 
 const route = useRoute();
 const router = useRouter();
