@@ -5,9 +5,17 @@
 
       <Name class="col-12 col-md-6" :name="company.name" :id="company.id" />
     </div>
-    <div :class="$q.screen.lt.md ? 'row' : 'column'">
+    <div
+      v-if="company != undefined && company.active"
+      :class="$q.screen.lt.md ? 'row' : 'column'"
+    >
       <div class="flex-break hidden"></div>
+      <div class="flex-break"></div>
       <Textblock :body="company.description" />
+      <Map
+        :map="mapsStore.getMapFromId(company.map_image)"
+        :booth_number="company.booth_number"
+      />
       <Textblock
         :body="company.unique_selling_point"
         title="What Makes Us Special"
@@ -46,10 +54,6 @@
       <Contacts
         :contacts="company.contacts"
         :contact_email="company.contact_email"
-      />
-      <Map
-        :map="mapsStore.getMapFromId(company.map_image)"
-        :booth_number="company.booth_number"
       />
       <Trivia
         :talk_to_us_about="company.talk_to_us_about"
@@ -220,7 +224,7 @@ function prev() {
   .column > div:nth-child(#{$x}n)
     order: #{$x}
   .column
-    height: 100vh
-    margin-left: -24px
-    padding: 16px
+    height: 200vh
+    margin-left: -34px
+    padding: 24px
 </style>
