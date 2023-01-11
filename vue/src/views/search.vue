@@ -144,12 +144,7 @@ const columns = computed(() => {
     },
   ];
   if ($q.screen.lt.md) {
-    return tempCols
-      .filter((col) => col.mobile)
-      .map((col) => {
-        delete col.mobile;
-        return col;
-      });
+    return tempCols.filter((col) => col.mobile);
   } else {
     return tempCols;
   }
