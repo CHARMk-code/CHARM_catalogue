@@ -1,5 +1,5 @@
 <template>
-  <q-card>
+  <q-card flat>
     <q-card-section>
       <q-input
         filled
@@ -18,6 +18,7 @@
             @click="expanded = !expanded"
           ></q-btn>
           <q-btn
+            class="q-ml-sm"
             label="Search"
             color="primary"
             noCaps
