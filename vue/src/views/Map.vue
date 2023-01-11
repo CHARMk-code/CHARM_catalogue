@@ -1,23 +1,21 @@
 <template>
   <v-main>
     <v-sheet class="pa-6">
-      <v-img
+      <Image
         v-if="maps.length > 0"
         contain
         justify="center"
-        :src="base_URL + maps[0].image"
+        :imageName="maps[0].image"
       />
     </v-sheet>
   </v-main>
 </template>
 
 <script lang="ts" setup>
-import axios from "@/plugins/axios";
 import { useMapsStore } from "@/stores/modules/maps";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
+import Image from "@/components/utils/Image.vue";
 
 const mapsStore = useMapsStore();
 

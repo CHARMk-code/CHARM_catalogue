@@ -7,10 +7,10 @@
           :style="{ width: $q.screen.lt.md ? '75%' : '100%' }"
           v-if="first_prepage"
         >
-          <q-img
+          <Image
             :height="$q.screen.lt.md ? '400px' : ''"
             fit="contain"
-            :src="base_URL + first_prepage.image"
+            :imageName="first_prepage.image"
           />
           <q-card-actions :align="'center'" class="text-h5 text-center">
             <q-btn
@@ -43,12 +43,11 @@
 <script lang="ts" setup>
 import hoverCard from "@/components/landing/hoverCard.vue";
 import shortcut from "@/components/landing/shortcut.vue";
-import axios from "@/plugins/axios";
+import Image from "@/components/utils/Image.vue";
 import { computed } from "vue";
 import { usePrepagesStore } from "@/stores/modules/prepages";
 import { useShortcutsStore } from "@/stores/modules/shortcuts";
 
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 const prepagesStore = usePrepagesStore();
 const shortcutsStore = useShortcutsStore();
 

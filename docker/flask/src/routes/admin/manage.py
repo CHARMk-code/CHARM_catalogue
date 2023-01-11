@@ -9,6 +9,7 @@ from ... import db, config
 from ...helper_functions import *
 import shutil
 import openpyxl
+import urllib.parse
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
@@ -20,7 +21,7 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 
 @blueprint.route("/image/<filename>", methods = ["GET"])
 def imageSend(filename):
-    return send_from_directory(config['flask']['static_folder'], secure_filename(filename))
+    return send_from_directory(config['flask']['static_folder'], (filename))
 
 
 def imageLoad(request):
@@ -28,8 +29,9 @@ def imageLoad(request):
     filename = file.filename
     if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
         return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-    file.save(os.path.join(config['flask']['static_folder'], secure_filename(filename)))
 
+    urlEncodeFilename = urllib.parse.unquote_plus(filename)
+    file.save(os.path.join(config['flask']['static_folder'], filename))
     return "All files uploaded", status.HTTP_200_OK
 
 
@@ -47,11 +49,8 @@ def parseXlsx():
         map_object = Prepage.query.filter_by(name=maps_sheet.cell(i,1)).first()
 
         data = list(map(lambda x: x.value, maps_sheet[i]))
-        ref_object = Map.query.filter_by(name=data[2]).first()
-        if ref_object:
-            data[2] = ref_object.id
-        else:
-            data[2] = None
+        REF_NAME_POS = 2
+        data[REF_NAME_POS] = mapLookUpIdOrNull(data[REF_NAME_POS])
         if not map_object:
             Map.create(*data)
         else:
@@ -157,6 +156,11 @@ def parseXlsx():
             metadata = companies_sheet[i][:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
 
+            # Map map name to id
+            MAP_POS = 15
+
+            metadata[MAP_POS] = mapLookUpIdOrNull(metadata[MAP_POS])
+
             if metadata[0] == "":
                 continue
             print(metadata, file=sys.stderr)
@@ -173,6 +177,14 @@ def parseXlsx():
 
 
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
+
+def mapLookUpIdOrNull(name):
+    map_obj = Map.query.filter_by(name=name).first()
+    if map_obj:
+        return map_obj.id
+    else:
+        return None
+
 
 def unpackAndParse(request):
     file = request.files["file"]
