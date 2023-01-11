@@ -14,6 +14,7 @@
 
 <script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
+import Image from "../utils/Image.vue";
 
 const props = defineProps<{
   src: string;

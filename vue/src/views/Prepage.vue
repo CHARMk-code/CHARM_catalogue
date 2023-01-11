@@ -4,23 +4,23 @@
       v-if="$q.screen.gt.sm"
       v-for="prepage in prepagesStore.pageGroups[$route.params.page].pages"
     >
-      <q-img
+      <Image
         :class="{ prepage: true, 'col-6': pagesToShow === 2 }"
         fit="contain"
         position="50% top"
         :draggable="false"
-        :src="base_URL + prepage.image"
+        :imageName="prepage.image"
         v-touch-swipe="handleSwipe"
       />
     </template>
     <template v-if="$q.screen.lt.md && mobilePrepage">
-      <q-img
+      <Image
         v-if="mobilePrepage.mobile"
         class="prepage"
         fit="contain"
         position="50% top"
         :draggable="false"
-        :src="base_URL + mobilePrepage.image"
+        :imageName="mobilePrepage.image"
         v-touch-swipe="handleSwipe"
       />
     </template>
@@ -28,6 +28,7 @@
 </template>
 
 <script lang="ts" setup>
+import Image from "@/components/utils/Image.vue";
 import axios from "@/plugins/axios";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useFilterStore } from "@/stores/modules/filter";
@@ -62,8 +63,6 @@ const mobilePrepage: Prepage = computed(() => {
     return pageGroupPages[0];
   }
 });
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const pagesToShow = computed(
   () => prepagesStore.pageGroups[route.params.page].pages.length

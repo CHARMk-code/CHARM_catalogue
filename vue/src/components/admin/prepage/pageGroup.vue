@@ -17,7 +17,7 @@
     <template #item="{ index, element }">
       <q-card square flat bordered class="col-6">
         <q-card-section>
-          <q-img :src="base_URL + element.image"></q-img>
+          <Image :imageName="element.image" />
         </q-card-section>
         <q-card-actions>
           <q-space />
@@ -85,8 +85,7 @@ import draggable from "vuedraggable";
 import type { TableColMeta } from "../table_edit_dialog.vue";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 import type { TableRow } from "@/components/table.vue";
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
+import Image from "@/components/utils/Image.vue";
 
 const headerHover = ref(false);
 const dragging = ref(false);

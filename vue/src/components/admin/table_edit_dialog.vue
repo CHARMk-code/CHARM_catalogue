@@ -116,16 +116,17 @@
           <template v-if="col.type == 'image'">
             <div class="row q-col-gutter-md">
               <div class="col-6">
-                <q-img
+                <Image
+                  class="q-mx-md"
                   v-if="rawRow[col.model] != undefined"
-                  :src="base_URL + rawRow[col.model]"
+                  :imageName="rawRow[col.model]"
                   height="300px"
                   fit="contain"
                 >
-                </q-img>
+                </Image>
               </div>
               <div class="col-6">
-                <div class="">
+                <div class="q-ml-md q-mt-md">
                   <template
                     v-if="
                       typeof rawRow[col.model] === 'string' &&
@@ -170,6 +171,7 @@ import axios from "@/plugins/axios";
 import { colors } from "quasar";
 import { reactive, ref, unref, type Ref } from "vue";
 import { deepUnref } from "vue-deepunref";
+import Image from "../utils/Image.vue";
 
 export interface TableColMeta {
   type:
@@ -190,8 +192,6 @@ export interface TableColMeta {
   hint?: string;
   meta?: boolean;
 }
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const props = defineProps<{
   name: string;

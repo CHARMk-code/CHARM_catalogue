@@ -67,7 +67,7 @@
           <template #item="{ element }">
             <div class="col-6">
               <q-card>
-                <q-img :src="base_URL + element.image"></q-img>
+                <Image :imageName="element.image" />
               </q-card>
             </div>
           </template>
@@ -109,8 +109,8 @@ import draggable from "vuedraggable";
 import pageGroupDraggable from "./pageGroup.vue";
 import axios from "@/plugins/axios";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
+import Image from "@/components/utils/Image.vue";
 
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 const prepagesStore = usePrepagesStore();
 
 function onMoveCallbackInactivePrepages(evt) {

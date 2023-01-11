@@ -12,12 +12,12 @@
       flat
       :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
     >
-      <q-img
+      <Image
         class="ma-2"
         height="400px"
         width="400px"
         fit="contain"
-        :src="base_URL + props.map.image"
+        :imageName="props.map.image"
       />
     </q-card-section>
   </company_card_wrapper>
@@ -27,12 +27,12 @@
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 import axios from "@/plugins/axios";
 import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
+import Image from "../utils/Image.vue";
 
 const props = defineProps<{
   booth_number: number;
   map: Company_Map | undefined;
 }>();
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const mapsStore = useMapsStore();
 </script>
