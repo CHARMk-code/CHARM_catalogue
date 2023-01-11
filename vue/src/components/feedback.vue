@@ -16,7 +16,7 @@
             label="Title..."
             maxlength="50"
             counter
-            v-model="feedbackTitle"
+            v-model="feedback.title"
             required
           />
           <q-input
@@ -24,8 +24,8 @@
             filled
             label="Your feedback here..."
             type="textarea"
-            maxlength="500"
-            v-model="feedbackText"
+            maxlength="1000"
+            v-model="feedback.text"
             counter
             required
           />
@@ -42,15 +42,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { useFeedbackStore, type Feedback } from "@/stores/modules/feedback";
+import { reactive, ref } from "vue";
 
 const dialog = ref(false);
 const sendingFeedback = ref(false);
-const feedbackTitle = ref("");
-const feedbackText = ref("");
+const feedback: Feedback = reactive({ title: "", text: "", meta: "" });
 
 function sendFeedback() {
   sendingFeedback.value = true;
+  useFeedbackStore().sendFeedback(feedback);
+
   // Code for sending the feedback to us
   dialog.value = false;
 }
