@@ -119,8 +119,12 @@ export const useFilterStore = defineStore('filter', {
       });
     },
     sortCompanies() {
-      const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
-      this.filteredCompanies.sort(strategy);
+      return new Promise<void>((resolve, reject) => {
+        console.log("sorting started on:", this.filteredCompanies)
+        const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
+        this.filteredCompanies.sort(strategy);
+        resolve()
+      })
     },
     setFiltersFromRouteQuery(rQuery: LocationQuery) {
       this.resetFilter();

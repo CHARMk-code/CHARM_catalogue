@@ -40,7 +40,7 @@
             ></q-td>
           </template>
 
-          <template #body-cell-Fair_areas="props">
+          <template #body-cell-Fair_area="props">
             <q-td :props="props">
               <TagGroup :tags="props.value"></TagGroup
             ></q-td>
