@@ -11,10 +11,9 @@
       </div>
       <div v-if="sweden != -1 || world != -1">
         <span class="text-bold"> Employees: </span>
-        <span v-if="sweden != -1">{{ sweden }} in sweden</span>
+        <span v-if="sweden != -1">{{ sweden }} in Sweden</span>
         <span v-if="sweden != -1 && world != -1"> and </span>
-        <span v-if="world != -1">{{ world }} in the world</span>
-        .
+        <span v-if="world != -1">{{ world }} in the world</span>.
       </div>
     </q-card-section>
     <q-card-section v-if="world != -1"> </q-card-section>
