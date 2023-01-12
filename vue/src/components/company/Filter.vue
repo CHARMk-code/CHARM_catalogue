@@ -2,7 +2,7 @@
 <template>
   <div>
       <div>
-        <template v-if="showFilter">
+        <template :v-if="showFilter">
           Current Filter:
           <q-chip size="sm" class="ma-1" v-if=showQuery clickable @click=clearQuery()>
             {{filterStore.filters.query}}
@@ -42,8 +42,10 @@ const tags:[Tag] = ref(
 ));
 
 const showQuery = computed(() => filterStore.filters.query != "")
-const showFilter = ref(false);
-update();
+const showFilter = ref(showQuery.value || (tags.value.length > 0) || filterStore.filters.favorites|| filterStore.filters.sweden|| filterStore.filters.charmtalk)
+
+console.log(showQuery.value, (tags.value.length > 0), filterStore.filters.favorites, filterStore.filters.sweden, filterStore.filters.charmtalk, (showQuery.value || (tags.value.length > 0) || filterStore.filters.favorites|| filterStore.filters.sweden|| filterStore.filters.charmtalk), showFilter.value
+ )
 
 function removeTag(tag: Tag) {
   tags.value = tags.value.filter((t) => t.id != tag.id);
@@ -58,15 +60,6 @@ function removeTag(tag: Tag) {
   filterStore.filterCompanies();
 
 }
-
-function update() {
-   showFilter.value =  showQuery
-    || tags.length > 0
-    || filterStore.filters.favorites
-    || filterStore.filters.sweden
-    || filterStore.filters.charmtalk;
-}
-
 
 function clearQuery() {
   filterStore.filters.query = "";
