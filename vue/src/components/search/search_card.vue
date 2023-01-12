@@ -40,7 +40,7 @@
             v-if="isVisible('tag_business_areas')"
             :tags="tagsStore.business_areas"
             v-model:selected_tags="selectedBusiness_areas"
-            label="Business area"
+            label="Business areas"
             :maxShown="3"
           />
           <tagSelector
