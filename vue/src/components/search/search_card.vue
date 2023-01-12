@@ -163,7 +163,6 @@ const checkbox_options = computed(() => {
 function search() {
   console.log("search");
   filterStore.filterCompanies().then(() => {
-    filterStore.sortCompanies();
     const searchQuery = filterStore.generateSearchRouteQuery();
     console.log("generatedSRQ", searchQuery);
     router.replace({
