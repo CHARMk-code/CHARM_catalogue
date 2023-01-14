@@ -19,7 +19,7 @@ def create_app():
     # # enable CORS
     CORS(app, origins="*")
     #if config['flask']['secret_key'] == "":
-    #    def randomString(): 
+    #    def randomString():
     #        random_string = ''
     #        for _ in range(255):
     #            # Do while loop to avoid reserved char '
@@ -28,7 +28,7 @@ def create_app():
     #                random_integer = random.randint(32, 127)
     #            # Keep appending random characters using chr(x)
     #            random_string += (chr(random_integer))
-    #        
+    #
     #        return random_string
 #
     #    # Randomize secrets
@@ -60,12 +60,4 @@ def create_app():
 
     return app
 
-with create_app().app_context():
-    while True:
-        try:
-            db.create_all()
-            break
-        except:
-            sleep(1)
-            pass
-    db.session.commit()
+create_app().app_context()
