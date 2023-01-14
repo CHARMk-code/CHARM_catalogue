@@ -9,6 +9,24 @@
         :colMeta="colMeta"
         :editable="false"
       >
+        <template #top-right>
+          <q-btn
+            color="primary"
+            label="Save changes"
+            @click="feedbackStore.sendAllFeedback()"
+          />
+        </template>
+        <template #body-cell-Important="props">
+          <q-td :props="props" auto-width>
+            <q-checkbox v-model="props.row.important" />
+          </q-td>
+        </template>
+
+        <template #body-cell-Archived="props">
+          <q-td :props="props" auto-width>
+            <q-checkbox v-model="props.row.archived" />
+          </q-td>
+        </template>
       </Table>
     </q-card-section>
   </q-card>
@@ -23,6 +41,20 @@ import type { TableColMeta } from "./table_edit_dialog.vue";
 const feedbackStore = useFeedbackStore();
 
 const headers = [
+  {
+    name: "Important",
+    label: "Important",
+    field: "important",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "Archived",
+    label: "Archived",
+    field: "archived",
+    align: "left",
+    sortable: true,
+  },
   {
     name: "Title",
     label: "Title",

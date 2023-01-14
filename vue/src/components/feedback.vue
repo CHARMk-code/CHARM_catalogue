@@ -51,7 +51,7 @@ const feedback: Feedback = reactive({ title: "", text: "", meta: "" });
 
 function sendFeedback() {
   sendingFeedback.value = true;
-  useFeedbackStore().sendFeedback(feedback);
+  useFeedbackStore().sendUserFeedback(feedback);
 
   // Code for sending the feedback to us
   dialog.value = false;

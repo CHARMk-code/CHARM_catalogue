@@ -8,6 +8,8 @@ export interface Feedback {
   text: string,
   meta: string,
   received: Date
+  important: boolean,
+  archived: boolean
 }
 
 interface State {
@@ -61,7 +63,7 @@ export const useFeedbackStore = defineStore('feedback', {
         }
       });
     },
-    sendFeedback(feedback: Feedback) {
+    sendUserFeedback(feedback: Feedback) {
       return new Promise((resolve, reject) => {
         this.axios
           .put("/feedback", feedback)
@@ -73,6 +75,22 @@ export const useFeedbackStore = defineStore('feedback', {
           });
       });
 
+    },
+    sendAdminFeedback(feedback) {
+      return new Promise((resolve, reject) => {
+        this.axios
+          .post("/feedback", feedback)
+          .then((resp: any) => {
+            resolve(resp);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      });
+    },
+    sendAllFeedback() {
+      const promises = this.feedback.map(f => this.sendAdminFeedback(f))
+      return Promise.all(promises)
     }
   },
 });

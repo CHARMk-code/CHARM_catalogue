@@ -584,6 +584,8 @@ class Feedback(db.Model):
     text = db.Column(db.String(1000))
     meta = db.Column(db.String(1000))
     received = db.Column(db.DateTime)
+    important = db.Column(db.Boolean)
+    archived = db.Column(db.Boolean)
 
     @staticmethod
     def create(title, text, meta=""):
@@ -592,7 +594,9 @@ class Feedback(db.Model):
                 title=title,
                 text=text,
                 meta=meta,
-                received=datetime.datetime.now()
+                received=datetime.datetime.now(),
+                important=False,
+                archived=False
             )
 
             db.session.add(new_feedback)
@@ -601,10 +605,12 @@ class Feedback(db.Model):
             return False
         return True
 
-    def update(self, title, text, meta):
+    def update(self, title, text, meta, important, archived):
         self.title = test_and_set(self.title, title)
         self.text = test_and_set(self.text, text)
         self.meta = test_and_set(self.meta, meta)
+        self.important = test_and_set(self.important, important)
+        self.archived = test_and_set(self.archived, archived)
         db.session.commit()
         return True
 
@@ -620,5 +626,7 @@ class Feedback(db.Model):
             'title': self.title,
             'text': self.text,
             'meta': self.meta,
-            'received': self.received
+            'received': self.received,
+            'important': self.important,
+            'archived': self.archived
         }
