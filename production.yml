@@ -6,7 +6,8 @@ services:
     ports:
       - "5008:5000"
     depends_on:
-      - db
+      flyway:
+        condition: service_completed_successfully
     links:
       - db
     volumes:
@@ -17,7 +18,15 @@ services:
       FLASK_ENV: production
       FLASK_APP: .
       SERVER_MODE: summer job
-
+  flyway:
+    image: flyway/flyway
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - ./flyway:/flyway/sql
+    command: -url=jdbc:mysql://db:3306/catalogue -user=catalogue -password=password -connectRetries=60 migrate
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
