@@ -74,6 +74,10 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { useLayoutsStore } from "@/stores/modules/layouts";
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import feedback from "@/components/feedback.vue";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
 
 const emit = defineEmits<{
   (e: "next"): void;

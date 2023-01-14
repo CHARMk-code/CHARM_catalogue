@@ -12,6 +12,7 @@
           :rows="filterStore.filteredCompanies"
           :columns="columns"
           wrap-cells
+          :pagination="initialPagination"
           @row-click="
             (_event, row, _index) => router.push('/company/' + row.name)
           "
@@ -24,26 +25,26 @@
 
           <template #body-cell-Programs="props">
             <q-td :props="props">
-              <TagGroup :tags="props.value"></TagGroup
-            ></q-td>
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
 
           <template #body-cell-Looking_for="props">
             <q-td :props="props">
-              <TagGroup :tags="props.value"></TagGroup
-            ></q-td>
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
 
           <template #body-cell-Offering="props">
             <q-td :props="props">
-              <TagGroup :tags="props.value"></TagGroup
-            ></q-td>
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
 
           <template #body-cell-Fair_area="props">
             <q-td :props="props">
-              <TagGroup :tags="props.value"></TagGroup
-            ></q-td>
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
 
           <template #body-cell-Favorites="props">
@@ -109,7 +110,14 @@ const initialPagination = {
 const $q = useQuasar();
 const columns = computed(() => {
   const tempCols = [
-    { name: "Logo", label: "Logo", field: "logo", align: "left", mobile: true },
+    {
+      name: "Logo",
+      label: "Logo",
+      field: "logo",
+      align: "left",
+      mobile: true,
+      style: "min-width:120px",
+    },
     { name: "Name", label: "Name", field: "name", align: "left", mobile: true },
     {
       name: "Programs",

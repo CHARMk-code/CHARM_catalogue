@@ -40,7 +40,7 @@
             v-if="isVisible('tag_business_areas')"
             :tags="tagsStore.business_areas"
             v-model:selected_tags="selectedBusiness_areas"
-            label="Business area"
+            label="Business areas"
             :maxShown="3"
           />
           <tagSelector
@@ -163,7 +163,6 @@ const checkbox_options = computed(() => {
 function search() {
   console.log("search");
   filterStore.filterCompanies().then(() => {
-    filterStore.sortCompanies();
     const searchQuery = filterStore.generateSearchRouteQuery();
     console.log("generatedSRQ", searchQuery);
     router.replace({

@@ -115,7 +115,10 @@ export const useFilterStore = defineStore('filter', {
         //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);
         // }
         // state.filteredCompanies = companies;
-        resolve();
+
+        this.sortCompanies().then(() => {
+          resolve();
+        })
       });
     },
     sortCompanies() {
@@ -173,7 +176,7 @@ export const useFilterStore = defineStore('filter', {
         this.filters.sweden = true;
       }
       console.log(this.filters)
-      this.filterCompanies();
+      this.filterCompanies()
 
 
     },
