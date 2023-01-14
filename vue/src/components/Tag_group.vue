@@ -9,7 +9,7 @@
       </template>
 
       <template v-else>
-        <q-chip size="sm" class="ma-1" clickable @click=tagClick(tag)>
+        <q-chip :icon-right="removeable ? 'mdi-close-circle': ''" size="sm" class="ma-1" clickable @click=tagClick(tag)>
           {{ tag.name }}
         </q-chip>
       </template>
@@ -27,6 +27,7 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   tags: Tag[];
+  removeable: boolean;
 }>();
 
 
