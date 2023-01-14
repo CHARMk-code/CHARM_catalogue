@@ -9,7 +9,6 @@ CORS(blueprint,origins="*", resources=r'*', allow_headers=[
 
 
 @blueprint.route("", methods=["GET"])
-# @login_required
 def feedback_get():
     result = auth_token(request)
     if not result[0]:
@@ -18,6 +17,22 @@ def feedback_get():
     feedbacks = Feedback.query.all()
     return jsonify([feedback.serialize for feedback in feedbacks]), status.HTTP_200_OK
 
+
+@blueprint.route("", methods=["POST"])
+def feedback_post():
+    result = auth_token(request)
+    if not result[0]:
+        return result[1]
+
+    request_data = request.get_json()
+    id = try_int(get_if_exist(request_data, "id"))
+
+    important = try_bool(get_if_exist(request_data, "important"))
+    archived = try_bool(get_if_exist(request_data,"archived"))
+
+    feedback = Feedback.query.get(id)
+
+    return send_status(feedback.update(None,None,None,important, archived))
 
 @blueprint.route("<id>",methods=["DELETE"])
 def feedback_delete(id):
