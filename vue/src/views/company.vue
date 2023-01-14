@@ -1,5 +1,6 @@
 <template>
   <q-page padding v-touch-swipe.left.right="handleSwipe">
+    <Filter @filterChanged="() => {setNextRoute(); setPrevRoute()}"/>
     <div class="row" v-if="company != undefined && company.active">
       <Logo class="col-12 col-md-6" :src="company.logo" />
 
@@ -66,6 +67,7 @@
 </template>
 
 <script lang="ts" setup>
+import Filter from "@/components/company/Filter.vue";
 import Logo from "@/components/company/Logo.vue";
 import Name from "@/components/company/Name.vue";
 import Trivia from "@/components/company/Trivia.vue";
@@ -151,6 +153,8 @@ function setNextRoute() {
   if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
     settingsStore.settings.navigation.next =
       "/company/" + filterStore.filteredCompanies[currentIndex.value + 1].name;
+  } else {
+    settingsStore.settings.navigation.next = undefined;
   }
 }
 const $q = useQuasar();
