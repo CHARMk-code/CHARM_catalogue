@@ -90,63 +90,18 @@ def parseXlsx():
         else:
             tag.update(row[NUMBER_OF_METADATA_COLS_TAG].value,None,1,1,False,*metadata)
 
-
-   # next_col = NUMBER_OF_METADATA_COLS_TAG
-   # parent_tag = None
-   # for i in range(2,tags_sheet.max_row + 1):
-   #     row = tags_sheet[i]
-   #     tag = Tag.query.filter_by(name=row[next_col].value).first()
-   #     metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
-   #     if not tag: # No tag exists
-   #         Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
-   #         parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
-   #     else:
-   #         tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
-   #         parent_tag = tag.id
-   #
-   #     if (i+1 >= tags_sheet.max_row):
-   #         break
-   #     if (tags_sheet.cell(i+1,next_col)!=''):
-   #         if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-   #             parent_tag = None
-   #         continue
-   #     elif (next_col+1 < tags_sheet.ncols):
-   #         if (tags_sheet.cell(i+1,next_col+1)!=''):
-   #             next_col += 1
-   #             continue
-##
-   #     print(tags_sheet, file=sys.stderr)
-   #     for j in range(tags_sheet.ncols):
-   #         if tags_sheet.cell(i+1,j) != '':
-   #             if (j==NUMBER_OF_METADATA_COLS_TAG):
-   #                 parent_tag = None
-   #             next_col = j
-   #             break
-   #         if (tags_sheet.cell(i+1,next_col)!=''):
-   ##             if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-   #                 parent_tag = None
-   #             continue
-   #         elif (next_col+1 < tags_sheet.ncols):
-  # #             if (tags_sheet.cell(i+1,next_col+1)!=''):
-  #                  next_col += 1
-   #                 continue
-
-     #       for j in range(tags_sheet.ncols):
-     #           if tags_sheet.cell(i+1,j) != '':
-     #               if (j==NUMBER_OF_METADATA_COLS_TAG):
-     #                   parent_tag = None
-     #               next_col = j
-      #              break
     # Generats companies
     companies_sheet = workbook["Companies"]
+
     tags = []
-
     tag_row = companies_sheet[1]
-    with db.session.no_autoflush:
-        for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.max_column):
-            tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
+    for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.max_column):
+        if (Tag.query.filter_by(name = tag_row[i].value).first() == None):
+            raise Exception(f"No such tag named {tag_row[i].value}")
+        tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
-        for i in range(2,companies_sheet.max_row ):
+    with db.session.no_autoflush:
+        for i in range(2,companies_sheet.max_row +1):
             tags_temp = []
             for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column + 1):
 
