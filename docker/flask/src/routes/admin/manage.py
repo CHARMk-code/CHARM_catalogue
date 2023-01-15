@@ -47,7 +47,7 @@ def parseXlsx():
     Company.query.update({Company.active:False})
     db.session.commit()
 
-    workbook = openpyxl.load_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
+    workbook = openpyxl.load_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"),data_only = True)
 
     # Adds maps
     maps_sheet = workbook["Maps"]
@@ -138,13 +138,15 @@ def parseXlsx():
 
             if metadata[0] == "":
                 continue
-            print(metadata, file=sys.stderr)
+
             company = Company.query.filter_by(name = metadata[0]).first()
             if  company == None:
-                Company.create(
-                        *metadata,
-                        tags_temp
-                        )
+                if (Company.create(
+                    *metadata,
+                    tags_temp
+                    ) == False):
+                    return
+
             else:
                 company.update(*metadata,tags_temp)
 
