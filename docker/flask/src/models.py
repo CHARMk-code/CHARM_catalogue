@@ -124,6 +124,7 @@ class Company(db.Model):
             db.session.add(new_company)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -229,7 +230,8 @@ class Tag(db.Model):
             )
             db.session.add(new_tag)
             db.session.commit()
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -315,7 +317,8 @@ class Tag_company(db.Model):
 
             db.session.add(new_tag_company)
             db.session.commit()
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -353,6 +356,7 @@ class Map(db.Model):
             db.session.add(new_map)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -460,6 +464,7 @@ class Layout(db.Model):
             db.session.add(new_layout)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -506,6 +511,7 @@ class Shortcut(db.Model):
             db.session.add(new_shortcut)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -552,6 +558,7 @@ class Company_card(db.Model):
             db.session.add(new_company_card)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -602,6 +609,7 @@ class Feedback(db.Model):
             db.session.add(new_feedback)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
