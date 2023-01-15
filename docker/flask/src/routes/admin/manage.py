@@ -15,6 +15,13 @@ import urllib.parse
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
 NUMBER_OF_METADATA_COLS_COMPANY = 17
 NUMBER_OF_METADATA_COLS_TAG = 7
+
+# Number of rows per object
+NUMBER_OF_COLS_IN_MAP = 3
+NUMBER_OF_COLS_IN_PREPAGE = 6
+NUMBER_OF_COLS_IN_LAYOUT = 3
+
+
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
@@ -49,6 +56,11 @@ def parseXlsx():
         map_object = Prepage.query.filter_by(name=maps_sheet.cell(i,1)).first()
 
         data = list(map(lambda x: x.value, maps_sheet[i]))
+
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_MAP:]
+
+
         REF_NAME_POS = 2
         data[REF_NAME_POS] = mapLookUpIdOrNull(data[REF_NAME_POS])
         if not map_object:
@@ -62,6 +74,9 @@ def parseXlsx():
         data = list(map(lambda x: x.value, prepages_sheet[i]))
         prepage = Prepage.query.filter_by(name=data[0]).first()
 
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_PREPAGE:]
+
         if not prepage:
             Prepage.create(*data)
         else:
@@ -73,6 +88,11 @@ def parseXlsx():
         layout = Layout.query.filter_by(image=layout_sheet.cell(i,2)).first()
 
         data = list(map(lambda x: x.value, layout_sheet[i]))
+
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_LAYOUT:]
+
+
         if not layout:
             Layout.create(*data)
         else:
