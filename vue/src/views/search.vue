@@ -18,8 +18,14 @@
           "
         >
           <template #body-cell-Logo="props">
-            <q-td :props="props">
-              <Image :imageName="props.value"></Image>
+            <q-td :props="props" auto-width>
+              <Image
+                :ratio="4 / 3"
+                :imageName="props.value"
+                fit="contain"
+                :height="$q.screen.lt.md ? '80px' : '60px'"
+                :width="$q.screen.lt.md ? '120px' : '80px'"
+              ></Image>
             </q-td>
           </template>
 
@@ -116,7 +122,6 @@ const columns = computed(() => {
       field: "logo",
       align: "left",
       mobile: true,
-      style: "min-width:120px",
     },
     { name: "Name", label: "Name", field: "name", align: "left", mobile: true },
     {
