@@ -12,13 +12,7 @@
       flat
       :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
     >
-      <Image
-        class="ma-2"
-        height="400px"
-        width="400px"
-        fit="contain"
-        :imageName="props.map.image"
-      />
+      <Image :ratio="1" fit="contain" :imageName="props.map.image" />
     </q-card-section>
   </company_card_wrapper>
 </template>
