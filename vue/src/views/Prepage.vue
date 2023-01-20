@@ -2,12 +2,13 @@
   <q-page class="row">
     <template
       v-if="$q.screen.gt.sm"
-      v-for="prepage in prepagesStore.pageGroups[$route.params.page].pages"
+      v-for="(prepage, index) in prepagesStore.pageGroups[$route.params.page]
+        .pages"
     >
       <Image
         :class="{ prepage: true, 'col-6': pagesToShow === 2 }"
         fit="contain"
-        position="50% top"
+        :position="prepagePositioning(pagesToShow, index)"
         :draggable="false"
         :imageName="prepage.image"
         v-touch-swipe="handleSwipe"
@@ -18,7 +19,7 @@
         v-if="mobilePrepage.mobile"
         class="prepage"
         fit="contain"
-        position="50% top"
+        position="center top"
         :draggable="false"
         :imageName="mobilePrepage.image"
         v-touch-swipe="handleSwipe"
@@ -77,6 +78,18 @@ onMounted(() => {
   setNextRoute();
   setPrevRoute();
 });
+
+function prepagePositioning(amount: number, index: number) {
+  if (amount === 2) {
+    if (index === 0) {
+      return "right top";
+    } else {
+      return "left top";
+    }
+  } else {
+    return "center top";
+  }
+}
 
 watch(
   () => route.params.page,
