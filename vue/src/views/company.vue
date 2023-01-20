@@ -1,6 +1,13 @@
 <template>
   <q-page padding v-touch-swipe.left.right="handleSwipe">
-    <Filter @filterChanged="() => {setNextRoute(); setPrevRoute()}"/>
+    <Filter
+      @filterChanged="
+        () => {
+          setNextRoute();
+          setPrevRoute();
+        }
+      "
+    />
     <div class="row" v-if="company != undefined && company.active">
       <Logo class="col-12 col-md-6" :src="company.logo" />
 
@@ -8,60 +15,14 @@
     </div>
     <div
       v-if="company != undefined && company.active"
-      :class="$q.screen.lt.md ? 'row' : 'column'"
+      class="row q-col-gutter-md"
     >
-      <div class="flex-break hidden"></div>
-      <div class="flex-break"></div>
-      <Textblock :body="company.description" />
-      <Map
-        :map="mapsStore.getMapFromId(company.map_image)"
-        :booth_number="company.booth_number"
-      />
-      <Textblock
-        :body="company.unique_selling_point"
-        title="What Makes Us Special"
-      />
-      <Summerjob
-        name="summerjob"
-        :desc="company.summer_job_description"
-        :link="company.summer_job_link"
-        :deadline="company.summer_job_deadline"
-      />
-      <Layout />
-      <Tags
-        :tags="tagsStore.getDivisionsFromIds(company.tags)"
-        name="tag_divisions"
-        title="Divisions"
-      />
-      <Tags
-        :tags="tagsStore.getLookingForFromIds(company.tags)"
-        name="tag_looking_for"
-        title="Looking For"
-        getter_target="tags/getLookingForFromIds"
-      />
-      <Tags
-        :tags="tagsStore.getOfferingsFromIds(company.tags)"
-        name="tag_offering"
-        title="Offering"
-        getter_target="tags/getOffersFromIds"
-      />
-      <Tags
-        :tags="tagsStore.getBusinessAreasFromIds(company.tags)"
-        name="tag_business_areas"
-        title="Business Areas"
-        getter_target="tags/getBusinessAreasFromIds"
-      />
-      <Website :website="company.website" />
-      <Contacts
-        :contacts="company.contacts"
-        :contact_email="company.contact_email"
-      />
-      <Trivia
-        :talk_to_us_about="company.talk_to_us_about"
-        :sweden="company.employees_sweden"
-        :world="company.employees_world"
-      />
-      <Note :id="company.id" />
+      <div class="col-12 col-md-6 q-gutter-md">
+        <component :is="comp" v-for="comp in component_layout.left" />
+      </div>
+      <div class="col-12 col-md-6 q-gutter-md">
+        <component :is="comp" v-for="comp in component_layout.right" />
+      </div>
     </div>
   </q-page>
 </template>
@@ -79,7 +40,16 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import { computed, onMounted, onUnmounted, watch } from "vue";
+import {
+  computed,
+  h,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type Component,
+  type Ref,
+} from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
 import { usePrepagesStore } from "@/stores/modules/prepages";
@@ -94,6 +64,7 @@ const prepagesStore = usePrepagesStore();
 const companiesStore = useCompaniesStore();
 const tagsStore = useTagsStore();
 const mapsStore = useMapsStore();
+const settingsStore = useSite_settingsStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +72,128 @@ const router = useRouter();
 const company = computed(() => {
   return companiesStore.companyByName(route.params.name);
 });
+
+const component_layout: Ref<{ left: any; right: any }> = ref({
+  left: [],
+  right: [],
+});
+
+function addComponent(side: "left" | "right", comp: any) {
+  component_layout.value[side].push(comp);
+}
+
+function isVisible(card_name: string) {
+  const visibleCards = settingsStore.settings.company_view.cards;
+  return visibleCards.some((card) =>
+    card.name === card_name ? card.active : false
+  );
+}
+if (company.value) {
+  // Description
+  if (isVisible("desc")) {
+    const vnode = h(Textblock, { body: company.value.description });
+    addComponent("left", vnode);
+  }
+  // Layout
+  if (isVisible("layout") || true) {
+    const vnode = h(Layout);
+    addComponent("left", vnode);
+  }
+  // Divisions
+  if (isVisible("tag_divisions")) {
+    const vnode = h(Tags, {
+      title: "Divisions",
+      name: "tag_divisions",
+      tags: tagsStore.getDivisionsFromIds(company.value.tags),
+    });
+    addComponent("left", vnode);
+  }
+  // Looking for
+  if (isVisible("tag_looking_for")) {
+    const vnode = h(Tags, {
+      title: "Looking For",
+      name: "tag_looking_for",
+      tags: tagsStore.getLookingForFromIds(company.value.tags),
+    });
+    addComponent("left", vnode);
+  }
+  // Offering
+  if (isVisible("tag_offering")) {
+    const vnode = h(Tags, {
+      title: "Offering",
+      name: "tag_offering",
+      tags: tagsStore.getOfferingsFromIds(company.value.tags),
+    });
+    addComponent("left", vnode);
+  }
+  // Business areas
+  if (isVisible("tag_business_areas")) {
+    const vnode = h(Tags, {
+      title: "Business areas",
+      name: "tag_business_areas",
+      tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
+    });
+    addComponent("left", vnode);
+  }
+
+  // Map
+  if (isVisible("map")) {
+    const vnode = h(Map, {
+      map: mapsStore.getMapFromId(company.value.map_image),
+      booth_number: company.value.booth_number,
+    });
+    addComponent("right", vnode);
+  }
+  // What makes us special
+  if (isVisible("desc")) {
+    const vnode = h(Textblock, {
+      title: "What Makes Us Special",
+      body: company.value.unique_selling_point,
+    });
+    addComponent("right", vnode);
+  }
+  // Summerjob
+  if (isVisible("summerjob")) {
+    const vnode = h(Summerjob, {
+      name: "summerjob",
+      desc: company.value.summer_job_description,
+      link: company.value.summer_job_link,
+      deadline: company.value.summer_job_deadline,
+    });
+    addComponent("right", vnode);
+  }
+  // Website
+  if (isVisible("website")) {
+    const vnode = h(Website, {
+      website: company.value.website,
+    });
+    addComponent("right", vnode);
+  }
+  // Contacts
+  if (isVisible("contacts")) {
+    const vnode = h(Contacts, {
+      contacts: company.value.contacts,
+      contact_email: company.value.contact_email,
+    });
+    addComponent("right", vnode);
+  }
+  // Trivia
+  if (isVisible("trivia")) {
+    const vnode = h(Trivia, {
+      talk_to_us_about: company.value.talk_to_us_about,
+      sweden: company.value.employees_sweden,
+      world: company.value.employees_world,
+    });
+    addComponent("right", vnode);
+  }
+  // Notes
+  if (isVisible("notes")) {
+    const vnode = h(Note, {
+      id: company.value.id,
+    });
+    addComponent("right", vnode);
+  }
+}
 
 const currentIndex = computed(() => {
   return filterStore.filteredCompanies
@@ -137,8 +230,6 @@ function arrowKeyHandler(e: any) {
     prev();
   }
 }
-
-const settingsStore = useSite_settingsStore();
 
 function handleSwipe({ direction }) {
   if (direction === "right") {
@@ -204,31 +295,6 @@ function prev() {
 
 <style lang="sass" scoped>
 @media (max-width: $breakpoint-md-min)
-  .row > *
-    width: 100%
-    margin: 6px
-
   .logo
     width: 100%
-
-
-@media (min-width: $breakpoint-md-min)
-  $x: 2
-  .column > *
-    width: 50%
-    margin: 6px
-  .flex-break
-    flex: 1 0 100% !important
-    width: 0!important
-
-  @for $i from 1 through ($x - 1)
-    .column > div:nth-child(#{$x}n + #{$i})
-      order: #{$i}
-
-  .column > div:nth-child(#{$x}n)
-    order: #{$x}
-  .column
-    height: 200vh
-    margin-left: -34px
-    padding: 24px
 </style>
