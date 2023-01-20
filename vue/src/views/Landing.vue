@@ -3,20 +3,22 @@
     <div class="row">
       <div class="col-12 col-md-6">
         <q-card
-          class="q-mx-auto"
-          :style="{ width: $q.screen.lt.md ? '75%' : '100%' }"
+          id="prepage-card"
+          class="column q-mx-auto q-mb-lg"
           v-if="first_prepage"
         >
-          <Image
-            :height="$q.screen.lt.md ? '400px' : ''"
-            fit="contain"
-            :imageName="first_prepage.image"
-          />
+          <q-card-section class="col-grow">
+            <Image
+              fit="contain"
+              height="100%"
+              :imageName="first_prepage.image"
+            />
+          </q-card-section>
           <q-card-actions :align="'center'" class="text-h5 text-center">
             <q-btn
               no-caps
               color="primary"
-              size="lg"
+              size="xl"
               label="Browse the catalogue"
               to="/prepage/1"
             ></q-btn>
@@ -24,7 +26,7 @@
         </q-card>
       </div>
       <div class="col-12 col-md-6">
-        <span class="text-h4 text-center block full-width">Shortcuts</span>
+        <span class="text-h3 text-center block full-width">Shortcuts</span>
         <template v-for="shortcut in shortcutsStore.shortcuts">
           <div class="q-pa-sm full-width">
             <shortcut
@@ -41,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import hoverCard from "@/components/landing/hoverCard.vue";
 import shortcut from "@/components/landing/shortcut.vue";
 import Image from "@/components/utils/Image.vue";
 import { computed } from "vue";
@@ -65,6 +66,10 @@ const first_prepage = computed(() => {
 .v-card:not(.on-hover) {
   opacity: 0.4;
 }*/
+#prepage-card {
+  height: 80vh;
+}
+
 #hovereffect {
   transition: opacity 0.4s ease-in-out;
   opacity: 0.75;
