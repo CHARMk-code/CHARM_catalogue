@@ -80,9 +80,9 @@ const colMeta: TableColMeta[] = [
     model: "placement",
     label: "Placement",
     items: [
-      { title: "Company page", value: 0 },
-      { title: "Page Left", value: 1 },
-      { title: "Page Right", value: 2 },
+      { label: "Company page", value: 0 },
+      { label: "Page Left", value: 1 },
+      { label: "Page Right", value: 2 },
     ],
   },
 ];
