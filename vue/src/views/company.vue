@@ -78,120 +78,125 @@ const component_layout: Ref<{ left: any; right: any }> = ref({
   right: [],
 });
 
-function addComponent(side: "left" | "right", comp: any) {
-  component_layout.value[side].push(comp);
-}
-
 function isVisible(card_name: string) {
   const visibleCards = settingsStore.settings.company_view.cards;
   return visibleCards.some((card) =>
     card.name === card_name ? card.active : false
   );
 }
-if (company.value) {
-  // Description
-  if (isVisible("desc")) {
-    const vnode = h(Textblock, { body: company.value.description });
-    addComponent("left", vnode);
-  }
-  // Layout
-  if (isVisible("layout") || true) {
-    const vnode = h(Layout);
-    addComponent("left", vnode);
-  }
-  // Divisions
-  if (isVisible("tag_divisions")) {
-    const vnode = h(Tags, {
-      title: "Divisions",
-      name: "tag_divisions",
-      tags: tagsStore.getDivisionsFromIds(company.value.tags),
-    });
-    addComponent("left", vnode);
-  }
-  // Looking for
-  if (isVisible("tag_looking_for")) {
-    const vnode = h(Tags, {
-      title: "Looking For",
-      name: "tag_looking_for",
-      tags: tagsStore.getLookingForFromIds(company.value.tags),
-    });
-    addComponent("left", vnode);
-  }
-  // Offering
-  if (isVisible("tag_offering")) {
-    const vnode = h(Tags, {
-      title: "Offering",
-      name: "tag_offering",
-      tags: tagsStore.getOfferingsFromIds(company.value.tags),
-    });
-    addComponent("left", vnode);
-  }
-  // Business areas
-  if (isVisible("tag_business_areas")) {
-    const vnode = h(Tags, {
-      title: "Business areas",
-      name: "tag_business_areas",
-      tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
-    });
-    addComponent("left", vnode);
+
+function renderCompanyCards() {
+  function addComponent(side: "left" | "right", comp: any) {
+    component_layout.value[side].push(comp);
   }
 
-  // Map
-  if (isVisible("map")) {
-    const vnode = h(Map, {
-      map: mapsStore.getMapFromId(company.value.map_image),
-      booth_number: company.value.booth_number,
-    });
-    addComponent("right", vnode);
-  }
-  // What makes us special
-  if (isVisible("desc")) {
-    const vnode = h(Textblock, {
-      title: "What Makes Us Special",
-      body: company.value.unique_selling_point,
-    });
-    addComponent("right", vnode);
-  }
-  // Summerjob
-  if (isVisible("summerjob")) {
-    const vnode = h(Summerjob, {
-      name: "summerjob",
-      desc: company.value.summer_job_description,
-      link: company.value.summer_job_link,
-      deadline: company.value.summer_job_deadline,
-    });
-    addComponent("right", vnode);
-  }
-  // Website
-  if (isVisible("website")) {
-    const vnode = h(Website, {
-      website: company.value.website,
-    });
-    addComponent("right", vnode);
-  }
-  // Contacts
-  if (isVisible("contacts")) {
-    const vnode = h(Contacts, {
-      contacts: company.value.contacts,
-      contact_email: company.value.contact_email,
-    });
-    addComponent("right", vnode);
-  }
-  // Trivia
-  if (isVisible("trivia")) {
-    const vnode = h(Trivia, {
-      talk_to_us_about: company.value.talk_to_us_about,
-      sweden: company.value.employees_sweden,
-      world: company.value.employees_world,
-    });
-    addComponent("right", vnode);
-  }
-  // Notes
-  if (isVisible("notes")) {
-    const vnode = h(Note, {
-      id: company.value.id,
-    });
-    addComponent("right", vnode);
+  component_layout.value = { left: [], right: [] };
+
+  if (company.value) {
+    // Description
+    if (isVisible("desc")) {
+      const vnode = h(Textblock, { body: company.value.description });
+      addComponent("left", vnode);
+    }
+    // Layout
+    if (isVisible("layout") || true) {
+      const vnode = h(Layout);
+      addComponent("left", vnode);
+    }
+    // Divisions
+    if (isVisible("tag_divisions")) {
+      const vnode = h(Tags, {
+        title: "Divisions",
+        name: "tag_divisions",
+        tags: tagsStore.getDivisionsFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Looking for
+    if (isVisible("tag_looking_for")) {
+      const vnode = h(Tags, {
+        title: "Looking For",
+        name: "tag_looking_for",
+        tags: tagsStore.getLookingForFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Offering
+    if (isVisible("tag_offering")) {
+      const vnode = h(Tags, {
+        title: "Offering",
+        name: "tag_offering",
+        tags: tagsStore.getOfferingsFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Business areas
+    if (isVisible("tag_business_areas")) {
+      const vnode = h(Tags, {
+        title: "Business areas",
+        name: "tag_business_areas",
+        tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+
+    // Map
+    if (isVisible("map")) {
+      const vnode = h(Map, {
+        map: mapsStore.getMapFromId(company.value.map_image),
+        booth_number: company.value.booth_number,
+      });
+      addComponent("right", vnode);
+    }
+    // What makes us special
+    if (isVisible("desc")) {
+      const vnode = h(Textblock, {
+        title: "What Makes Us Special",
+        body: company.value.unique_selling_point,
+      });
+      addComponent("right", vnode);
+    }
+    // Summerjob
+    if (isVisible("summerjob")) {
+      const vnode = h(Summerjob, {
+        name: "summerjob",
+        desc: company.value.summer_job_description,
+        link: company.value.summer_job_link,
+        deadline: company.value.summer_job_deadline,
+      });
+      addComponent("right", vnode);
+    }
+    // Website
+    if (isVisible("website")) {
+      const vnode = h(Website, {
+        website: company.value.website,
+      });
+      addComponent("right", vnode);
+    }
+    // Contacts
+    if (isVisible("contacts")) {
+      const vnode = h(Contacts, {
+        contacts: company.value.contacts,
+        contact_email: company.value.contact_email,
+      });
+      addComponent("right", vnode);
+    }
+    // Trivia
+    if (isVisible("trivia")) {
+      const vnode = h(Trivia, {
+        talk_to_us_about: company.value.talk_to_us_about,
+        sweden: company.value.employees_sweden,
+        world: company.value.employees_world,
+      });
+      addComponent("right", vnode);
+    }
+    // Notes
+    if (isVisible("notes")) {
+      const vnode = h(Note, {
+        id: company.value.id,
+      });
+      addComponent("right", vnode);
+    }
   }
 }
 
@@ -207,6 +212,7 @@ onMounted(() => {
   window.addEventListener("keydown", arrowKeyHandler);
   setNextRoute();
   setPrevRoute();
+  renderCompanyCards();
 });
 
 watch(
@@ -215,6 +221,7 @@ watch(
     if (name) {
       setNextRoute();
       setPrevRoute();
+      renderCompanyCards();
     }
   }
 );
