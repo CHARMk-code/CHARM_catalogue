@@ -57,8 +57,6 @@ export const usePrepagesStore = defineStore('prepages', {
               const prepages: Prepage[] = resp.data;
               if (prepages.length > 0) {
                 prepages.forEach(prepage => {
-                  console.log("prepage", prepage)
-                  console.log(this.pageGroups[prepage.page])
                   if (!prepage.active) {
                     this.inactivePrepages.push(prepage)
                   } else {
@@ -74,7 +72,6 @@ export const usePrepagesStore = defineStore('prepages', {
                     }
                   }
                 })
-                console.log(this.pageGroups)
 
               }
               resolve(resp);
@@ -89,7 +86,6 @@ export const usePrepagesStore = defineStore('prepages', {
     },
     modifyPrepage(prepage: Prepage) {
       return new Promise((resolve, reject) => {
-        console.log("ModfyingPrepage", prepage)
         if (prepage.id && !isValidPrepage(this, prepage)) {
           reject()
         }
@@ -116,7 +112,6 @@ export const usePrepagesStore = defineStore('prepages', {
     },
     deletePrepage(prepage: Prepage) {
       return new Promise((resolve, reject) => {
-        console.log("deletingPrepage", prepage)
         if (!prepage.id || !isValidPrepage(this, prepage)) {
           reject()
         }

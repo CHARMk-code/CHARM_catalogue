@@ -68,12 +68,10 @@ const router = createRouter({
             generated: false,
           },
           beforeEnter: (to, from) => {
-            console.log("beforeSearch", to.meta.generated, to.query, Object.keys(to.query).length)
 
             const filterStore = useFilterStore()
             if (!to.meta.generated || Object.keys(to.query).length > 0) {
               filterStore.setFiltersFromRouteQuery(to.query)
-              console.log("beforeEnter Filters", filterStore.filters)
               to.meta.generated = true
               return
             }

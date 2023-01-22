@@ -46,7 +46,6 @@ const route = useRoute();
 const router = useRouter();
 const test = () => {
   show_pass.value = !show_pass.value;
-  console.log(show_pass);
 };
 let show_pass = ref(false);
 let btn_loader = ref(false);

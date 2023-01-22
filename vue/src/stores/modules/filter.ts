@@ -73,7 +73,6 @@ export const useFilterStore = defineStore('filter', {
     },
     filterCompanies() {
       return new Promise<void>((resolve) => {
-        console.log("about to filter")
         const companiesStore = useCompaniesStore();
         var filteredCompanies = Array.from(companiesStore.companies.values());
 
@@ -123,7 +122,6 @@ export const useFilterStore = defineStore('filter', {
     },
     sortCompanies() {
       return new Promise<void>((resolve, reject) => {
-        console.log("sorting started on:", this.filteredCompanies)
         const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
         this.filteredCompanies.sort(strategy);
         resolve()
@@ -175,7 +173,6 @@ export const useFilterStore = defineStore('filter', {
       if (rQuery.sweden) {
         this.filters.sweden = true;
       }
-      console.log(this.filters)
       this.filterCompanies()
 
 

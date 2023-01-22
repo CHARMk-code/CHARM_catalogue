@@ -31,7 +31,6 @@
         </template>
 
         <template #body-cell-Programs="props">
-          {{ log("program", props.value) }}
           <q-td :props="props">
             <template
               v-if="
@@ -113,9 +112,6 @@ import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
-function log(a, b) {
-  console.log(a, b);
-}
 const headers = [
   { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
   {
@@ -186,14 +182,6 @@ const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
     const meta_map_image = map_image_obj
       ? { label: map_image_obj, value: map_image_obj.id }
       : { label: { name: "None" }, value: -1 };
-    console.log(
-      "init metaTows",
-      mapsStore.maps,
-      row.map_image,
-      typeof row.map_image,
-      map_image_obj,
-      meta_map_image
-    );
     return reactive({
       meta_map_image,
       divisions: tagsStore
@@ -224,7 +212,6 @@ type selectedTag = {
 };
 
 function updateWithMetaModels(meta: metaRow, row: Company) {
-  console.log("updateTags running");
   var allTags: number[] = [];
   if (
     meta.divisions ||
@@ -233,16 +220,13 @@ function updateWithMetaModels(meta: metaRow, row: Company) {
     meta.offering ||
     meta.language
   ) {
-    console.log("contains tag categories");
     if (meta.divisions) {
-      console.log("meta divisions", meta.divisions);
       var allTags = allTags.concat(meta.divisions.map((v) => v.value));
     }
     if (meta.looking_for) {
       var allTags = allTags.concat(meta.looking_for.map((v) => v.value));
     }
     if (meta.business_areas) {
-      console.log("meta business areas", meta.business_areas);
       var allTags = allTags.concat(meta.business_areas.map((v) => v.value));
     }
     if (meta.offering) {
@@ -255,7 +239,6 @@ function updateWithMetaModels(meta: metaRow, row: Company) {
       var allTags = allTags.concat(meta.fair_area.map((v) => v.value));
     }
     row.tags = new Set(allTags);
-    console.log("meta", new Set(allTags));
   }
   row.map_image = meta.meta_map_image.value;
 }

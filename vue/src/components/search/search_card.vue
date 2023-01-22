@@ -107,7 +107,6 @@ import { useRoute, useRouter } from "vue-router";
 
 const filterStore = useFilterStore();
 
-console.log(filterStore.filters);
 const companiesStore = useCompaniesStore();
 const tagsStore = useTagsStore();
 const site_settingsStore = useSite_settingsStore();
@@ -161,10 +160,8 @@ const checkbox_options = computed(() => {
 });
 
 function search() {
-  console.log("search");
   filterStore.filterCompanies().then(() => {
     const searchQuery = filterStore.generateSearchRouteQuery();
-    console.log("generatedSRQ", searchQuery);
     router.replace({
       path: "/search",
       query: searchQuery,
@@ -178,11 +175,9 @@ const visibleCards = site_settingsStore.settings.company_view.cards.filter(
 
 const selectedDivisions = computed({
   get() {
-    console.log("selectedDivisions", filterStore.filters);
     return tagsStore.getDivisionsFromIds(filterStore.filters.tags.divisions);
   },
   set(v) {
-    console.log("settingDivisions", v);
     if (v) {
       filterStore.filters.tags.divisions = v.map((t: Tag) => t.id);
     } else {
