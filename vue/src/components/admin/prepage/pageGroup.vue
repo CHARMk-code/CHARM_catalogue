@@ -100,10 +100,7 @@ const deleteIndex = ref(-1);
 
 function onMoveCallback(evt) {
   if (evt.to.id === "inactivePages") return true;
-  if (evt.from !== evt.to && evt.to.childElementCount >= 2) {
-    console.log("Too big");
-    return false;
-  }
+  if (evt.from !== evt.to && evt.to.childElementCount >= 2) return false;
 }
 const props = defineProps<{
   pages: Prepage[];
@@ -127,7 +124,6 @@ function deletePrepage(index: number) {
 }
 
 function savePrepage(prepage: Prepage) {
-  console.log("saving");
   const prepagesStore = usePrepagesStore();
   prepagesStore.modifyPrepage(prepage);
 }

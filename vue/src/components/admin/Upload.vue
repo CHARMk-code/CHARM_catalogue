@@ -91,7 +91,6 @@ function onUploadFile() {
       feedback.value = res.data;
     })
     .catch((err) => {
-      console.log(err.response);
       feedback.value = err.response.data;
     });
 }
@@ -101,19 +100,15 @@ function download() {
     url: "/manage/download",
     method: "GET",
     responseType: "blob",
-  })
-    .then((response) => {
-      var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      var fURL = document.createElement("a");
+  }).then((response) => {
+    var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+    var fURL = document.createElement("a");
 
-      fURL.href = fileURL;
-      fURL.setAttribute("download", "CHARM_catalogue_datadump.zip");
-      document.body.appendChild(fURL);
+    fURL.href = fileURL;
+    fURL.setAttribute("download", "CHARM_catalogue_datadump.zip");
+    document.body.appendChild(fURL);
 
-      fURL.click();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    fURL.click();
+  });
 }
 </script>

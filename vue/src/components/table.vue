@@ -141,7 +141,6 @@ const deleteDialog = ref(false);
 const newRow = ref(false);
 
 function editRow(index: number) {
-  console.log(index);
   clickedRow.value.row = props.rows[index];
   clickedRow.value.meta = props.metaRows ? props.metaRows[index] : {};
   newRow.value = false;
@@ -161,8 +160,4 @@ function createRow() {
 }
 
 var hasActions = computed(() => useSlots().actions || props.editable);
-
-function log(a: any) {
-  console.log(a);
-}
 </script>

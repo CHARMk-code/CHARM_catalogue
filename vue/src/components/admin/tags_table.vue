@@ -36,7 +36,6 @@ import { type Ref, ref, onMounted } from "vue";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const tagsStore = useTagsStore();
-console.log(tagsStore.tags.values());
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const headers = [

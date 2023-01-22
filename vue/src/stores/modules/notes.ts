@@ -15,7 +15,6 @@ export const useNotesStore = defineStore('notes', {
   }),
   actions: {
     setNotes(data: { id: number, note: string }) {
-      console.log(data);
       this.notes[data.id] = data.note;
       localStorage.setItem("notes", JSON.stringify(this.notes));
     },

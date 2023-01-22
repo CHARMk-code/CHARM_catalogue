@@ -100,7 +100,6 @@ export const useSite_settingsStore = defineStore('site_settings', {
     consumeNext() {
       const temp = unref(this.settings.navigation.next)
       this.settings.navigation.next = undefined
-      console.log("consumedNext", this.settings.navigation.next)
       return temp
     },
     consumePrev() {

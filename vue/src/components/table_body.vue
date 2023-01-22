@@ -98,8 +98,4 @@ function closeDialog() {
   dialog.value = false;
   updatedRow.value = {};
 }
-
-watch(useTagsStore(), async (nRows, oRows) => {
-  console.log("new", nRows, "old", oRows);
-});
 </script>

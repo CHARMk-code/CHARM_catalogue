@@ -54,7 +54,6 @@ const metaRows = Array.from(mapsStore.maps.values()).map((map) => {
   const parent = ref
     ? { label: ref, value: ref.id }
     : { label: { name: "None" }, value: -1 };
-  console.log("metaRow, map", map, parent);
   return {
     parent,
   };
@@ -64,7 +63,6 @@ function updateMapParent(
   meta: { parent: { label: Company_Map; value: number } },
   row: Company_Map
 ) {
-  console.log("updatingMapParent", meta);
   row.ref = meta.parent.value;
 }
 

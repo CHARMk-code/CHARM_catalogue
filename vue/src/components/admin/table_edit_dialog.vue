@@ -63,7 +63,6 @@
               </template>
 
               <template #selected-item="{ index, opt }">
-                {{ log("itemProps", opt) }}
                 <Tag_group :tags="[opt.label]"></Tag_group>
               </template>
             </q-select>
@@ -87,7 +86,6 @@
             >
               <template #option="{ opt, itemProps }">
                 <q-item v-bind="itemProps">
-                  <!-- {{ log("itemProps", itemProps) }} -->
                   <q-item-section
                     avatar
                     v-if="opt.label.icon && opt.label.icon.length > 0"
@@ -224,7 +222,6 @@ async function save() {
           .post("/manage/upload", formData)
           .then(() => {
             rawRow[col.model] = file.name;
-            console.log("filenamed", rawRow, file.name);
           })
           .catch(() => {});
       })
@@ -238,9 +235,5 @@ async function save() {
 
     emit("saveRow", rawRow);
   });
-}
-
-function log(a, b) {
-  console.log(a, b);
 }
 </script>

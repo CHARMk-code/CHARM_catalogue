@@ -152,8 +152,6 @@ import { useQuasar } from "quasar";
 
 const $q = useQuasar();
 
-console.log($q);
-
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();

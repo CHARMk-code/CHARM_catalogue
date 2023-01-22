@@ -116,7 +116,6 @@ const prepagesStore = usePrepagesStore();
 function onMoveCallbackInactivePrepages(evt) {
   if (evt.to.id === "inactivePages") return true;
   if (evt.from !== evt.to && evt.to.childElementCount >= 2) {
-    console.log("Too big");
     return false;
   }
 }
@@ -142,7 +141,6 @@ const pageGroups: Ref<PrepageGroup[]> = ref(
 const inactivePages: Prepage[] = prepagesStore.inactivePrepages;
 
 function createPrepage(prepage: Prepage) {
-  console.log("saving");
   const prepagesStore = usePrepagesStore();
   prepagesStore.modifyPrepage(prepage);
 }
@@ -157,19 +155,16 @@ function addPageGroup() {
 
 function saveOrder() {
   pageGroups.value.forEach((pageGroup, pageIndex) => {
-    console.log(pageIndex);
     pageGroup.pages.forEach((prepage, index) => {
       prepage.side = index === 0 ? "left" : "right";
       prepage.page = pageIndex + 1;
       prepage.active = true;
 
-      console.log(prepage);
       prepagesStore.modifyPrepage(prepage);
     });
   });
   inactivePages.forEach((prepage) => {
     prepage.active = false;
-    console.log(prepage);
     prepagesStore.modifyPrepage(prepage);
   });
 }
