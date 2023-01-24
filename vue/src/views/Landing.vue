@@ -1,69 +1,61 @@
 <template>
-  <sideLayout>
-    <v-container>
-      <v-row style="justify-content: center">
-        <v-col full-width xs="12" md="6">
-          <div class="mx-auto mb-4 text-center text-h5 text-md-h3">
-            Browse the catalogue
-          </div>
-          <hoverCard
-            class="mx-auto"
-            to="/prepages/0"
-            :background_image="
-              base_URL + (prepages.length === 0 ? '' : prepages[0].image)
-            "
-          />
-        </v-col>
-        <v-col xs="12" md="6">
-          <div class="mx-auto mb-4 d-block text-center text-h5 text-md-h3">
-            Shortcuts
-          </div>
-          <v-container class="ma-0 pa-0 d-flex flex-wrap" style="gap: 16px">
+  <q-page padding>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <q-card
+          id="prepage-card"
+          class="column q-mx-auto q-mb-lg"
+          v-if="first_prepage"
+        >
+          <q-card-section class="col-grow">
+            <Image
+              fit="contain"
+              height="100%"
+              :imageName="first_prepage.image"
+            />
+          </q-card-section>
+          <q-card-actions :align="'center'" class="text-h5 text-center">
+            <q-btn
+              no-caps
+              color="primary"
+              size="xl"
+              label="Browse the catalogue"
+              to="/prepage/1"
+            ></q-btn>
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="col-12 col-md-6">
+        <span class="text-h3 text-center block full-width">Shortcuts</span>
+        <template v-for="shortcut in shortcutsStore.shortcuts">
+          <div class="q-pa-sm full-width">
             <shortcut
-              v-for="shortcut in shortcuts"
-              :key="shortcut.name"
               :icon="shortcut.icon"
               :name="shortcut.name"
               :desc="shortcut.desc"
               :link="shortcut.link"
             />
-          </v-container>
-        </v-col>
-      </v-row>
-    </v-container>
-  </sideLayout>
+          </div>
+        </template>
+      </div>
+    </div>
+  </q-page>
 </template>
 
-<script>
-import Vue from "vue";
-import { mapGetters } from "vuex";
-import sideLayout from "@/views/sideLayout.vue";
-import hoverCard from "@/components/landing/hoverCard.vue";
+<script lang="ts" setup>
 import shortcut from "@/components/landing/shortcut.vue";
+import Image from "@/components/utils/Image.vue";
+import { computed } from "vue";
+import { usePrepagesStore } from "@/stores/modules/prepages";
+import { useShortcutsStore } from "@/stores/modules/shortcuts";
 
-export default {
-  name: "Landing_view",
-  components: {
-    sideLayout,
-    hoverCard,
-    shortcut,
-  },
-  data() {
-    return {
-      hover: false,
-    };
-  },
-  computed: {
-    base_URL() {
-      console.log(this.hover);
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    ...mapGetters({
-      prepages: "prepages/getActive",
-      shortcuts: "shortcuts/get",
-    }),
-  },
-};
+const prepagesStore = usePrepagesStore();
+const shortcutsStore = useShortcutsStore();
+
+const first_prepage = computed(() => {
+  if (Object.values(prepagesStore.pageGroups).length > 1)
+    return prepagesStore.pageGroups[1].pages[0];
+});
 </script>
 
 <style scoped>
@@ -74,6 +66,10 @@ export default {
 .v-card:not(.on-hover) {
   opacity: 0.4;
 }*/
+#prepage-card {
+  height: 80vh;
+}
+
 #hovereffect {
   transition: opacity 0.4s ease-in-out;
   opacity: 0.75;

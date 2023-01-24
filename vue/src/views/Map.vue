@@ -1,25 +1,29 @@
 <template>
   <v-main>
     <v-sheet class="pa-6">
-      <v-img contain justify="center" :src="base_URL + map_src" />
+      <Image
+        v-if="maps.length > 0"
+        contain
+        justify="center"
+        :imageName="maps[0].image"
+      />
     </v-sheet>
   </v-main>
 </template>
 
-<script>
-import Vue from "vue";
-export default {
-  name: "Map",
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    map_src() {
-      console.log(this.$store.getters["maps/get"]);
-      return this.$store.getters["maps/get"].filter(
-        (t) => t.name == this.$route.params.page
-      )[0].image;
-    },
-  },
-};
+<script lang="ts" setup>
+import { useMapsStore } from "@/stores/modules/maps";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import Image from "@/components/utils/Image.vue";
+
+const mapsStore = useMapsStore();
+
+const route = useRoute();
+
+const maps = computed(() => {
+  return Array.from(mapsStore.maps.values()).filter(
+    (m) => m.name === route.params.page
+  );
+});
 </script>

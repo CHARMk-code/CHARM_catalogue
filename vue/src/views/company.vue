@@ -1,114 +1,34 @@
 <template>
-  <sideLayout
-    v-on:next="next"
-    v-on:prev="prev"
-    v-bind:button_left="true"
-    v-bind:button_right="currentIndex < maxIndex - 1"
-  >
-    <v-container
-      v-if="company != undefined && company.active == true"
-      v-touch="{
-        right: () => prev(),
-        left: () => next(),
-      }"
+  <q-page padding v-touch-swipe.left.right="handleSwipe">
+    <Filter
+      @filterChanged="
+        () => {
+          setNextRoute();
+          setPrevRoute();
+        }
+      "
+    />
+    <div class="row" v-if="company != undefined && company.active">
+      <Logo class="col-12 col-md-6" :src="company.logo" />
+
+      <Name class="col-12 col-md-6" :name="company.name" :id="company.id" />
+    </div>
+    <div
+      v-if="company != undefined && company.active"
+      class="row q-col-gutter-md"
     >
-      <!-- Edit Company -->
-      <v-btn class="mb-4" v-on:click="editRow(company)" v-if="isLoggedIn">
-        Edit
-      </v-btn>
-      <v-dialog persistent v-model="dialog" max-width="900px">
-        <tableEditDialog
-          @close_dialog="closeDialog()"
-          @save_row="saveRow"
-          name="Company"
-          :row="company"
-          :row_meta="row_meta"
-        />
-      </v-dialog>
-
-      <v-row>
-        <v-col align="center" xs="12" sm="12" md="auto">
-          <Logo :src="company.logo" />
-        </v-col>
-        <v-col align-content="start">
-          <Name :name="company.name" :id="company.id" />
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col>
-          <Textblock :body="company.description" class="mb-6" />
-          <Textblock :body="company.unique_selling_point" title="What Makes Us Special" class="mb-6" />
-          <Summerjob
-            name="summerjob"
-            :desc="company.summer_job_description"
-            :link="company.summer_job_link"
-            :deadline="company.summer_job_deadline"
-            class="mb-6"
-          />
-          <Layout class="mb-6" />
-          <v-row>
-            <v-col
-              class="pa-0 mb-0 d-flex flex-wrap justify-space-between"
-              style="margin: 0 -3px"
-            >
-              <Tags
-                :tags="company.tags"
-                name="tag_divisions"
-                title="Divisions"
-                getter_target="tags/getDivisionsFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_looking_for"
-                title="Looking For"
-                getter_target="tags/getLookingForFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_offering"
-                title="Offering"
-                getter_target="tags/getOffersFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-              <Tags
-                :tags="company.tags"
-                name="tag_business_areas"
-                title="Business Areas"
-                getter_target="tags/getBusinessAreasFromIds"
-                class="mb-6 mx-3 flex-grow-1"
-              />
-            </v-col>
-          </v-row>
-          <Website :website="company.website" class="mb-6" />
-          <Contacts
-            :contacts="company.contacts"
-            :contact_email="company.contact_email"
-          />
-        </v-col>
-        <v-col>
-          <Map
-            :map="company.map_image"
-            :booth_number="company.booth_number"
-            class="mb-6"
-          />
-          <Trivia
-            :talk_to_us_about="company.talk_to_us_about"
-            :sweden="company.employees_sweden"
-            :world="company.employees_world"
-            :year="company.founded"
-            class="mb-6"
-          />
-          <Note :id="company.id" class="mb-6" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </sideLayout>
+      <div class="col-12 col-md-6 q-gutter-md">
+        <component :is="comp" v-for="comp in component_layout.left" />
+      </div>
+      <div class="col-12 col-md-6 q-gutter-md">
+        <component :is="comp" v-for="comp in component_layout.right" />
+      </div>
+    </div>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
+import Filter from "@/components/company/Filter.vue";
 import Logo from "@/components/company/Logo.vue";
 import Name from "@/components/company/Name.vue";
 import Trivia from "@/components/company/Trivia.vue";
@@ -116,182 +36,277 @@ import Contacts from "@/components/company/Contacts.vue";
 import Textblock from "@/components/company/Textblock.vue";
 import Website from "@/components/company/Website.vue";
 import Tags from "@/components/company/Tags.vue";
-import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import sideLayout from "@/views/sideLayout.vue";
-import { mapGetters } from "vuex";
+import {
+  computed,
+  h,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type Component,
+  type Ref,
+} from "vue";
+import { useFilterStore } from "@/stores/modules/filter";
+import { useRoute, useRouter } from "vue-router";
+import { usePrepagesStore } from "@/stores/modules/prepages";
+import { useCompaniesStore } from "@/stores/modules/companies";
+import { useTagsStore } from "@/stores/modules/tags";
+import { useMapsStore } from "@/stores/modules/maps";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { useQuasar } from "quasar";
 
-export default {
-  name: "Company_View",
-  data() {
-    return { dialog: false };
-  },
-  components: {
-    sideLayout,
-    Name,
-    Logo,
-    Trivia, //Did you know...
-    Contacts, //name, email, position?
-    Textblock, //Company description
-    Website, //Company website
-    Tags, //Tags
-    tableEditDialog,
-    Note,
-    Map,
-    Summerjob,
-    Layout,
-  },
-  watch: {
-    filteredCompanies: function (val) {
-      this.currentIndex = val.map((x) => x.id).indexOf(this.company.id);
-    },
-  },
-  created() {
-    window.addEventListener("keydown", this.arrowKeyHandler);
-  },
-  beforeDestroy() {
-    window.removeEventListener("keydown", this.arrowKeyHandler);
-  },
-  computed: {
-    ...mapGetters({
-      isLoggedIn: "auth/isLoggedIn",
-      filteredCompanies: "filter/filteredCompanies",
-      divisions: "tags/divisions",
-      looking_for: "tags/looking_fors",
-      business_areas: "tags/business_areas",
-      offerings: "tags/offers",
-      isInFavorites: "favorites/isInFavorites",
-      prepages: "prepages/getActive",
-    }),
-    company() {
-      const matching_companies = this.$store.getters["companies/companyByName"](
-        this.$route.params.name
-      );
-      if (matching_companies.length == 1) {
-        return matching_companies[0];
-      } else {
-        return undefined;
-      }
-    },
-    currentIndex() {
-      return this.filteredCompanies.map((x) => x.id).indexOf(this.company.id);
-    },
-    maxIndex() {
-      return this.filteredCompanies.length;
-    },
-    tags() {
-      return this.company.tags;
-    },
-    row_meta() {
-      return [
-        {
-          type: "checkbox",
-          model: "active",
-          on_icon: "mdi-eye",
-          off_icon: "mdi-eye-off",
-          label: "Active (required for row to be visible)",
-        },
-        {
-          type: "text",
-          model: "name",
-          label: "Company name",
-          displayname: true,
-        },
-        { type: "image", model: "logo", label: "Company Logo" },
-        {
-          type: "textarea",
-          model: "description",
-          label: "Company description",
-        },
-        { type: "text", model: "founded", label: "Founded" },
-        { type: "text", model: "Contacts", label: "Contacts" },
-        { type: "text", model: "website", label: "Website" },
-        {
-          type: "text",
-          model: "employees_sweden",
-          label: "Number of Employees in Sweden",
-        },
-        {
-          type: "text",
-          model: "employees_world",
-          label: "Number of Employees in the whole world",
-        },
-        { type: "text", model: "trivia", label: "Trivia" },
-        {
-          type: "select",
-          model: "divisions",
-          items: this.divisions,
-          label: "Divisions",
-          hint: "Programs the company are interested in",
-        },
-        {
-          type: "select",
-          model: "looking_for",
-          items: this.looking_for,
-          label: "Looking For",
-          hint: "Which level of education the company is looking for",
-        },
-        {
-          type: "select",
-          model: "business_area",
-          items: this.business_areas,
-          label: "Business areas",
-          hint: "The companys business areas",
-        },
-        {
-          type: "select",
-          model: "offering",
-          items: this.offerings,
-          label: "offering",
-          hint: "Which type of jobs the company is offering",
-        },
-      ];
-    },
-  },
-  methods: {
-    editRow(row) {
-      this.editedRow = row;
-      this.creating = false;
-      this.dialog = true;
-    },
-    closeDialog() {
-      this.dialog = false;
-      this.creating = true;
-      this.editedRow = {};
-    },
-    saveRow(row) {
-      this.$store.dispatch("companies/modifyCompany", row);
-    },
-    arrowKeyHandler(e) {
-      if (e.key == "ArrowRight") {
-        this.next();
-      } else if (e.key == "ArrowLeft") {
-        this.prev();
-      }
-    },
-    next() {
-      this.$store.commit("layouts/updateCenter");
-      const index = this.currentIndex + 1;
-      if (index < this.filteredCompanies.length) {
-        this.$router.push("/company/" + this.filteredCompanies[index].name);
-      }
-    },
-    prev() {
-      this.$store.commit("layouts/updateCenter");
-      const index = this.currentIndex - 1;
-      if (index >= 0) {
-        return this.$router.push(
-          "/company/" + this.filteredCompanies[index].name
+const filterStore = useFilterStore();
+const prepagesStore = usePrepagesStore();
+const companiesStore = useCompaniesStore();
+const tagsStore = useTagsStore();
+const mapsStore = useMapsStore();
+const settingsStore = useSite_settingsStore();
+
+const route = useRoute();
+const router = useRouter();
+
+const company = computed(() => {
+  return companiesStore.companyByName(route.params.name);
+});
+
+const component_layout: Ref<{ left: any; right: any }> = ref({
+  left: [],
+  right: [],
+});
+
+function isVisible(card_name: string) {
+  const visibleCards = settingsStore.settings.company_view.cards;
+  return visibleCards.some((card) =>
+    card.name === card_name ? card.active : false
+  );
+}
+
+function renderCompanyCards() {
+  function addComponent(side: "left" | "right", comp: any) {
+    component_layout.value[side].push(comp);
+  }
+
+  component_layout.value = { left: [], right: [] };
+
+  if (company.value) {
+    // Description
+    if (isVisible("desc")) {
+      const vnode = h(Textblock, { body: company.value.description });
+      addComponent("left", vnode);
+    }
+    // Layout
+    if (isVisible("layout") || true) {
+      const vnode = h(Layout);
+      addComponent("left", vnode);
+    }
+    // Divisions
+    if (isVisible("tag_divisions")) {
+      const vnode = h(Tags, {
+        title: "Divisions",
+        name: "tag_divisions",
+        tags: tagsStore.getDivisionsFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Looking for
+    if (isVisible("tag_looking_for")) {
+      const vnode = h(Tags, {
+        title: "Looking For",
+        name: "tag_looking_for",
+        tags: tagsStore.getLookingForFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Offering
+    if (isVisible("tag_offering")) {
+      const vnode = h(Tags, {
+        title: "Offering",
+        name: "tag_offering",
+        tags: tagsStore.getOfferingsFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+    // Business areas
+    if (isVisible("tag_business_areas")) {
+      const vnode = h(Tags, {
+        title: "Business areas",
+        name: "tag_business_areas",
+        tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
+      });
+      addComponent("left", vnode);
+    }
+
+    // Map
+    if (isVisible("map")) {
+      const vnode = h(Map, {
+        map: mapsStore.getMapFromId(company.value.map_image),
+        booth_number: company.value.booth_number,
+      });
+      addComponent("right", vnode);
+    }
+    // What makes us special
+    if (isVisible("desc")) {
+      const vnode = h(Textblock, {
+        title: "What Makes Us Special",
+        body: company.value.unique_selling_point,
+      });
+      addComponent("right", vnode);
+    }
+    // Summerjob
+    if (isVisible("summerjob")) {
+      const vnode = h(Summerjob, {
+        name: "summerjob",
+        desc: company.value.summer_job_description,
+        link: company.value.summer_job_link,
+        deadline: company.value.summer_job_deadline,
+      });
+      addComponent("right", vnode);
+    }
+    // Website
+    if (isVisible("website")) {
+      const vnode = h(Website, {
+        website: company.value.website,
+      });
+      addComponent("right", vnode);
+    }
+    // Contacts
+    if (isVisible("contacts")) {
+      const vnode = h(Contacts, {
+        contacts: company.value.contacts,
+        contact_email: company.value.contact_email,
+      });
+      addComponent("right", vnode);
+    }
+    // Trivia
+    if (isVisible("trivia")) {
+      const vnode = h(Trivia, {
+        talk_to_us_about: company.value.talk_to_us_about,
+        sweden: company.value.employees_sweden,
+        world: company.value.employees_world,
+      });
+      addComponent("right", vnode);
+    }
+    // Notes
+    if (isVisible("notes")) {
+      const vnode = h(Note, {
+        id: company.value.id,
+      });
+      addComponent("right", vnode);
+    }
+  }
+}
+
+const currentIndex = computed(() => {
+  return filterStore.filteredCompanies
+    .map((x) => x.id)
+    .indexOf(company.value.id);
+});
+
+const maxIndex = filterStore.filteredCompanies.length;
+
+onMounted(() => {
+  window.addEventListener("keydown", arrowKeyHandler);
+  setNextRoute();
+  setPrevRoute();
+  renderCompanyCards();
+});
+
+watch(
+  () => route.params.name,
+  (name) => {
+    if (name) {
+      setNextRoute();
+      setPrevRoute();
+      renderCompanyCards();
+    }
+  }
+);
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", arrowKeyHandler);
+});
+
+function arrowKeyHandler(e: any) {
+  if (e.key == "ArrowRight") {
+    next();
+  } else if (e.key == "ArrowLeft") {
+    prev();
+  }
+}
+
+function handleSwipe({ direction }) {
+  if (direction === "right") {
+    prev();
+  } else if (direction === "left") {
+    next();
+  }
+}
+
+function setNextRoute() {
+  // Set next route
+  if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
+    settingsStore.settings.navigation.next =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value + 1].name;
+  } else {
+    settingsStore.settings.navigation.next = undefined;
+  }
+}
+const $q = useQuasar();
+
+function setPrevRoute() {
+  //set prev route
+  if (currentIndex.value > 0) {
+    settingsStore.settings.navigation.prev =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value - 1].name;
+  } else {
+    if (Object.values(prepagesStore.pageGroups).length !== 0) {
+      const pageGroups = Object.values(prepagesStore.pageGroups);
+      var lastPageGroupIndex = pageGroups.length;
+
+      if ($q.screen.lt.md) {
+        var mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+          (p) => p.mobile
         );
-      } else {
-        if (this.prepages.length !== 0) {
-          return this.$router.push("/prepages/" + (this.prepages.length - 1));
+        while (mobilePages.length == 0) {
+          lastPageGroupIndex -= 1;
+          mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+            (p) => p.mobile
+          );
+        }
+        if (mobilePages.length > 1) {
+          settingsStore.settings.navigation.prev =
+            "/prepage/" + lastPageGroupIndex + "?p=" + (mobilePages.length - 1);
+          return;
         }
       }
-    },
-  },
-};
+      settingsStore.settings.navigation.prev = "/prepage/" + pageGroups.length;
+    } else {
+      settingsStore.settings.navigation.prev = undefined;
+    }
+  }
+}
+
+function next() {
+  const maybeNext: string | undefined = settingsStore.consumeNext();
+  if (maybeNext) {
+    router.push(maybeNext);
+  }
+}
+
+function prev() {
+  const maybePrev: string | undefined = settingsStore.consumePrev();
+  if (maybePrev) {
+    router.push(maybePrev);
+  }
+}
 </script>
+
+<style lang="sass" scoped>
+@media (max-width: $breakpoint-md-min)
+  .logo
+    width: 100%
+</style>

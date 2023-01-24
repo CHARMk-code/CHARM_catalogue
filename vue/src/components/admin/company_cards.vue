@@ -1,131 +1,108 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title> Visible Company Cards</v-card-title>
-      <v-combobox
-        flat
-        class="mx-4"
+  <q-card>
+    <q-card-section>
+      <div class="text-h5">Company Page Layout</div>
+      <div>
+        Choose which cards should be displayed when looking at companies as a
+        user
+      </div>
+    </q-card-section>
+    <q-card-section>
+      <q-select
+        filled
         v-model="selected"
-        :filter="filter"
-        :hide-nod-data="!search"
-        :items="company_cards"
-        :search-input.sync="search"
-        hide-selected
-        label="Select the elements should be visible for users"
+        :options="company_cards"
+        option-label="name"
+        option-value="id"
+        label="Select the elements that should be visible for users"
         multiple
-        solo
+        use-chips
       >
-        <template v-slot:selection="{ attrs, item, parent, selected }">
-          <v-chip
-            v-if="item === Object(item)"
-            v-bind="attrs"
-            :input-value="selected"
-            label
-            @click="parent.selectItem(item)"
-          >
-            <span class="pr-2">
-              {{ item.text }}
-            </span>
-            <v-icon small @click="parent.selectItem(item)"> $delete </v-icon>
-          </v-chip>
-        </template>
-        <template v-slot:item="{ index, item }">
-          <v-chip label>
-            {{ item.text }}
-          </v-chip>
-        </template>
-        <template v-slot:no-data>
-          <v-list-item>
-            <span class="subheading">All cards are activated</span>
-          </v-list-item>
-        </template>
-      </v-combobox>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn large text @click="reset_popup = !reset_popup"> Reset </v-btn>
-        <v-dialog persistent v-model="reset_popup" max-width="500px">
-          <v-card absolute>
-            <v-card-title> Reset to Default </v-card-title>
-            <v-card-text>
-              This will reset which company cards are shown to user to the
-              default settings
-              <v-card color="red lighten-4" v-if="error.length > 0">
-                <v-card-title> Error: while reseting </v-card-title>
-                <v-card-text> {{ error }} </v-card-text>
-              </v-card>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="primary" :loading="reseting" @click="reset()">
-                Reset
-              </v-btn>
+      </q-select>
+    </q-card-section>
 
-              <v-btn @click="reset_popup = false"> Cancel </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-btn class="mx-2" large color="primary" @click="save()"> Save </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
+    <q-card-actions>
+      <q-btn label="Reset" @click="reset_popup = !reset_popup">
+        <q-dialog v-model="reset_popup" width="500px">
+          <q-card>
+            <q-card-section class="row items-center">
+              <div class="text-h5">Reset Company Page Layout?</div>
+              This will reset which company cards are shown to user to the
+              default settings. Are you sure?
+
+              <div color="error" v-if="error.length > 0">
+                <div class="text-bold">Error: while resetting</div>
+                {{ error }}
+              </div>
+            </q-card-section>
+
+            <q-card-actions :align="'right'">
+              <q-btn flat label="Cancel" v-close-popup />
+              <q-btn
+                flat
+                label="Reset"
+                color="primary"
+                @click="reset()"
+                :loading="resetting"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+      </q-btn>
+      <q-btn color="primary" label="Save" @click="save()" />
+    </q-card-actions>
+  </q-card>
 </template>
 
-<script>
-import { mapGetters } from "vuex";
+<script lang="ts" setup>
+import {
+  useSite_settingsStore,
+  type Card,
+} from "@/stores/modules/site_settings";
+import { computed, ref } from "vue";
 
-export default {
-  name: "Companies",
-  components: {},
-  data() {
-    return {
-      reset_popup: false,
-      search: "",
-      reseting: false,
-      error: "",
-    };
-  },
-  computed: {
-    ...mapGetters({
-      company_cards: "site_settings/getCompanyCards",
-    }),
-    selected: {
-      get() {
-        return this.company_cards.filter((c) => c.active);
-      },
-      set(new_cards) {
-        this.$store.dispatch("site_settings/setCompanyCards", new_cards);
-      },
-    },
-  },
-  methods: {
-    filter(item, queryText, itemText) {
-      if (item.header) return false;
+let reset_popup = ref(false);
+let search = "";
+let resetting = ref(false);
+let error = "";
 
-      const hasValue = (val) => (val != null ? val : "");
+let site_settingsStore = useSite_settingsStore();
 
-      const text = hasValue(itemText);
-      const query = hasValue(queryText);
+const company_cards = site_settingsStore.settings.company_view.cards;
 
-      return (
-        text.toString().toLowerCase().indexOf(query.toString().toLowerCase()) >
-        -1
-      );
-    },
-    save() {
-      this.$store.dispatch("site_settings/saveCompanyCards", this.selected);
-    },
-    reset() {
-      this.reseting = true;
-      this.$store
-        .dispatch("site_settings/resetCompanyCards")
-        .then(() => {
-          this.reseting = false;
-          this.reset_popup = false;
-        })
-        .catch((err) => {
-          this.reseting = false;
-          this.error = err;
-        });
-    },
-  },
+// const selected = ref([]);
+const selected = computed<Card[]>({
+  get: () => company_cards.filter((c) => c.active),
+  set: (active_cards) => site_settingsStore.setCompanyCards(active_cards),
+});
+
+const filter = (item, queryText, itemText) => {
+  if (item.header) return false;
+
+  const hasValue = (val: string) => (val != null ? val : "");
+
+  const text = hasValue(itemText);
+  const query = hasValue(queryText);
+
+  return (
+    text.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1
+  );
+};
+
+const save = () => {
+  useSite_settingsStore().saveCompanyCards();
+};
+const reset = () => {
+  resetting.value = true;
+  useSite_settingsStore()
+    .resetCompanyCards()
+    .then(() => {
+      resetting.value = false;
+      reset_popup.value = false;
+    })
+    .catch((err) => {
+      resetting.value = false;
+      error = err;
+    });
 };
 </script>

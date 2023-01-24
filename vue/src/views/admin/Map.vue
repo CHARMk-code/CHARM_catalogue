@@ -1,16 +1,9 @@
 <template>
-  <v-container>
+  <q-page padding>
     <maps_table />
-  </v-container>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
 import maps_table from "@/components/admin/maps_table.vue";
-
-export default {
-  name: "Maps",
-  components: {
-    maps_table,
-  },
-};
 </script>

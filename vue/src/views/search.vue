@@ -1,148 +1,166 @@
 <template>
-  <sideLayout>
-    <v-container>
-      <searchCard />
-      <Table
-        noSearch="true"
-        name="Results"
-        :headers="headers"
-        :data="modifiedFilteredCompanies"
-        :editable="false"
-        @click_row="onRowClick"
-      >
-        <template v-slot:item.tags="{ item }">
-          <template v-for="tag in item.tags">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-              tag.name
-            }}</v-chip>
+  <q-page padding>
+    <q-card>
+      <q-card-section>
+        <span class="block text-h6">Search</span>
+        <searchCard />
+      </q-card-section>
+      <q-card-section>
+        <span class="block text-h6">Results</span>
+        <q-table
+          flat
+          :rows="filterStore.filteredCompanies"
+          :columns="columns"
+          wrap-cells
+          :pagination="initialPagination"
+          @row-click="
+            (_event, row, _index) => router.push('/company/' + row.name)
+          "
+        >
+          <template #body-cell-Logo="props">
+            <q-td :props="props" auto-width>
+              <Image
+                :ratio="4 / 3"
+                :imageName="props.value"
+                fit="contain"
+                :height="$q.screen.lt.md ? '80px' : '60px'"
+                :width="$q.screen.lt.md ? '120px' : '80px'"
+              ></Image>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.divisions="{ item }">
-          <template v-for="tag in item.divisions">
-            <template v-if="tag.icon != ''">
-              <v-avatar size="24px" class="ma-1" x-small :key="tag.id">
-                <v-img
-                  max-height="32px"
-                  max-width="32px"
-                  :src="base_URL + tag.icon"
-                />
-              </v-avatar>
-            </template>
-            <template v-else>
-              <v-chip small :key="tag.id">
-                {{ item.name }}
-              </v-chip>
-            </template>
+
+          <template #body-cell-Programs="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.looking_for="{ item }">
-          <template v-for="tag in item.looking_for">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Looking_for="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.offering="{ item }">
-          <template v-for="tag in item.offerings">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Offering="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.business_area="{ item }">
-          <template v-for="tag in item.business_area">
-            <v-chip class="mr-1 mb-1" x-small :key="tag.id">{{
-              tag.name
-            }}</v-chip>
+
+          <template #body-cell-Fair_area="props">
+            <q-td :props="props">
+              <TagGroup :tags="props.value"></TagGroup>
+            </q-td>
           </template>
-        </template>
-        <template v-slot:item.id="{ item }">
-          <v-checkbox
-            :input-value="$store.getters['favorites/favorites'].has(item.id)"
-            disabled
-            on-icon="mdi-star"
-            off-icon="mdi-star-outline"
-          />
-          <!--  TODO: Should make start clickable to changes status-->
-        </template>
-      </Table>
-    </v-container>
-  </sideLayout>
+
+          <template #body-cell-Favorites="props">
+            <q-td :props="props" auto-width>
+              <q-icon
+                v-if="props.value"
+                size="sm"
+                name="mdi-star"
+                color="primary"
+                @click.stop="favoritesStore.removeFavorite(props.row.id)"
+              ></q-icon>
+              <q-icon
+                v-else
+                size="sm"
+                name="mdi-star-outline"
+                color="grey"
+                @click.stop="favoritesStore.addFavorite(props.row.id)"
+              ></q-icon>
+            </q-td>
+          </template>
+        </q-table>
+      </q-card-section>
+    </q-card>
+  </q-page>
 </template>
 
-<script>
-import sideLayout from "@/views/sideLayout.vue";
-import Vue from "vue";
-import { mapGetters } from "vuex";
+<script lang="ts" setup>
 import searchCard from "@/components/search/search_card.vue";
-import Table from "@/components/table.vue";
-export default {
-  name: "Search",
-  components: {
-    sideLayout,
-    searchCard,
-    Table,
-  },
-  computed: {
-    headers() {
-      const headers = [];
-      this.isVisible("name")
-        ? headers.push({ text: "Name", value: "name" })
-        : null;
-      this.isVisible("tag_divisions")
-        ? headers.push({ text: "Programs", value: "divisions" })
-        : null;
-      this.isVisible("tag_business_areas")
-        ? headers.push({ text: "Business areas", value: "business_area" })
-        : null;
-      this.isVisible("tag_looking_for")
-        ? headers.push({ text: "Looking for", value: "looking_for" })
-        : null;
-      this.isVisible("tag_offering")
-        ? headers.push({ text: "Offering", value: "offering" })
-        : null;
-      this.isVisible("name")
-        ? headers.push({ text: "Liked", value: "id", width: "80" })
-        : null;
-      return headers;
-    },
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
+import axios from "@/plugins/axios";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import { useFilterStore } from "@/stores/modules/filter";
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
+import { useFavoritesStore } from "@/stores/modules/favorites";
+import type { Company } from "@/stores/modules/companies";
+import { computed } from "vue";
+import { useTagsStore } from "@/stores/modules/tags";
+import TagGroup from "@/components/Tag_group.vue";
+import Image from "@/components/utils/Image.vue";
+import { useQuasar } from "quasar";
 
-    ...mapGetters({
-      visibleCards: "site_settings/getCompanyCards",
-      filteredCompanies: "filter/filteredCompanies",
-    }),
-    modifiedFilteredCompanies() {
-      const companies = Array.from(this.filteredCompanies);
-      const modified = companies.map((c) => ({
-        ...c,
-        divisions: this.$store.getters["tags/getDivisionsFromIds"](c.tags),
-        looking_for: this.$store.getters["tags/getLookingForFromIds"](c.tags),
-        offerings: this.$store.getters["tags/getOffersFromIds"](c.tags),
-        business_area: this.$store.getters["tags/getBusinessAreasFromIds"](
-          c.tags
-        ),
-        tags: this.$store.getters["tags/getTagsFromIds"](c.tags),
-      }));
-      return modified;
-    },
-  },
-  methods: {
-    isVisible(name) {
-      return this.visibleCards.some((c) =>
-        c.name === name ? c.active : false
-      );
-    },
-    tagsFromIDs(tags) {
-      return tags.map((id) => {
-        return this.$store.getters["tags/getTagFromId"](id);
-      });
-    },
-    onRowClick(row) {
-      this.$router.push("/company/" + row.name);
-    },
-  },
+const site_settingsStore = useSite_settingsStore();
+const filterStore = useFilterStore();
+const favoritesStore = useFavoritesStore();
+const tagsStore = useTagsStore();
+
+const base_URL = axios.defaults.baseURL + "/manage/image/";
+
+const visibleCards = site_settingsStore.settings.company_view.cards.filter(
+  (card) => card.active
+);
+
+function isVisible(name: string): boolean {
+  return visibleCards.some((c) => c.name === name);
+}
+
+const initialPagination = {
+  sortBy: "desc",
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
 };
+
+const $q = useQuasar();
+const columns = computed(() => {
+  const tempCols = [
+    {
+      name: "Logo",
+      label: "Logo",
+      field: "logo",
+      align: "left",
+      mobile: true,
+    },
+    { name: "Name", label: "Name", field: "name", align: "left", mobile: true },
+    {
+      name: "Programs",
+      label: "Programs",
+      field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Looking_for",
+      label: "Looking for",
+      field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Offering",
+      label: "Offering",
+      field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Fair_area",
+      label: "Fair Area",
+      field: (row: Company) => tagsStore.getFairAreasFromIds(row.tags),
+      align: "left",
+    },
+    {
+      name: "Favorites",
+      label: "Favorites",
+      field: (row: Company) => favoritesStore.favorites.has(row.id),
+      align: "center",
+      mobile: true,
+    },
+  ];
+  if ($q.screen.lt.md) {
+    return tempCols.filter((col) => col.mobile);
+  } else {
+    return tempCols;
+  }
+});
+const router = useRouter();
 </script>

@@ -1,16 +1,9 @@
 <template>
-  <v-container>
+  <q-page padding>
     <tags_table />
-  </v-container>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
 import tags_table from "@/components/admin/tags_table.vue";
-
-export default {
-  name: "Tags",
-  components: {
-    tags_table,
-  },
-};
 </script>

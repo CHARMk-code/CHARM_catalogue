@@ -1,89 +1,89 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveLayout"
-      @delete_row="deleteLayout"
-      name="Layout"
-      :headers="headers"
-      :data="Array.from(this.layouts)"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.placement="{ item }">
-        <template v-if="item.placement == 0"> Company page</template>
-        <template v-else-if="item.placement == 1"> Page Left </template>
-        <template v-else-if="item.placement == 2"> Page Right </template>
-      </template>
-      <template v-slot:item.active="{ item }">
-        <v-simple-checkbox
-          disabled
-          on-icon="mdi-eye"
-          off-icon="mdi-eye-off"
-          v-model="item.active"
-        ></v-simple-checkbox>
-      </template>
-    </Table>
-  </v-container>
+  <q-card>
+    <q-card-section>
+      <div class="text-h5">Graphics</div>
+    </q-card-section>
+    <q-card-section>
+      <Table
+        @saveRow="(l: Layout) => layoutsStore.modifyLayout(l)"
+        @deleteRow="(l: Layout) => layoutsStore.deleteLayout(l)"
+        name="Layout"
+        :tableColumns="headers"
+        :colMeta="colMeta"
+        :rows="layoutsStore.layouts"
+        :editable="true"
+      >
+        <template #body-cell-Placement="props">
+          <q-td :props="props">
+            <template v-if="props.value == 0">On Company Page</template>
+            <template v-else-if="props.value == 1">Left side</template>
+            <template v-else-if="props.value == 2">Right side</template>
+          </q-td>
+        </template>
+
+        <template #body-cell-Active="props">
+          <q-td :props="props">
+            <q-icon
+              v-if="props.value"
+              size="sm"
+              color="primary"
+              name="mdi-eye"
+            />
+            <q-icon
+              v-if="!props.value"
+              size="sm"
+              color="grey"
+              name="mdi-eye-off"
+            />
+          </q-td>
+        </template>
+      </Table>
+    </q-card-section>
+  </q-card>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+import { useLayoutsStore } from "@/stores/modules/layouts";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "layouts_table",
-  components: {
-    Table,
+const layoutsStore = useLayoutsStore();
+const headers = [
+  {
+    name: "Placement",
+    label: "Placement",
+    field: "placement",
+    align: "left",
+    sortable: true,
   },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Placement",
-          value: "placement",
-        },
-        {
-          text: "Image",
-          value: "image",
-        },
-        { text: "Active", value: "active" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 130,
-          align: "center",
-          sortable: false,
-        },
-      ],
-      row_meta: [
-        { type: "image", model: "image", label: "image", displayname: true },
-        { type: "checkbox", model: "active", label: "Active" },
-        {
-          type: "radio",
-          model: "placement",
-          label: "Placement",
-          items: [
-            { name: "Company page", value: 0 },
-            { name: "Page Left", value: 1 },
-            { name: "Page Right", value: 2 },
-          ],
-        },
-      ],
-    };
+  {
+    name: "Image",
+    label: "Image",
+    field: "image",
+    align: "left",
+    sortable: true,
   },
-  computed: {
-    ...mapGetters({ layouts: "layouts/get" }),
+  {
+    name: "Active",
+    label: "Active",
+    field: "active",
+    align: "left",
+    sortable: true,
   },
-  methods: {
-    saveLayout(layout) {
-      this.$store.dispatch("layouts/modifyLayout", layout);
-    },
-    deleteLayout(layout) {
-      this.$store.dispatch("layouts/deleteLayout", layout);
-    },
+];
+
+const colMeta: TableColMeta[] = [
+  { type: "image", model: "image", label: "image" },
+  { type: "checkbox", model: "active", label: "Active" },
+  {
+    type: "radio",
+    model: "placement",
+    label: "Placement",
+    items: [
+      { label: "Company page", value: 0 },
+      { label: "Page Left", value: 1 },
+      { label: "Page Right", value: 2 },
+    ],
   },
-  beforeMount() {
-    this.$store.dispatch("layouts/getLayouts");
-  },
-};
+];
 </script>

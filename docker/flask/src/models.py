@@ -83,7 +83,7 @@ class Company(db.Model):
     website = db.Column(db.String(200))
     talk_to_us_about = db.Column(db.String(1000))
     logo = db.Column(db.String(100))
-    map_image = db.Column(db.String(100))
+    map_image = db.Column(db.Integer)
     booth_number = db.Column(db.Integer)
     tags = db.relationship(
         'Tag',
@@ -124,11 +124,12 @@ class Company(db.Model):
             db.session.add(new_company)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
     def update(self, name, active, charmtalk, description, unique_selling_point,
-               summer_job_description, summer_job_link, summer_job_deadline, contacts, 
+               summer_job_description, summer_job_link, summer_job_deadline, contacts,
                contact_email, employees_world, employees_sweden, website,
             talk_to_us_about,logo, map_image, booth_number, tags):
 
@@ -206,9 +207,10 @@ class Tag(db.Model):
     looking_for = db.Column(db.Boolean)
     offering = db.Column(db.Boolean)
     language = db.Column(db.Boolean)
+    fair_area = db.Column(db.Boolean)
 
     @staticmethod
-    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
+    def create(name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area):
         try:
             if Tag.query.filter_by(name=name).first():
                 return False
@@ -223,15 +225,17 @@ class Tag(db.Model):
                 business_area = business_area,
                 looking_for = looking_for,
                 offering = offering,
-                language = language
+                language = language,
+                fair_area = fair_area,
             )
             db.session.add(new_tag)
             db.session.commit()
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
-    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language):
+    def update(self,name, parent_tag,up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area):
         try:
             self.name = test_and_set(self.name,name)
             self.parent_tag = test_and_set(self.parent_tag,parent_tag)
@@ -244,6 +248,7 @@ class Tag(db.Model):
             self.looking_for = test_and_set(self.looking_for, looking_for)
             self.offering = test_and_set(self.offering, offering)
             self.language = test_and_set(self.language, language)
+            self.fair_area = test_and_set(self.fair_area, fair_area)
             db.session.commit()
             return True
         except:
@@ -270,7 +275,8 @@ class Tag(db.Model):
             'business_area': self.business_area,
             'looking_for': self.looking_for,
             'offering': self.offering,
-            'language': self.language
+            'language': self.language,
+            'fair_area': self.fair_area
         }
 
 class Tag_company(db.Model):
@@ -311,7 +317,8 @@ class Tag_company(db.Model):
 
             db.session.add(new_tag_company)
             db.session.commit()
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -349,6 +356,7 @@ class Map(db.Model):
             db.session.add(new_map)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -381,32 +389,40 @@ class Prepage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     image = db.Column(db.String(100))
-    order = db.Column(db.Integer)
     active = db.Column(db.Boolean)
+    mobile = db.Column(db.Boolean)
+    side = db.Column(db.String(5))
+    page = db.Column(db.Integer)
 
     @staticmethod
-    def create( name,active,image, order ):
+    def create(name,active,image,mobile,side,page):
+
         try:
             if Prepage.query.filter_by(image=image).first():
                 return False
             new_prepage = Prepage(
                 name = name,
                 image = image,
-                order = order,
-                active = active
+                active = active,
+                mobile = mobile,
+                side = side,
+                page = page
             )
 
             db.session.add(new_prepage)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
-    def update(self, name, active,image, order,):
+    def update(self,name,active,image,mobile,side,page):
         self.name = test_and_set(self.name,name)
         self.active = test_and_set(self.active, active)
         self.image = test_and_set(self.image, image)
-        self.order = test_and_set(self.order, order)
+        self.mobile = test_and_set(self.mobile, mobile)
+        self.side = test_and_set(self.side, side)
+        self.page = test_and_set(self.page, page)
         db.session.commit()
         return True
 
@@ -421,8 +437,10 @@ class Prepage(db.Model):
             'id': self.id,
             'name': self.name,
             'image': self.image,
-            'order': self.order,
-            'active': self.active
+            'active': self.active,
+            'mobile': self.mobile,
+            'side': self.side,
+            'page': self.page
         }
 
 class Layout(db.Model):
@@ -446,6 +464,7 @@ class Layout(db.Model):
             db.session.add(new_layout)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -492,6 +511,7 @@ class Shortcut(db.Model):
             db.session.add(new_shortcut)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -538,6 +558,7 @@ class Company_card(db.Model):
             db.session.add(new_company_card)
             db.session.commit()
         except Exception as e:
+            print(e, file=sys.stderr)
             return False
         return True
 
@@ -560,4 +581,60 @@ class Company_card(db.Model):
             'name': self.name,
             'text': self.text,
             'active': self.active,
+        }
+
+class Feedback(db.Model):
+    __tablename__ = "feedback"
+    id = db.Column(db.Integer, primary_key=True)
+
+    title = db.Column(db.String(50))
+    text = db.Column(db.String(1000))
+    meta = db.Column(db.String(1000))
+    received = db.Column(db.DateTime)
+    important = db.Column(db.Boolean)
+    archived = db.Column(db.Boolean)
+
+    @staticmethod
+    def create(title, text, meta=""):
+        try:
+            new_feedback = Feedback(
+                title=title,
+                text=text,
+                meta=meta,
+                received=datetime.datetime.now(),
+                important=False,
+                archived=False
+            )
+
+            db.session.add(new_feedback)
+            db.session.commit()
+        except Exception as e:
+            print(e, file=sys.stderr)
+            return False
+        return True
+
+    def update(self, title, text, meta, important, archived):
+        self.title = test_and_set(self.title, title)
+        self.text = test_and_set(self.text, text)
+        self.meta = test_and_set(self.meta, meta)
+        self.important = test_and_set(self.important, important)
+        self.archived = test_and_set(self.archived, archived)
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'text': self.text,
+            'meta': self.meta,
+            'received': self.received,
+            'important': self.important,
+            'archived': self.archived
         }

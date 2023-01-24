@@ -9,18 +9,26 @@ from ... import db, config
 from ...helper_functions import *
 import shutil
 import openpyxl
+import urllib.parse
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
 NUMBER_OF_METADATA_COLS_COMPANY = 17
-NUMBER_OF_METADATA_COLS_TAG = 6
+NUMBER_OF_METADATA_COLS_TAG = 7
+
+# Number of rows per object
+NUMBER_OF_COLS_IN_MAP = 3
+NUMBER_OF_COLS_IN_PREPAGE = 6
+NUMBER_OF_COLS_IN_LAYOUT = 3
+
+
 blueprint = Blueprint('manage', __name__, url_prefix='/api/manage')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 @blueprint.route("/image/<filename>", methods = ["GET"])
 def imageSend(filename):
-    return send_from_directory(config['flask']['static_folder'], secure_filename(filename))
+    return send_from_directory(config['flask']['static_folder'], (filename))
 
 
 def imageLoad(request):
@@ -28,8 +36,9 @@ def imageLoad(request):
     filename = file.filename
     if not filename[-3:] in ACCEPT_IMAGE_EXTENDS:
         return f'{filename} is not accept file type', status.HTTP_400_BAD_REQUEST
-    file.save(os.path.join(config['flask']['static_folder'], secure_filename(filename)))
 
+    urlEncodeFilename = urllib.parse.unquote_plus(filename)
+    file.save(os.path.join(config['flask']['static_folder'], filename))
     return "All files uploaded", status.HTTP_200_OK
 
 
@@ -38,7 +47,7 @@ def parseXlsx():
     Company.query.update({Company.active:False})
     db.session.commit()
 
-    workbook = openpyxl.load_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
+    workbook = openpyxl.load_workbook(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"),data_only = True)
 
     # Adds maps
     maps_sheet = workbook["Maps"]
@@ -47,11 +56,13 @@ def parseXlsx():
         map_object = Prepage.query.filter_by(name=maps_sheet.cell(i,1)).first()
 
         data = list(map(lambda x: x.value, maps_sheet[i]))
-        ref_object = Map.query.filter_by(name=data[2]).first()
-        if ref_object:
-            data[2] = ref_object.id
-        else:
-            data[2] = None
+
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_MAP:]
+
+
+        REF_NAME_POS = 2
+        data[REF_NAME_POS] = mapLookUpIdOrNull(data[REF_NAME_POS])
         if not map_object:
             Map.create(*data)
         else:
@@ -60,9 +71,12 @@ def parseXlsx():
     # Prepages
     prepages_sheet = workbook["Prepages"]
     for i in range(2,prepages_sheet.max_row + 1):
-        prepage = Prepage.query.filter_by(name=prepages_sheet.cell(i,1)).first()
-
         data = list(map(lambda x: x.value, prepages_sheet[i]))
+        prepage = Prepage.query.filter_by(name=data[0]).first()
+
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_PREPAGE:]
+
         if not prepage:
             Prepage.create(*data)
         else:
@@ -74,6 +88,11 @@ def parseXlsx():
         layout = Layout.query.filter_by(image=layout_sheet.cell(i,2)).first()
 
         data = list(map(lambda x: x.value, layout_sheet[i]))
+
+        # Truncate to correct size
+        del data[NUMBER_OF_COLS_IN_LAYOUT:]
+
+
         if not layout:
             Layout.create(*data)
         else:
@@ -91,79 +110,42 @@ def parseXlsx():
         else:
             tag.update(row[NUMBER_OF_METADATA_COLS_TAG].value,None,1,1,False,*metadata)
 
-
-   # next_col = NUMBER_OF_METADATA_COLS_TAG
-   # parent_tag = None
-   # for i in range(2,tags_sheet.max_row + 1):
-   #     row = tags_sheet[i]
-   #     tag = Tag.query.filter_by(name=row[next_col].value).first()
-   #     metadata = list(map( lambda x: x.value, row[:NUMBER_OF_METADATA_COLS_TAG]))
-   #     if not tag: # No tag exists
-   #         Tag.create(row[next_col].value,parent_tag,1,1,False,*metadata)
-   #         parent_tag = Tag.query.filter_by(name=row[next_col].value).first().id
-   #     else:
-   #         tag.update(row[next_col].value,parent_tag,1,1,False,*metadata)
-   #         parent_tag = tag.id
-   #
-   #     if (i+1 >= tags_sheet.max_row):
-   #         break
-   #     if (tags_sheet.cell(i+1,next_col)!=''):
-   #         if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-   #             parent_tag = None
-   #         continue
-   #     elif (next_col+1 < tags_sheet.ncols):
-   #         if (tags_sheet.cell(i+1,next_col+1)!=''):
-   #             next_col += 1
-   #             continue
-##
-   #     print(tags_sheet, file=sys.stderr)
-   #     for j in range(tags_sheet.ncols):
-   #         if tags_sheet.cell(i+1,j) != '':
-   #             if (j==NUMBER_OF_METADATA_COLS_TAG):
-   #                 parent_tag = None
-   #             next_col = j
-   #             break
-   #         if (tags_sheet.cell(i+1,next_col)!=''):
-   ##             if (next_col==NUMBER_OF_METADATA_COLS_TAG):
-   #                 parent_tag = None
-   #             continue
-   #         elif (next_col+1 < tags_sheet.ncols):
-  # #             if (tags_sheet.cell(i+1,next_col+1)!=''):
-  #                  next_col += 1
-   #                 continue
-
-     #       for j in range(tags_sheet.ncols):
-     #           if tags_sheet.cell(i+1,j) != '':
-     #               if (j==NUMBER_OF_METADATA_COLS_TAG):
-     #                   parent_tag = None
-     #               next_col = j
-      #              break
     # Generats companies
     companies_sheet = workbook["Companies"]
+
     tags = []
-
     tag_row = companies_sheet[1]
-    with db.session.no_autoflush:
-        for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.max_column):
-            tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
+    for i in range(NUMBER_OF_METADATA_COLS_COMPANY,companies_sheet.max_column):
+        if (Tag.query.filter_by(name = tag_row[i].value).first() == None):
+            raise Exception(f"No such tag named {tag_row[i].value}")
+        tags.append(Tag.query.filter_by(name = tag_row[i].value).first())
 
-        for i in range(2,companies_sheet.max_row ):
+    with db.session.no_autoflush:
+        for i in range(2,companies_sheet.max_row +1):
             tags_temp = []
-            for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column):
+            for j in range(NUMBER_OF_METADATA_COLS_COMPANY +1 ,companies_sheet.max_column + 1):
                 if companies_sheet.cell(i,j).value:
                     tags_temp.append(tags[j-NUMBER_OF_METADATA_COLS_COMPANY -1 ]) # This is -1 is due to xlsx being 1 index and the tag list is 0 index
 
             metadata = companies_sheet[i][:NUMBER_OF_METADATA_COLS_COMPANY]
             metadata = list(map(lambda x: x.value, metadata))
 
+            # Map map name to id
+            MAP_POS = 15
+
+            metadata[MAP_POS] = mapLookUpIdOrNull(metadata[MAP_POS])
+
             if metadata[0] == "":
                 continue
+
             company = Company.query.filter_by(name = metadata[0]).first()
             if  company == None:
-                Company.create(
-                        *metadata,
-                        tags_temp
-                        )
+                if (Company.create(
+                    *metadata,
+                    tags_temp
+                    ) == False):
+                    return
+
             else:
                 company.update(*metadata,tags_temp)
 
@@ -171,6 +153,14 @@ def parseXlsx():
 
 
     os.remove(os.path.join(config["flask"]["upload_folder"],"CHARM_CATALOGUE_DATA.xlsx"))
+
+def mapLookUpIdOrNull(name):
+    map_obj = Map.query.filter_by(name=name).first()
+    if map_obj:
+        return map_obj.id
+    else:
+        return None
+
 
 def unpackAndParse(request):
     file = request.files["file"]

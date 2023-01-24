@@ -1,27 +1,9 @@
 <template>
-  <v-container>
+  <q-page padding>
     <companies_table />
-  </v-container>
+  </q-page>
 </template>
 
-<script>
+<script lang="ts" setup>
 import companies_table from "@/components/admin/company_table.vue";
-
-export default {
-  name: "Companies",
-  components: {
-    companies_table,
-  },
-  data() {
-    return {
-      headers: [
-        { text: "Name", value: "name" },
-        { text: "Website", value: "website" },
-        { text: "Tags", value: "tags" },
-        { text: "Active", value: "active" },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
-    };
-  },
-};
 </script>

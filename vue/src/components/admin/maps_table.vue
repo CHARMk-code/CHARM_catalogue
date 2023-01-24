@@ -1,88 +1,87 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveMap"
-      @delete_row="deleteMap"
-      name="Map (Do NOT modify this table it will corrupt the data)"
-      :headers="headers"
-      :data="modified_maps"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-      </template>
-      <template v-slot:item.image="{ item }">
-        {{ item.image }}
-      </template>
-      <template v-slot:item.ref="{ item }">
-        {{ item.ref == null || item.ref == "No Goto" ? "" : item.ref.name }}
-      </template>
-    </Table>
-  </v-container>
+  <q-card>
+    <q-card-section class="text-h5">Maps</q-card-section>
+    <q-card-section>
+      <Table
+        @saveRow="(m) => mapsStore.updateMap(m)"
+        @deleteRow="(m) => mapsStore.removeMap(m)"
+        name="Map"
+        :tableColumns="headers"
+        :rows="rows"
+        :metaRows="metaRows"
+        :colMeta="colMeta"
+        :editable="true"
+        :metaModelCallback="updateMapParent"
+      >
+        <template #body-cell-Parent="props">
+          <q-td :props="props">
+            {{ (mapsStore.getMapFromId(props.value) || { name: "None" }).name }}
+          </q-td>
+        </template>
+      </Table>
+    </q-card-section>
+  </q-card>
 </template>
 
-<script>
+<script lang="ts" setup>
 import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "maps_table",
-  components: {
-    Table,
+const mapsStore = useMapsStore();
+
+const headers = [
+  { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
+  {
+    name: "Image",
+    label: "Image",
+    field: "image",
+    align: "left",
+    sortable: true,
   },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Image",
-          value: "image",
-        },
-        { text: "Goto", value: "ref" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 100,
-          align: "center",
-          sortable: false,
-        },
-      ],
-    };
+  {
+    name: "Parent",
+    label: "Parent",
+    field: "ref",
+    align: "left",
+    sortable: true,
   },
-  computed: {
-    ...mapGetters({
-      maps: "maps/get",
-    }),
-    row_meta() {
-      return [
-        { type: "image", model: "image", label: "Map image" },
-        {
-          type: "single_select",
-          model: "ref",
-          label: "Goto",
-          items: this.maps.concat([{ name: "No Goto", id: null }]),
-        },
-        { type: "text", model: "name", label: "Name", displayname: true },
-      ];
-    },
-    modified_maps() {
-      return this.maps.map((m) => ({
-        ...m,
-        ref: m.ref == null ? "" : this.maps.filter((rm) => rm.id == m.ref)[0],
-      }));
-    },
+];
+
+const rows = Array.from(mapsStore.maps.values());
+const metaRows = Array.from(mapsStore.maps.values()).map((map) => {
+  const ref = mapsStore.getMapFromId(map.ref);
+  const parent = ref
+    ? { label: ref, value: ref.id }
+    : { label: { name: "None" }, value: -1 };
+  console.log("metaRow, map", map, parent);
+  return {
+    parent,
+  };
+});
+
+function updateMapParent(
+  meta: { parent: { label: Company_Map; value: number } },
+  row: Company_Map
+) {
+  console.log("updatingMapParent", meta);
+  row.ref = meta.parent.value;
+}
+
+const colMeta: TableColMeta[] = [
+  { type: "image", model: "image", label: "Map image" },
+  {
+    type: "single-select",
+    model: "parent",
+    label: "Parent",
+    items: [{ label: { name: "None" }, value: -1 }].concat(
+      Array.from(mapsStore.maps.values()).map((m) => ({
+        label: m,
+        value: m.id,
+      }))
+    ),
+    meta: true,
   },
-  methods: {
-    saveMap(map) {
-      this.$store.dispatch("maps/modifyMap", { ...map, ref: map.ref.id });
-    },
-    deleteMap(map) {
-      this.$store.dispatch("maps/deleteMap", map);
-    },
-  },
-};
+  { type: "text", model: "name", label: "Name" },
+];
 </script>

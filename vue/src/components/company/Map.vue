@@ -1,47 +1,32 @@
 <template>
-  <company_card_wrapper class="mb-6" name="map">
-    <v-card-title> Location </v-card-title>
-    <v-card-text class="text-subtitle-1 text-center">
-      <v-icon color="primary" large>mdi-map-marker</v-icon> Booth #{{
-        booth_number
-      }}
-      <v-card flat :to="'/maps/' + map_ref_object.name">
-        <v-img
-          class="ma-2"
-          max-height="400px"
-          contain
-          :src="base_URL + map_object.image"
-        />
-      </v-card>
-    </v-card-text>
+  <company_card_wrapper name="map">
+    <q-card-section>
+      <div class="text-h6">Location</div>
+    </q-card-section>
+    <q-card-section class="text-subtitle-1 text-center">
+      <q-icon color="primary" name="mdi-map-marker"></q-icon>
+      Booth #{{ booth_number }}
+    </q-card-section>
+    <q-card-section
+      v-if="props.map"
+      flat
+      :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
+    >
+      <Image :ratio="1" fit="contain" :imageName="props.map.image" />
+    </q-card-section>
   </company_card_wrapper>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
+import axios from "@/plugins/axios";
+import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
+import Image from "../utils/Image.vue";
 
-export default {
-  name: "Company_map",
-  components: {
-    company_card_wrapper,
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-    map_object() {
-      return this.$store.getters["maps/get"].filter(
-        (t) => t.name == this.map
-      )[0];
-    },
-    map_ref_object() {
-      return this.$store.getters["maps/get"].filter(
-        (t) => t.id == this.map_object.ref
-      )[0];
-    },
-  },
+const props = defineProps<{
+  booth_number: number;
+  map: Company_Map | undefined;
+}>();
 
-  props: ["map", "booth_number"],
-};
+const mapsStore = useMapsStore();
 </script>

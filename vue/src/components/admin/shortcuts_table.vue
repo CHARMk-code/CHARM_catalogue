@@ -1,89 +1,56 @@
 <template>
-  <v-container>
-    <Table
-      @save_edit="saveShortcut"
-      @delete_row="deleteShortcut"
-      name="Shortcut"
-      :headers="headers"
-      :data="modified_shortcuts"
-      :row_meta="row_meta"
-      :editable="true"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-      </template>
-      <template v-slot:item.desc="{ item }">
-        {{ item.desc }}
-      </template>
-      <template v-slot:item.link="{ item }">
-        {{ item.link }}
-      </template>
-      <template v-slot:item.icon="{ item }">
-        <v-icon>{{ item.icon }}</v-icon>
-      </template>
-    </Table>
-  </v-container>
+  <q-card>
+    <q-card-section class="text-h5">Shortcuts</q-card-section>
+    <q-card-section>
+      <Table
+        @saveRow="(s) => shortcutsStore.modifyShortcut(s)"
+        @deleteRow="(s) => shortcutsStore.deleteShortcut(s)"
+        name="Shortcut"
+        :tableColumns="columns"
+        :colMeta="colMeta"
+        :rows="shortcutsStore.shortcuts"
+        :editable="true"
+      >
+        <template #body-cell-Icon="props">
+          <q-td :props="props">
+            <q-icon size="sm" :name="props.value"></q-icon>
+          </q-td>
+        </template>
+      </Table>
+    </q-card-section>
+  </q-card>
 </template>
 
-<script>
-import Table from "@/components/table.vue";
-import { mapGetters } from "vuex";
+<script lang="ts" setup>
+import Table, { type TableRow } from "@/components/table.vue";
+import type { Layout } from "@/stores/modules/layouts";
+import { useShortcutsStore, type Shortcut } from "@/stores/modules/shortcuts";
+import type { TableColMeta } from "./table_edit_dialog.vue";
 
-export default {
-  name: "shortcuts_table",
-  components: {
-    Table,
+const shortcutsStore = useShortcutsStore();
+const columns = [
+  { name: "Icon", label: "Icon", field: "icon", align: "left" },
+  {
+    name: "Title",
+    label: "Title",
+    field: "name",
+    align: "left",
+    sortable: true,
   },
-  data() {
-    return {
-      headers: [
-        { text: "Icon", value: "icon" },
-        {
-          text: "Title",
-          value: "name",
-        },
-        {
-          text: "Description",
-          value: "desc",
-        },
-        { text: "Link", value: "link" },
-        {
-          text: "Actions",
-          value: "actions",
-          width: 100,
-          align: "center",
-          sortable: false,
-        },
-      ],
-    };
+  {
+    name: "Description",
+    label: "Description",
+    field: "desc",
+    align: "left",
+    sortable: true,
   },
-  computed: {
-    ...mapGetters({
-      shortcuts: "shortcuts/get",
-    }),
-    row_meta() {
-      return [
-        { type: "text", model: "name", label: "Title" },
-        { type: "text", model: "desc", label: "Description" },
-        { type: "text", model: "icon", label: "Icon" },
-        { type: "text", model: "link", label: "Link" },
-      ];
-    },
-    modified_shortcuts() {
-      return this.shortcuts.map((m) => ({
-        ...m,
-      }));
-    },
-  },
-  methods: {
-    saveShortcut(shortcut) {
-      this.$store.dispatch("shortcuts/modifyShortcut", {
-        ...shortcut,
-      });
-    },
-    deleteShortcut(shortcut) {
-      this.$store.dispatch("shortcuts/deleteShortcut", shortcut);
-    },
-  },
-};
+  { name: "Link", label: "Link", field: "link", align: "left", sortable: true },
+];
+
+const colMeta: TableColMeta[] = [
+  { type: "text", model: "name", label: "Title" },
+  { type: "text", model: "desc", label: "Description" },
+  { type: "icon", model: "icon", label: "Icon" },
+  { type: "text", model: "link", label: "Link" },
+];
 </script>

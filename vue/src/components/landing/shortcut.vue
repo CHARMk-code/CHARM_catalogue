@@ -1,20 +1,40 @@
 <template>
-  <v-card :to="link" style="width: 100%">
-    <div class="d-flex flex-no-wrap justify-space-between">
-      <div>
-        <v-card-title>
-          <v-icon large left> {{ icon }} </v-icon>
-          {{ name }}
-        </v-card-title>
-        <v-card-text> {{ desc }}</v-card-text>
-      </div>
-      <v-icon right x-large> mdi-chevron-right</v-icon>
-    </div>
-  </v-card>
+  <q-card
+    v-ripple
+    class="bg-primary text-white cursor-pointer q-hoverable q-pa-xs"
+    @click="externalLink ? gotoExternal(link) : router.push(link)"
+  >
+    <span class="q-focus-helper"></span>
+    <q-item>
+      <q-item-section avatar>
+        <q-icon left size="md" color="white" :name="icon"></q-icon>
+      </q-item-section>
+      <q-item-section>
+        <q-item-label class="text-h6">{{ name }}</q-item-label>
+        <q-item-label class="text-subtitle"> {{ desc }}</q-item-label>
+      </q-item-section>
+      <q-item-section avatar>
+        <q-icon right size="md" color="white" name="mdi-chevron-right"></q-icon>
+      </q-item-section>
+    </q-item>
+  </q-card>
 </template>
 
-<script>
-export default {
-  props: ["icon", "link", "name", "desc"],
-};
+<script lang="ts" setup>
+import { useRouter } from "vue-router";
+
+const props = defineProps<{
+  icon: string;
+  link: string;
+  name: string;
+  desc: string;
+}>();
+
+function gotoExternal(link) {
+  window.location.href = link;
+}
+
+const router = useRouter();
+
+const externalLink = props.link.startsWith("http");
 </script>

@@ -1,29 +1,13 @@
 <template>
-  <v-img v-if="layout != undefined" :src="base_URL + layout.image" contain />
+  <div v-if="layout != undefined">
+    <Image :imageName="layout.image" fit="contain" />
+  </div>
 </template>
 
-<script>
-import Vue from "vue";
-export default {
-  name: "Company_layout",
-  data() {
-    return {
-      layout: undefined,
-    };
-  },
-  computed: {
-    base_URL() {
-      return Vue.prototype.$axios.defaults.baseURL + "/manage/image/";
-    },
-  },
-  mounted(){
-    this.$store.commit("layouts/updateCenter");
-  },
-  watch: {
-    "$store.state.layouts.current_center"(val)
-    {
-      this.layout = val;
-  }
-  }
-};
+<script lang="ts" setup>
+import { useLayoutsStore } from "@/stores/modules/layouts";
+import Image from "../utils/Image.vue";
+
+const layoutsStore = useLayoutsStore();
+const layout = layoutsStore.getCenter;
 </script>
