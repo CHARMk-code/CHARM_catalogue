@@ -264,17 +264,22 @@ function setPrevRoute() {
       "/company/" + filterStore.filteredCompanies[currentIndex.value - 1].name;
   } else {
     if (Object.values(prepagesStore.pageGroups).length !== 0) {
-      console.log("has prepages");
       const pageGroups = Object.values(prepagesStore.pageGroups);
-      const lastpageGroup = pageGroups[pageGroups.length - 1];
-      console.log(lastpageGroup);
+      var lastPageGroupIndex = pageGroups.length;
+
       if ($q.screen.lt.md) {
-        console.log("onMobile");
-        const mobilePages = lastpageGroup.pages.filter((p) => p.mobile);
+        var mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+          (p) => p.mobile
+        );
+        while (mobilePages.length == 0) {
+          lastPageGroupIndex -= 1;
+          mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+            (p) => p.mobile
+          );
+        }
         if (mobilePages.length > 1) {
-          console.log("has mobilepages");
           settingsStore.settings.navigation.prev =
-            "/prepage/" + pageGroups.length + "?p=" + (mobilePages.length - 1);
+            "/prepage/" + lastPageGroupIndex + "?p=" + (mobilePages.length - 1);
           return;
         }
       }
