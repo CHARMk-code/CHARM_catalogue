@@ -24,10 +24,10 @@
 import { useRouter } from "vue-router";
 
 const props = defineProps<{
-  icon: string;
+  icon: string | undefined;
   link: string;
   name: string;
-  desc: string;
+  desc: string | undefined;
 }>();
 
 function gotoExternal(link) {

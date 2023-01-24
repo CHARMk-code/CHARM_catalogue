@@ -204,6 +204,11 @@ function logout() {
   z-index: 9999999;
   top: 50%;
 }
+
+.navigation button {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
 .navigation > * {
   top: -100%;
 }
