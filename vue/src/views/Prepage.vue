@@ -53,15 +53,14 @@ const prepagesStore = usePrepagesStore();
 const router = useRouter();
 const route = useRoute();
 
-const mobilePrepage: Prepage = computed(() => {
+const mobilePrepage: Ref<Prepage> = computed(() => {
   const pageGroupPages: Prepage[] =
     prepagesStore.pageGroups[route.params.page].pages;
+  const mobilePages = pageGroupPages.filter((p) => p.mobile);
   if (route.query.p) {
-    const mobilePages = pageGroupPages.filter((p) => p.mobile);
-
     return mobilePages[route.query.p];
   } else {
-    return pageGroupPages[0];
+    return mobilePages[0];
   }
 });
 
@@ -123,54 +122,85 @@ const arrowKeyHandler = (e: { key: string }) => {
 };
 
 const page = computed(() => {
-  if (route.params.page) return parseInt(route.params.page) - 1;
+  if (route.params.page) return parseInt(route.params.page);
   else return 0;
 });
 
 const settingsStore = useSite_settingsStore();
 const $q = useQuasar();
 function setNextRoute() {
+  var nextPage, nextP;
   if ($q.screen.lt.md) {
+    //if mobile
     var p = 0;
     if (route.query.p) {
       p = parseInt(route.query.p);
     }
-    const pageGroupPages = prepagesStore.pageGroups[route.params.page].pages;
 
+    const pageGroupPages = prepagesStore.pageGroups[route.params.page].pages;
     const mobilePages = pageGroupPages.filter((p) => p.mobile);
 
     if (mobilePages.length - 1 > p) {
-      settingsStore.settings.navigation.next =
-        "/prepage/" + route.params.page + "?p=" + (p + 1);
-      return;
-    }
-  }
-  if (page.value + 1 >= Object.values(prepagesStore.pageGroups).length) {
-    filtersStore.filterCompanies();
-    if (filtersStore.filteredCompanies.length > 0) {
-      settingsStore.settings.navigation.next =
-        "/company/" + filtersStore.filteredCompanies[0].name;
+      nextPage = page.value;
+      nextP = p + 1;
+    } else {
+      nextPage = page.value + 1;
+      nextP = 0;
     }
   } else {
-    settingsStore.settings.navigation.next = "/prepage/" + (page.value + 2);
+    //if desktop
+    nextPage = page.value + 1;
+    nextP = 0;
+  }
+
+  // determine if nextPage is company or prepage
+  if (nextPage > Object.values(prepagesStore.pageGroups).length) {
+    filtersStore.filterCompanies();
+    if (filtersStore.filteredCompanies.length < 1) return; //go nowhere if there are no companypages
+
+    settingsStore.settings.navigation.next =
+      "/company/" + filtersStore.filteredCompanies[0].name;
+  } else {
+    settingsStore.settings.navigation.next = `/prepage/${nextPage}${
+      $q.screen.lt.md ? "?p=" + nextP : ""
+    }`;
   }
 }
 function setPrevRoute() {
+  var prevPage, prevP;
+  if (page.value <= 1) return;
   if ($q.screen.lt.md) {
+    //if mobile
     var p = 0;
     if (route.query.p) {
       p = parseInt(route.query.p);
     }
 
+    const prevPageGroupPages =
+      prepagesStore.pageGroups[parseInt(route.params.page) - 1].pages;
+    const prevMobilePages = prevPageGroupPages.filter((p) => p.mobile);
+
     if (p > 0) {
-      settingsStore.settings.navigation.prev =
-        "/prepage/" + route.params.page + "?p=" + (p - 1);
-      return;
+      prevPage = page.value;
+      prevP = p - 1;
+    } else {
+      prevPage = page.value - 1;
+      if (prevMobilePages.length > 1) {
+        prevP = prepagesStore.pageGroups[prevPage].pages.length - 1;
+      } else {
+        prevP = 0;
+      }
+      console.log(prevP);
     }
+  } else {
+    //if desktop
+    prevPage = page.value - 1;
+    prevP = 0;
   }
-  if (page.value > 0) {
-    settingsStore.settings.navigation.prev = "/prepage/" + page.value;
-  }
+
+  settingsStore.settings.navigation.prev = `/prepage/${prevPage}${
+    $q.screen.lt.md ? "?p=" + prevP : ""
+  }`;
 }
 
 function handleSwipe({ direction }) {
