@@ -1,15 +1,16 @@
 <template>
   <q-page padding>
-    <div class="row">
-      <div class="col-12 col-md-6">
+    <div class="row full-height">
+      <q-space />
+      <div class="full-height col-12 col-md-4">
         <q-card
           id="prepage-card"
-          class="column q-mx-auto q-mb-lg"
+          class="q-mx-auto q-mb-lg"
           v-if="first_prepage"
         >
           <q-card-section class="col-grow">
             <Image
-              fit="contain"
+              fit="scale-down"
               height="100%"
               :imageName="first_prepage.image"
             />
@@ -25,7 +26,8 @@
           </q-card-actions>
         </q-card>
       </div>
-      <div class="col-12 col-md-6">
+      <q-space />
+      <div class="col-12 col-md-4">
         <span class="text-h3 text-center block full-width">Shortcuts</span>
         <template v-for="shortcut in shortcutsStore.shortcuts">
           <div class="q-pa-sm full-width">
@@ -38,6 +40,7 @@
           </div>
         </template>
       </div>
+      <q-space />
     </div>
   </q-page>
 </template>
@@ -66,9 +69,6 @@ const first_prepage = computed(() => {
 .v-card:not(.on-hover) {
   opacity: 0.4;
 }*/
-#prepage-card {
-  height: 80vh;
-}
 
 #hovereffect {
   transition: opacity 0.4s ease-in-out;
