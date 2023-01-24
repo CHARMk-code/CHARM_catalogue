@@ -190,7 +190,6 @@ function setPrevRoute() {
       } else {
         prevP = 0;
       }
-      console.log(prevP);
     }
   } else {
     //if desktop
