@@ -10,7 +10,7 @@
         size="xl"
         left-label
       >
-        <span class="text-h3">{{ name }}</span>
+        <span class="text-h4">{{ name }}</span>
         <q-tooltip>
           Save as favorite (This is only stored in your browser and will not be
           transferred between browsers)
