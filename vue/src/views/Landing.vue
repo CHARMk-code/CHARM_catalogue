@@ -31,7 +31,7 @@
         <span class="text-h3 text-center block full-width">Shortcuts</span>
         <template v-for="shortcut in shortcutsStore.shortcuts">
           <div class="q-pa-sm full-width">
-            <shortcut
+            <Shortcut
               :icon="shortcut.icon"
               :name="shortcut.name"
               :desc="shortcut.desc"
@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import shortcut from "@/components/landing/shortcut.vue";
+import Shortcut from "@/components/landing/shortcut.vue";
 import Image from "@/components/utils/Image.vue";
 import { computed } from "vue";
 import { usePrepagesStore } from "@/stores/modules/prepages";
