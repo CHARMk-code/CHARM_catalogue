@@ -6,7 +6,7 @@
     </v-card-text>
     <v-card-actions>
       <v-btn color="primary" @click="$emit('delete')"> Delete </v-btn>
-      <v-btn @click="$emit('closePopup')"> Cancel </v-btn>
+      <v-btn @click="$emit('close-popup')"> Cancel </v-btn>
     </v-card-actions>
   </v-card>
 </template>

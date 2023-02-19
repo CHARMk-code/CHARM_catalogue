@@ -47,6 +47,6 @@ const props = withDefaults(
 );
 
 function tagClick(tag: Tag) {
-  emit("tagClick", tag);
+  emit("tag-click", tag);
 }
 </script>
