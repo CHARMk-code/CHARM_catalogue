@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.15.8",
+    "@typescript-eslint/parser": "^5.52.0",
     "axios": "^1.2.0",
     "dayjs": "^1.11.6",
+    "eslint-plugin-vue": "^9.9.0",
     "pinia": "^2.0.27",
     "quasar": "^2.11.2",
     "vue": "^3.2.45",
@@ -22,16 +24,18 @@
   "devDependencies": {
     "@quasar/vite-plugin": "^1.3.0",
     "@rushstack/eslint-patch": "^1.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@vitejs/plugin-legacy": "^2.0.0",
     "@vitejs/plugin-vue": "^3.0.0",
-    "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.2",
     "@vue/tsconfig": "^0.1.3",
-    "eslint": "^8.5.0",
-    "eslint-plugin-vue": "^9.0.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
     "prettier": "^2.5.1",
     "sass": "1.32.12",
     "terser": "^5.14.2",
-    "vite": "^3.0.2"
+    "typescript": "^4.9.5",
+    "vite": "^3.0.2",
+    "vue-eslint-parser": "^9.1.0"
   }
 }
