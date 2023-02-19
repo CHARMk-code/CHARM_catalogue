@@ -2,8 +2,8 @@
   <q-card flat>
     <q-card-section>
       <q-input
-        filled
         v-model="filterStore.filters.query"
+        filled
         clearable
         @update:model-value="search()"
       >
@@ -21,7 +21,7 @@
             class="q-ml-sm"
             label="Search"
             color="primary"
-            noCaps
+            no-caps
             @click="search()"
           ></q-btn>
         </template>
@@ -31,45 +31,45 @@
         <div v-show="expanded">
           <tagSelector
             v-if="isVisible('tag_divisions')"
+            v-model:selectedTags="selectedDivisions"
             :tags="tagsStore.divisions"
-            v-model:selected_tags="selectedDivisions"
             label="Programs"
-            :maxShown="8"
+            :max-shown="8"
           />
           <tagSelector
             v-if="isVisible('tag_business_areas')"
+            v-model:selectedTags="selectedBusiness_areas"
             :tags="tagsStore.business_areas"
-            v-model:selected_tags="selectedBusiness_areas"
             label="Business areas"
-            :maxShown="3"
+            :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('tag_looking_for')"
+            v-model:selectedTags="selectedLooking_for"
             :tags="tagsStore.looking_for"
-            v-model:selected_tags="selectedLooking_for"
             label="Looking for"
-            :maxShown="3"
+            :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('tag_offering')"
+            v-model:selectedTags="selectedOfferings"
             :tags="tagsStore.offering"
-            v-model:selected_tags="selectedOfferings"
             label="Offering"
-            :maxShown="3"
+            :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('language')"
+            v-model:selectedTags="selectedLanguages"
             :tags="tagsStore.languages"
-            v-model:selected_tags="selectedLanguages"
             label="Language"
-            :maxShown="2"
+            :max-shown="2"
           />
           <tagSelector
             v-if="isVisible('fair_area')"
+            v-model:selectedTags="selectedFairAreas"
             :tags="tagsStore.fair_areas"
-            v-model:selected_tags="selectedFairAreas"
             label="Fair Areas"
-            :maxShown="2"
+            :max-shown="2"
           />
           <q-option-group
             v-model="checkboxes"
@@ -84,10 +84,10 @@
           ></q-btn> -->
           <q-btn
             label="Apply filters"
-            noCaps
+            no-caps
             color="primary"
-            @click="search()"
             class="q-mt-sm q-ml-sm"
+            @click="search()"
           >
           </q-btn>
         </div>
@@ -98,21 +98,18 @@
 
 <script lang="ts" setup>
 import tagSelector from "@/components/search/tag_selector.vue";
-import { useCompaniesStore } from "@/stores/modules/companies";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
-import { computed, onBeforeMount, onMounted, ref, watch, type Ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { computed, ref, watch, type Ref } from "vue";
+import { useRouter } from "vue-router";
 
 const filterStore = useFilterStore();
 
-const companiesStore = useCompaniesStore();
 const tagsStore = useTagsStore();
 const site_settingsStore = useSite_settingsStore();
 
 const router = useRouter();
-const route = useRoute();
 
 const checkboxes: Ref<string[]> = ref([]);
 const isVisible = (name: string) => visibleCards.some((c) => c.name === name);
@@ -125,7 +122,7 @@ if (filterStore.filters.charmtalk && isVisible("charmtalk"))
 if (filterStore.filters.sweden && isVisible("sweden")) tmp.push("sweden");
 checkboxes.value = tmp;
 
-let expanded = ref(false);
+const expanded = ref(false);
 watch(checkboxes, async (vs: string[]) => {
   const tmp = {
     ...filterStore.filters,

@@ -4,15 +4,15 @@
       <q-space />
       <div class="full-height col-12 col-md-4">
         <q-card
+          v-if="first_prepage"
           id="prepage-card"
           class="q-mx-auto q-mb-lg"
-          v-if="first_prepage"
         >
           <q-card-section class="col-grow">
             <Image
               fit="scale-down"
               height="100%"
-              :imageName="first_prepage.image"
+              :image-name="first_prepage.image"
             />
           </q-card-section>
           <q-card-actions :align="'center'" class="text-h5 text-center">
@@ -29,7 +29,10 @@
       <q-space />
       <div class="col-12 col-md-4">
         <span class="text-h3 text-center block full-width">Shortcuts</span>
-        <template v-for="shortcut in shortcutsStore.shortcuts">
+        <template
+          v-for="shortcut in shortcutsStore.shortcuts"
+          :key="shortcut.id"
+        >
           <div class="q-pa-sm full-width">
             <Shortcut
               :icon="shortcut.icon"

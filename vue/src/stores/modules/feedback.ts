@@ -3,30 +3,28 @@ import { defineStore } from "pinia";
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export interface Feedback {
-  id?: number,
-  title: string,
-  text: string,
-  meta: string,
-  received: Date
-  important: boolean,
-  archived: boolean
+  id?: number;
+  title: string;
+  text: string;
+  meta: string;
+  received: Date;
+  important: boolean;
+  archived: boolean;
 }
 
 interface State {
-  feedback: Feedback[],
-  load_wait: number,
-
+  feedback: Feedback[];
+  load_wait: number;
 }
 
-
-export const useFeedbackStore = defineStore('feedback', {
+export const useFeedbackStore = defineStore("feedback", {
   state: (): State => ({
     feedback: [],
     load_wait: 0,
   }),
   actions: {
     removeFeedbackById(id: number) {
-      this.feedback.filter(f => f.id !== id)
+      this.feedback.filter((f) => f.id !== id);
     },
     fetchFeedback() {
       return new Promise<void>((resolve, reject) => {
@@ -49,17 +47,17 @@ export const useFeedbackStore = defineStore('feedback', {
     deleteFeedback(feedback: Feedback) {
       return new Promise((resolve, reject) => {
         if (feedback.id == undefined) {
-          reject("No id")
+          reject("No id");
         } else {
           this.axios
             .delete("/feedback/" + feedback.id)
             .then((resp: any) => {
-              this.removeFeedbackById(feedback.id)
+              this.removeFeedbackById(feedback.id);
               resolve(resp);
             })
             .catch((err: any) => {
               reject(err);
-            })
+            });
         }
       });
     },
@@ -74,7 +72,6 @@ export const useFeedbackStore = defineStore('feedback', {
             reject(err);
           });
       });
-
     },
     sendAdminFeedback(feedback) {
       return new Promise((resolve, reject) => {
@@ -89,8 +86,8 @@ export const useFeedbackStore = defineStore('feedback', {
       });
     },
     sendAllFeedback() {
-      const promises = this.feedback.map(f => this.sendAdminFeedback(f))
-      return Promise.all(promises)
-    }
+      const promises = this.feedback.map((f) => this.sendAdminFeedback(f));
+      return Promise.all(promises);
+    },
   },
 });

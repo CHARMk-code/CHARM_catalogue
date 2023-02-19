@@ -3,13 +3,13 @@
     <q-card-section class="text-h5">Tags</q-card-section>
     <q-card-section>
       <Table
-        @saveRow="(t) => tagsStore.updateTag(t)"
-        @deleteRow="(t) => tagsStore.removeTag(t)"
         name="Tags"
-        :tableColumns="headers"
+        :table-columns="headers"
         :rows="Array.from(tagsStore.tags.values())"
-        :colMeta="colMeta"
+        :col-meta="colMeta"
         :editable="true"
+        @save-row="(t) => tagsStore.updateTag(t)"
+        @delete-row="(t) => tagsStore.removeTag(t)"
       >
         <template #body-cell-Icon="props">
           <q-td :props="props">
@@ -28,18 +28,15 @@
 </template>
 
 <script lang="ts" setup>
-import Table, { type TableRow } from "@/components/table.vue";
+import Table from "@/components/table.vue";
 import Tags from "@/components/Tag_group.vue";
-import axios from "@/plugins/axios";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
-import { type Ref, ref, onMounted } from "vue";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const tagsStore = useTagsStore();
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const headers = [
-  { name: "Icon", label: "Icon", field: (row) => row, align: "left" },
+  { name: "Icon", label: "Icon", field: (row: any) => row, align: "left" },
   { name: "Name", label: "Name", field: "name", align: "left", sortable: true },
   {
     name: "Categories",

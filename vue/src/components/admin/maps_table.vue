@@ -3,15 +3,15 @@
     <q-card-section class="text-h5">Maps</q-card-section>
     <q-card-section>
       <Table
-        @saveRow="(m) => mapsStore.updateMap(m)"
-        @deleteRow="(m) => mapsStore.removeMap(m)"
         name="Map"
-        :tableColumns="headers"
+        :table-columns="headers"
         :rows="rows"
-        :metaRows="metaRows"
-        :colMeta="colMeta"
+        :meta-rows="metaRows"
+        :col-meta="colMeta"
         :editable="true"
-        :metaModelCallback="updateMapParent"
+        :meta-model-callback="updateMapParent"
+        @save-row="(m) => mapsStore.updateMap(m)"
+        @delete-row="(m) => mapsStore.removeMap(m)"
       >
         <template #body-cell-Parent="props">
           <q-td :props="props">

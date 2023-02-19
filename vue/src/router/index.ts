@@ -29,7 +29,7 @@ const Map_admin = () => import("@/views/admin/Map.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
-const Feedback_admin = () => import("@/views/admin/Feedback.vue")
+const Feedback_admin = () => import("@/views/admin/Feedback.vue");
 
 const router = createRouter({
   history: createWebHistory(),
@@ -67,21 +67,21 @@ const router = createRouter({
             noAuth: true,
             generated: false,
           },
-          beforeEnter: (to, from) => {
-
-            const filterStore = useFilterStore()
+          beforeEnter: (to) => {
+            const filterStore = useFilterStore();
             if (!to.meta.generated || Object.keys(to.query).length > 0) {
-              filterStore.setFiltersFromRouteQuery(to.query)
-              to.meta.generated = true
-              return
+              filterStore.setFiltersFromRouteQuery(to.query);
+              to.meta.generated = true;
+              return;
             }
-            if (to.meta.generated) { return }
+            if (to.meta.generated) {
+              return;
+            }
 
-            to.query = filterStore.generateSearchRouteQuery()
+            to.query = filterStore.generateSearchRouteQuery();
             to.meta.generated = true;
-            return to
-
-          }
+            return to;
+          },
         },
         {
           path: "/maps/:page",
@@ -99,14 +99,15 @@ const router = createRouter({
             noAuth: true,
             navigation: true,
           },
-        }],
+        },
+      ],
     },
     {
       path: "/Admin",
       name: "Admin",
       component: Admin_view,
       beforeEnter: () => {
-        useFeedbackStore().fetchFeedback()
+        useFeedbackStore().fetchFeedback();
       },
       children: [
         {
@@ -170,7 +171,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (from.name == null) {
     // Arriving from offsite, need to load data
-    useAuthStore().setAuthorizationHeader()
+    useAuthStore().setAuthorizationHeader();
     useFavoritesStore().loadFromStorage();
 
     const mapsStore = useMapsStore();
@@ -185,9 +186,9 @@ router.beforeEach(async (to, from, next) => {
       useSite_settingsStore().getCompanyCards(),
     ])
       .then(() => {
-        useFilterStore().filterCompanies()
+        useFilterStore().filterCompanies();
       })
-      .catch(() => { }); // add some error here in the future?
+      .catch(() => {}); // add some error here in the future?
   }
   if (to.matched.some((record) => !record.meta.noAuth)) {
     const authStore = useAuthStore();

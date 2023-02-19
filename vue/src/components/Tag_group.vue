@@ -2,7 +2,13 @@
   <div class="">
     <template v-for="(tag, index) in props.tags">
       <template v-if="tag.icon && tag.icon.length > 0">
-        <q-avatar size="md" v-bind="props" clickable @click="tagClick(tag)">
+        <q-avatar
+          :key="index"
+          size="md"
+          v-bind="props"
+          clickable
+          @click="tagClick(tag)"
+        >
           <img :src="base_URL + tag.icon" cover />
           <q-tooltip> {{ tag.name }} </q-tooltip>
         </q-avatar>
@@ -10,6 +16,7 @@
 
       <template v-else>
         <q-chip
+          :key="index"
           :icon-right="removeable ? 'mdi-close-circle' : ''"
           size="sm"
           class="ma-1"
@@ -28,7 +35,7 @@ import axios from "@/plugins/axios";
 import type { Tag } from "@/stores/modules/tags";
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 const emit = defineEmits<{
-  (e: "tagClick", tag: Tag): void;
+  (e: "tag-click", tag: Tag): void;
 }>();
 
 const props = withDefaults(
@@ -40,6 +47,6 @@ const props = withDefaults(
 );
 
 function tagClick(tag: Tag) {
-  emit("tagClick", tag);
+  emit("tag-click", tag);
 }
 </script>

@@ -3,18 +3,18 @@ import { defineStore } from "pinia";
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export interface Layout {
-  id: number,
-  image: string,
-  active: boolean,
-  placement: number,
+  id: number;
+  image: string;
+  active: boolean;
+  placement: number;
 }
 
 interface State {
-  layouts: Layout[]
-  load_wait: number,
+  layouts: Layout[];
+  load_wait: number;
 }
 
-export const useLayoutsStore = defineStore('layouts', {
+export const useLayoutsStore = defineStore("layouts", {
   state: (): State => ({
     layouts: [],
     load_wait: 0,
@@ -32,12 +32,11 @@ export const useLayoutsStore = defineStore('layouts', {
     getLayouts() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
-          this.load_wait =
-            Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+          this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
             .get("/layout")
             .then((resp: any) => {
-              this.removeAllLayouts()
+              this.removeAllLayouts();
               const layouts = resp.data;
               if (layouts.length > 0) {
                 this.setAllLayouts(layouts);
@@ -85,8 +84,10 @@ export const useLayoutsStore = defineStore('layouts', {
   },
   getters: {
     getSide: (state) => (side: "left" | "right") => {
-      const side_number = side === "left" ? 1 : 2
-      const layout = state.layouts.filter((t) => t.placement === side_number && t.active);
+      const side_number = side === "left" ? 1 : 2;
+      const layout = state.layouts.filter(
+        (t) => t.placement === side_number && t.active
+      );
       return layout.length === 0 ? undefined : layout[0];
     },
     getCenter: (state) => {
@@ -95,6 +96,6 @@ export const useLayoutsStore = defineStore('layouts', {
         const index = Math.floor(Math.random() * layouts.length);
         return layouts[index];
       }
-    }
+    },
   },
 });

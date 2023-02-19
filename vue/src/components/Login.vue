@@ -3,15 +3,15 @@
     <q-form @submit="onSubmit">
       <q-card-section>
         <div class="text-center text-h5 q-mb-md">Login</div>
-        <q-card color="error" v-if="error" class="mb-6">
+        <q-card v-if="error" color="error" class="mb-6">
           <q-card-section>
             <span class="text-bold">Invalid credentials </span>
             Your credentials are invalid
           </q-card-section>
         </q-card>
         <q-input
-          filled
           v-model="password"
+          filled
           :type="show_pass ? 'text' : 'password'"
           label="Password"
           required
@@ -44,13 +44,10 @@ const authStore = useAuthStore();
 
 const route = useRoute();
 const router = useRouter();
-const test = () => {
-  show_pass.value = !show_pass.value;
-};
-let show_pass = ref(false);
-let btn_loader = ref(false);
-let password = ref("");
-let error = ref(false);
+const show_pass = ref(false);
+const btn_loader = ref(false);
+const password = ref("");
+const error = ref(false);
 
 function onSubmit() {
   btn_loader.value = true;

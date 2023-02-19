@@ -13,29 +13,27 @@ import router from "@/router";
 // import * as components from 'vuetify/components'
 // import * as directives from 'vuetify/directives'
 
-import { Dialog, Quasar } from "quasar"
+import { Dialog, Quasar } from "quasar";
 
 // Import icon libraries
-import '@quasar/extras/material-icons/material-icons.css'
+import "@quasar/extras/material-icons/material-icons.css";
 
 // Import Quasar css
-import 'quasar/src/css/index.sass'
+import "quasar/src/css/index.sass";
 
-const app = createApp(App)
+const app = createApp(App);
 
 app.use(Quasar, {
-    plugins: {
-        Dialog
-    }, // import Quasar plugins and add here
-})
-
-
+  plugins: {
+    Dialog,
+  }, // import Quasar plugins and add here
+});
 
 // Pinia
 const pinia = createPinia();
-app.use(pinia)
+app.use(pinia);
 //injects axios into all pinia stores
-pinia.use(piniaAxiosPlugin)
+pinia.use(piniaAxiosPlugin);
 
 // Vuetify
 // const customLightTheme = {
@@ -58,10 +56,8 @@ pinia.use(piniaAxiosPlugin)
 
 // app.use(vuetify)
 
-
-
 //Router
-app.use(router)
+app.use(router);
 //router.app = app
 
-app.mount('#app')
+app.mount("#app");

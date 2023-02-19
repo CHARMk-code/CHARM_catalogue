@@ -1,27 +1,35 @@
 <template>
-  <q-page padding v-touch-swipe.left.right="handleSwipe">
+  <q-page v-touch-swipe.left.right="handleSwipe" padding>
     <Filter
-      @filterChanged="
+      @filter-changed="
         () => {
           setNextRoute();
           setPrevRoute();
         }
       "
     />
-    <div class="row" v-if="company != undefined && company.active">
+    <div v-if="company != undefined && company.active" class="row">
       <Logo class="col-12 col-md-6" :src="company.logo" />
 
-      <Name class="col-12 col-md-6" :name="company.name" :id="company.id" />
+      <Name :id="company.id" class="col-12 col-md-6" :name="company.name" />
     </div>
     <div
       v-if="company != undefined && company.active"
       class="row q-col-gutter-md"
     >
       <div class="col-12 col-md-6 q-gutter-md">
-        <component :is="comp" v-for="comp in component_layout.left" />
+        <component
+          :is="comp"
+          v-for="(comp, index) in component_layout.left"
+          :key="index"
+        />
       </div>
       <div class="col-12 col-md-6 q-gutter-md">
-        <component :is="comp" v-for="comp in component_layout.right" />
+        <component
+          :is="comp"
+          v-for="(comp, index) in component_layout.right"
+          :key="index"
+        />
       </div>
     </div>
   </q-page>
@@ -40,19 +48,10 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import {
-  computed,
-  h,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  type Component,
-  type Ref,
-} from "vue";
+import { computed, h, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
-import { usePrepagesStore } from "@/stores/modules/prepages";
+import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useTagsStore } from "@/stores/modules/tags";
 import { useMapsStore } from "@/stores/modules/maps";
@@ -144,7 +143,7 @@ function renderCompanyCards() {
     if (isVisible("map")) {
       const vnode = h(Map, {
         map: mapsStore.getMapFromId(company.value.map_image),
-        booth_number: company.value.booth_number,
+        boothNumber: company.value.booth_number,
       });
       addComponent("right", vnode);
     }
@@ -177,14 +176,14 @@ function renderCompanyCards() {
     if (isVisible("contacts")) {
       const vnode = h(Contacts, {
         contacts: company.value.contacts,
-        contact_email: company.value.contact_email,
+        contactEmail: company.value.contact_email,
       });
       addComponent("right", vnode);
     }
     // Trivia
     if (isVisible("trivia")) {
       const vnode = h(Trivia, {
-        talk_to_us_about: company.value.talk_to_us_about,
+        talkToUsAbout: company.value.talk_to_us_about,
         sweden: company.value.employees_sweden,
         world: company.value.employees_world,
       });
@@ -205,8 +204,6 @@ const currentIndex = computed(() => {
     .map((x) => x.id)
     .indexOf(company.value.id);
 });
-
-const maxIndex = filterStore.filteredCompanies.length;
 
 onMounted(() => {
   window.addEventListener("keydown", arrowKeyHandler);
@@ -265,16 +262,16 @@ function setPrevRoute() {
   } else {
     if (Object.values(prepagesStore.pageGroups).length !== 0) {
       const pageGroups = Object.values(prepagesStore.pageGroups);
-      var lastPageGroupIndex = pageGroups.length;
+      let lastPageGroupIndex = pageGroups.length;
 
       if ($q.screen.lt.md) {
-        var mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
-          (p) => p.mobile
+        let mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+          (p: Prepage) => p.mobile
         );
         while (mobilePages.length == 0) {
           lastPageGroupIndex -= 1;
           mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
-            (p) => p.mobile
+            (p: Prepage) => p.mobile
           );
         }
         if (mobilePages.length > 1) {

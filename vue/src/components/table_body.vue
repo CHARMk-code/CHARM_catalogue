@@ -1,7 +1,11 @@
 <template>
   <tbody>
-    <tr v-for="row in rows" @click="$emit('clickRow', row)" @hover="">
-      <template v-for="column in tableColumns">
+    <tr
+      v-for="(row, row_index) in rows"
+      :key="row_index"
+      @click="$emit('click-row', row)"
+    >
+      <template v-for="(column, col_index) in tableColumns" :key="col_index">
         <td>
           <slot
             :name="`col(${column.value})`"
@@ -23,8 +27,8 @@
           >
           </v-btn>
 
-          <v-dialog persistent v-model="show_popup" max-width="500px">
-            <template v-slot:activator="{ props }">
+          <v-dialog v-model="show_popup" persistent max-width="500px">
+            <template #activator="{ props }">
               <v-btn
                 v-bind="props"
                 variant="plain"
@@ -33,15 +37,15 @@
               ></v-btn>
             </template>
             <tablePopup
-              @closePopup="show_popup = false"
+              :name="row.name ? row.name.toString() : props.name"
+              :title="props.name"
+              @close-popup="show_popup = false"
               @delete="
                 () => {
-                  $emit('deleteRow', row);
+                  $emit('delete-row', row);
                   show_popup = false;
                 }
               "
-              :name="row.name ? row.name.toString() : props.name"
-              :title="props.name"
             />
           </v-dialog>
         </template>
@@ -51,12 +55,12 @@
   </tbody>
   <v-dialog v-if="editable" v-model="dialog" max-width="900px">
     <tableEditDialog
-      @closeDialog="closeDialog()"
-      @saveRow="$emit('saveRow', updatedRow)"
       :name="props.name"
       :row="updatedRow"
-      :colMeta="colMeta"
-      :newRow="false"
+      :col-meta="colMeta"
+      :new-row="false"
+      @close-dialog="closeDialog()"
+      @save-row="$emit('save-row', updatedRow)"
     ></tableEditDialog>
   </v-dialog>
 </template>
@@ -64,8 +68,7 @@
 <script lang="ts" setup>
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 import tablePopup from "@/components/admin/table_popup.vue";
-import { useTagsStore } from "@/stores/modules/tags";
-import { computed, ref, useSlots, watch, type Ref } from "vue";
+import { computed, ref, useSlots, type Ref } from "vue";
 import type { TableColMeta } from "./admin/table_edit_dialog.vue";
 import type { TableRow } from "./table.vue";
 
@@ -78,16 +81,16 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: "saveRow", updatedRow: TableRow): void;
-  (e: "deleteRow", row: TableRow): void;
-  (e: "clickRow", row: TableRow): void;
+  (e: "save-row", updatedRow: TableRow): void;
+  (e: "delete-row", row: TableRow): void;
+  (e: "click-row", row: TableRow): void;
 }>();
 
-var dialog: Ref<boolean> = ref(false);
-var show_popup: Ref<boolean> = ref(false);
+const dialog: Ref<boolean> = ref(false);
+const show_popup: Ref<boolean> = ref(false);
 // var search = ""
-var updatedRow: Ref<TableRow> = ref({});
-var hasActions = computed(() => useSlots().actions || props.editable);
+const updatedRow: Ref<TableRow> = ref({});
+const hasActions = computed(() => useSlots().actions || props.editable);
 
 function editRow(row: TableRow) {
   updatedRow.value = row;

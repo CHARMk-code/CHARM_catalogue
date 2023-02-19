@@ -4,9 +4,9 @@
     <q-card-section>
       <Table
         name="Tags"
-        :tableColumns="headers"
+        :table-columns="headers"
         :rows="feedbackStore.feedback"
-        :colMeta="colMeta"
+        :col-meta="colMeta"
         :editable="false"
       >
         <template #top-right>
@@ -34,7 +34,6 @@
 
 <script lang="ts" setup>
 import Table from "@/components/table.vue";
-import axios from "@/plugins/axios";
 import { useFeedbackStore } from "@/stores/modules/feedback";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 

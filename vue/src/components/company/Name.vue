@@ -2,10 +2,10 @@
   <company_card_wrapper name="name" flat>
     <q-card-section style="height: 150px">
       <q-checkbox
+        v-model="favorite"
         class="absolute-right"
         checked-icon="mdi-star"
         unchecked-icon="mdi-star-outline"
-        v-model="favorite"
         :color="favorite ? 'primary' : 'grey'"
         size="xl"
         left-label

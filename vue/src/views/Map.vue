@@ -5,7 +5,7 @@
         v-if="maps.length > 0"
         contain
         justify="center"
-        :imageName="maps[0].image"
+        :image-name="maps[0].image"
       />
     </v-sheet>
   </v-main>

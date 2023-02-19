@@ -22,11 +22,11 @@
         <q-form>
           <q-card-section>
             <q-file
+              v-model="selectedFile"
               filled
               accept="image/*, .xlsx, .zip, .tar.gz"
-              v-model="selectedFile"
             >
-              <template v-slot:prepend>
+              <template #prepend>
                 <q-icon name="attach_file" />
               </template>
             </q-file>
@@ -39,10 +39,10 @@
               Example file
             </q-btn>
             <q-btn
-              @click="onUploadFile"
               variant="flat"
               color="primary"
               :disabled="!selectedFile"
+              @click="onUploadFile"
             >
               Upload file
             </q-btn>
@@ -60,7 +60,7 @@
           restored to the state from when it was downloaded. same state
         </q-card-section>
         <q-card-actions :align="'right'">
-          <q-btn @click="download" variant="flat" color="primary">
+          <q-btn variant="flat" color="primary" @click="download">
             Download snapshot
           </q-btn>
         </q-card-actions>
@@ -73,8 +73,8 @@
 import { ref, type Ref } from "vue";
 import axios from "@/plugins/axios";
 
-let selectedFile: Ref<File | undefined> = ref();
-let feedback = ref("");
+const selectedFile: Ref<File | undefined> = ref();
+const feedback = ref("");
 
 function onUploadFile() {
   // abort if no file is selected
@@ -101,8 +101,8 @@ function download() {
     method: "GET",
     responseType: "blob",
   }).then((response) => {
-    var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-    var fURL = document.createElement("a");
+    const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+    const fURL = document.createElement("a");
 
     fURL.href = fileURL;
     fURL.setAttribute("download", "CHARM_catalogue_datadump.zip");

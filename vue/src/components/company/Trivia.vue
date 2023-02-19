@@ -1,7 +1,7 @@
 <template>
   <company_card_wrapper
-    name="didyouknow"
     v-if="!(talk_to_us_about == '' && sweden == -1 && world == -1)"
+    name="didyouknow"
   >
     <q-card-section v-if="talk_to_us_about != ''">
       <div class="text-h6">Did you know...</div>
@@ -23,8 +23,8 @@
 <script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-const props = defineProps<{
-  talk_to_us_about: string;
+defineProps<{
+  talkToUsAbout: string;
   sweden: number;
   world: number;
 }>();

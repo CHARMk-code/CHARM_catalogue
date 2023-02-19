@@ -1,17 +1,16 @@
-import { defineStore } from "pinia"
+import { defineStore } from "pinia";
 
 interface User {
-  username?: any,
+  username?: any;
 }
-
 
 interface State {
-  status: string,
-  token: string,
-  user: User
+  status: string;
+  token: string;
+  user: User;
 }
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
   state: (): State => ({
     status: "",
     token: localStorage.getItem("token") || "",
@@ -19,22 +18,22 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     setAuthorizationHeader() {
-      if(this.token) {
+      if (this.token) {
         this.axios.defaults.headers.common["Authorization"] =
           "basic " + this.token;
       }
     },
     login(user: any) {
       return new Promise((resolve, reject) => {
-        this.status = "loading"
+        this.status = "loading";
         this.axios
           .post("auth", user)
           .then((resp: any) => {
-            this.token = resp.data
-            this.status = "success"
+            this.token = resp.data;
+            this.status = "success";
 
             localStorage.setItem("token", this.token);
-            this.setAuthorizationHeader()
+            this.setAuthorizationHeader();
             resolve(resp);
           })
           .catch((err: any) => {
@@ -52,9 +51,9 @@ export const useAuthStore = defineStore('auth', {
             resolve();
           })
           .catch((err: any) => {
-            reject(err)
+            reject(err);
           });
-      })
+      });
     },
     logout() {
       return new Promise<void>((resolve) => {
@@ -76,6 +75,6 @@ export const useAuthStore = defineStore('auth', {
       } catch (e) {
         return false;
       }
-    }
+    },
   },
 });
