@@ -10,6 +10,7 @@ from ...helper_functions import *
 import shutil
 import openpyxl
 import urllib.parse
+import re
 
 
 ACCEPT_IMAGE_EXTENDS = ["jpg","png","svg"]
@@ -138,6 +139,17 @@ def parseXlsx():
             if metadata[0] == "":
                 continue
 
+            SUMMER_JOB_LINK_POS = 6
+            if (metadata[SUMMER_JOB_LINK_POS]) != None:
+                if (not validateLink(metadata[SUMMER_JOB_LINK_POS])):
+                        raise Exception("Website link must start with http or https")
+
+
+            LINK_POS = 12
+            if (metadata[LINK_POS] != None):
+                if (not validateLink(metadata[LINK_POS])):
+                        raise Exception(f"Website link must start with http or https. {metadata[LINK_POS]} does not do this.")
+
             company = Company.query.filter_by(name = metadata[0]).first()
             if  company == None:
                 if (Company.create(
@@ -160,6 +172,10 @@ def mapLookUpIdOrNull(name):
         return map_obj.id
     else:
         return None
+
+def validateLink(url: str) -> bool:
+    url_regex = re.compile('https?:\/\/.*')
+    return url_regex.match(url)
 
 
 def unpackAndParse(request):
