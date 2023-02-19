@@ -21,7 +21,7 @@
             <q-td :props="props" auto-width>
               <Image
                 :ratio="4 / 3"
-                :imageName="props.value"
+                :image-name="props.value"
                 fit="contain"
                 :height="$q.screen.lt.md ? '80px' : '60px'"
                 :width="$q.screen.lt.md ? '120px' : '80px'"
@@ -79,10 +79,8 @@
 
 <script lang="ts" setup>
 import searchCard from "@/components/search/search_card.vue";
-import axios from "@/plugins/axios";
-import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
-import { onBeforeRouteUpdate, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { useFavoritesStore } from "@/stores/modules/favorites";
 import type { Company } from "@/stores/modules/companies";
 import { computed } from "vue";
@@ -91,20 +89,9 @@ import TagGroup from "@/components/Tag_group.vue";
 import Image from "@/components/utils/Image.vue";
 import { useQuasar } from "quasar";
 
-const site_settingsStore = useSite_settingsStore();
 const filterStore = useFilterStore();
 const favoritesStore = useFavoritesStore();
 const tagsStore = useTagsStore();
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
-
-const visibleCards = site_settingsStore.settings.company_view.cards.filter(
-  (card) => card.active
-);
-
-function isVisible(name: string): boolean {
-  return visibleCards.some((c) => c.name === name);
-}
 
 const initialPagination = {
   sortBy: "desc",

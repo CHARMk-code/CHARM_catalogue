@@ -11,21 +11,21 @@
       <q-form @submit="sendFeedback()">
         <q-card-section class="q-gutter-md">
           <q-input
+            v-model="feedback.title"
             autofocus
             filled
             label="Title..."
             maxlength="50"
             counter
-            v-model="feedback.title"
             required
           />
           <q-input
+            v-model="feedback.text"
             autofocus
             filled
             label="Your feedback here..."
             type="textarea"
             maxlength="1000"
-            v-model="feedback.text"
             counter
             required
           />

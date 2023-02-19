@@ -30,7 +30,7 @@ const props = defineProps<{
   desc: string | undefined;
 }>();
 
-function gotoExternal(link) {
+function gotoExternal(link: any) {
   window.location.href = link;
 }
 

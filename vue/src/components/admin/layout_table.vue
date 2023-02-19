@@ -5,13 +5,13 @@
     </q-card-section>
     <q-card-section>
       <Table
-        @saveRow="(l: Layout) => layoutsStore.modifyLayout(l)"
-        @deleteRow="(l: Layout) => layoutsStore.deleteLayout(l)"
         name="Layout"
-        :tableColumns="headers"
-        :colMeta="colMeta"
+        :table-columns="headers"
+        :col-meta="colMeta"
         :rows="layoutsStore.layouts"
         :editable="true"
+        @save-row="(l: Layout) => layoutsStore.modifyLayout(l)"
+        @delete-row="(l: Layout) => layoutsStore.deleteLayout(l)"
       >
         <template #body-cell-Placement="props">
           <q-td :props="props">

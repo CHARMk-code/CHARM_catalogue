@@ -16,16 +16,17 @@
       side="left"
       class="column"
       bordered
-      :modelValue="true"
+      :model-value="true"
       :width="200"
     >
       <q-list>
         <q-separator></q-separator>
         <q-item
           v-for="link in links"
+          :key="link.name"
+          v-ripple
           clickable
           :active="route.name === link.name"
-          v-ripple
           :to="link.route"
         >
           <q-item-section avatar>
@@ -69,17 +70,14 @@
 </template>
 
 <script lang="ts" setup>
-import axios from "@/plugins/axios";
 import { useAuthStore } from "@/stores/modules/auth";
-import { useLayoutsStore } from "@/stores/modules/layouts";
-import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import feedback from "@/components/feedback.vue";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "next"): void;
   (e: "prev"): void;
 }>();
@@ -87,11 +85,6 @@ const emit = defineEmits<{
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const layoutsStore = useLayoutsStore();
-
-const leftDrawerOpen = ref(false);
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const links: { name: string; route: string; icon: string }[] = [
   {
@@ -108,9 +101,6 @@ const links: { name: string; route: string; icon: string }[] = [
   { name: "batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
   { name: "account", route: "/admin/account", icon: "mdi-account" },
 ];
-
-const leftLayout = computed(() => layoutsStore.getSide("left"));
-const rightLayout = computed(() => layoutsStore.getSide("right"));
 
 function logout() {
   useAuthStore().logout();

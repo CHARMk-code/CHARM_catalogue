@@ -8,8 +8,8 @@
           <q-space />
           <q-btn
             color="primary"
-            @click="saveOrder()"
             label="Save Prepage Order"
+            @click="saveOrder()"
           ></q-btn>
           <q-space />
         </q-card-actions>
@@ -26,8 +26,8 @@
             <div class="row q-pa-md">
               <q-space />
               <q-btn
-                @click="addPageGroup()"
                 label="Add empty page group"
+                @click="addPageGroup()"
               ></q-btn>
               <q-space />
             </div>
@@ -37,8 +37,8 @@
           <q-space />
           <q-btn
             color="primary"
-            @click="saveOrder()"
             label="Save Prepage Order"
+            @click="saveOrder()"
           ></q-btn>
           <q-space />
         </q-card-actions>
@@ -56,9 +56,9 @@
           Drop active pages here to inactivate them
         </div>
         <draggable
+          id="inactivePages"
           style="min-height: 200px"
           class="row q-col-gutter-sm q-pr-sm q-pb-sm dragArea rounded-borders"
-          id="inactivePages"
           :move="onMoveCallbackInactivePrepages"
           :list="inactivePages"
           item-key="id"
@@ -67,27 +67,27 @@
           <template #item="{ element }">
             <div class="col-6">
               <q-card>
-                <Image :imageName="element.image" />
+                <Image :image-name="element.image" />
               </q-card>
             </div>
           </template>
         </draggable>
         <div class="row q-mt-md">
           <q-space />
-          <q-btn @click="editDialog = true" label="Create new Prepage"></q-btn>
+          <q-btn label="Create new Prepage" @click="editDialog = true"></q-btn>
           <q-space />
         </div>
       </q-card-section>
     </q-card>
     <q-space />
   </div>
-  <q-dialog full-width full-height v-model="editDialog">
+  <q-dialog v-model="editDialog" full-width full-height>
     <tableEditDialog
-      name="Prepage"
       v-model:row="newPrepage"
-      :colMeta="colMeta"
-      :newRow="true"
-      @saveRow="
+      name="Prepage"
+      :col-meta="colMeta"
+      :new-row="true"
+      @save-row="
         (rawRow) => {
           editDialog = false;
           createPrepage(rawRow);
@@ -104,16 +104,15 @@ import {
   type Prepage,
   type PrepageGroup,
 } from "@/stores/modules/prepages";
-import { computed, reactive, readonly, ref, type Ref } from "vue";
+import { ref, type Ref } from "vue";
 import draggable from "vuedraggable";
 import pageGroupDraggable from "./pageGroup.vue";
-import axios from "@/plugins/axios";
-import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
+import tableEditDialog, { type TableColMeta } from "@/components/admin/table_edit_dialog.vue";
 import Image from "@/components/utils/Image.vue";
 
 const prepagesStore = usePrepagesStore();
 
-function onMoveCallbackInactivePrepages(evt) {
+function onMoveCallbackInactivePrepages(evt: any) {
   if (evt.to.id === "inactivePages") return true;
   if (evt.from !== evt.to && evt.to.childElementCount >= 2) {
     return false;

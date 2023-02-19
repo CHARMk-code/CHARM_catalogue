@@ -7,9 +7,9 @@
       <q-form @submit.prevent="update">
         <q-card-section>
           <q-input
+            v-model="password1"
             class="q-pa-md"
             filled
-            v-model="password1"
             :type="show_pass1 ? 'text' : 'password'"
             label="Enter new password"
             :error="password1.length < 1"
@@ -26,15 +26,15 @@
             </template>
           </q-input>
           <q-input
+            v-model="password2"
             class="q-pa-md"
             filled
-            v-model="password2"
             :error="password1 != password2"
             error-message="Passwords doesn't match"
             :type="show_pass2 ? 'text' : 'password'"
-            @click:append="show_pass2 = !show_pass2"
             label="Enter new password again"
             required
+            @click:append="show_pass2 = !show_pass2"
           >
             <template #append>
               <q-checkbox
@@ -69,16 +69,11 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { ref } from "vue";
 
 let btn_loader = false;
-let valid = ref(true);
-let show_pass1 = ref(false);
-let show_pass2 = ref(false);
-let password1 = ref("");
-let password2 = ref("");
-let error = false;
-
-const rules = {
-  required: (value: any) => !!value || "Required",
-};
+const valid = ref(true);
+const show_pass1 = ref(false);
+const show_pass2 = ref(false);
+const password1 = ref("");
+const password2 = ref("");
 
 function update() {
   if (password1.value == password2.value) {
@@ -91,7 +86,6 @@ function update() {
       })
       .catch(() => {
         btn_loader = false;
-        error = true; // "Invalid sign in credentials!";
       });
   }
 }

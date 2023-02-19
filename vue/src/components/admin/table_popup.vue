@@ -16,4 +16,9 @@ const props = defineProps<{
   name: string;
   title: string;
 }>();
+
+defineEmits<{
+  (e: "delete"): void;
+  (e: "close-popup"): void;
+}>();
 </script>

@@ -3,13 +3,13 @@
     <q-card-section class="text-h5">Shortcuts</q-card-section>
     <q-card-section>
       <Table
-        @saveRow="(s) => shortcutsStore.modifyShortcut(s)"
-        @deleteRow="(s) => shortcutsStore.deleteShortcut(s)"
         name="Shortcut"
-        :tableColumns="columns"
-        :colMeta="colMeta"
+        :table-columns="columns"
+        :col-meta="colMeta"
         :rows="shortcutsStore.shortcuts"
         :editable="true"
+        @save-row="(s) => shortcutsStore.modifyShortcut(s)"
+        @delete-row="(s) => shortcutsStore.deleteShortcut(s)"
       >
         <template #body-cell-Icon="props">
           <q-td :props="props">
@@ -22,9 +22,8 @@
 </template>
 
 <script lang="ts" setup>
-import Table, { type TableRow } from "@/components/table.vue";
-import type { Layout } from "@/stores/modules/layouts";
-import { useShortcutsStore, type Shortcut } from "@/stores/modules/shortcuts";
+import Table from "@/components/table.vue";
+import { useShortcutsStore } from "@/stores/modules/shortcuts";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const shortcutsStore = useShortcutsStore();

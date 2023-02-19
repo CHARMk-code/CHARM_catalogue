@@ -38,9 +38,10 @@
         <q-separator></q-separator>
         <q-item
           v-for="link in links"
+          :key="link.name"
+          v-ripple
           clickable
           :active="route.name === link.name"
-          v-ripple
           :to="link.route"
         >
           <q-item-section avatar>
@@ -51,7 +52,7 @@
           </q-item-section>
         </q-item>
         <q-separator v-if="authStore.isLoggedIn"></q-separator>
-        <q-item v-if="authStore.isLoggedIn" clickable v-ripple to="/admin">
+        <q-item v-if="authStore.isLoggedIn" v-ripple clickable to="/admin">
           <q-item-section avatar>
             <q-icon name="mdi-cog"></q-icon>
           </q-item-section>
@@ -84,52 +85,52 @@
     </q-drawer>
 
     <q-drawer
+      v-if="$q.screen.gt.sm"
       :width="200"
       side="left"
       persistent
       show-if-above
-      v-if="$q.screen.gt.sm"
     >
       <div class="navigation">
         <q-btn
           v-if="hasPrev && $route.meta.navigation"
           elevation="4"
-          v-on:click="prev()"
           icon="mdi-arrow-left"
           size="lg"
           round
+          @click="prev()"
         ></q-btn>
       </div>
       <Image
+        v-if="leftLayout"
         class="ma-0 pa-0"
         height="100%"
-        v-if="leftLayout"
-        :imageName="leftLayout.image"
+        :image-name="leftLayout.image"
       />
     </q-drawer>
 
     <q-drawer
+      v-if="$q.screen.gt.sm"
       :width="200"
       side="right"
       persistent
       show-if-above
-      v-if="$q.screen.gt.sm"
     >
       <div class="navigation">
         <q-btn
           v-if="hasNext && $route.meta.navigation"
           elevation="4"
-          v-on:click="next()"
           icon="mdi-arrow-right"
           size="lg"
           round
+          @click="next()"
         ></q-btn>
       </div>
       <Image
+        v-if="rightLayout"
         class="ma-0 pa-0"
         height="100%"
-        v-if="rightLayout"
-        :imageName="rightLayout.image"
+        :image-name="rightLayout.image"
       />
     </q-drawer>
 
@@ -141,7 +142,6 @@
 
 <script lang="ts" setup>
 import Image from "@/components/utils/Image.vue";
-import axios from "@/plugins/axios";
 import { useAuthStore } from "@/stores/modules/auth";
 import { useLayoutsStore } from "@/stores/modules/layouts";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";

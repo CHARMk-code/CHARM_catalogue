@@ -74,7 +74,7 @@ export const useFilterStore = defineStore('filter', {
     filterCompanies() {
       return new Promise<void>((resolve) => {
         const companiesStore = useCompaniesStore();
-        var filteredCompanies = Array.from(companiesStore.companies.values());
+        let filteredCompanies = Array.from(companiesStore.companies.values());
 
         // Filter all non active companies
         filteredCompanies = filteredCompanies.filter((t) => t.active);
@@ -87,8 +87,8 @@ export const useFilterStore = defineStore('filter', {
         }
 
         // Filter on tags
-        var filterTags: number[] = []
-        for (var key in this.filters.tags) filterTags = filterTags.concat(this.filters.tags[key]);
+        let filterTags: number[] = []
+        for (const key in this.filters.tags) filterTags = filterTags.concat(this.filters.tags[key]);
 
         if (filterTags.length > 0) {
           filteredCompanies = filteredCompanies.filter((c) => {
@@ -121,7 +121,7 @@ export const useFilterStore = defineStore('filter', {
       });
     },
     sortCompanies() {
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<void>((resolve) => {
         const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
         this.filteredCompanies.sort(strategy);
         resolve()
@@ -179,7 +179,7 @@ export const useFilterStore = defineStore('filter', {
     },
     generateSearchRouteQuery() {
       const filter = this.filters
-      let rQuery: LocationQuery = {};
+      const rQuery: LocationQuery = {};
 
       if (filter.query.length > 0) rQuery.q = filter.query;
 

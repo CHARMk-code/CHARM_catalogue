@@ -6,7 +6,7 @@
 import axios from "@/plugins/axios";
 const base_URL = axios.defaults.baseURL + "/manage/image/";
 
-const props = defineProps<{
+defineProps<{
   imageName: string;
   position?: string;
   ratio?: string | number;

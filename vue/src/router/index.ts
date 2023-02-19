@@ -67,7 +67,7 @@ const router = createRouter({
             noAuth: true,
             generated: false,
           },
-          beforeEnter: (to, from) => {
+          beforeEnter: (to) => {
 
             const filterStore = useFilterStore()
             if (!to.meta.generated || Object.keys(to.query).length > 0) {

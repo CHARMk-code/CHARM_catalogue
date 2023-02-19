@@ -1,6 +1,6 @@
 <template>
   <div v-if="layout != undefined">
-    <Image :imageName="layout.image" fit="contain" />
+    <Image :image-name="layout.image" fit="contain" />
   </div>
 </template>
 

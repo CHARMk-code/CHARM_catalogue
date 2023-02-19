@@ -8,21 +8,21 @@
   >
     <template #top-left>
       <q-input
+        v-model="rowFilter"
         filled
         dense
         debounce="300"
-        v-model="rowFilter"
         placeholder="Search"
       >
-        <template v-slot:append>
+        <template #append>
           <q-icon name="search" />
         </template>
       </q-input>
     </template>
     <template #top-right>
       <q-btn
-        class="q-ml-md"
         v-if="editable"
+        class="q-ml-md"
         color="primary"
         @click="createRow()"
       >
@@ -53,26 +53,26 @@
       </q-td>
     </template>
 
-    <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
+    <template v-for="(_, name) in $slots" #[name]="slotData">
       <slot v-if="!name.startsWith('edit-')" :name="name" v-bind="slotData" />
     </template>
   </q-table>
-  <q-dialog full-width full-height v-model="editDialog">
+  <q-dialog v-model="editDialog" full-width full-height>
     <tableEditDialog
-      :name="name"
       v-model:row="clickedRow.row"
-      :colMeta="colMeta"
-      :newRow="newRow"
-      :metaRow="clickedRow.meta"
-      @saveRow="
+      :name="name"
+      :col-meta="colMeta"
+      :new-row="newRow"
+      :meta-row="clickedRow.meta"
+      :meta-model-callback="metaModelCallback"
+      @save-row="
         () => {
           editDialog = false;
           $emit('saveRow', clickedRow.row);
         }
       "
-      :metaModelCallback="metaModelCallback"
     >
-      <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
+      <template v-for="(_, name) in $slots" #[name]="slotData">
         <slot v-if="name.startsWith('edit-')" :name="name" v-bind="slotData" />
       </template>
     </tableEditDialog>
@@ -84,13 +84,13 @@
       </q-card-section>
 
       <q-card-actions :align="'right'">
-        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn v-close-popup flat label="Cancel" />
         <q-btn
+          v-close-popup
           flat
           label="Delete"
           color="primary"
           @click="$emit('deleteRow', clickedRow.row)"
-          v-close-popup
         />
       </q-card-actions>
     </q-card>
@@ -99,16 +99,16 @@
 
 <script lang="ts" setup>
 import { ref, type Ref } from "vue";
-import { computed, useSlots } from "vue";
+import { computed } from "vue";
 import type { TableColMeta } from "@/components/admin/table_edit_dialog.vue";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
 
 export type TableRow = any;
 
 defineEmits<{
-  (e: "saveRow", updatedRow: TableRow): void;
-  (e: "deleteRow", row: TableRow): void;
-  (e: "clickRow", row: TableRow): void;
+  (e: "save-row", updatedRow: TableRow): void;
+  (e: "delete-row", row: TableRow): void;
+  (e: "click-row", row: TableRow): void;
 }>();
 
 const props = defineProps<{
@@ -159,5 +159,4 @@ function createRow() {
   editDialog.value = true;
 }
 
-var hasActions = computed(() => useSlots().actions || props.editable);
 </script>

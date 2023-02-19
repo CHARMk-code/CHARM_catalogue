@@ -8,9 +8,10 @@
         <template v-for="col in colMeta">
           <template v-if="col.type == 'checkbox'">
             <q-checkbox
+              :key="col.model"
+              v-model="rawRow[col.model]"
               filled
               large
-              v-model="rawRow[col.model]"
               :checked-icon="col.onIcon"
               :unchecked-icon="col.offIcon"
               :label="col.label"
@@ -18,15 +19,30 @@
           </template>
 
           <template v-if="col.type == 'text'">
-            <q-input filled v-model="rawRow[col.model]" :label="col.label" />
+            <q-input
+              :key="col.model"
+              v-model="rawRow[col.model]"
+              filled
+              :label="col.label"
+            />
           </template>
 
           <template v-if="col.type == 'number'">
-            <q-input filled v-model="rawRow[col.model]" :label="col.label" />
+            <q-input
+              :key="col.model"
+              v-model="rawRow[col.model]"
+              filled
+              :label="col.label"
+            />
           </template>
 
           <template v-if="col.type == 'icon'">
-            <q-input filled v-model="rawRow[col.model]" :label="col.label">
+            <q-input
+              :key="col.model"
+              v-model="rawRow[col.model]"
+              filled
+              :label="col.label"
+            >
               <template #before>
                 <q-icon size="lg" :name="rawRow[col.model]" />
               </template>
@@ -35,17 +51,19 @@
 
           <template v-if="col.type == 'textarea'">
             <q-input
+              :key="col.model"
+              v-model="rawRow[col.model]"
               filled
               type="textarea"
-              v-model="rawRow[col.model]"
               :label="col.label"
             />
           </template>
 
           <template v-if="col.type == 'single-select'">
             <q-select
-              filled
+              :key="col.model"
               v-model="rawRow[col.model]"
+              filled
               :options="col.items"
               :label="col.label"
               :hint="col.hint"
@@ -53,8 +71,8 @@
               <template #option="{ opt, itemProps }">
                 <q-item v-bind="itemProps">
                   <q-item-section
-                    avatar
                     v-if="opt.label.icon && opt.label.icon.length > 0"
+                    avatar
                   >
                     <Tag_group :tags="[opt.label]"></Tag_group>
                   </q-item-section>
@@ -62,24 +80,18 @@
                 </q-item>
               </template>
 
-              <template #selected-item="{ index, opt }">
+              <template #selected-item="{ opt }">
                 <Tag_group :tags="[opt.label]"></Tag_group>
               </template>
             </q-select>
           </template>
 
           <template v-if="col.type == 'multiple-select'">
-            <slot
-              v-if="col.slot"
-              :name="'edit-' + col.model"
-              :row="rawRow"
-              :colMeta="col"
-            />
             <q-select
-              v-else
+              :key="col.model"
+              v-model="rawRow[col.model]"
               filled
               multiple
-              v-model="rawRow[col.model]"
               :options="col.items"
               :label="col.label"
               :hint="col.hint"
@@ -87,8 +99,8 @@
               <template #option="{ opt, itemProps }">
                 <q-item v-bind="itemProps">
                   <q-item-section
-                    avatar
                     v-if="opt.label.icon && opt.label.icon.length > 0"
+                    avatar
                   >
                     <Tag_group :tags="[opt.label]"></Tag_group>
                   </q-item-section>
@@ -96,28 +108,29 @@
                 </q-item>
               </template>
 
-              <template #selected-item="{ index, opt }">
+              <template #selected-item="{ opt }">
                 <Tag_group :tags="[opt.label]"></Tag_group>
               </template>
             </q-select>
           </template>
 
-          <template class="col-12" v-if="col.type == 'radio'">
+          <template v-if="col.type == 'radio'">
             <q-option-group
+              :key="col.model"
+              v-model="rawRow[col.model]"
               filled
               type="radio"
-              v-model="rawRow[col.model]"
               :options="col.items"
             ></q-option-group>
           </template>
 
           <template v-if="col.type == 'image'">
-            <div class="row q-col-gutter-md">
+            <div :key="col.model" class="row q-col-gutter-md">
               <div class="col-6">
                 <Image
-                  class="q-mx-md"
                   v-if="rawRow[col.model] != undefined"
-                  :imageName="rawRow[col.model]"
+                  class="q-mx-md"
+                  :image-name="rawRow[col.model]"
                   height="300px"
                   fit="contain"
                 >
@@ -143,7 +156,7 @@
                     clearable
                     :label="col.label"
                   >
-                    <template v-slot:prepend>
+                    <template #prepend>
                       <q-icon name="attach_file" />
                     </template>
                   </q-file>
@@ -166,8 +179,7 @@
 import type { TableRow } from "@/components/table.vue";
 import Tag_group from "@/components/Tag_group.vue";
 import axios from "@/plugins/axios";
-import { colors } from "quasar";
-import { reactive, ref, unref, type Ref } from "vue";
+import { reactive, ref, type Ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 import Image from "../utils/Image.vue";
 
@@ -203,7 +215,7 @@ const props = defineProps<{
 const rawRow = reactive({ ...deepUnref(props.row), ...props.metaRow });
 
 const emit = defineEmits<{
-  (e: "saveRow", rawRow: any): void;
+  (e: "save-row", rawRow: any): void;
 }>();
 
 const files: Ref<{ [key: string]: File }> = ref({});

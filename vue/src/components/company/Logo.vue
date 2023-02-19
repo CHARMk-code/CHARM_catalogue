@@ -3,7 +3,7 @@
     <q-card-section>
       <Image
         v-if="src != ''"
-        :imageName="src"
+        :image-name="src"
         height="150px"
         fit="contain"
         :position="$q.screen.lt.md ? '50% 50%' : 'left 50%'"
@@ -16,7 +16,7 @@
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 import Image from "../utils/Image.vue";
 
-const props = defineProps<{
+defineProps<{
   src: string;
 }>();
 </script>

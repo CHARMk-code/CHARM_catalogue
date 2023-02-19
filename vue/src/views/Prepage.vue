@@ -1,28 +1,30 @@
 <template>
   <q-page class="row">
-    <template
-      v-if="$q.screen.gt.sm"
-      v-for="(prepage, index) in prepagesStore.pageGroups[$route.params.page]
-        .pages"
-    >
-      <Image
-        :class="{ prepage: true, 'col-6': pagesToShow === 2 }"
-        fit="contain"
-        :position="prepagePositioning(pagesToShow, index)"
-        :draggable="false"
-        :imageName="prepage.image"
-        v-touch-swipe="handleSwipe"
-      />
+    <template v-if="$q.screen.gt.sm">
+      <template
+        v-for="(prepage, index) in prepagesStore.pageGroups[$route.params.page]
+          .pages"
+        :key="index"
+      >
+        <Image
+          v-touch-swipe="handleSwipe"
+          :class="{ prepage: true, 'col-6': pagesToShow === 2 }"
+          fit="contain"
+          :position="prepagePositioning(pagesToShow, index)"
+          :draggable="false"
+          :image-name="prepage.image"
+        />
+      </template>
     </template>
     <template v-if="$q.screen.lt.md && mobilePrepage">
       <Image
         v-if="mobilePrepage.mobile"
+        v-touch-swipe="handleSwipe"
         class="prepage"
         fit="contain"
         position="center top"
         :draggable="false"
-        :imageName="mobilePrepage.image"
-        v-touch-swipe="handleSwipe"
+        :image-name="mobilePrepage.image"
       />
     </template>
   </q-page>
@@ -30,8 +32,6 @@
 
 <script lang="ts" setup>
 import Image from "@/components/utils/Image.vue";
-import axios from "@/plugins/axios";
-import { useCompaniesStore } from "@/stores/modules/companies";
 import { useFilterStore } from "@/stores/modules/filter";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
@@ -42,12 +42,10 @@ import {
   computed,
   onBeforeMount,
   watch,
-  watchEffect,
-  ref,
+type Ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-const companiesStore = useCompaniesStore();
 const filtersStore = useFilterStore();
 const prepagesStore = usePrepagesStore();
 const router = useRouter();
@@ -129,16 +127,16 @@ const page = computed(() => {
 const settingsStore = useSite_settingsStore();
 const $q = useQuasar();
 function setNextRoute() {
-  var nextPage, nextP;
+  let nextPage, nextP;
   if ($q.screen.lt.md) {
     //if mobile
-    var p = 0;
+    let p = 0;
     if (route.query.p) {
       p = parseInt(route.query.p);
     }
 
     const pageGroupPages = prepagesStore.pageGroups[route.params.page].pages;
-    const mobilePages = pageGroupPages.filter((p) => p.mobile);
+    const mobilePages = pageGroupPages.filter((p: Prepage) => p.mobile);
 
     if (mobilePages.length - 1 > p) {
       nextPage = page.value;
@@ -167,11 +165,11 @@ function setNextRoute() {
   }
 }
 function setPrevRoute() {
-  var prevPage, prevP;
+  let prevPage, prevP;
   if (page.value <= 1) return;
   if ($q.screen.lt.md) {
     //if mobile
-    var p = 0;
+    let p = 0;
     if (route.query.p) {
       p = parseInt(route.query.p);
     }

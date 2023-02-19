@@ -9,8 +9,8 @@
     </q-card-section>
     <q-card-section>
       <q-select
-        filled
         v-model="selected"
+        filled
         :options="company_cards"
         option-label="name"
         option-value="id"
@@ -30,20 +30,20 @@
               This will reset which company cards are shown to user to the
               default settings. Are you sure?
 
-              <div color="error" v-if="error.length > 0">
+              <div v-if="error.length > 0" color="error">
                 <div class="text-bold">Error: while resetting</div>
                 {{ error }}
               </div>
             </q-card-section>
 
             <q-card-actions :align="'right'">
-              <q-btn flat label="Cancel" v-close-popup />
+              <q-btn v-close-popup flat label="Cancel" />
               <q-btn
                 flat
                 label="Reset"
                 color="primary"
-                @click="reset()"
                 :loading="resetting"
+                @click="reset()"
               />
             </q-card-actions>
           </q-card>
@@ -61,12 +61,11 @@ import {
 } from "@/stores/modules/site_settings";
 import { computed, ref } from "vue";
 
-let reset_popup = ref(false);
-let search = "";
-let resetting = ref(false);
+const reset_popup = ref(false);
+const resetting = ref(false);
 let error = "";
 
-let site_settingsStore = useSite_settingsStore();
+const site_settingsStore = useSite_settingsStore();
 
 const company_cards = site_settingsStore.settings.company_view.cards;
 
@@ -75,19 +74,6 @@ const selected = computed<Card[]>({
   get: () => company_cards.filter((c) => c.active),
   set: (active_cards) => site_settingsStore.setCompanyCards(active_cards),
 });
-
-const filter = (item, queryText, itemText) => {
-  if (item.header) return false;
-
-  const hasValue = (val: string) => (val != null ? val : "");
-
-  const text = hasValue(itemText);
-  const query = hasValue(queryText);
-
-  return (
-    text.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1
-  );
-};
 
 const save = () => {
   useSite_settingsStore().saveCompanyCards();

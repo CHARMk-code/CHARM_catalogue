@@ -17,7 +17,7 @@
 <script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
 
-const props = defineProps<{
+defineProps<{
   desc: string;
   link: string;
   deadline: string;

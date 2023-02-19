@@ -1,38 +1,37 @@
-
 <template>
       <div v-if="showFilter" class="full-width">
         <span class="text-bold"> Current Filter: </span>
-          <q-chip icon-right="mdi-close-circle" size="sm" class="ma-1" v-if=showQuery clickable @click=clearQuery()>
+          <q-chip v-if=showQuery icon-right="mdi-close-circle" size="sm" class="ma-1" clickable @click=clearQuery()>
             {{filterStore.filters.query}}
           </q-chip>
-          <q-chip icon-right="mdi-close-circle" size="sm" class="ma-1" v-if=filterStore.filters.favorites clickable @click=clearFavorite()>
+          <q-chip v-if=filterStore.filters.favorites icon-right="mdi-close-circle" size="sm" class="ma-1" clickable @click=clearFavorite()>
             Favorites
           </q-chip>
-          <q-chip icon-right="mdi-close-circle" size="sm" class="ma-1" v-if=filterStore.filters.sweden  clickable @click=clearSweden()>
+          <q-chip v-if=filterStore.filters.sweden icon-right="mdi-close-circle" size="sm" class="ma-1"  clickable @click=clearSweden()>
             In Sweden
           </q-chip>
-          <q-chip icon-right="mdi-close-circle" size="sm" class="ma-1" v-if=filterStore.filters.charmtalk  clickable @click=clearCharmtalk()>
+          <q-chip v-if=filterStore.filters.charmtalk icon-right="mdi-close-circle" size="sm" class="ma-1"  clickable @click=clearCharmtalk()>
             CHARMtalk
           </q-chip>
-          <TagGroup :tags="tags" :removeable="true" @tagClick="removeTag"></TagGroup>
+          <TagGroup :tags="tags" :removeable="true" @tag-click="removeTag"></TagGroup>
       </div>
 </template>
 
 <script lang="ts" setup>
 import type { Tag } from "@/stores/modules/tags";
 import { useFilterStore } from "@/stores/modules/filter";
-import { ref, computed } from "vue";
+import { ref, computed, type Ref } from "vue";
 import { useTagsStore } from "@/stores/modules/tags";
 import TagGroup from "../Tag_group.vue";
 const filterStore = useFilterStore();
 
 const emit = defineEmits<{
-    (e: "filterChanged"): void;
+    (e: "filter-changed"): void;
 }>()
 
 const tagsStore = useTagsStore();
 const grouped_tags = filterStore.filters.tags;
-const tags:[Tag] = ref(
+const tags: Ref<Tag[]> = ref(
   tagsStore.getTagsFromIds([grouped_tags.business_areas,
   grouped_tags.divisions,
   grouped_tags.fair_areas,
@@ -55,32 +54,32 @@ function removeTag(tag: Tag) {
   filterStore.filters.tags.languages = pre_tags.languages.filter((t) => t != tag.id);
   filterStore.filters.tags.looking_for = pre_tags.looking_for.filter((t) => t != tag.id);
   filterStore.filterCompanies();
-  emit("filterChanged")
+  emit("filter-changed")
 
 }
 
 function clearQuery() {
   filterStore.filters.query = "";
   filterStore.filterCompanies();
-  emit("filterChanged")
+  emit("filter-changed")
 }
 
 function clearFavorite() {
   filterStore.filters.favorites = false;
   filterStore.filterCompanies();
-  emit("filterChanged")
+  emit("filter-changed")
 }
 
 function clearSweden() {
     filterStore.filters.sweden = false;
     filterStore.filterCompanies();
-    emit("filterChanged")
+    emit("filter-changed")
 }
 
 function clearCharmtalk() {
   filterStore.filters.charmtalk = false;
   filterStore.filterCompanies();
-  emit("filterChanged")
+  emit("filter-changed")
 }
 
 </script>

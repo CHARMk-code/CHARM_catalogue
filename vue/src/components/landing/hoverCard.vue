@@ -3,9 +3,9 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{
+defineProps<{
   to: string;
-  background_image: string;
+  backgroundImage: string;
 }>();
 </script>
 

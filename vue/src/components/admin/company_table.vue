@@ -3,15 +3,15 @@
     <q-card-section class="text-h5">Companies</q-card-section>
     <q-card-section>
       <Table
-        @saveRow="(c) => companiesStore.updateCompany(c)"
-        @deleteRow="(c) => companiesStore.removeCompany(c)"
         name="Companies"
-        :tableColumns="headers"
+        :table-columns="headers"
         :rows="rows"
-        :metaRows="metaRows"
-        :colMeta="colMeta"
+        :meta-rows="metaRows"
+        :col-meta="colMeta"
         :editable="true"
-        :metaModelCallback="updateWithMetaModels"
+        :meta-model-callback="updateWithMetaModels"
+        @save-row="(c) => companiesStore.updateCompany(c)"
+        @delete-row="(c) => companiesStore.removeCompany(c)"
       >
         <template #body-cell-Active="props">
           <q-td :props="props">
@@ -99,18 +99,13 @@
 </template>
 
 <script lang="ts" setup>
-import Table, { type TableRow } from "@/components/table.vue";
+import Table from "@/components/table.vue";
 import TagGroup from "@/components/Tag_group.vue";
-import axios from "@/plugins/axios";
-import { computed, onMounted, reactive, ref, watch, type Ref } from "vue";
-import dayjs from "dayjs";
+import { reactive } from "vue";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
 import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
-import { useRouter } from "vue-router";
 import type { TableColMeta } from "./table_edit_dialog.vue";
-
-const base_URL = axios.defaults.baseURL + "/manage/image/";
 
 const headers = [
   { name: "Name", label: "Name", field: "name", align: "left", sortable: true },

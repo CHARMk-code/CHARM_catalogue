@@ -8,7 +8,7 @@
     @start="dragging = true"
     @end="dragging = false"
   >
-    <template #header v-if="pages.length === 0">
+    <template v-if="pages.length === 0" #header>
       <div class="q-pa-lg full-width text-center text-italic">
         Empty page group
       </div>
@@ -17,7 +17,7 @@
     <template #item="{ index, element }">
       <q-card square flat bordered class="col-6">
         <q-card-section>
-          <Image :imageName="element.image" />
+          <Image :image-name="element.image" />
         </q-card-section>
         <q-card-actions>
           <q-space />
@@ -38,23 +38,23 @@
           >
           </q-btn>
           <q-toggle
+            v-model="element.mobile"
             class="position-center"
             size="sm"
             label="Visible on mobile"
-            v-model="element.mobile"
           ></q-toggle>
           <q-space />
         </q-card-actions>
       </q-card>
     </template>
   </draggable>
-  <q-dialog full-width full-height v-model="editDialog">
+  <q-dialog v-model="editDialog" full-width full-height>
     <tableEditDialog
-      name="Prepage"
       v-model:row="clickedRow"
-      :colMeta="colMeta"
-      :newRow="false"
-      @saveRow="
+      name="Prepage"
+      :col-meta="colMeta"
+      :new-row="false"
+      @save-row="
         (rawRow) => {
           editDialog = false;
           savePrepage(rawRow);
@@ -70,7 +70,7 @@
       </q-card-section>
 
       <q-card-actions :align="'right'">
-        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn v-close-popup flat label="Cancel" />
         <q-btn flat label="Delete" color="primary" @click="deletePrepage()" />
       </q-card-actions>
     </q-card>
@@ -78,20 +78,14 @@
 </template>
 
 <script lang="ts" setup>
-import axios from "@/plugins/axios";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
-import { computed, ref, type Ref } from "vue";
+import { ref, type Ref } from "vue";
 import draggable from "vuedraggable";
 import type { TableColMeta } from "../table_edit_dialog.vue";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
-import type { TableRow } from "@/components/table.vue";
 import Image from "@/components/utils/Image.vue";
 
-const headerHover = ref(false);
 const dragging = ref(false);
-const showEmptyPlaceholder = computed(() => {
-  !(headerHover.value && dragging);
-});
 
 const clickedRow: Ref<Prepage | {}> = ref({});
 const editDialog = ref(false);
@@ -118,7 +112,7 @@ function preDeletePrepage(index: number) {
   deleteDialog.value = true;
 }
 
-function deletePrepage(index: number) {
+function deletePrepage() {
   prepagesStore.deletePrepage(clickedRow.value);
   deleteDialog.value = false;
 }
