@@ -251,7 +251,6 @@ async function save() {
 
 function isValidExternalLink(url: String):boolean {
   const linkValidationRegex = "https?:\/\/.*"
-  console.log(url.match(linkValidationRegex))
   return url.match(linkValidationRegex) != null
 }
 </script>
