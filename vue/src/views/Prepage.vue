@@ -32,6 +32,7 @@
 
 <script lang="ts" setup>
 import Image from "@/components/utils/Image.vue";
+import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
@@ -216,6 +217,11 @@ function next() {
 function prev() {
   const maybePrev: string | undefined = settingsStore.consumePrev();
   if (maybePrev) router.push(maybePrev);
+}
+
+// Logic for swipe instructions on mobile
+if ($q.screen.lt.md && !(localStorage.getItem("swipeInstructions") || false)) {
+  $q.dialog({ component: SwipeOverlay });
 }
 </script>
 
