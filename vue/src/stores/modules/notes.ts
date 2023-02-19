@@ -1,4 +1,3 @@
-import type { Note } from "esbuild";
 import { defineStore } from "pinia";
 
 interface Notes {

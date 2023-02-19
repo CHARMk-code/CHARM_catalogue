@@ -68,7 +68,7 @@
       @save-row="
         () => {
           editDialog = false;
-          $emit('saveRow', clickedRow.row);
+          $emit('save-row', clickedRow.row);
         }
       "
     >
@@ -90,7 +90,7 @@
           flat
           label="Delete"
           color="primary"
-          @click="$emit('deleteRow', clickedRow.row)"
+          @click="$emit('delete-row', clickedRow.row)"
         />
       </q-card-actions>
     </q-card>

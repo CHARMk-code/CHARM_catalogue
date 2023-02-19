@@ -245,7 +245,7 @@ async function save() {
     }
     if (props.metaModelCallback) props.metaModelCallback(rawRow, props.row);
 
-    emit("saveRow", rawRow);
+    emit("save-row", rawRow);
   });
 }
 </script>
