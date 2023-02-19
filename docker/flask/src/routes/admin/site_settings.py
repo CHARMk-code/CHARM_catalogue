@@ -50,6 +50,7 @@ def reset_company_view():
         { 'text': "Logo", 'name': "logo", 'active': True },
         { 'text': "Name", 'name': "name", 'active': True },
         { 'text': "Description", 'name': "desc", 'active': True },
+        { 'text': "Contacts", 'name': "contacts", 'active': True },
         { 'text': "Did you know", 'name': "didyouknow", 'active': True },
         { 'text': "Divisions", 'name': "tag_divisions", 'active': True },
         { 'text': "Business Areas", 'name': "tag_business_areas", 'active': True },
