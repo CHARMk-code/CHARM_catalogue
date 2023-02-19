@@ -1,5 +1,6 @@
 <template>
   <q-table
+    v-model:pagination="tablePagination"
     flat
     :rows="rows"
     :columns="editable || $slots.actions ? tableColumnsWAction : tableColumns"
@@ -102,6 +103,7 @@ import { ref, type Ref } from "vue";
 import { computed } from "vue";
 import type { TableColMeta } from "@/components/admin/table_edit_dialog.vue";
 import tableEditDialog from "@/components/admin/table_edit_dialog.vue";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
 
 export type TableRow = any;
 
@@ -131,6 +133,18 @@ const tableColumnsWAction = computed(() =>
     },
   ])
 );
+
+const siteSettingsStore = useSite_settingsStore();
+
+const tablePagination = computed({
+  get() {
+    return siteSettingsStore.getTablePagination();
+  },
+  set(v) {
+    siteSettingsStore.settings.tables.rowsPerPage = v.rowsPerPage;
+  },
+});
+
 const clickedRow: Ref<{ row: TableRow; meta: any }> = ref({
   row: {},
   meta: {},

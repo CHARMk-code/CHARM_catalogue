@@ -19,6 +19,9 @@ interface State {
       next: string | undefined;
       prev: string | undefined;
     };
+    tables: {
+      rowsPerPage: number;
+    };
   };
   load_wait: number;
 }
@@ -32,6 +35,9 @@ export const useSite_settingsStore = defineStore("site_settings", {
       navigation: {
         next: undefined,
         prev: undefined,
+      },
+      tables: {
+        rowsPerPage: 10,
       },
     },
     load_wait: 0,
@@ -103,6 +109,14 @@ export const useSite_settingsStore = defineStore("site_settings", {
       const temp = unref(this.settings.navigation.prev);
       this.settings.navigation.prev = undefined;
       return temp;
+    },
+    getTablePagination() {
+      return {
+        sortBy: "desc",
+        descending: false,
+        page: 1,
+        rowsPerPage: this.settings.tables.rowsPerPage,
+      };
     },
   },
 });
