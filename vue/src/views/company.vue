@@ -18,10 +18,18 @@
       class="row q-col-gutter-md"
     >
       <div class="col-12 col-md-6 q-gutter-md">
-        <component :is="comp" v-for="(comp, index) in component_layout.left" :key="index" />
+        <component
+          :is="comp"
+          v-for="(comp, index) in component_layout.left"
+          :key="index"
+        />
       </div>
       <div class="col-12 col-md-6 q-gutter-md">
-        <component :is="comp" v-for="(comp, index) in component_layout.right" :key="index" />
+        <component
+          :is="comp"
+          v-for="(comp, index) in component_layout.right"
+          :key="index"
+        />
       </div>
     </div>
   </q-page>
@@ -40,15 +48,7 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
-import {
-  computed,
-  h,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  type Ref,
-} from "vue";
+import { computed, h, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";

@@ -2,7 +2,13 @@
   <div class="">
     <template v-for="(tag, index) in props.tags">
       <template v-if="tag.icon && tag.icon.length > 0">
-        <q-avatar :key="index" size="md" v-bind="props" clickable @click="tagClick(tag)">
+        <q-avatar
+          :key="index"
+          size="md"
+          v-bind="props"
+          clickable
+          @click="tagClick(tag)"
+        >
           <img :src="base_URL + tag.icon" cover />
           <q-tooltip> {{ tag.name }} </q-tooltip>
         </q-avatar>

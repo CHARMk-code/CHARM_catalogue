@@ -107,7 +107,9 @@ import {
 import { ref, type Ref } from "vue";
 import draggable from "vuedraggable";
 import pageGroupDraggable from "./pageGroup.vue";
-import tableEditDialog, { type TableColMeta } from "@/components/admin/table_edit_dialog.vue";
+import tableEditDialog, {
+  type TableColMeta,
+} from "@/components/admin/table_edit_dialog.vue";
 import Image from "@/components/utils/Image.vue";
 
 const prepagesStore = usePrepagesStore();

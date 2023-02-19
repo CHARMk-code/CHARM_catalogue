@@ -9,21 +9,21 @@ const config = {
 
 // If we are in a local dev env then change config to match
 if (location.hostname == "localhost") {
-  config.withCredentials =  false;
-//  config.baseURL = "http://localhost:5008/api";
+  config.withCredentials = false;
+  //  config.baseURL = "http://localhost:5008/api";
   config.baseURL = "https://catalogue.charm.chalmers.se/api";
 }
 
 const axios_instance: AxiosInstance = axios.create(config);
 
-declare module 'pinia' {
+declare module "pinia" {
   export interface PiniaCustomProperties {
-    axios: AxiosInstance
+    axios: AxiosInstance;
   }
 }
 
 export function piniaAxiosPlugin(context: PiniaPluginContext) {
-    return { axios: axios_instance }
+  return { axios: axios_instance };
 }
 
-export default axios_instance
+export default axios_instance;

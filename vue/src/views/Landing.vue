@@ -29,7 +29,10 @@
       <q-space />
       <div class="col-12 col-md-4">
         <span class="text-h3 text-center block full-width">Shortcuts</span>
-        <template v-for="shortcut in shortcutsStore.shortcuts" :key="shortcut.id">
+        <template
+          v-for="shortcut in shortcutsStore.shortcuts"
+          :key="shortcut.id"
+        >
           <div class="q-pa-sm full-width">
             <Shortcut
               :icon="shortcut.icon"

@@ -3,27 +3,25 @@ import { defineStore } from "pinia";
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export interface Company_Map {
-  id: number,
-  name: string,
-  image: string,
-  ref: number,
+  id: number;
+  name: string;
+  image: string;
+  ref: number;
 }
 
 interface State {
-  maps: Map<number, Company_Map>,
-  load_wait: number,
-
+  maps: Map<number, Company_Map>;
+  load_wait: number;
 }
 
-
-export const useMapsStore = defineStore('maps', {
+export const useMapsStore = defineStore("maps", {
   state: (): State => ({
     maps: new Map(),
     load_wait: 0,
   }),
   actions: {
     setAllMaps(company_maps: Company_Map[]) {
-      this.maps = new Map(company_maps.map(m => [m.id, m]))
+      this.maps = new Map(company_maps.map((m) => [m.id, m]));
     },
     removeMapById(id: number) {
       this.maps.delete(id);
@@ -41,7 +39,7 @@ export const useMapsStore = defineStore('maps', {
               this.removeAllMaps();
               const maps = resp.data;
               if (maps.length > 0) {
-                this.setAllMaps(maps)
+                this.setAllMaps(maps);
               }
               resolve(resp);
             })
@@ -58,7 +56,7 @@ export const useMapsStore = defineStore('maps', {
         this.axios
           .put("/map", map)
           .then((resp: any) => {
-            this.maps.set(map.id, map)
+            this.maps.set(map.id, map);
             resolve(resp);
           })
           .catch((err: any) => {
@@ -71,7 +69,7 @@ export const useMapsStore = defineStore('maps', {
         this.axios
           .delete("/map/" + map.id)
           .then((resp: any) => {
-            this.removeMapById(map.id)
+            this.removeMapById(map.id);
             resolve(resp);
           })
           .catch((err: any) => {

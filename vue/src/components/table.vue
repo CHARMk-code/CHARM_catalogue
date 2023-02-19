@@ -158,5 +158,4 @@ function createRow() {
   newRow.value = true;
   editDialog.value = true;
 }
-
 </script>

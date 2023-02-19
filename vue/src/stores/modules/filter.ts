@@ -5,25 +5,25 @@ import { useFavoritesStore } from "./favorites";
 import { useTagsStore } from "./tags";
 
 interface Tags {
-  divisions: number[],
-  looking_for: number[],
-  business_areas: number[],
-  offerings: number[],
-  languages: number[],
+  divisions: number[];
+  looking_for: number[];
+  business_areas: number[];
+  offerings: number[];
+  languages: number[];
   [key: string]: number[];
 }
 
 interface Filters {
-  query: string,
-  tags: Tags,
-  favorites: boolean,
-  charmtalk: boolean,
-  sweden: boolean,
+  query: string;
+  tags: Tags;
+  favorites: boolean;
+  charmtalk: boolean;
+  sweden: boolean;
 }
 
 interface State {
-  filters: Filters,
-  filteredCompanies: Company[],
+  filters: Filters;
+  filteredCompanies: Company[];
 }
 
 interface Route_query {
@@ -35,8 +35,7 @@ interface Route_query {
   [key: string]: string | undefined;
 }
 
-
-export const useFilterStore = defineStore('filter', {
+export const useFilterStore = defineStore("filter", {
   state: (): State => ({
     filters: {
       query: "",
@@ -69,7 +68,7 @@ export const useFilterStore = defineStore('filter', {
         favorites: false,
         charmtalk: false,
         sweden: false,
-      }
+      };
     },
     filterCompanies() {
       return new Promise<void>((resolve) => {
@@ -87,28 +86,33 @@ export const useFilterStore = defineStore('filter', {
         }
 
         // Filter on tags
-        let filterTags: number[] = []
-        for (const key in this.filters.tags) filterTags = filterTags.concat(this.filters.tags[key]);
+        let filterTags: number[] = [];
+        for (const key in this.filters.tags)
+          filterTags = filterTags.concat(this.filters.tags[key]);
 
         if (filterTags.length > 0) {
           filteredCompanies = filteredCompanies.filter((c) => {
-            return filterTags.some((filterTag: number) => c.tags.has(filterTag))
+            return filterTags.some((filterTag: number) =>
+              c.tags.has(filterTag)
+            );
           });
         }
 
         // Filter on attendance to charmtalks
         if (this.filters.charmtalk) {
-          filteredCompanies = filteredCompanies.filter((c: Company) => c.charmtalk);
+          filteredCompanies = filteredCompanies.filter(
+            (c: Company) => c.charmtalk
+          );
         }
 
         // Filter on favorites
         if (this.filters.favorites) {
-          const favoritesStore = useFavoritesStore()
+          const favoritesStore = useFavoritesStore();
           filteredCompanies = filteredCompanies.filter((c: Company) =>
             favoritesStore.favorites.has(c.id)
           );
         }
-        this.filteredCompanies = filteredCompanies
+        this.filteredCompanies = filteredCompanies;
         // Filter on in sweden (no sweden attribute left)
         // if (state.filters.sweden) {
         //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);
@@ -117,15 +121,16 @@ export const useFilterStore = defineStore('filter', {
 
         this.sortCompanies().then(() => {
           resolve();
-        })
+        });
       });
     },
     sortCompanies() {
       return new Promise<void>((resolve) => {
-        const strategy = (a: any, b: any): number => ("" + a.name).localeCompare(b.name);
+        const strategy = (a: any, b: any): number =>
+          ("" + a.name).localeCompare(b.name);
         this.filteredCompanies.sort(strategy);
-        resolve()
-      })
+        resolve();
+      });
     },
     setFiltersFromRouteQuery(rQuery: LocationQuery) {
       this.resetFilter();
@@ -173,12 +178,10 @@ export const useFilterStore = defineStore('filter', {
       if (rQuery.sweden) {
         this.filters.sweden = true;
       }
-      this.filterCompanies()
-
-
+      this.filterCompanies();
     },
     generateSearchRouteQuery() {
-      const filter = this.filters
+      const filter = this.filters;
       const rQuery: LocationQuery = {};
 
       if (filter.query.length > 0) rQuery.q = filter.query;
@@ -207,7 +210,7 @@ export const useFilterStore = defineStore('filter', {
       if (filter.charmtalk) rQuery.charmtalk = "true";
       if (filter.sweden) rQuery.sweden = "true";
 
-      return rQuery
-    }
+      return rQuery;
+    },
   },
 });

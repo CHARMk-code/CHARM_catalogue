@@ -1,10 +1,10 @@
-import { defineStore } from "pinia"
+import { defineStore } from "pinia";
 
 interface State {
-  favorites: Set<number>,
+  favorites: Set<number>;
 }
 
-export const useFavoritesStore = defineStore('favorites', {
+export const useFavoritesStore = defineStore("favorites", {
   state: (): State => ({
     favorites: new Set(),
   }),
@@ -27,13 +27,13 @@ export const useFavoritesStore = defineStore('favorites', {
     },
     toggleFavorite(id: number) {
       if (!this.isFavorite(id)) {
-        this.addFavorite(id)
+        this.addFavorite(id);
       } else {
-        this.removeFavorite(id)
+        this.removeFavorite(id);
       }
     },
     loadFromStorage() {
-      const stored_favorites = localStorage.getItem("favorites") || "[]"
+      const stored_favorites = localStorage.getItem("favorites") || "[]";
       if (stored_favorites == "{}") {
         this.favorites = new Set();
       } else {

@@ -42,7 +42,7 @@ import {
   computed,
   onBeforeMount,
   watch,
-type Ref,
+  type Ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
