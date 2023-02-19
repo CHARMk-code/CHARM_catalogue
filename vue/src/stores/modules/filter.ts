@@ -87,12 +87,11 @@ export const useFilterStore = defineStore('filter', {
         }
 
         // Filter on tags
-        var filterTags: number[] = []
-        for (var key in this.filters.tags) filterTags = filterTags.concat(this.filters.tags[key]);
+        for (var key in this.filters.tags) {
+          if (this.filters.tags[key].length == 0) { continue }
 
-        if (filterTags.length > 0) {
-          filteredCompanies = filteredCompanies.filter((c) => {
-            return filterTags.some((filterTag: number) => c.tags.has(filterTag))
+          filteredCompanies = filteredCompanies.filter((c) =>{
+            return this.filters.tags[key].some((tag: number) => c.tags.has(tag))
           });
         }
 
