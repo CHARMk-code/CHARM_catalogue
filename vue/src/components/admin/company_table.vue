@@ -282,7 +282,7 @@ const colMeta: TableColMeta[] = [
     label: "Description of summer job",
   },
   {
-    type: "text",
+    type: "external-link",
     model: "summer_job_link",
     label: "Link to summer job application",
   },
@@ -297,7 +297,7 @@ const colMeta: TableColMeta[] = [
     model: "contact_email",
     label: "Contacts email",
   },
-  { type: "text", model: "website", label: "Website" },
+  { type: "external-link", model: "website", label: "Website" },
   {
     type: "number",
     model: "employees_world",

@@ -5,6 +5,8 @@ from flask import Blueprint, request
 from ...models import Company, Tag
 from flask_cors import CORS
 from ...helper_functions import *
+from flask_api import status
+import re
 
 blueprint = Blueprint('company_admin', __name__, url_prefix='/api/company')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
@@ -56,6 +58,10 @@ def company_put():
             tag_objs.append(Tag.query.get(tag))
 
 
+    if (not isValidExternalLink(summer_job_link)) or (not isValidExternalLink(website)):
+        return status.HTTP_400_BAD_REQUEST, "Invalid link fromat, all external links must start with http or https"
+
+
     if not id:
 
         return send_status(Company.create(name,active,charmtalk,description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline,
@@ -66,6 +72,11 @@ def company_put():
     return send_status(company.update(name,active, charmtalk, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline,
                 contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number, tag_objs))
 
+def isValidExternalLink(url: str) -> bool:
+    if (url == None):
+        return True
+    url_regex = re.compile('https?:\/\/.*')
+    return url_regex.match(url)
 
 @blueprint.route("<id>",methods=["DELETE"])
 def company_delete(id):
