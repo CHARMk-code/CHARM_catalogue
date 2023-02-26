@@ -48,6 +48,7 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
+import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
 import { computed, h, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
@@ -252,6 +253,7 @@ function setNextRoute() {
     settingsStore.settings.navigation.next = undefined;
   }
 }
+
 const $q = useQuasar();
 
 function setPrevRoute() {
@@ -299,6 +301,12 @@ function prev() {
   if (maybePrev) {
     router.push(maybePrev);
   }
+}
+
+// Logic for swipe instructions on mobile
+// has saved thing in localStorage
+if ($q.screen.lt.md && !(localStorage.getItem("swipeInstructions") || false)) {
+  $q.dialog({ component: SwipeOverlay });
 }
 </script>
 
