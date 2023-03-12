@@ -5,7 +5,6 @@ import { setCssVar } from "quasar";
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export interface Card {
-  id: number;
   name: string;
   text: string;
   active: boolean;
@@ -32,7 +31,23 @@ export const useSite_settingsStore = defineStore("site_settings", {
   state: (): State => ({
     settings: {
       company_view: {
-        cards: [],
+        cards: [
+          { text: "Logo", name: "logo", active: true },
+          { text: "Name", name: "name", active: true },
+          { text: "Description", name: "desc", active: true },
+          { text: "Did you know", name: "didyouknow", active: true },
+          { text: "Divisions", name: "tag_divisions", active: true },
+          { text: "Business Areas", name: "tag_business_areas", active: true },
+          { text: "Offering", name: "tag_offering", active: true },
+          { text: "Looking for", name: "tag_looking_for", active: true },
+          { text: "Website", name: "website", active: true },
+          { text: "Map", name: "map", active: true },
+          { text: "Summer job", name: "summerjob", active: true },
+          { text: "Notes", name: "notes", active: true },
+          { text: "CHARMtalks", name: "CHARMtalks", active: true },
+          { text: "Language", name: "language", active: true },
+          { text: "Fair Areas", name: "fair_area", active: true },
+        ],
       },
       navigation: {
         next: undefined,
@@ -46,39 +61,8 @@ export const useSite_settingsStore = defineStore("site_settings", {
     load_wait: 0,
   }),
   actions: {
-    getCompanyCards(force = false) {
-      return new Promise<void>((resolve, reject) => {
-        if (force || this.load_wait < Date.now()) {
-          this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
-          this.axios
-            .get("/settings/company_view")
-            .then((resp: any) => {
-              this.settings.company_view.cards = resp.data;
-              resolve(resp);
-            })
-            .catch((err: any) => {
-              reject(err);
-            });
-        } else {
-          resolve();
-        }
-      });
-    },
-    setCompanyCards(active_cards: Card[]) {
-      return new Promise<void>((resolve) => {
-        const all_cards = this.settings.company_view.cards;
-        all_cards.forEach((card) => {
-          if (active_cards.some((active_card) => active_card.id === card.id)) {
-            card.active = true;
-          } else {
-            card.active = false;
-          }
-        });
-
-        resolve();
-      });
-    },
     saveSettings() {
+      console.log("test");
       return new Promise<void>((resolve, reject) => {
         this.axios
           .put("/settings/site", { name: "settings", blob: this.settings })
@@ -110,29 +94,20 @@ export const useSite_settingsStore = defineStore("site_settings", {
         }
       });
     },
-    saveCompanyCards() {
-      return new Promise<void>((resolve, reject) => {
-        const cards = this.settings.company_view.cards;
-        this.axios
-          .put("/settings/company_view", cards)
-          .then(() => {
-            resolve();
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
-      });
-    },
-    resetCompanyCards() {
-      return new Promise((resolve, reject) => {
-        this.axios
-          .get("/settings/company_view/reset")
-          .then(() => {
-            resolve(this.getCompanyCards(true));
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
+    setCompanyCards(active_cards: Card[]) {
+      return new Promise<void>((resolve) => {
+        const all_cards = this.settings.company_view.cards;
+        all_cards.forEach((card) => {
+          if (
+            active_cards.some((active_card) => active_card.name === card.name)
+          ) {
+            card.active = true;
+          } else {
+            card.active = false;
+          }
+        });
+
+        resolve();
       });
     },
     consumeNext() {

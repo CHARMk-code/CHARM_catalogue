@@ -76,7 +76,7 @@ const selected = computed<Card[]>({
 });
 
 const save = () => {
-  useSite_settingsStore().saveCompanyCards();
+  useSite_settingsStore().saveSettings();
 };
 const reset = () => {
   resetting.value = true;
