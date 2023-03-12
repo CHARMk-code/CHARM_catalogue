@@ -16,6 +16,17 @@ services:
     environment:
       FLASK_ENV: development
       FLASK_APP: .
+
+  rust:
+    image: marccarre/rust-dev-env
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+    links:
+      - db
+    volumes:
+      - ./backend:/home/rust
+
   flyway:
     image: flyway/flyway
     depends_on:

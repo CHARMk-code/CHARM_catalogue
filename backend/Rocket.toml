@@ -1,0 +1,2 @@
+[default.database.sqlx]
+url = "mysql://catalogue:password@db:3306/catalogue"
