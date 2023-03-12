@@ -19,6 +19,9 @@ interface State {
       next: string | undefined;
       prev: string | undefined;
     };
+    theme: {
+      logo: string;
+    };
   };
   load_wait: number;
 }
@@ -32,6 +35,9 @@ export const useSite_settingsStore = defineStore("site_settings", {
       navigation: {
         next: undefined,
         prev: undefined,
+      },
+      theme: {
+        logo: "prepage0.png",
       },
     },
     load_wait: 0,
@@ -67,6 +73,37 @@ export const useSite_settingsStore = defineStore("site_settings", {
         });
 
         resolve();
+      });
+    },
+    saveSettings() {
+      return new Promise<void>((resolve, reject) => {
+        this.axios
+          .put("/settings/site", { name: "settings", blob: this.settings })
+          .then(() => {
+            resolve();
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      });
+    },
+    fetchSettings(force = false) {
+      return new Promise<void>((res, rej) => {
+        if (force || this.load_wait < Date.now()) {
+          this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
+          this.axios
+            .get("/settings/site")
+            .then((resp: any) => {
+              if (resp.data.name === "settings") {
+                this.settings = JSON.parse(resp.blob);
+                res(resp);
+              }
+              rej("Didn't receive settings blob");
+            })
+            .catch((err: any) => {
+              rej(err);
+            });
+        }
       });
     },
     saveCompanyCards() {

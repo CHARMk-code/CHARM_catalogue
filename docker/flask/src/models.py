@@ -638,3 +638,45 @@ class Feedback(db.Model):
             'important': self.important,
             'archived': self.archived
         }
+
+class Blob(db.Model):
+    __tablename__ = "blobs"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    blob = db.Column(db.JSON)
+
+    @staticmethod
+    def create(name, blob):
+        try:
+            print("before", file=sys.stderr)
+            new_blob = Blob(
+                name=name,
+                blob=blob
+            )
+            print("after", file=sys.stderr)
+
+            db.session.add(new_blob)
+            db.session.commit()
+        except Exception as e:
+            print(e, file=sys.stderr)
+            return False
+        return True
+
+    def update(self, name, blob):
+        self.name = name
+        self.blob = blob
+        db.session.commit()
+        return True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @property
+    def serialize(self):
+        return {
+                'id': self.id,
+                'name': self.name,
+                'blob': self.blob
+                }
+

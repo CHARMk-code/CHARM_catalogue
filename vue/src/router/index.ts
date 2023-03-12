@@ -30,6 +30,7 @@ const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
 const Feedback_admin = () => import("@/views/admin/Feedback.vue");
+const Site_admin = () => import("@/views/admin/Site_settings.vue");
 
 const router = createRouter({
   history: createWebHistory(),
@@ -112,48 +113,53 @@ const router = createRouter({
       children: [
         {
           path: "prepages",
-          name: "Admin/Prepage",
+          name: "Prepages",
           component: Prepage_admin,
         },
         {
           path: "companies",
-          name: "Admin/Companies",
+          name: "Companies",
           component: Companies_admin,
         },
         {
           path: "tags",
-          name: "Admin/Tags",
+          name: "Tags",
           component: Tags_admin,
         },
         {
           path: "maps",
-          name: "Admin/Maps",
+          name: "Maps",
           component: Map_admin,
         },
         {
           path: "shortcuts",
-          name: "Admin/Shortcuts",
+          name: "Shortcuts",
           component: Shortcuts_admin,
         },
         {
           path: "layout",
-          name: "Admin/Layout",
+          name: "Layout",
           component: Layout_admin,
         },
         {
           path: "feedback",
-          name: "Admin/feedback",
+          name: "Feedback",
           component: Feedback_admin,
         },
         {
           path: "batch",
-          name: "batch",
+          name: "Batch",
           component: Upload_admin,
         },
         {
           path: "account",
           name: "Account",
           component: Account_admin,
+        },
+        {
+          path: "site",
+          name: "Site settings",
+          component: Site_admin,
         },
       ],
     },
@@ -183,10 +189,11 @@ router.beforeEach(async (to, from, next) => {
       usePrepagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),
       useShortcutsStore().getShortcuts(),
-      useSite_settingsStore().getCompanyCards(),
+      useSite_settingsStore().fetchSettings(),
     ])
       .then(() => {
         useFilterStore().filterCompanies();
+        useSite_settingsStore().getCompanyCards();
       })
       .catch(() => {}); // add some error here in the future?
   }

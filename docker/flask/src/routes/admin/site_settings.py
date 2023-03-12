@@ -1,9 +1,10 @@
 from flask import Blueprint,jsonify, request
-from ...models import Company_card
+from ...models import Company_card, Blob
 from flask_cors import CORS
 from flask_api import status
 from ...helper_functions import *
 import os
+import sys
 
 blueprint = Blueprint('settings_admin', __name__, url_prefix='/api/settings')
 CORS(blueprint,origins="*", resources=r'*', allow_headers=[
@@ -29,6 +30,7 @@ def company_view_put():
         return company_card_object.update(name,text,active)
 
     request_data = request.get_json()
+
     if isinstance(request_data, list):
         status = all(map(create_or_update, request_data))
     else:
@@ -68,5 +70,32 @@ def reset_company_view():
         card.delete()
     status = map(lambda card: Company_card.create(**card), default_cards)
     return send_status(all(status))
+
+@blueprint.route("site", methods=["PUT"])
+def put_settings():
+    result = auth_token(request)
+    #if not result[0]:
+    #    return result[1]
+    def create_or_update(one_request_data):
+        name = "settings" 
+        blob = get_if_exist(one_request_data,"blob")
+        
+        settings_query = Blob.query.filter_by(name=name)
+
+        if settings_query.count() == 0:
+            return send_status(Blob.create(name,blob))
+
+        settings_blob = settings_query.first()
+         
+        return settings_blob.update(name,blob)
+
+    request_data = request.get_json()
+    print(request_data, file=sys.stderr)
+
+    status = create_or_update(request_data)
+
+
+    return send_status(status)
+    
 
 
