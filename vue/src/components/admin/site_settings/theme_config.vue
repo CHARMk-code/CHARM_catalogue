@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-card-section class="text-h5">Update Website logo</q-card-section>
+    <q-card-section class="text-h5">Website Themeing</q-card-section>
     <q-card-section class="row">
       <Image
         class="col-6"
@@ -24,6 +24,18 @@
         </template>
       </q-file>
     </q-card-section>
+    <q-card-section>
+      <q-input
+        v-model="site_settingsStore.settings.theme.primary"
+        label="Primary theme colour"
+      >
+        <template #after
+          ><q-btn color="primary" @click="saveColors"
+            >Apply colour</q-btn
+          ></template
+        >
+      </q-input>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -32,6 +44,7 @@ import { type Ref, ref } from "vue";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import Image from "@/components/utils/Image.vue";
 import axios from "@/plugins/axios";
+import { setCssVar } from "quasar";
 
 const site_settingsStore = useSite_settingsStore();
 
@@ -60,5 +73,10 @@ function onSubmit() {
     .catch((err) => {
       feedback.value = err.response.data;
     });
+}
+
+function saveColors() {
+  site_settingsStore.saveSettings();
+  setCssVar("primary", site_settingsStore.settings.theme.primary);
 }
 </script>

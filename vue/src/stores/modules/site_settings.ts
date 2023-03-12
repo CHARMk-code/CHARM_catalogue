@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { unref } from "vue";
+import { setCssVar } from "quasar";
 
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
@@ -21,6 +22,7 @@ interface State {
     };
     theme: {
       logo: string;
+      primary: string;
     };
   };
   load_wait: number;
@@ -38,6 +40,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
       },
       theme: {
         logo: "prepage0.png",
+        primary: "#d60000",
       },
     },
     load_wait: 0,
@@ -96,6 +99,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
             .then((resp: any) => {
               if (resp.data.name === "settings") {
                 this.settings = JSON.parse(resp.blob);
+                setCssVar("primary", this.settings.theme.primary);
                 res(resp);
               }
               rej("Didn't receive settings blob");
