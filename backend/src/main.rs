@@ -16,21 +16,19 @@ type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 struct Shortcut {
-    id: Option<i64>,
-    name: String,
-    desc: String,
-    link: String,
-    icon: String,
+    id: i32,
+    name: Option<String>,
+    desc: Option<String>,
+    link: Option<String>,
+    icon: Option<String>,
 }
 
 #[get("/")]
 async fn get_shortcuts(mut db: Connection<Db>) -> Result<Json<Vec<Shortcut>>> {
-    let shortcuts = sqlx::query!("SELECT * FROM shortcuts")
-        .fetch(&mut *db)
-        .map_ok(|record| record)
-        .try_collect::<Vec<Result<Json<Vec<Shortcut>>>>>()
+    let shortcuts = sqlx::query_as!(Shortcut, "SELECT * FROM shortcuts")
+        .fetch_all(&mut *db)
         .await?;
-
+        
     Ok(Json(shortcuts))
 }
 
