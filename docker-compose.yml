@@ -17,16 +17,6 @@ services:
       FLASK_ENV: development
       FLASK_APP: .
 
-  rust:
-    image: marccarre/rust-dev-env
-    depends_on:
-      flyway:
-        condition: service_completed_successfully
-    links:
-      - db
-    volumes:
-      - ./backend:/home/rust
-
   flyway:
     image: flyway/flyway
     depends_on:
@@ -39,6 +29,8 @@ services:
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: catalogue

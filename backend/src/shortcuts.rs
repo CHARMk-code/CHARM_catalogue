@@ -27,7 +27,7 @@ async fn get_shortcuts(mut db: Connection<Db>) -> Result<Json<Vec<Shortcut>>> {
         .try_collect::<Vec<Result<Json<Vec<Shortcut>>>>>()
         .await?;
 
-    return Ok(Json(shortcuts))
+    Ok(Json(shortcuts))
 }
 
 pub fn stage() -> AdHoc {
