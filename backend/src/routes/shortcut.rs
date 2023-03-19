@@ -57,6 +57,9 @@ async fn update_shortcut(mut db: Connection<Db>, data: Json<ShortcutUpdateable>)
 
             let affected_rows = sqlx::query!("UPDATE shortcuts SET `name` = ?, `desc` = ?, `link` = ?, `icon` = ? where `id` = ?",
                 data.name.as_ref().or(shortcut.name.as_ref()).unwrap(),
+                //unwrap is bad practices, should either expected or
+                // return a good error
+
                 data.desc.as_ref().or(shortcut.desc.as_ref()).unwrap(),
                 data.link.as_ref().or(shortcut.link.as_ref()).unwrap(),
                 data.icon.as_ref().or(shortcut.icon.as_ref()).unwrap(),
@@ -80,7 +83,8 @@ async fn create_shortcut(mut db: Connection<Db>, data: Json<ShortcutUpdateable>)
         },
         | Some(_) =>  {
             let query_result = sqlx::query!("INSERT INTO shortcuts (`name`, `desc`, `link`, `icon`) VALUES (?, ?, ?, ?)",
-                data.name.as_ref().unwrap(),
+                data.name.as_ref().unwrap(), //unwrap is bad practices, should either expected or
+                                             // return a good error
                 data.desc.as_ref().unwrap(),
                 data.link.as_ref().unwrap(),
                 data.icon.as_ref().unwrap())
@@ -102,16 +106,23 @@ async fn delete_shortcut(mut db: Connection<Db>, id: i32) -> Result<Json<i32>> {
 
 }
 
+
+
+// This should really be in a diffrent file for clarity
+// This test is way too big it really should be 5-10 ish independet test. It bad practices to have
+// the test being dependent on each other and a guide line is one assert per test, this often not
+// reasonable but the idea is verify on aspect per test. This help to keep tests clean, easy to
+// maintain, and debug both code and tests.
 #[cfg(test)]
 mod tests {
     use crate::rocket;
     use rocket::local::blocking::Client;
     use rocket::http::Status;
-    
+
     #[test]
     fn create_update_and_remove_shortcut() {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
-       
+
         // Create a shortcut in DB
         //////////////////////////
         let mut expected_shortcut = super::ShortcutUpdateable{
