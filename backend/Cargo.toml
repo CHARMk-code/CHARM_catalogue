@@ -6,7 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = { version = "0.5.0-rc.2", features = ["secrets", "tls", "json"] }
-
-rocket_db_pools = {version = "0.1.0-rc.2", features = ["sqlx_mysql"]}
-sqlx = { version = "0.5", default-features = false, features = ["macros", "offline", "migrate"]}
+actix-web = { version = "4"}  
+env_logger = { version = "0.10" }
+sqlx = { version = "0.6", default-features = false, features = ["mysql", "runtime-tokio-rustls",  "macros", "offline", "migrate"]}
+serde = { version = "1.0" }
+derive_more = { version = "0.99"}

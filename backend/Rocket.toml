@@ -1,4 +1,4 @@
 [default.databases.main]
 # Change "localhost" to "db" for prod deployment
-url = "mysql://catalogue:password@localhost:3306/catalogue" 
+url = "mysql://catalogue:password@localhost:3306" 
 

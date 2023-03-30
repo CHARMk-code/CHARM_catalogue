@@ -1,13 +1,12 @@
-use rocket::fairing::AdHoc;
+use actix_web::web;
 
 pub mod shortcut;
 
-
-pub fn stage() -> AdHoc {
-    AdHoc::on_ignite("Routes stage", |rocket| async {
-//        rocket.mount("/api/v2", routes![index])
-        rocket.mount("/api/v2/", shortcut::routes()) 
-    } )
+pub fn setup(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/api/v2")
+            .configure(shortcut::routes),
+    );
 }
 
 
