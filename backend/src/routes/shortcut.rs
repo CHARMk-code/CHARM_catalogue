@@ -8,10 +8,10 @@ use crate::errors::MyError;
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ShortcutDB {
     id: i32,
-    name: Option<String>,
-    desc: Option<String>,
-    link: Option<String>,
-    icon: Option<String>,
+    name: String,
+    desc: String,
+    link: String,
+    icon: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
@@ -54,30 +54,14 @@ async fn get_one_handler(db: web::Data<MySqlPool>, path: web::Path<i32>) -> Resu
 #[put("/")]
 async fn update_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
     match data.id {
-        | Some(id) => { 
-            let shortcut = sqlx::query_as!(ShortcutDB, "SELECT * FROM shortcuts where id= ? ", id)
-                .fetch_one(& *db.into_inner())
-                .await.map_err(MyError::SQLxError)?;
-
-            let affected_rows = sqlx::query!("UPDATE shortcuts SET `name` = ?, `desc` = ?, `link` = ?, `icon` = ? where `id` = ?",
-                data.name.as_ref().or(shortcut.name.as_ref()).expect("Either updated or original name should exist"),
-                data.desc.as_ref().or(shortcut.desc.as_ref()).expect("Either updated or original name should exist"),
-                data.link.as_ref().or(shortcut.link.as_ref()).expect("Either updated or original name should exist"),
-                data.icon.as_ref().or(shortcut.icon.as_ref()).expect("Either updated or original name should exist"),
-                data.id)
-                .execute(&*db.into_inner()).await.map_err(MyError::SQLxError)?.rows_affected();
-
-            return Ok(Json(affected_rows.try_into().expect("Should have affected rows")))
-        },
-        | None => {
-            return Ok(Json(create_shortcut(db, data).await?))
-        },
+        | Some(_) => update_shortcut(db.clone(), data).await,
+        | None => create_shortcut(db.clone(), data).await
     }
 }
 
 #[post("/")]
 async fn create_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
-    create_shortcut(db, data)
+    create_shortcut(db, data).await
 }
 
 #[delete("/{id}")]
@@ -96,7 +80,7 @@ fn is_valid_required_field<T>(val: &Option<T>) -> Result<&T> {
     }
 }
 
-async fn create_shortcut(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<u64> {
+async fn create_shortcut(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<Json<u64>> {
     let name = is_valid_required_field(&data.name)?;
     let desc = is_valid_required_field(&data.desc)?;
     let icon = is_valid_required_field(&data.icon)?;
@@ -104,8 +88,40 @@ async fn create_shortcut(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> R
     
     let query_result = sqlx::query!("INSERT INTO shortcuts (`name`, `desc`, `link`, `icon`) VALUES (?, ?, ?, ?)",
         name, desc, link, icon)
-        .execute(&*db.into_inner()).await.map_err(MyError::SQLxError)?;
+        .execute(&**db).await.map_err(MyError::SQLxError)?;
 
-    Ok(query_result.last_insert_id().try_into().expect("Should have id for last insert"))
+    Ok(Json(query_result.last_insert_id()))
+
+}
+
+async fn update_shortcut(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<Json<u64>> {
+    let id = data.id.as_ref().expect("Should have id to update");
+    
+    // In an optimal world we shouldn't need this query 
+    // (TODO change the second query to only use the data values that will be updated)
+    let shortcut = sqlx::query_as!(ShortcutDB, "SELECT * FROM shortcuts where id= ? ", id)
+        .fetch_one(&**db)
+        .await.map_err(MyError::SQLxError)?;
+
+    let name = data.name.as_ref();
+    let desc = data.desc.as_ref();
+    let link = data.link.as_ref();
+    let icon = data.icon.as_ref();
+
+    if name.or(desc).or(link).or(icon).is_none() {
+        return Err(error::ErrorUnprocessableEntity("No field to update"));
+    }
+
+    let query_result = sqlx::query!("UPDATE shortcuts SET `name` = ?, `desc` = ?, `link` = ?, `icon` = ? where `id` = ?",
+        if name.is_some() {name.unwrap()} else {&shortcut.name}, 
+        if desc.is_some() {desc.unwrap()} else {&shortcut.desc}, 
+        if icon.is_some() {icon.unwrap()} else {&shortcut.icon}, 
+        if link.is_some() {link.unwrap()} else {&shortcut.link}, 
+        data.id)
+        .execute(&**db).await.map_err(MyError::SQLxError)?;
+
+    let affected_rows = query_result.rows_affected();
+
+    return Ok(Json(affected_rows))
 
 }
