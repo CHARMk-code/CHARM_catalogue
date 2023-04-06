@@ -4,9 +4,6 @@ services:
     build: ./docker/flask
     ports:
       - "5008:5000"
-    depends_on:
-      flyway:
-        condition: service_completed_successfully
     links:
       - db
     volumes:
@@ -17,15 +14,6 @@ services:
       FLASK_ENV: development
       FLASK_APP: .
 
-  flyway:
-    image: flyway/flyway
-    depends_on:
-      - db
-    links:
-      - db
-    volumes:
-      - ./flyway:/flyway/sql
-    command: -url=jdbc:mysql://db:3306/catalogue -user=catalogue -password=password -connectRetries=60 migrate
   db:
     image: "mysql"
     command: --default-authentication-plugin=mysql_native_password
@@ -36,4 +24,4 @@ services:
       MYSQL_DATABASE: catalogue
       MYSQL_USER: catalogue
       MYSQL_PASSWORD: password
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: rootpass

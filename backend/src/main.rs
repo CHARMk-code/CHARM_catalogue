@@ -13,11 +13,13 @@ use sqlx::mysql::MySqlPoolOptions;
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
+
     let database_url = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = MySqlPoolOptions::new()
         .max_connections(5)
         .connect(database_url).await.expect("Failed to initialize Database pool");
 
+    sqlx::migrate!().run(&pool).await.expect("Migrations failed");
 
     HttpServer::new(move || {
         App::new()
@@ -55,9 +57,10 @@ mod errors {
                 },
                 _ => HttpResponse::InternalServerError().finish()
 
-
             }
         } 
     }
 }
-
+ 
+#[cfg(test)]
+mod tests;
