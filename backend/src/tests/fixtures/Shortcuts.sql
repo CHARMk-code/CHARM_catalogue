@@ -1,4 +1,4 @@
-INSERT INTO `shortcuts` (`name`, `desc`, `link`, `icon`)
+INSERT INTO shortcuts (name, description, link, icon)
 VALUES 
   ('Favorites', 'Your favorite companies', '/search?favorites=true', 'mdi-star'),
   ('Search', '', '/search', 'mdi-magnify'),

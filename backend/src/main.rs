@@ -5,7 +5,7 @@ use actix_web::web::Data;
 use actix_web::{middleware::Logger, App};
 use actix_web::HttpServer;
 use std::env;
-use sqlx::mysql::MySqlPoolOptions;
+use sqlx::postgres::PgPoolOptions;
 
 // access logs are printed with the INFO level so ensure it is enabled by default
 
@@ -16,7 +16,7 @@ async fn main() -> std::io::Result<()> {
 
 
     let database_url = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = MySqlPoolOptions::new()
+    let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(database_url).await.expect("Failed to initialize Database pool");
 

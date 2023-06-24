@@ -25,3 +25,12 @@ services:
       MYSQL_USER: catalogue
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpass
+
+  postgres:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: catalogue
+      POSTGRES_PASSWORD: password

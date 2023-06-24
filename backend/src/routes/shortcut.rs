@@ -1,9 +1,8 @@
 use actix_web::web::Json;
-use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse, error};
+use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse};
 use serde::{Deserialize, Serialize};
-use sqlx::{MySqlPool, MySql, Pool};
+use sqlx::PgPool;
 
-use crate::errors::MyError;
 use crate::services;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
@@ -27,14 +26,14 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/")]
-    async fn get_all_handler(db: web::Data<MySqlPool>) -> Result<impl Responder> {
+    async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
     let shortcuts = services::shortcut::get_all((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok().json(shortcuts))
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<MySqlPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
     let shortcut = services::shortcut::get_by_id((*db).as_ref().clone(), id).await?;
 
@@ -42,7 +41,7 @@ async fn get_by_id_handler(db: web::Data<MySqlPool>, path: web::Path<i32>) -> Re
 }
 
 #[put("/")]
-async fn update_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
+async fn update_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
     let input_shortcut = data.into_inner();
 
     let response = match input_shortcut.id {
@@ -72,7 +71,7 @@ async fn update_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Re
 }
 
 #[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
+async fn create_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Result<impl Responder> {
     let input_shortcut = data.into_inner();
     let affected_rows = services::shortcut::create((*db).as_ref().clone(), input_shortcut).await?;
 
@@ -80,7 +79,7 @@ async fn create_handler(db: web::Data<MySqlPool>, data: Json<ShortcutWeb>) -> Re
 }
 
 #[delete("/{id}")]
-async fn delete_handler(db: web::Data<MySqlPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::shortcut::delete((*db).as_ref().clone(), id).await?;
    
