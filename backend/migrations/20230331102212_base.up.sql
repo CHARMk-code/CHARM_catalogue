@@ -86,7 +86,7 @@ CREATE TABLE maps (
   id serial NOT NULL,
   name varchar(100) DEFAULT NULL NOT NULL,
   image varchar(100) DEFAULT NULL NOT NULL,
-  ref int DEFAULT NULL NOT NULL,
+  reference int DEFAULT NULL NOT NULL,
   PRIMARY KEY (id)
 );
 
