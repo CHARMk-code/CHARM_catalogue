@@ -9,7 +9,7 @@ use crate::services;
 pub struct ShortcutWeb {
     pub id: Option<i32>,
     pub name: Option<String>,
-    pub desc: Option<String>,
+    pub description: Option<String>,
     pub link: Option<String>,
     pub icon: Option<String>,
 }
@@ -48,11 +48,11 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Resul
         | Some(_) => {
 
             let name = input_shortcut.name.as_ref(); 
-            let desc = input_shortcut.desc.as_ref();
+            let description = input_shortcut.description.as_ref();
             let link = input_shortcut.link.as_ref();
             let icon = input_shortcut.icon.as_ref();
 
-            if name.and(desc).and(link).and(icon).is_none() {
+            if name.and(description).and(link).and(icon).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
                 let shortcut = services::shortcut::update((*db).as_ref().clone(), input_shortcut).await?;

@@ -20,12 +20,12 @@ pub struct ShortcutDB {
 
 pub async fn create(db: Pool<Postgres>, data: ShortcutWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;
-    let desc = is_valid_required_field(&data.desc)?;
+    let description = is_valid_required_field(&data.description)?;
     let icon = is_valid_required_field(&data.icon)?;
     let link = is_valid_required_field(&data.link)?;
     
     let query_result = sqlx::query!("INSERT INTO shortcuts (name, description, link, icon) VALUES ($1, $2, $3, $4) returning id",
-        name, desc, link, icon)
+        name, description, link, icon)
         .fetch_one(&db).await.map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
@@ -42,13 +42,13 @@ pub async fn update(db: Pool<Postgres>, data: ShortcutWeb) -> Result<i32, actix_
         .await.map_err(MyError::SQLxError)?;
 
     let name = data.name.as_ref();
-    let desc = data.desc.as_ref();
+    let description = data.description.as_ref();
     let link = data.link.as_ref();
     let icon = data.icon.as_ref();
 
     let query_result = sqlx::query!("UPDATE shortcuts SET name = $1, description = $2, link = $3, icon = $4 where id = $5 returning id",
         if name.is_some() {name.unwrap()} else {&shortcut.name}, 
-        if desc.is_some() {desc.unwrap()} else {&shortcut.description}, 
+        if description.is_some() {description.unwrap()} else {&shortcut.description}, 
         if link.is_some() {link.unwrap()} else {&shortcut.link}, 
         if icon.is_some() {icon.unwrap()} else {&shortcut.icon}, 
         data.id)

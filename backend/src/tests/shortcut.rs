@@ -13,7 +13,7 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(db: Pool<Post
     let updated_shortcut = routes::shortcut::ShortcutWeb {
         id: Some(initial_db_shortcut.id),
         name: Some("Updated_Favorites".to_string()),
-        desc: Some("Updated_Description".to_string()),
+        description: Some("Updated_Description".to_string()),
         link: Some("Updated_Link".to_string()),
         icon: Some("Updated_icon".to_string())
     };
@@ -46,7 +46,7 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(db: Pool<Postgres>) -
     let new_shortcut = routes::shortcut::ShortcutWeb {
         id: None,
         name: Some("New shortcut".to_string()),
-        desc: Some("New shortcut description".to_string()),
+        description: Some("New shortcut description".to_string()),
         link: Some("link/to/somewhere".to_string()),
         icon: Some("Updated_icon".to_string())
     };
@@ -61,7 +61,7 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(db: Pool<Postgres>) -
     let expected_shortcut = services::shortcut::ShortcutDB {
         id: created_id.try_into().expect("Should be a convertable number"),
         name: new_shortcut.name.unwrap(),
-        description: new_shortcut.desc.unwrap(),
+        description: new_shortcut.description.unwrap(),
         link: new_shortcut.link.unwrap(),
         icon: new_shortcut.icon.unwrap() 
     };
