@@ -3,6 +3,7 @@ pub mod tag;
 pub mod map;
 pub mod layout;
 pub mod prepage;
+pub mod feedback;
 
 
 use actix_web::web;
@@ -12,7 +13,10 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
         web::scope("/api/v2")
             .configure(shortcut::routes)
             .configure(tag::routes)
-            .configure(map::routes),
+            .configure(map::routes)
+            .configure(layout::routes)
+            .configure(prepage::routes)
+            .configure(feedback::routes)
     );
 }
 

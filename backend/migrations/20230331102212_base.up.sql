@@ -67,7 +67,7 @@ CREATE TABLE feedback (
   title varchar(50) DEFAULT NULL NOT NULL,
   text varchar(1000) DEFAULT NULL NOT NULL,
   meta varchar(1000) DEFAULT NULL NOT NULL,
-  received timestamp DEFAULT NULL NOT NULL,
+  received timestamptz DEFAULT NULL NOT NULL,
   important boolean DEFAULT FALSE NOT NULL,
   archived boolean DEFAULT FALSE NOT NULL,
   PRIMARY KEY (id)

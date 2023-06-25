@@ -3,6 +3,7 @@ pub mod tag;
 pub mod map;
 pub mod layout;
 pub mod prepage;
+pub mod feedback;
 
 pub fn is_valid_required_field<T>(val: &Option<T>) -> Result<&T, actix_web::Error> {
     match val.as_ref() {
