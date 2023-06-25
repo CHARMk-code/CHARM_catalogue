@@ -74,7 +74,7 @@ CREATE TABLE feedback (
 );
 
 
-CREATE TABLE layout (
+CREATE TABLE layouts (
   id serial NOT NULL,
   image varchar(100) DEFAULT NULL NOT NULL,
   active boolean DEFAULT NULL NOT NULL,

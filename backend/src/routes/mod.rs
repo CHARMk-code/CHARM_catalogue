@@ -1,6 +1,7 @@
 pub mod shortcut;
 pub mod tag;
 pub mod map;
+pub mod layout;
 
 use actix_web::web;
 
