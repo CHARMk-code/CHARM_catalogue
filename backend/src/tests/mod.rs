@@ -4,3 +4,4 @@ mod map;
 mod layout;
 mod prepage;
 mod feedback;
+mod company;

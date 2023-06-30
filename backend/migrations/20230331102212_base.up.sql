@@ -6,7 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE companies (
   id serial NOT NULL NOT NULL,
-  last_updated timestamp DEFAULT NULL NOT NULL,
+  last_updated timestamptz DEFAULT NULL NOT NULL,
   active boolean DEFAULT NULL NOT NULL,
   charmtalk boolean DEFAULT NULL NOT NULL,
   name varchar(200) DEFAULT NULL NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE companies (
   unique_selling_point varchar(1000) DEFAULT NULL NOT NULL,
   summer_job_description varchar(1000) DEFAULT NULL NOT NULL,
   summer_job_link varchar(1000) DEFAULT NULL NOT NULL,
-  summer_job_deadline date DEFAULT NULL NOT NULL,
+  summer_job_deadline timestamptz DEFAULT NULL NOT NULL,
   contacts varchar(100) DEFAULT NULL NOT NULL,
   contact_email varchar(320) DEFAULT NULL NOT NULL,
   employees_world int DEFAULT NULL NOT NULL,
