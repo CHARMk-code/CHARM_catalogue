@@ -153,6 +153,8 @@ async fn valid_update_on_existing_company_should_update_row_in_db(db: Pool<Postg
     let initial_companies_tags = sqlx::query_as!(CompanyTagRel, "SELECT * FROM companies_tags").fetch_all(&db).await?;
    
     let initial_first_company = initial_companies.first().unwrap();
+    let initial_other_companies = initial_companies.iter().filter(|r| r.id != initial_first_company.id).collect::<Vec<&services::company::CompanyDB>>();
+
     let first_company_update = routes::company::CompanyWeb {
         id: Some(initial_first_company.id),
     	last_updated: None,
@@ -178,18 +180,19 @@ async fn valid_update_on_existing_company_should_update_row_in_db(db: Pool<Postg
 
     // What's tested
     
-    //check output validity
+    // Check output validity
     let update_query_result = services::company::update(db.clone(), first_company_update).await;
     assert!(update_query_result.is_ok(), "Update should not return an error");
     assert_eq!(update_query_result.unwrap(), initial_first_company.id, "Update should return the id of the updated row");
     
     // Check updates of company table
     let updated_companies = services::company::get_all(db.clone()).await.unwrap();
-    let updated_first_company = updated_companies.first().unwrap();
+    let updated_first_company = updated_companies.iter().cloned().filter(|r| r.id == initial_first_company.id).next().unwrap();
+    let updated_other_companies = updated_companies.iter().filter(|r| r.id != initial_first_company.id).collect::<Vec<&services::company::CompanyDB>>();
     
     assert_eq!(
         updated_first_company, 
-        &services::company::CompanyDB {
+        services::company::CompanyDB {
             id: initial_first_company.id,
             last_updated: DateTime::parse_from_str("2023-06-25 21:00:00+02", "%F %T%#z").unwrap().into(),
             active: true,
@@ -212,7 +215,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(db: Pool<Postg
             tags: Some(vec![3])
         },
     "The updated sure the company has been properly updated in the database");
-    assert_eq!(initial_companies[1..],updated_companies[1..], "Update should not affect other rows");
+    assert_eq!(initial_other_companies, updated_other_companies, "Update should not affect other rows");
 
     // Check updates of companies_tags table
     let remaining_companies_tags_rows = sqlx::query_as!(CompanyTagRel, "SELECT * FROM companies_tags").fetch_all(&db).await?;
