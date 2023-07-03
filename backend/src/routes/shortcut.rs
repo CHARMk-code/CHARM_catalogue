@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -21,12 +21,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_by_id_handler)
             .service(update_handler)
             .service(create_handler)
-            .service(delete_handler)
+            .service(delete_handler),
     );
 }
 
 #[get("/")]
-    async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
+async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
     let shortcuts = services::shortcut::get_all((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok().json(shortcuts))
@@ -45,9 +45,8 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Resul
     let input_shortcut = data.into_inner();
 
     let response = match input_shortcut.id {
-        | Some(_) => {
-
-            let name = input_shortcut.name.as_ref(); 
+        Some(_) => {
+            let name = input_shortcut.name.as_ref();
             let description = input_shortcut.description.as_ref();
             let link = input_shortcut.link.as_ref();
             let icon = input_shortcut.icon.as_ref();
@@ -55,14 +54,14 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Resul
             if name.and(description).and(link).and(icon).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let shortcut = services::shortcut::update((*db).as_ref().clone(), input_shortcut).await?;
+                let shortcut =
+                    services::shortcut::update((*db).as_ref().clone(), input_shortcut).await?;
                 HttpResponse::Ok().json(shortcut)
             }
-
-
-        },
-        | None => {
-            let shortcut = services::shortcut::create((*db).as_ref().clone(), input_shortcut).await?;
+        }
+        None => {
+            let shortcut =
+                services::shortcut::create((*db).as_ref().clone(), input_shortcut).await?;
             HttpResponse::Created().json(shortcut)
         }
     };
@@ -82,7 +81,6 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<ShortcutWeb>) -> Resul
 async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::shortcut::delete((*db).as_ref().clone(), id).await?;
-   
+
     Ok(HttpResponse::Ok().json(affected_rows))
 }
-

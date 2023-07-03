@@ -1,7 +1,7 @@
 use actix_web::web::Json;
-use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse, error};
+use actix_web::{delete, error, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool};
+use sqlx::PgPool;
 
 use crate::errors::MyError;
 use crate::services;
@@ -30,12 +30,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_by_id_handler)
             .service(update_handler)
             .service(create_handler)
-            .service(delete_handler)
+            .service(delete_handler),
     );
 }
 
 #[get("/")]
-    async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
+async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
     let tags = services::tag::get_all((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok().json(tags))
@@ -54,8 +54,7 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<imp
     let input_tag = data.into_inner();
 
     let response = match input_tag.id {
-        | Some(_) => {
-
+        Some(_) => {
             let name = input_tag.name.as_ref();
             let parent_tag = input_tag.parent_tag.as_ref();
             let up_votes = input_tag.up_votes.as_ref();
@@ -68,16 +67,26 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<imp
             let language = input_tag.language.as_ref();
             let fair_area = input_tag.fair_area.as_ref();
 
-            if name.and(parent_tag).and(up_votes).and(down_votes).and(icon).and(division).and(business_area).and(looking_for).and(offering).and(language).and(fair_area).is_none() {
+            if name
+                .and(parent_tag)
+                .and(up_votes)
+                .and(down_votes)
+                .and(icon)
+                .and(division)
+                .and(business_area)
+                .and(looking_for)
+                .and(offering)
+                .and(language)
+                .and(fair_area)
+                .is_none()
+            {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
                 let tag = services::tag::update((*db).as_ref().clone(), input_tag).await?;
                 HttpResponse::Ok().json(tag)
             }
-
-
-        },
-        | None => {
+        }
+        None => {
             let tag = services::tag::create((*db).as_ref().clone(), input_tag).await?;
             HttpResponse::Created().json(tag)
         }
@@ -98,7 +107,6 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<imp
 async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::tag::delete((*db).as_ref().clone(), id).await?;
-   
+
     Ok(HttpResponse::Ok().json(affected_rows))
 }
-

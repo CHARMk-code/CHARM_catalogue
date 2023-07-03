@@ -1,12 +1,12 @@
 use actix_web::web::Json;
-use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::services;
 
-use chrono::DateTime;
 use chrono::offset::Utc;
+use chrono::DateTime;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct FeedbackWeb {
@@ -16,7 +16,7 @@ pub struct FeedbackWeb {
     pub meta: Option<String>,
     pub received: Option<DateTime<Utc>>,
     pub important: Option<bool>,
-    pub archived: Option<bool>
+    pub archived: Option<bool>,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -26,12 +26,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_by_id_handler)
             .service(update_handler)
             .service(create_handler)
-            .service(delete_handler)
+            .service(delete_handler),
     );
 }
 
 #[get("/")]
-    async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
+async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
     let feedback = services::feedback::get_all((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok().json(feedback))
@@ -50,8 +50,7 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Resul
     let input_feedback = data.into_inner();
 
     let response = match input_feedback.id {
-        | Some(_) => {
-
+        Some(_) => {
             let title = input_feedback.title.as_ref();
             let text = input_feedback.text.as_ref();
             let meta = input_feedback.meta.as_ref();
@@ -59,17 +58,24 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Resul
             let important = input_feedback.important.as_ref();
             let archived = input_feedback.archived.as_ref();
 
-            if title.and(text).and(meta).and(received).and(important).and(archived).is_none() {
+            if title
+                .and(text)
+                .and(meta)
+                .and(received)
+                .and(important)
+                .and(archived)
+                .is_none()
+            {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let feedback = services::feedback::update((*db).as_ref().clone(), input_feedback).await?;
+                let feedback =
+                    services::feedback::update((*db).as_ref().clone(), input_feedback).await?;
                 HttpResponse::Ok().json(feedback)
             }
-
-
-        },
-        | None => {
-            let feedback = services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
+        }
+        None => {
+            let feedback =
+                services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
             HttpResponse::Created().json(feedback)
         }
     };
@@ -92,4 +98,3 @@ async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<i
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }
-

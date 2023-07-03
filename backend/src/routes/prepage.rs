@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use actix_web::{web, get, put, Result, Responder, post, delete, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -13,7 +13,7 @@ pub struct PrepageWeb {
     pub active: Option<bool>,
     pub mobile: Option<bool>,
     pub side: Option<String>,
-    pub page: Option<i32>
+    pub page: Option<i32>,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -23,12 +23,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_by_id_handler)
             .service(update_handler)
             .service(create_handler)
-            .service(delete_handler)
+            .service(delete_handler),
     );
 }
 
 #[get("/")]
-    async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
+async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
     let prepages = services::prepage::get_all((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok().json(prepages))
@@ -47,8 +47,7 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<PrepageWeb>) -> Result
     let input_prepage = data.into_inner();
 
     let response = match input_prepage.id {
-        | Some(_) => {
-
+        Some(_) => {
             let name = input_prepage.name.as_ref();
             let image = input_prepage.image.as_ref();
             let active = input_prepage.active.as_ref();
@@ -56,16 +55,22 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<PrepageWeb>) -> Result
             let side = input_prepage.side.as_ref();
             let page = input_prepage.page.as_ref();
 
-            if name.and(image).and(active).and(mobile).and(side).and(page).is_none() {
+            if name
+                .and(image)
+                .and(active)
+                .and(mobile)
+                .and(side)
+                .and(page)
+                .is_none()
+            {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let prepage = services::prepage::update((*db).as_ref().clone(), input_prepage).await?;
+                let prepage =
+                    services::prepage::update((*db).as_ref().clone(), input_prepage).await?;
                 HttpResponse::Ok().json(prepage)
             }
-
-
-        },
-        | None => {
+        }
+        None => {
             let prepage = services::prepage::create((*db).as_ref().clone(), input_prepage).await?;
             HttpResponse::Created().json(prepage)
         }
@@ -89,4 +94,3 @@ async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<i
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }
-

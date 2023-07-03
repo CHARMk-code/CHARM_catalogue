@@ -1,14 +1,13 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{Postgres, Pool};
+use sqlx::{Pool, Postgres};
 
 use crate::errors::MyError;
 use crate::routes::feedback::FeedbackWeb;
 
-use chrono::DateTime;
 use chrono::offset::Utc;
+use chrono::DateTime;
 
 use super::is_valid_required_field;
-
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct FeedbackDB {
@@ -20,8 +19,6 @@ pub struct FeedbackDB {
     pub important: bool,
     pub archived: bool,
 }
-
-
 
 pub async fn create(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_web::Error> {
     let title = is_valid_required_field(&data.title)?;
@@ -36,7 +33,6 @@ title, text, meta, received, important, archived)
         .fetch_one(&db).await.map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
-
 }
 
 pub async fn update(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_web::Error> {
@@ -46,7 +42,8 @@ pub async fn update(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_
     // (TODO change the second query to only use the data values that will be updated)
     let feedback = sqlx::query_as!(FeedbackDB, "SELECT * FROM feedback where id = $1", id)
         .fetch_one(&db)
-        .await.map_err(MyError::SQLxError)?;
+        .await
+        .map_err(MyError::SQLxError)?;
 
     let title = data.title.as_ref();
     let text = data.text.as_ref();
@@ -70,22 +67,28 @@ pub async fn update(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_
 }
 
 pub async fn delete(db: Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
-    let query_result = sqlx::query!("DELETE FROM feedback WHERE id = $1", id).execute(&db).await.map_err(MyError::SQLxError)?;
+    let query_result = sqlx::query!("DELETE FROM feedback WHERE id = $1", id)
+        .execute(&db)
+        .await
+        .map_err(MyError::SQLxError)?;
 
     Ok(query_result.rows_affected())
-
 }
 
-pub async fn get_all(db: Pool<Postgres>) ->  Result<Vec<FeedbackDB>, actix_web::Error> {
+pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<FeedbackDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(FeedbackDB, "SELECT * FROM feedback")
-        .fetch_all(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_all(&db)
+        .await
+        .map_err(MyError::SQLxError)?;
 
     Ok(query_result)
 }
 
 pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<FeedbackDB, actix_web::Error> {
     let query_result = sqlx::query_as!(FeedbackDB, "SELECT * FROM feedback where id = $1", id)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(&db)
+        .await
+        .map_err(MyError::SQLxError)?;
 
     Ok(query_result)
 }

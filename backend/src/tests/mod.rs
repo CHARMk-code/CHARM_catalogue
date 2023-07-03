@@ -1,7 +1,7 @@
+mod company;
+mod feedback;
+mod layout;
+mod map;
+mod prepage;
 mod shortcut;
 mod tag;
-mod map;
-mod layout;
-mod prepage;
-mod feedback;
-mod company;
