@@ -42,7 +42,6 @@ pub async fn update(db: Pool<Postgres>, data: MapWeb) -> Result<i32, actix_web::
         .await
         .map_err(MyError::SQLxError)?;
 
-    let id = data.id.as_ref();
     let name = data.name.as_ref();
     let image = data.image.as_ref();
     let reference = data.reference.as_ref();

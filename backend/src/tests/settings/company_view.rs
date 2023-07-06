@@ -13,8 +13,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let result =
-        services::settings::company_view::get_by_id(db.clone(), initial_db_company_card.id).await;
+    let result = services::settings::company_view::get_by_id(&db, initial_db_company_card.id).await;
     assert!(result.is_ok(), "Get by id should not fail");
     assert_eq!(initial_db_company_card, result.unwrap());
     Ok(())
@@ -23,16 +22,16 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
 #[sqlx::test()]
 async fn reset_should_not_change_anything_from_default(db: Pool<Postgres>) -> Result<(), Error> {
     // Setup
-    let initial_company_view = services::settings::company_view::get_all(db.clone()).await;
+    let initial_company_view = services::settings::company_view::get_all(&db).await;
     assert!(
         initial_company_view.is_ok(),
         "Get all copmany cards should not fail"
     );
 
-    let reset_result = services::settings::company_view::reset(db.clone()).await;
+    let reset_result = services::settings::company_view::reset(&db).await;
     assert!(reset_result.is_ok(), "reset function should not fail");
 
-    let reset_company_view = services::settings::company_view::get_all(db.clone()).await;
+    let reset_company_view = services::settings::company_view::get_all(&db).await;
     assert_eq!(
         initial_company_view.unwrap(),
         reset_company_view.unwrap(),
@@ -47,7 +46,7 @@ async fn valid_update_on_existing_company_view_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_company_views = services::settings::company_view::get_all(db.clone())
+    let initial_company_views = services::settings::company_view::get_all(&db)
         .await
         .unwrap();
 
@@ -68,7 +67,7 @@ async fn valid_update_on_existing_company_view_should_update_row_in_db(
 
     // Check output validity
     let update_query_result =
-        services::settings::company_view::update(db.clone(), first_company_view_update).await;
+        services::settings::company_view::update(&db, first_company_view_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -80,7 +79,7 @@ async fn valid_update_on_existing_company_view_should_update_row_in_db(
     );
 
     // Check updates of company_view table
-    let updated_company_views = services::settings::company_view::get_all(db.clone())
+    let updated_company_views = services::settings::company_view::get_all(&db)
         .await
         .unwrap();
     let updated_first_company_view = updated_company_views

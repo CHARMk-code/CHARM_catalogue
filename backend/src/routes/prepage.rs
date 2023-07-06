@@ -45,7 +45,7 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 
 #[put("/")]
 async fn update_handler(
-    user_: AuthedUser,
+    _user: AuthedUser,
     db: web::Data<PgPool>,
     data: Json<PrepageWeb>,
 ) -> Result<impl Responder> {
@@ -86,7 +86,7 @@ async fn update_handler(
 
 #[post("/")] // TODO Deprecatea in favor of put
 async fn create_handler(
-    user_: AuthedUser,
+    _user: AuthedUser,
     db: web::Data<PgPool>,
     data: Json<PrepageWeb>,
 ) -> Result<impl Responder> {
@@ -98,7 +98,7 @@ async fn create_handler(
 
 #[delete("/{id}")]
 async fn delete_handler(
-    user_: AuthedUser,
+    _user: AuthedUser,
     db: web::Data<PgPool>,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {

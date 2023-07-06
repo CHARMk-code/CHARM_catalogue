@@ -24,7 +24,7 @@ pub struct UserLoginWeb {
     pub password: String,
 }
 
-// NOTE: Currently the same as UserLoginWe but with more sofisticated accounts a user
+// NOTE: Currently the same as UserLoginWeb but with more sofisticated accounts a user
 // will be more than a password and most likely more than what's needed for login
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserWeb {
@@ -60,9 +60,9 @@ async fn update_password_handler(
 }
 
 #[get("/")]
-async fn register_handler(db: web::Data<PgPool>, data: Json<UserWeb>) -> Result<impl Responder> {
+async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, data: Json<UserWeb>) -> Result<impl Responder> {
     println!("register: {:?}", data);
     let user_id = services::auth::create_user(&db, data.into_inner()).await?;
+
     Ok(HttpResponse::Ok().json(user_id))
-    // }
 }

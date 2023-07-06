@@ -33,5 +33,18 @@ pub fn generated_token_should_be_validateable_by_the_same_keypair() -> Result<()
     Ok(())
 }
 
+#[test]
+pub fn invalid_token_should_not_be_valid() -> Result<(), jwt_simple::Error> {
+    let key_pair = jwt_simple::prelude::Ed25519KeyPair::generate();
+    let token = "asdfjlkasdrfuytnmansjhkjlsfhgueirythjk".to_string();
+
+    assert!(
+        validate_token::<NoCustomClaims>(&token, key_pair).is_err(),
+        "validating random string should error"
+    );
+
+    Ok(())
+}
+
 //TODO: Write tests for getting, updating and creating users. However wait for remake of
 //authentication system before that
