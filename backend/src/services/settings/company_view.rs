@@ -12,10 +12,14 @@ pub struct CompanyCardDB {
 }
 
 pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<CompanyCardDB, actix_web::Error> {
-    let cards = query_as!(CompanyCardDB, "SELECT * FROM company_cards where id = $1", id)
-        .fetch_one(&db)
-        .await
-        .map_err(MyError::SQLxError)?;
+    let cards = query_as!(
+        CompanyCardDB,
+        "SELECT * FROM company_cards where id = $1",
+        id
+    )
+    .fetch_one(&db)
+    .await
+    .map_err(MyError::SQLxError)?;
 
     Ok(cards)
 }
@@ -116,12 +120,14 @@ pub async fn reset(db: Pool<Postgres>) -> Result<(), actix_web::Error> {
 
     let active = vec![true; 16];
 
-    query!("DELETE FROM company_cards").execute(&db)
+    query!("DELETE FROM company_cards")
+        .execute(&db)
         .await
         .map_err(MyError::SQLxError)?;
     // Reset the id counter every time this is done so that the IDs wont increment on each reset
     // probably not needed but frontend might get duplicates otherwise
-    query!("ALTER SEQUENCE company_cards_id_seq RESTART WITH 1").execute(&db)
+    query!("ALTER SEQUENCE company_cards_id_seq RESTART WITH 1")
+        .execute(&db)
         .await
         .map_err(MyError::SQLxError)?;
 
@@ -131,7 +137,10 @@ pub async fn reset(db: Pool<Postgres>) -> Result<(), actix_web::Error> {
         &name,
         &text,
         &active
-    ).execute(&db).await.map_err(MyError::SQLxError)?;
+    )
+    .execute(&db)
+    .await
+    .map_err(MyError::SQLxError)?;
 
     Ok(())
 }

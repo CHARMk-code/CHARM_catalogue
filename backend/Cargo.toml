@@ -7,8 +7,11 @@ edition = "2021"
 
 [dependencies]
 actix-web = { version = "4"}  
+actix-web-httpauth = { version = "0.8"}
 env_logger = { version = "0.10" }
 sqlx = { version = "0.6", default-features = false, features = ["postgres", "runtime-tokio-rustls",  "macros", "offline", "migrate", "chrono"]}
 serde = { version = "1.0" }
 derive_more = { version = "0.99"}
 chrono = { version = "0.4.2", features = ["serde"]}
+rust-argon2 = "1.0"
+jwt-simple = "0.11.5"

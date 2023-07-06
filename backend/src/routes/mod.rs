@@ -1,12 +1,12 @@
+pub mod auth;
 pub mod company;
 pub mod feedback;
 pub mod layout;
 pub mod map;
 pub mod prepage;
+pub mod settings;
 pub mod shortcut;
 pub mod tag;
-pub mod settings;
-pub mod auth;
 
 use actix_web::web;
 
@@ -20,6 +20,7 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
             .configure(prepage::routes)
             .configure(feedback::routes)
             .configure(company::routes)
+            .configure(auth::routes)
             .configure(settings::scope),
     );
 }

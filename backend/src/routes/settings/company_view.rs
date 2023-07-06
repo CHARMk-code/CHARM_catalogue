@@ -13,7 +13,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         web::scope("/company_view")
             .service(get_all_handler)
             .service(reset_company_view_handler)
-            .service(update_company_view_handler)
+            .service(update_company_view_handler),
     );
 }
 
