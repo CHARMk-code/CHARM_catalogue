@@ -82,11 +82,7 @@ last_updated, active, charmtalk, name, description, unique_selling_point, summer
     // Create the company (one) to tag (many) relation
     if tags.len() > 0 {
         let _create_tag_relation_query_result = sqlx::query!(
-            "INSERT INTO companies_tags (company_id, tag_id) 
-        (SELECT * FROM UNNEST( 
-          array_fill($1::int, ARRAY[$3::int]),
-          $2::int[]))
-        ",
+            "INSERT INTO companies_tags (company_id, tag_id) (SELECT * FROM UNNEST(array_fill($1::int, ARRAY[$3::int]), $2::int[]))",
             new_company_id,
             tags,
             tags.len() as i32

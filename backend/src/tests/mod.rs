@@ -5,3 +5,4 @@ mod map;
 mod prepage;
 mod shortcut;
 mod tag;
+mod settings;
