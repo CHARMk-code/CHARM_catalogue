@@ -1,10 +1,10 @@
 use actix_web::web::Json;
-use actix_web::{delete, error, get, post, put, web, HttpResponse, Responder, Result};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::errors::MyError;
 use crate::services;
+use crate::services::auth::AuthedUser;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct TagWeb {

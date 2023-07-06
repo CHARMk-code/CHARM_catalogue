@@ -11,29 +11,29 @@ pub struct CompanyCardDB {
     pub active: bool,
 }
 
-pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<CompanyCardDB, actix_web::Error> {
+pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<CompanyCardDB, actix_web::Error> {
     let cards = query_as!(
         CompanyCardDB,
         "SELECT * FROM company_cards where id = $1",
         id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
     Ok(cards)
 }
 
-pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<CompanyCardDB>, actix_web::Error> {
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<CompanyCardDB>, actix_web::Error> {
     let cards = query_as!(CompanyCardDB, "SELECT * FROM company_cards")
-        .fetch_all(&db)
+        .fetch_all(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(cards)
 }
 
-pub async fn update(db: Pool<Postgres>, data: CompanyCardWeb) -> Result<i32, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: CompanyCardWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
@@ -43,11 +43,10 @@ pub async fn update(db: Pool<Postgres>, data: CompanyCardWeb) -> Result<i32, act
         "SELECT * FROM company_cards where id = $1",
         id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
-    let id = data.id.as_ref();
     let name = data.name.as_ref();
     let text = data.text.as_ref();
     let active = data.active.as_ref();
@@ -71,7 +70,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyCardWeb) -> Result<i32, act
         },
         data.id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
@@ -79,7 +78,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyCardWeb) -> Result<i32, act
 }
 
 // TODO: Make this company_card reset function actually do something smart
-pub async fn reset(db: Pool<Postgres>) -> Result<(), actix_web::Error> {
+pub async fn reset(db: &Pool<Postgres>) -> Result<(), actix_web::Error> {
     let text = vec![
         "Logo".to_string(),
         "Name".to_string(),
@@ -121,13 +120,13 @@ pub async fn reset(db: Pool<Postgres>) -> Result<(), actix_web::Error> {
     let active = vec![true; 16];
 
     query!("DELETE FROM company_cards")
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
     // Reset the id counter every time this is done so that the IDs wont increment on each reset
     // probably not needed but frontend might get duplicates otherwise
     query!("ALTER SEQUENCE company_cards_id_seq RESTART WITH 1")
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
 
@@ -138,7 +137,7 @@ pub async fn reset(db: Pool<Postgres>) -> Result<(), actix_web::Error> {
         &text,
         &active
     )
-    .execute(&db)
+    .execute(db)
     .await
     .map_err(MyError::SQLxError)?;
 
