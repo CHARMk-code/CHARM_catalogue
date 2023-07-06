@@ -50,7 +50,11 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 }
 
 #[put("/")]
-async fn update_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<impl Responder> {
+async fn update_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<TagWeb>,
+) -> Result<impl Responder> {
     let input_tag = data.into_inner();
 
     let response = match input_tag.id {
@@ -96,7 +100,11 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<imp
 }
 
 #[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<impl Responder> {
+async fn create_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<TagWeb>,
+) -> Result<impl Responder> {
     let input_tag = data.into_inner();
     let affected_rows = services::tag::create((*db).as_ref().clone(), input_tag).await?;
 
@@ -104,7 +112,11 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<TagWeb>) -> Result<imp
 }
 
 #[delete("/{id}")]
-async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn delete_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    path: web::Path<i32>,
+) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::tag::delete((*db).as_ref().clone(), id).await?;
 

@@ -1,10 +1,10 @@
 use actix_web::web::Json;
-use actix_web::{delete, error, get, post, put, web, HttpResponse, Responder, Result};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::errors::MyError;
 use crate::services;
+use crate::services::auth::AuthedUser;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct MapWeb {
@@ -41,7 +41,11 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 }
 
 #[put("/")]
-async fn update_handler(db: web::Data<PgPool>, data: Json<MapWeb>) -> Result<impl Responder> {
+async fn update_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<MapWeb>,
+) -> Result<impl Responder> {
     let input_map = data.into_inner();
 
     let response = match input_map.id {
@@ -67,7 +71,11 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<MapWeb>) -> Result<imp
 }
 
 #[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(db: web::Data<PgPool>, data: Json<MapWeb>) -> Result<impl Responder> {
+async fn create_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<MapWeb>,
+) -> Result<impl Responder> {
     let input_map = data.into_inner();
     let affected_rows = services::map::create((*db).as_ref().clone(), input_map).await?;
 
@@ -75,7 +83,11 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<MapWeb>) -> Result<imp
 }
 
 #[delete("/{id}")]
-async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn delete_handler(
+    _user: AuthedUser,
+    db: web::Data<PgPool>,
+    path: web::Path<i32>,
+) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::map::delete((*db).as_ref().clone(), id).await?;
 

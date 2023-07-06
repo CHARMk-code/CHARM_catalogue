@@ -4,14 +4,11 @@ use actix_web::{
     HttpResponse, Responder, Result,
 };
 
-use jwt_simple::prelude::{Ed25519KeyPair, NoCustomClaims};
+use jwt_simple::prelude::Ed25519KeyPair;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::services::{
-    self,
-    auth::{AuthedUser, UserDB},
-};
+use crate::services::{self, auth::AuthedUser};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

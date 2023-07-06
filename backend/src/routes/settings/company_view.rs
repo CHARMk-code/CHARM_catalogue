@@ -6,7 +6,7 @@ use actix_web::{
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::services;
+use crate::services::{self, auth::AuthedUser};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -33,7 +33,10 @@ async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
 }
 
 #[post("/reset")]
-async fn reset_company_view_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
+async fn reset_company_view_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+) -> Result<impl Responder> {
     let response = services::settings::company_view::reset((*db).as_ref().clone()).await?;
 
     Ok(HttpResponse::Ok())
@@ -41,6 +44,7 @@ async fn reset_company_view_handler(db: web::Data<PgPool>) -> Result<impl Respon
 
 #[put("/")]
 async fn update_company_view_handler(
+    user_: AuthedUser,
     db: web::Data<PgPool>,
     data: Json<CompanyCardWeb>,
 ) -> Result<impl Responder> {

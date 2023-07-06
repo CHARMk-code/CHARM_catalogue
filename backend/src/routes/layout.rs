@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::services;
+use crate::services::auth::AuthedUser;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct LayoutWeb {
@@ -40,7 +41,11 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 }
 
 #[put("/")]
-async fn update_handler(db: web::Data<PgPool>, data: Json<LayoutWeb>) -> Result<impl Responder> {
+async fn update_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<LayoutWeb>,
+) -> Result<impl Responder> {
     let input_layout = data.into_inner();
 
     let response = match input_layout.id {
@@ -67,7 +72,11 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<LayoutWeb>) -> Result<
 }
 
 #[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(db: web::Data<PgPool>, data: Json<LayoutWeb>) -> Result<impl Responder> {
+async fn create_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<LayoutWeb>,
+) -> Result<impl Responder> {
     let input_layout = data.into_inner();
     let affected_rows = services::layout::create((*db).as_ref().clone(), input_layout).await?;
 
@@ -75,7 +84,11 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<LayoutWeb>) -> Result<
 }
 
 #[delete("/{id}")]
-async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn delete_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    path: web::Path<i32>,
+) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::layout::delete((*db).as_ref().clone(), id).await?;
 

@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::services;
+use crate::services::auth::AuthedUser;
 
 use chrono::offset::Utc;
 use chrono::DateTime;
@@ -46,7 +47,11 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 }
 
 #[put("/")]
-async fn update_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Result<impl Responder> {
+async fn update_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<FeedbackWeb>,
+) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
 
     let response = match input_feedback.id {
@@ -84,7 +89,11 @@ async fn update_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Resul
 }
 
 #[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Result<impl Responder> {
+async fn create_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    data: Json<FeedbackWeb>,
+) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
     let affected_rows = services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
 
@@ -92,7 +101,11 @@ async fn create_handler(db: web::Data<PgPool>, data: Json<FeedbackWeb>) -> Resul
 }
 
 #[delete("/{id}")]
-async fn delete_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn delete_handler(
+    user_: AuthedUser,
+    db: web::Data<PgPool>,
+    path: web::Path<i32>,
+) -> Result<impl Responder> {
     let id = path.into_inner();
     let affected_rows = services::feedback::delete((*db).as_ref().clone(), id).await?;
 
