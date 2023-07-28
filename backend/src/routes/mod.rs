@@ -8,6 +8,7 @@ pub mod settings;
 pub mod shortcut;
 pub mod tag;
 pub mod batch;
+pub mod image;
 
 use actix_web::web;
 
@@ -23,6 +24,7 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
             .configure(company::routes)
             .configure(auth::routes)
             .configure(batch::routes)
+            .configure(image::routes)
             .configure(settings::scope),
     );
 }
