@@ -75,11 +75,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
 
     let new_company = routes::company::CompanyWeb {
         id: None,
-        last_updated: Some(
-            DateTime::parse_from_str("2023-06-26 10:00:00+02", "%F %T%#z")
-                .unwrap()
-                .into(),
-        ),
+        last_updated: None,
         active: Some(true),
         charmtalk: Some(false),
         name: Some("New company".to_string()),
@@ -126,9 +122,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
 
     let expected_company = services::company::CompanyDB {
         id: created_query_result.unwrap(),
-        last_updated: DateTime::parse_from_str("2023-06-26 10:00:00+02", "%F %T%#z")
-            .unwrap()
-            .into(),
+        last_updated: new_created_company.last_updated,
         active: true,
         charmtalk: false,
         name: "New company".to_string(),
@@ -273,9 +267,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         updated_first_company,
         services::company::CompanyDB {
             id: initial_first_company.id,
-            last_updated: DateTime::parse_from_str("2023-06-25 21:00:00+02", "%F %T%#z")
-                .unwrap()
-                .into(),
+            last_updated: updated_first_company.last_updated,
             active: true,
             charmtalk: false,
             name: "FrennFjord Consulting".to_string(),
