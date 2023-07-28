@@ -69,7 +69,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     };
 
     // What's tested
-    let created_query_result = services::tag::create(db.clone(), new_tag.clone()).await;
+    let created_query_result = services::tag::create(&db, &new_tag).await;
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"

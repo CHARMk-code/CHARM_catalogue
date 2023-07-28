@@ -2,6 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -21,6 +22,39 @@ pub struct TagWeb {
     pub offering: Option<bool>,
     pub language: Option<bool>,
     pub fair_area: Option<bool>,
+}
+
+impl Default for TagWeb {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            parent_tag: Some(0),
+            up_votes: Some(0),
+            down_votes: Some(0),
+            crowd_sourced: Some(false),
+            icon: Default::default(),
+            division: Default::default(),
+            business_area: Default::default(),
+            looking_for: Default::default(),
+            offering: Default::default(),
+            language: Default::default(),
+            fair_area: Default::default(),
+        }
+    }
+}
+
+#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
+pub enum RequiredField {
+    Id,
+    Name,
+    Icon,
+    Division,
+    Businessarea,
+    Lookingfor,
+    Offering,
+    Language,
+    Fairarea,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -91,7 +125,7 @@ async fn update_handler(
             }
         }
         None => {
-            let tag = services::tag::create((*db).as_ref().clone(), input_tag).await?;
+            let tag = services::tag::create(&db, &input_tag).await?;
             HttpResponse::Created().json(tag)
         }
     };
@@ -106,7 +140,7 @@ async fn create_handler(
     data: Json<TagWeb>,
 ) -> Result<impl Responder> {
     let input_tag = data.into_inner();
-    let affected_rows = services::tag::create((*db).as_ref().clone(), input_tag).await?;
+    let affected_rows = services::tag::create(&db, &input_tag).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }

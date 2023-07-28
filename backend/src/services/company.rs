@@ -34,8 +34,8 @@ pub struct CompanyDB {
     pub tags: Option<Vec<i32>>,
 }
 
-pub async fn create(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_web::Error> {
-    let last_updated = is_valid_required_field(&data.last_updated)?;
+pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix_web::Error> {
+    let last_updated = &Utc::now();
     let active = is_valid_required_field(&data.active)?;
     let charmtalk = is_valid_required_field(&data.charmtalk)?;
     let name = is_valid_required_field(&data.name)?;
@@ -64,7 +64,7 @@ pub async fn create(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
         "SELECT count(id) from tags where id = ANY(select * from UNNEST($1::int[]))",
         tags
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
     if usize::try_from(tag_count.count.unwrap_or(0)) != Ok(tags.len()) {
@@ -75,7 +75,7 @@ pub async fn create(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
 
     let create_company_query_result = sqlx::query!("INSERT INTO companies (last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) returning id",
 last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     let new_company_id = create_company_query_result.id;
 
@@ -87,7 +87,7 @@ last_updated, active, charmtalk, name, description, unique_selling_point, summer
             tags,
             tags.len() as i32
         )
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
     }
@@ -117,7 +117,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
     let new_tags = data.tags.unwrap_or(Vec::new());
     let current_tags = company.tags.unwrap_or(Vec::new());
 
-    let last_updated = data.last_updated.as_ref();
+    let last_updated = Some(Utc::now());
     let active = data.active.as_ref();
     let charmtalk = data.charmtalk.as_ref();
     let name = data.name.as_ref();
@@ -156,7 +156,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
 
     let query_result =
         sqlx::query!("UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, summer_job_description = $7, summer_job_link = $8, summer_job_deadline = $9, contacts = $10, contact_email = $11, employees_world = $12, employees_sweden = $13, website = $14, talk_to_us_about = $15, logo = $16, map_image = $17, booth_number = $18 where id = $19 returning id",
-            if last_updated.is_some() {last_updated.unwrap()} else {&company.last_updated},
+            if last_updated.is_some() {last_updated.unwrap()} else {company.last_updated},
             if active.is_some() {active.unwrap()} else {&company.active},
             if charmtalk.is_some() {charmtalk.unwrap()} else {&company.charmtalk},
             if name.is_some() {name.unwrap()} else {&company.name},

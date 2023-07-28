@@ -1,19 +1,19 @@
-DROP TABLE `user`;
+DROP TABLE user;
 
-DROP TABLE `companies`;
+DROP TABLE companies;
 
-DROP TABLE `tags`;
+DROP TABLE tags;
 
-DROP TABLE `companies_tags`;
+DROP TABLE companies_tags;
 
-DROP TABLE `company_cards`;
+DROP TABLE company_cards;
 
-DROP TABLE `feedback`;
+DROP TABLE feedback;
 
-DROP TABLE `layout`; 
+DROP TABLE layout; 
 
-DROP TABLE `maps`; 
+DROP TABLE maps; 
 
-DROP TABLE `prepages`;
+DROP TABLE prepages;
 
-DROP TABLE `shortcuts`;
+DROP TABLE shortcuts;

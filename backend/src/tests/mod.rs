@@ -7,3 +7,5 @@ mod prepage;
 mod settings;
 mod shortcut;
 mod tag;
+mod batch;
+    

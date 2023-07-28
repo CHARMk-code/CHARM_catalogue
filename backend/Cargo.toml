@@ -8,10 +8,20 @@ edition = "2021"
 [dependencies]
 actix-web = { version = "4"}  
 actix-web-httpauth = { version = "0.8"}
+actix-multipart = "0.6"
 env_logger = { version = "0.10" }
-sqlx = { version = "0.6", default-features = false, features = ["postgres", "runtime-tokio-rustls",  "macros", "offline", "migrate", "chrono"]}
+sqlx = { version = "0.6", default-features = false, features = ["postgres", "runtime-tokio-rustls",  "macros", "offline", "migrate", "chrono", "uuid"]}
 serde = { version = "1.0" }
 derive_more = { version = "0.99"}
 chrono = { version = "0.4.2", features = ["serde"]}
 rust-argon2 = "1.0"
 jwt-simple = "0.11.5"
+zip = "0.6"
+calamine = { version = "0.21", features = ["dates"]}
+thiserror = "1"
+anyhow = "1"
+strum = "0.25"
+strum_macros = "0.25"
+async-trait = "0.1"
+futures = "0.3"
+uuid = {version = "1.4.0", features = ["v4", "fast-rng", "serde", "macro-diagnostics"]}

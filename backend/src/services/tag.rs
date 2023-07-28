@@ -23,7 +23,7 @@ pub struct TagDB {
     pub fair_area: bool,
 }
 
-pub async fn create(db: Pool<Postgres>, data: TagWeb) -> Result<i32, actix_web::Error> {
+pub async fn create(db: &Pool<Postgres>, data: &TagWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;
     let parent_tag = is_valid_required_field(&data.parent_tag)?;
     let up_votes = is_valid_required_field(&data.up_votes)?;
@@ -39,7 +39,7 @@ pub async fn create(db: Pool<Postgres>, data: TagWeb) -> Result<i32, actix_web::
 
     let query_result = sqlx::query!("INSERT INTO tags (name, parent_tag, up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) returning id;",
 name, parent_tag, up_votes, down_votes, crowd_sourced, icon, division, business_area, looking_for, offering, language, fair_area)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }

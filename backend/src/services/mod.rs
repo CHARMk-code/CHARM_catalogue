@@ -7,6 +7,8 @@ pub mod prepage;
 pub mod settings;
 pub mod shortcut;
 pub mod tag;
+pub mod batch;
+pub mod file;
 
 pub fn is_valid_required_field<T>(val: &Option<T>) -> Result<&T, actix_web::Error> {
     match val.as_ref() {

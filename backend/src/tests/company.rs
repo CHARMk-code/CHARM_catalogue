@@ -105,7 +105,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
     };
 
     // What's tested
-    let created_query_result = services::company::create(db.clone(), new_company.clone()).await;
+    let created_query_result = services::company::create(&db, &new_company).await;
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"

@@ -3,11 +3,12 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use strum_macros::{EnumIter, Display, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
 
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq, Default)]
 pub struct CompanyWeb {
     pub id: Option<i32>,
     pub last_updated: Option<DateTime<Utc>>,
@@ -29,6 +30,30 @@ pub struct CompanyWeb {
     pub map_image: Option<i32>,
     pub booth_number: Option<i32>,
     pub tags: Option<Vec<i32>>,
+}
+
+#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
+pub enum RequiredField {
+    Id,
+    Lastupdated,
+    Active,
+    Charmtalk,
+    Name,
+    Description,
+    Uniquesellingpoint,
+    Summerjobdescription,
+    Summerjoblink,
+    Summerjobdeadline,
+    Contacts,
+    Contactemail,
+    Employeesworld,
+    Employeessweden,
+    Website,
+    Talktousabout,
+    Logo,
+    Mapimage,
+    Boothnumber,
+    Tags,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -67,7 +92,6 @@ async fn update_handler(
 
     let response = match input_company.id {
         Some(_) => {
-            let last_updated = input_company.last_updated.as_ref();
             let active = input_company.active.as_ref();
             let charmtalk = input_company.charmtalk.as_ref();
             let name = input_company.name.as_ref();
@@ -86,8 +110,7 @@ async fn update_handler(
             let map_image = input_company.map_image.as_ref();
             let booth_number = input_company.booth_number.as_ref();
 
-            if last_updated
-                .and(active)
+            if active
                 .and(charmtalk)
                 .and(name)
                 .and(description)
@@ -114,7 +137,7 @@ async fn update_handler(
             }
         }
         None => {
-            let company = services::company::create((*db).as_ref().clone(), input_company).await?;
+            let company = services::company::create(&db, &input_company).await?;
             HttpResponse::Created().json(company)
         }
     };
@@ -129,7 +152,7 @@ async fn create_handler(
     data: Json<CompanyWeb>,
 ) -> Result<impl Responder> {
     let input_company = data.into_inner();
-    let affected_rows = services::company::create((*db).as_ref().clone(), input_company).await?;
+    let affected_rows = services::company::create(&db, &input_company).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }

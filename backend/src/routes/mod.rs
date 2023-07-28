@@ -7,6 +7,7 @@ pub mod prepage;
 pub mod settings;
 pub mod shortcut;
 pub mod tag;
+pub mod batch;
 
 use actix_web::web;
 
@@ -21,6 +22,7 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
             .configure(feedback::routes)
             .configure(company::routes)
             .configure(auth::routes)
+            .configure(batch::routes)
             .configure(settings::scope),
     );
 }

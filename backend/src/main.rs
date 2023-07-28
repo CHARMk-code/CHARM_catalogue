@@ -9,10 +9,16 @@ use actix_web::{middleware::Logger, App};
 use actix_web_httpauth::extractors::bearer;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use std::path::{Path, PathBuf};
+
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
+
+    //Base upload path
+    let base_path: PathBuf = PathBuf::from("/upload");
 
     // DB setup
     let database_url = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -39,6 +45,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::new("%a %{User-Agent}i"))
             //.wrap(HttpAuthentication::bearer(bearer_auth_validator))
             .app_data(Data::new(pool.clone()))
+            .app_data(Data::new(base_path.clone()))
             .app_data(bearer_config.clone())
             .app_data(key_pair.clone()) // HACK: Key_pair copied and put both as data and "not"
             .app_data(Data::new(key_pair.clone())) // Since it needs to be used both as extractor
