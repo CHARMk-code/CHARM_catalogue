@@ -61,8 +61,13 @@ pub async fn get_user(db: &Pool<Postgres>) -> Result<UserDB, actix_web::Error> {
     Ok(user)
 }
 
-pub async fn create_user(db: &Pool<Postgres>, user: UserWeb) -> Result<i32, actix_web::Error> {
-    let hash = hash_password(&user.password).map_err(actix_web::error::ErrorInternalServerError)?;
+pub async fn create_user(
+    db: &Pool<Postgres>,
+    user: UserWeb,
+    salt: &[u8],
+) -> Result<i32, actix_web::Error> {
+    let hash =
+        hash_password(&user.password, salt).map_err(actix_web::error::ErrorInternalServerError)?;
     let user = query!(
         "INSERT INTO users (password) values ($1) returning id",
         hash
@@ -74,8 +79,7 @@ pub async fn create_user(db: &Pool<Postgres>, user: UserWeb) -> Result<i32, acti
     Ok(user.id)
 }
 
-pub fn hash_password(password_to_hash: &String) -> Result<String, argon2::Error> {
-    let salt = b"asdlfkasghjkge4ry"; // FIX:: Handle salt properly
+pub fn hash_password(password_to_hash: &String, salt: &[u8]) -> Result<String, argon2::Error> {
     let config = Config::default();
 
     argon2::hash_encoded(password_to_hash.as_bytes(), salt, &config)
@@ -84,8 +88,9 @@ pub fn hash_password(password_to_hash: &String) -> Result<String, argon2::Error>
 pub fn validate_password(
     password_to_validate: &String,
     valid_password_hash: &String,
+    salt: &[u8],
 ) -> Result<bool, argon2::Error> {
-    let new_hash = hash_password(password_to_validate)?;
+    let new_hash = hash_password(password_to_validate, salt)?;
 
     Ok(&new_hash == valid_password_hash)
 }

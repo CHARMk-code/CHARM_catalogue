@@ -1,0 +1,3 @@
+upload_path = "upload/"
+storage_path = "storage/"
+password_salt = "A freaking fantastic salt"

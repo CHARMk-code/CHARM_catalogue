@@ -8,14 +8,15 @@ use jwt_simple::prelude::Ed25519KeyPair;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::services::{self, auth::AuthedUser};
+use crate::{
+    config::Config,
+    services::{self, auth::AuthedUser},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/auth")
-            .service(get_token)
-            .service(register_handler)
-            .service(update_password_handler),
+        web::scope("/auth").service(get_token), // .service(register_handler)
+                                                // .service(update_password_handler),
     );
 }
 
@@ -35,11 +36,14 @@ pub struct UserWeb {
 async fn get_token(
     db: web::Data<PgPool>,
     keypair: web::Data<Ed25519KeyPair>,
+    config: web::Data<Config>,
     data: Json<UserLoginWeb>,
 ) -> Result<impl Responder> {
     let possible_user = services::auth::get_user(db.as_ref()).await?;
+    let salt: &[u8] = config.password_salt.as_slice();
 
-    let is_valid_pass = services::auth::validate_password(&data.password, &possible_user.password);
+    let is_valid_pass =
+        services::auth::validate_password(&data.password, &possible_user.password, salt);
 
     if is_valid_pass.is_ok() && is_valid_pass.unwrap() {
         let token = services::auth::generate_token(keypair.as_ref().clone());
@@ -51,18 +55,18 @@ async fn get_token(
     Ok(HttpResponse::Unauthorized().into())
 }
 
-#[put("/")]
-async fn update_password_handler(
-    _db: web::Data<PgPool>,
-    _user: AuthedUser,
-) -> Result<impl Responder> {
-    Ok(HttpResponse::Ok())
-}
-
-#[get("/")]
-async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, data: Json<UserWeb>) -> Result<impl Responder> {
-    println!("register: {:?}", data);
-    let user_id = services::auth::create_user(&db, data.into_inner()).await?;
-
-    Ok(HttpResponse::Ok().json(user_id))
-}
+// #[put("/")]
+// async fn update_password_handler(
+//     _db: web::Data<PgPool>,
+//     _user: AuthedUser,
+// ) -> Result<impl Responder> {
+//     Ok(HttpResponse::Ok())
+// }
+//
+// #[get("/")]
+// async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, config: web::Data<Config>, data: Json<UserWeb>) -> Result<impl Responder> {
+//
+//     let user_id = services::auth::create_user(&db, data.into_inner(), salt).await?;
+//
+//     Ok(HttpResponse::Ok().json(user_id))
+// }

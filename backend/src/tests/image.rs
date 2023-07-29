@@ -51,7 +51,6 @@ async fn creating_a_valid_image_file_should_create_row_in_db(
 
     let test_path = create_test_folders()?;
 
-    let storage_path: PathBuf = TEST_STORAGE.into();
     let new_images: Vec<PathBuf> = vec!["New file".into()];
     for image in &new_images {
         // create the dummy file on the disk
