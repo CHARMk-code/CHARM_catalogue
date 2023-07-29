@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use serde::{Deserialize, Serialize};
 use sqlx::Pool;
@@ -22,7 +22,8 @@ pub async fn create(
     db: &Pool<Postgres>,
     namespace: &str,
     saved_files: Vec<PathBuf>,
-    final_path: &PathBuf,
+    upload_path: &PathBuf,
+    storage_path: &PathBuf,
 ) -> Result<Vec<Uuid>, actix_web::Error> {
     let mut uuids: Vec<Uuid> = Vec::new();
 
@@ -44,15 +45,13 @@ pub async fn create(
 
         uuids.push(query_result.id);
 
-        let mut new_file_path = final_path.clone();
-        new_file_path.set_file_name(query_result.id.to_string());
-        move_file(saved_file, new_file_path).await?;
+        move_file(upload_path.join(saved_file), storage_path.join(query_result.id.to_string())).await?;
     }
 
     Ok(uuids)
 }
 
-pub async fn update(db: &Pool<Postgres>, data: FileWeb) -> Result<Uuid, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: &FileWeb) -> Result<Uuid, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
@@ -101,11 +100,18 @@ pub async fn get_by_id(db: &Pool<Postgres>, id: &Uuid) -> Result<FileDB, actix_w
     Ok(query_result)
 }
 
-pub async fn delete(db: &Pool<Postgres>, id: &Uuid) -> Result<u64, actix_web::Error> {
-    let mut saved_path: PathBuf = "storage/".into(); // TODO: Move this into a configuration file
-    saved_path.set_file_name(id.to_string());
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<FileDB>, actix_web::Error> {
+    let query_result = sqlx::query_as!(FileDB, "SELECT * FROM files where image = true")
+        .fetch_all(db)
+        .await
+        .map_err(MyError::SQLxError)?;
 
-    services::file::remove_file(saved_path).await?;
+    Ok(query_result)
+}
+
+pub async fn delete(db: &Pool<Postgres>, id: &Uuid, storage_path: &Path) -> Result<u64, actix_web::Error> {
+     
+    services::file::remove_file(&storage_path.join(id.to_string())).await?;
 
     let query_result = sqlx::query!("DELETE FROM files WHERE id = $1", id)
         .execute(db)
@@ -115,9 +121,3 @@ pub async fn delete(db: &Pool<Postgres>, id: &Uuid) -> Result<u64, actix_web::Er
     Ok(query_result.rows_affected())
 }
 
-mod tests {
-    use super::*;
-
-    #[test]
-    fn 
-}

@@ -1,4 +1,4 @@
-use std::{io::Write, path::{Path, PathBuf}, fs};
+use std::{fs, io::Write, path::{PathBuf, Path}};
 
 use actix_multipart::Multipart;
 use actix_web::{error::BlockingError, web, ResponseError};
@@ -16,8 +16,8 @@ pub enum FileServiceError {
     #[error("Error on file creation")]
     FileHandlingError { source: std::io::Error },
 
-    #[error("Error when moving file")]
-    FileMovingError { source: std::io::Error },
+    #[error("Error when moving file: {from:?} -> {to:?}")]
+    FileMovingError { source: std::io::Error, from: PathBuf, to: PathBuf },
 }
 
 // TODO: Possibly add more and better error handling out via the API, this just sends a
@@ -28,7 +28,7 @@ pub async fn save_files(
     mut payload: Multipart,
     base_path: &PathBuf,
 ) -> Result<Vec<PathBuf>, FileServiceError> {
-    let mut file_paths =  Vec::new();
+    let mut file_paths = Vec::new();
 
     while let Some(item) = payload.next().await {
         let mut field = item.map_err(|source| FileServiceError::MultipartError { source })?;
@@ -53,17 +53,18 @@ pub async fn save_files(
                 .map_err(|source| FileServiceError::FileHandlingError { source })?;
         }
         println!("FilePath: {:?}", &file_paths.last().unwrap().canonicalize());
-
     }
     Ok(file_paths)
 }
 
-pub async fn move_file(old_file_path: PathBuf, new_file_path: PathBuf) -> Result<(), FileServiceError> {
- std::fs::rename(old_file_path, new_file_path).map_err(|source| FileServiceError::FileMovingError { source })
+pub async fn move_file(
+    old_file_path: PathBuf,
+    new_file_path: PathBuf,
+) -> Result<(), FileServiceError> {
+    std::fs::rename(&old_file_path, &new_file_path)
+        .map_err(|source| FileServiceError::FileMovingError { source, from: old_file_path, to: new_file_path })
 }
 
-pub async fn remove_file(
-    file_path: PathBuf
-) -> Result<(), FileServiceError> {
+pub async fn remove_file(file_path: &Path) -> Result<(), FileServiceError> {
     fs::remove_file(file_path).map_err(|source| FileServiceError::FileHandlingError { source })
 }

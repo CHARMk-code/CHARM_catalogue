@@ -26,7 +26,7 @@ async fn upload_batchfile(
             let process_res = services::batch::process_batch_zip(&db, &file_path, &base_path).await;
             process_res?;
         }
-        let file_removal_res = services::file::remove_file(file_path).await;
+        let file_removal_res = services::file::remove_file(file_path.as_path()).await;
         file_removal_res?;
     }
 

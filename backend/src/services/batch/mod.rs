@@ -1,4 +1,4 @@
-use actix_web::{Responder, ResponseError};
+use actix_web::ResponseError;
 use async_trait::async_trait;
 use futures::future::join_all;
 use sqlx::{Pool, Postgres};
@@ -11,8 +11,8 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use strum::{EnumCount, IntoEnumIterator};
-use strum_macros::{Display, EnumIter, EnumString};
+use strum::IntoEnumIterator;
+use strum_macros::{Display, EnumIter};
 use thiserror::Error;
 
 use calamine::{open_workbook_auto_from_rs, DataType, Range, Reader};
@@ -80,7 +80,7 @@ pub async fn process_batch_zip(
     }
 
     //Check that all files for processed_values exist
-    // check_file_dependencies(&processed_values, &provided_files)?;
+    check_file_dependencies(&processed_values, &provided_files)?;
 
     //Check internal table dependencies
     check_tag_exist_for_company_tags(&processed_values)?;
@@ -220,7 +220,9 @@ fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, Ba
         .next_back()
         .ok_or(BatchProcessError::FileNameError)?;
 
-    let new_path = base_path.join(Path::new(&parent_dir)).join(Path::new(&file_name));
+    let new_path = base_path
+        .join(Path::new(&parent_dir))
+        .join(Path::new(&file_name));
 
     let parent_as_string = parent_dir
         .to_str()
@@ -235,7 +237,7 @@ fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, Ba
             name: parent_as_string,
         });
     };
-    
+
     let mut directory_path = new_path.clone();
     directory_path.pop();
     std::fs::create_dir_all(directory_path)

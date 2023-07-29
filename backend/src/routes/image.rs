@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use actix_multipart::Multipart;
 use actix_web::{
@@ -9,7 +9,7 @@ use actix_web::{
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Uuid, PgPool};
 
-use crate::services::{self, auth::AuthedUser, file::save_files};
+use crate::{services::{self, auth::AuthedUser, file::save_files}, config::Config};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/image").service(get_by_id_handler));
@@ -48,7 +48,7 @@ async fn update_handler(
             if name.and(namespace).and(image).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let map = services::image::update(&db, input_file).await?;
+                let map = services::image::update(&db, &input_file).await?;
                 HttpResponse::Ok().json(map)
             }
         }
@@ -62,14 +62,15 @@ async fn update_handler(
 async fn create_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
+    config: web::Data<Config>,
     payload: Multipart,
 ) -> Result<impl Responder> {
-    let original_path: PathBuf = "upload/".into(); // TODO: Move this into a configuration file
-    let final_path: PathBuf = "storage/".into(); // TODO: Move this into a configuration file
+    let upload_path: PathBuf = config.upload_path.clone().into(); 
+    let storage_path: PathBuf = config.storage_path.clone().into(); 
 
-    let saved_files = save_files(payload, &original_path).await?;
+    let saved_files = save_files(payload, &upload_path).await?;
 
-    let uuids = services::image::create(&db, "images", saved_files, &final_path).await?;
+    let uuids = services::image::create(&db, "images", saved_files, &upload_path, &storage_path).await?;
 
     Ok(HttpResponse::Ok().json(uuids))
 }
@@ -78,10 +79,13 @@ async fn create_handler(
 async fn delete_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
+    config: web::Data<Config>,
     path: web::Path<Uuid>,
+
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::image::delete(&db, &id).await?;
+    
+    let affected_rows = services::image::delete(&db, &id, Path::new(&config.storage_path)).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

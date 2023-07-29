@@ -25,3 +25,4 @@ strum_macros = "0.25"
 async-trait = "0.1"
 futures = "0.3"
 uuid = {version = "1.4.0", features = ["v4", "fast-rng", "serde", "macro-diagnostics"]}
+toml = "0.7.6"

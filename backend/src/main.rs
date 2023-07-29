@@ -1,5 +1,6 @@
 extern crate argon2;
 
+mod config;
 mod routes;
 mod services;
 
@@ -9,16 +10,12 @@ use actix_web::{middleware::Logger, App};
 use actix_web_httpauth::extractors::bearer;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use std::path::{Path, PathBuf};
-
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
-    //Base upload path
-    let base_path: PathBuf = PathBuf::from("/upload");
+    let config = config::read_config("config.toml".into())?;
 
     // DB setup
     let database_url = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -43,13 +40,15 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
-            //.wrap(HttpAuthentication::bearer(bearer_auth_validator))
             .app_data(Data::new(pool.clone()))
-            .app_data(Data::new(base_path.clone()))
+            .app_data(Data::new(config.clone()))
             .app_data(bearer_config.clone())
-            .app_data(key_pair.clone()) // HACK: Key_pair copied and put both as data and "not"
-            .app_data(Data::new(key_pair.clone())) // Since it needs to be used both as extractor
-            .configure(routes::setup) // and in definition of another extractor
+            // HACK: Key_pair copied and put both as data and "not"
+            // Since it needs to be used both as extractor
+            // and in definition of another extractor
+            .app_data(key_pair.clone())
+            .app_data(Data::new(key_pair.clone()))
+            .configure(routes::setup)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
