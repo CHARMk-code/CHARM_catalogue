@@ -14,7 +14,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let result = services::layout::get_by_id(db.clone(), initial_db_layout.id).await;
+    let result = services::layout::get_by_id(&db, initial_db_layout.id).await;
     assert!(result.is_ok());
     assert_eq!(initial_db_layout, result.unwrap());
     Ok(())
@@ -30,7 +30,7 @@ async fn get_by_id_when_no_matching_layout_should_fail(db: Pool<Postgres>) -> Re
     let invalid_id = i32::try_from(initial_row_amount.first().unwrap().count.unwrap()).unwrap() + 1;
 
     // What's tested
-    let queried_layout = services::layout::get_by_id(db.clone(), invalid_id).await;
+    let queried_layout = services::layout::get_by_id(&db, invalid_id).await;
     assert!(
         queried_layout.is_err(),
         "Should fail when querying for nonexisting id"
@@ -42,7 +42,7 @@ async fn get_by_id_when_no_matching_layout_should_fail(db: Pool<Postgres>) -> Re
 #[sqlx::test(fixtures("Layouts"))]
 async fn creating_a_valid_layout_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_layouts = services::layout::get_all(db.clone()).await.unwrap();
+    let initial_layouts = services::layout::get_all(&db).await.unwrap();
 
     let new_layout = routes::layout::LayoutWeb {
         id: None,
@@ -52,13 +52,13 @@ async fn creating_a_valid_layout_should_create_row_in_db(db: Pool<Postgres>) -> 
     };
 
     // What's tested
-    let created_query_result = services::layout::create(db.clone(), new_layout.clone()).await;
+    let created_query_result = services::layout::create(&db, &new_layout).await;
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"
     );
 
-    let new_layouts = services::layout::get_all(db.clone()).await.unwrap();
+    let new_layouts = services::layout::get_all(&db).await.unwrap();
     let new_created_layout: &services::layout::LayoutDB = new_layouts
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
@@ -100,7 +100,7 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_layouts = services::layout::get_all(db.clone()).await.unwrap();
+    let initial_layouts = services::layout::get_all(&db).await.unwrap();
 
     let initial_first_layout = initial_layouts.first().unwrap();
     let initial_other_layouts = initial_layouts
@@ -118,7 +118,7 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     // What's tested
 
     // Check output validity
-    let update_query_result = services::layout::update(db.clone(), first_layout_update).await;
+    let update_query_result = services::layout::update(&db, &first_layout_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -130,7 +130,7 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     );
 
     // Check updates of layout table
-    let updated_layouts = services::layout::get_all(db.clone()).await.unwrap();
+    let updated_layouts = services::layout::get_all(&db).await.unwrap();
     let updated_first_layout = updated_layouts
         .iter()
         .cloned()
@@ -165,17 +165,17 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_layouts = services::layout::get_all(db.clone()).await.unwrap();
+    let initial_layouts = services::layout::get_all(&db).await.unwrap();
 
     let initial_first_layout = initial_layouts.first().unwrap();
     let removed_id = initial_first_layout.id;
 
     // What's tested
-    let remove_query_result = services::layout::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::layout::delete(&db, removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_layout = services::layout::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_layout = services::layout::get_by_id(&db, removed_id).await;
     assert!(
         removed_layout.is_err(),
         "Database query should fail for removed id"

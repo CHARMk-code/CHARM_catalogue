@@ -3,8 +3,8 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
 use crate::routes::company::CompanyWeb;
+use crate::{errors::MyError, services::is_optional_field_or_default};
 
 use chrono::{DateTime, Utc};
 
@@ -35,15 +35,17 @@ pub struct CompanyDB {
 }
 
 pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix_web::Error> {
-    let last_updated = &Utc::now();
+    let last_updated = Utc::now();
     let active = is_valid_required_field(&data.active)?;
     let charmtalk = is_valid_required_field(&data.charmtalk)?;
     let name = is_valid_required_field(&data.name)?;
     let description = is_valid_required_field(&data.description)?;
-    let unique_selling_point = is_valid_required_field(&data.unique_selling_point)?;
-    let summer_job_description = is_valid_required_field(&data.summer_job_description)?;
-    let summer_job_link = is_valid_required_field(&data.summer_job_link)?;
-    let summer_job_deadline = is_valid_required_field(&data.summer_job_deadline)?;
+    let unique_selling_point = is_optional_field_or_default(&data.unique_selling_point, "".to_string())?;
+    let summer_job_description =
+        is_optional_field_or_default(&data.summer_job_description, "".to_string())?;
+    let summer_job_link = is_optional_field_or_default(&data.summer_job_link, "".to_string())?;
+    let summer_job_deadline =
+        is_optional_field_or_default(&data.summer_job_deadline, Utc::now())?;
     let contacts = is_valid_required_field(&data.contacts)?;
     let contact_email = is_valid_required_field(&data.contact_email)?;
     let employees_world = is_valid_required_field(&data.employees_world)?;
@@ -62,7 +64,7 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
     let tag_count = sqlx::query_as!(
         QueryReturn,
         "SELECT count(id) from tags where id = ANY(select * from UNNEST($1::int[]))",
-        tags
+        &tags
     )
     .fetch_one(db)
     .await
@@ -83,8 +85,8 @@ last_updated, active, charmtalk, name, description, unique_selling_point, summer
     if tags.len() > 0 {
         let _create_tag_relation_query_result = sqlx::query!(
             "INSERT INTO companies_tags (company_id, tag_id) (SELECT * FROM UNNEST(array_fill($1::int, ARRAY[$3::int]), $2::int[]))",
-            new_company_id,
-            tags,
+            &new_company_id,
+            &tags,
             tags.len() as i32
         )
         .execute(db)

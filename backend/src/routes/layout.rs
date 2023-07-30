@@ -2,6 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -12,6 +13,25 @@ pub struct LayoutWeb {
     pub image: Option<String>,
     pub active: Option<bool>,
     pub placement: Option<i32>,
+}
+
+impl Default for LayoutWeb {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            image: Default::default(),
+            active: Default::default(),
+            placement: Default::default(),
+        }
+    }
+}
+
+#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
+pub enum RequiredField {
+    Id,
+    Image,
+    Active,
+    Placement,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -27,7 +47,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[get("/")]
 async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let layouts = services::layout::get_all((*db).as_ref().clone()).await?;
+    let layouts = services::layout::get_all(&db).await?;
 
     Ok(HttpResponse::Ok().json(layouts))
 }
@@ -35,7 +55,7 @@ async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
 #[get("/{id}")]
 async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let layout = services::layout::get_by_id((*db).as_ref().clone(), id).await?;
+    let layout = services::layout::get_by_id(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(layout))
 }
@@ -58,12 +78,12 @@ async fn update_handler(
             if id.and(image).and(active).and(placement).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let layout = services::layout::update((*db).as_ref().clone(), input_layout).await?;
+                let layout = services::layout::update(&db, &input_layout).await?;
                 HttpResponse::Ok().json(layout)
             }
         }
         None => {
-            let layout = services::layout::create((*db).as_ref().clone(), input_layout).await?;
+            let layout = services::layout::create(&db, &input_layout).await?;
             HttpResponse::Created().json(layout)
         }
     };
@@ -78,7 +98,7 @@ async fn create_handler(
     data: Json<LayoutWeb>,
 ) -> Result<impl Responder> {
     let input_layout = data.into_inner();
-    let affected_rows = services::layout::create((*db).as_ref().clone(), input_layout).await?;
+    let affected_rows = services::layout::create(&db, &input_layout).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -90,7 +110,7 @@ async fn delete_handler(
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::layout::delete((*db).as_ref().clone(), id).await?;
+    let affected_rows = services::layout::delete(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

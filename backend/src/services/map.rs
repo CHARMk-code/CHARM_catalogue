@@ -4,7 +4,7 @@ use sqlx::{Pool, Postgres};
 use crate::errors::MyError;
 use crate::routes::map::MapWeb;
 
-use super::is_valid_required_field;
+use super::{is_valid_required_field, is_optional_field_or_default};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct MapDB {
@@ -14,10 +14,10 @@ pub struct MapDB {
     pub reference: i32,
 }
 
-pub async fn create(db: Pool<Postgres>, data: MapWeb) -> Result<i32, actix_web::Error> {
+pub async fn create(db: &Pool<Postgres>, data: &MapWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;
     let image = is_valid_required_field(&data.image)?;
-    let reference = is_valid_required_field(&data.reference)?;
+    let reference = is_optional_field_or_default(&data.reference, 0)?;
 
     let query_result = sqlx::query!(
         "INSERT INTO maps (name, image, reference) VALUES ($1, $2, $3) returning id;",
@@ -25,20 +25,20 @@ pub async fn create(db: Pool<Postgres>, data: MapWeb) -> Result<i32, actix_web::
         image,
         reference
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn update(db: Pool<Postgres>, data: MapWeb) -> Result<i32, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: &MapWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
     // (TODO change the second query to only use the data values that will be updated)
     let map = sqlx::query_as!(MapDB, "SELECT * FROM maps where id = $1", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 
@@ -65,34 +65,34 @@ pub async fn update(db: Pool<Postgres>, data: MapWeb) -> Result<i32, actix_web::
         },
         data.id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn delete(db: Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
+pub async fn delete(db: &Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
     let query_result = sqlx::query!("DELETE FROM maps WHERE id = $1", id)
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result.rows_affected())
 }
 
-pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<MapDB>, actix_web::Error> {
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<MapDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(MapDB, "SELECT * FROM maps")
-        .fetch_all(&db)
+        .fetch_all(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result)
 }
 
-pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<MapDB, actix_web::Error> {
+pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<MapDB, actix_web::Error> {
     let query_result = sqlx::query_as!(MapDB, "SELECT * FROM maps where id = $1", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 

@@ -6,7 +6,8 @@ use sqlx::{Pool, Postgres};
 
 use super::{
     helper_functions::{
-        value_to_bool, value_to_chrono_date, value_to_file_path, value_to_i32, value_to_string, value_to_vec,
+        value_to_bool, value_to_chrono_date, value_to_file_path, value_to_i32, value_to_string,
+        value_to_vec,
     },
     BatchProcessError, XlsxSheetProcessor,
 };
@@ -28,7 +29,7 @@ impl XlsxSheetProcessor for CompanyProcessor {
     ) -> Result<i32, BatchProcessError> {
         Ok(company::create(db, row)
             .await
-            .map_err(|source| BatchProcessError::ApplyToDatabaseError { source })?)
+            .map_err(|source| BatchProcessError::ApplyToDatabaseError { source, row: format!("{:?}",row) })?)
     }
 
     fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
@@ -49,7 +50,7 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Description => row_struct.description = value_to_string(value),
             RequiredField::Uniquesellingpoint => {
                 row_struct.unique_selling_point = value_to_string(value)
-           }
+            }
             RequiredField::Summerjobdescription => {
                 row_struct.summer_job_description = value_to_string(value)
             }
@@ -63,7 +64,9 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Employeessweden => row_struct.employees_sweden = value_to_i32(value),
             RequiredField::Website => row_struct.website = value_to_string(value),
             RequiredField::Talktousabout => row_struct.talk_to_us_about = value_to_string(value),
-            RequiredField::Logo => row_struct.logo = value_to_file_path(value, required_files, file_base_path),
+            RequiredField::Logo => {
+                row_struct.logo = value_to_file_path(value, required_files, file_base_path)
+            }
             RequiredField::Mapimage => row_struct.map_image = value_to_i32(value),
             RequiredField::Boothnumber => row_struct.booth_number = value_to_i32(value),
             RequiredField::Tags => row_struct.tags = value_to_vec::<i32>(value),

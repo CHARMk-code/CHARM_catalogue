@@ -40,13 +40,30 @@ pub fn check_file_dependencies(
                 sheet_name,
                 get_missing_files(&processed_values.tags, &provided_files_set),
             ),
+            SheetNames::Prepages => (
+                sheet_name,
+                get_missing_files(&processed_values.prepages, &provided_files_set),
+            ),
+            SheetNames::Layouts => (
+                sheet_name,
+                get_missing_files(&processed_values.layouts, &provided_files_set),
+            ),
+            SheetNames::Maps => (
+                sheet_name,
+                get_missing_files(&processed_values.maps, &provided_files_set),
+            ),
+            SheetNames::Shortcuts => (
+                sheet_name,
+                get_missing_files(&processed_values.shortcuts, &provided_files_set),
+            ),
         })
         .try_for_each(|(sheet_name, missing_files)| match missing_files.len() {
             0 => Ok(()),
-            _ => Err(BatchProcessError::MissingRequiredFiles {
+            _ => { println!("Provided files: {:?}", provided_files_set);
+                Err(BatchProcessError::MissingRequiredFiles {
                 sheet_name,
                 missing_files,
-            }),
+            })},
         })
 }
 
@@ -108,6 +125,10 @@ mod tests {
         let processed_values = ProcessedValues {
             companies: vec![(CompanyWeb::default(), vec![PathBuf::from("FILENAME")])],
             tags: Vec::new(),
+            prepages: Vec::new(),
+            layouts: Vec::new(),
+            maps: Vec::new(),
+            shortcuts: Vec::new(),
         };
         let provided_files = vec![PathBuf::from("OTHERFILE")];
 
@@ -127,6 +148,10 @@ mod tests {
         let processed_values = ProcessedValues {
             companies: vec![(CompanyWeb::default(), vec![PathBuf::from("FILENAME")])],
             tags: Vec::new(),
+            prepages: Vec::new(),
+            layouts: Vec::new(),
+            maps: Vec::new(),
+            shortcuts: Vec::new(),
         };
         let provided_files = vec![PathBuf::from("OTHERFILE"), PathBuf::from("FILENAME")];
 
@@ -176,6 +201,10 @@ mod tests {
                 ),
             ],
             tags: vec![],
+            prepages: vec!(),
+            layouts: vec!(),
+            maps: vec!(),
+            shortcuts: vec!(),
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);
@@ -224,6 +253,10 @@ mod tests {
                     Vec::new(),
                 ),
             ],
+            prepages: vec!(),
+            layouts: vec!(),
+            maps: vec!(),
+            shortcuts: vec!(),
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);
@@ -279,6 +312,10 @@ mod tests {
                     Vec::new(),
                 ),
             ],
+            prepages: vec!(),
+            layouts: vec!(),
+            maps: vec!(),
+            shortcuts: vec!(),
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);

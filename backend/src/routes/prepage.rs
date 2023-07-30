@@ -2,6 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use strum_macros::{EnumIter, EnumString, Display};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -17,6 +18,31 @@ pub struct PrepageWeb {
     pub page: Option<i32>,
 }
 
+impl Default for PrepageWeb {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            image: Default::default(),
+            active: Default::default(),
+            mobile: Default::default(),
+            side: Default::default(),
+            page: Default::default(),
+        }
+    }
+}
+
+#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
+pub enum RequiredField {
+    Id,
+    Name,
+    Image,
+    Active,
+    Mobile,
+    Side,
+    Page,
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/prepage")
@@ -30,7 +56,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[get("/")]
 async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let prepages = services::prepage::get_all((*db).as_ref().clone()).await?;
+    let prepages = services::prepage::get_all(&db).await?;
 
     Ok(HttpResponse::Ok().json(prepages))
 }
@@ -38,7 +64,7 @@ async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
 #[get("/{id}")]
 async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let prepage = services::prepage::get_by_id((*db).as_ref().clone(), id).await?;
+    let prepage = services::prepage::get_by_id(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(prepage))
 }
@@ -71,12 +97,12 @@ async fn update_handler(
                 HttpResponse::UnprocessableEntity().finish()
             } else {
                 let prepage =
-                    services::prepage::update((*db).as_ref().clone(), input_prepage).await?;
+                    services::prepage::update(&db, &input_prepage).await?;
                 HttpResponse::Ok().json(prepage)
             }
         }
         None => {
-            let prepage = services::prepage::create((*db).as_ref().clone(), input_prepage).await?;
+            let prepage = services::prepage::create(&db, &input_prepage).await?;
             HttpResponse::Created().json(prepage)
         }
     };
@@ -91,7 +117,7 @@ async fn create_handler(
     data: Json<PrepageWeb>,
 ) -> Result<impl Responder> {
     let input_prepage = data.into_inner();
-    let affected_rows = services::prepage::create((*db).as_ref().clone(), input_prepage).await?;
+    let affected_rows = services::prepage::create(&db, &input_prepage).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -103,7 +129,7 @@ async fn delete_handler(
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::prepage::delete((*db).as_ref().clone(), id).await?;
+    let affected_rows = services::prepage::delete(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

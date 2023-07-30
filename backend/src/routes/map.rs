@@ -2,6 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use strum_macros::{EnumIter, EnumString, Display};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -12,6 +13,25 @@ pub struct MapWeb {
     pub name: Option<String>,
     pub image: Option<String>,
     pub reference: Option<i32>,
+}
+
+impl Default for MapWeb {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            image: Default::default(),
+            reference: Default::default(),
+        }
+    }
+}
+
+#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
+pub enum RequiredField {
+    Id,
+    Name,
+    Image,
+    Reference,
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -27,7 +47,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[get("/")]
 async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let maps = services::map::get_all((*db).as_ref().clone()).await?;
+    let maps = services::map::get_all(&db).await?;
 
     Ok(HttpResponse::Ok().json(maps))
 }
@@ -35,7 +55,7 @@ async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
 #[get("/{id}")]
 async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let map = services::map::get_by_id((*db).as_ref().clone(), id).await?;
+    let map = services::map::get_by_id(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(map))
 }
@@ -57,12 +77,12 @@ async fn update_handler(
             if name.and(image).and(reference).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let map = services::map::update((*db).as_ref().clone(), input_map).await?;
+                let map = services::map::update(&db, &input_map).await?;
                 HttpResponse::Ok().json(map)
             }
         }
         None => {
-            let map = services::map::create((*db).as_ref().clone(), input_map).await?;
+            let map = services::map::create(&db, &input_map).await?;
             HttpResponse::Created().json(map)
         }
     };
@@ -77,7 +97,7 @@ async fn create_handler(
     data: Json<MapWeb>,
 ) -> Result<impl Responder> {
     let input_map = data.into_inner();
-    let affected_rows = services::map::create((*db).as_ref().clone(), input_map).await?;
+    let affected_rows = services::map::create(&db, &input_map).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -89,7 +109,7 @@ async fn delete_handler(
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::map::delete((*db).as_ref().clone(), id).await?;
+    let affected_rows = services::map::delete(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

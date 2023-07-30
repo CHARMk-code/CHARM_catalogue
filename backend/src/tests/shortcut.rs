@@ -15,7 +15,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let result = services::shortcut::get_by_id(db.clone(), initial_db_shortcut.id).await;
+    let result = services::shortcut::get_by_id(&db, initial_db_shortcut.id).await;
     assert!(result.is_ok());
     assert_eq!(initial_db_shortcut, result.unwrap());
     Ok(())
@@ -31,7 +31,7 @@ async fn get_by_id_when_no_matching_shortcut_should_fail(db: Pool<Postgres>) -> 
     let invalid_id = i32::try_from(initial_row_amount.first().unwrap().count.unwrap()).unwrap() + 1;
 
     // What's tested
-    let queried_shortcut = services::shortcut::get_by_id(db.clone(), invalid_id).await;
+    let queried_shortcut = services::shortcut::get_by_id(&db, invalid_id).await;
     assert!(
         queried_shortcut.is_err(),
         "Should fail when querying for nonexisting id"
@@ -45,7 +45,7 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     //Setup
-    let initial_shortcuts = services::shortcut::get_all(db.clone()).await.unwrap();
+    let initial_shortcuts = services::shortcut::get_all(&db).await.unwrap();
 
     let new_shortcut = routes::shortcut::ShortcutWeb {
         id: None,
@@ -56,13 +56,13 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(
     };
 
     // What's tested
-    let created_query_result = services::shortcut::create(db.clone(), new_shortcut.clone()).await;
+    let created_query_result = services::shortcut::create(&db, &new_shortcut).await;
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"
     );
 
-    let new_shortcuts = services::shortcut::get_all(db.clone()).await.unwrap();
+    let new_shortcuts = services::shortcut::get_all(&db).await.unwrap();
     let new_created_shortcut: &services::shortcut::ShortcutDB = new_shortcuts
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
@@ -105,7 +105,7 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_shortcuts = services::shortcut::get_all(db.clone()).await.unwrap();
+    let initial_shortcuts = services::shortcut::get_all(&db).await.unwrap();
 
     let initial_first_shortcut = initial_shortcuts.first().unwrap();
     let initial_other_shortcuts = initial_shortcuts
@@ -124,7 +124,7 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     // What's tested
 
     // Check output validity
-    let update_query_result = services::shortcut::update(db.clone(), first_shortcut_update).await;
+    let update_query_result = services::shortcut::update(&db, &first_shortcut_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -136,7 +136,7 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     );
 
     // Check updates of shortcut table
-    let updated_shortcuts = services::shortcut::get_all(db.clone()).await.unwrap();
+    let updated_shortcuts = services::shortcut::get_all(&db).await.unwrap();
     let updated_first_shortcut = updated_shortcuts
         .iter()
         .cloned()
@@ -172,17 +172,17 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_shortcuts = services::shortcut::get_all(db.clone()).await.unwrap();
+    let initial_shortcuts = services::shortcut::get_all(&db).await.unwrap();
 
     let initial_first_shortcut = initial_shortcuts.first().unwrap();
     let removed_id = initial_first_shortcut.id;
 
     // What's tested
-    let remove_query_result = services::shortcut::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::shortcut::delete(&db, removed_id.clone()).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_shortcut = services::shortcut::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_shortcut = services::shortcut::get_by_id(&db, removed_id.clone()).await;
     assert!(
         removed_shortcut.is_err(),
         "Database query should fail for removed id"

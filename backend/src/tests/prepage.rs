@@ -16,7 +16,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let result = services::prepage::get_by_id(db.clone(), initial_db_prepage.id).await;
+    let result = services::prepage::get_by_id(&db, initial_db_prepage.id).await;
     assert!(result.is_ok());
     assert_eq!(initial_db_prepage, result.unwrap());
     Ok(())
@@ -32,7 +32,7 @@ async fn get_by_id_when_no_matching_prepage_should_fail(db: Pool<Postgres>) -> R
     let invalid_id = i32::try_from(initial_row_amount.first().unwrap().count.unwrap()).unwrap() + 1;
 
     // What's tested
-    let queried_prepage = services::prepage::get_by_id(db.clone(), invalid_id).await;
+    let queried_prepage = services::prepage::get_by_id(&db, invalid_id).await;
     assert!(
         queried_prepage.is_err(),
         "Should fail when querying for nonexisting id"
@@ -44,7 +44,7 @@ async fn get_by_id_when_no_matching_prepage_should_fail(db: Pool<Postgres>) -> R
 #[sqlx::test(fixtures("Prepages"))]
 async fn creating_a_valid_prepage_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_prepages = services::prepage::get_all(db.clone()).await.unwrap();
+    let initial_prepages = services::prepage::get_all(&db).await.unwrap();
 
     let new_prepage = routes::prepage::PrepageWeb {
         id: None,
@@ -57,13 +57,13 @@ async fn creating_a_valid_prepage_should_create_row_in_db(db: Pool<Postgres>) ->
     };
 
     // What's tested
-    let created_query_result = services::prepage::create(db.clone(), new_prepage.clone()).await;
+    let created_query_result = services::prepage::create(&db, &new_prepage).await;
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"
     );
 
-    let new_prepages = services::prepage::get_all(db.clone()).await.unwrap();
+    let new_prepages = services::prepage::get_all(&db).await.unwrap();
     let new_created_prepage: &services::prepage::PrepageDB = new_prepages
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
@@ -108,7 +108,7 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_prepages = services::prepage::get_all(db.clone()).await.unwrap();
+    let initial_prepages = services::prepage::get_all(&db).await.unwrap();
 
     let initial_first_prepage = initial_prepages.first().unwrap();
     let initial_other_prepages = initial_prepages
@@ -129,7 +129,7 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     // What's tested
 
     // Check output validity
-    let update_query_result = services::prepage::update(db.clone(), first_prepage_update).await;
+    let update_query_result = services::prepage::update(&db, &first_prepage_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -141,7 +141,7 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     );
 
     // Check updates of prepage table
-    let updated_prepages = services::prepage::get_all(db.clone()).await.unwrap();
+    let updated_prepages = services::prepage::get_all(&db).await.unwrap();
     let updated_first_prepage = updated_prepages
         .iter()
         .cloned()
@@ -179,17 +179,17 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_prepages = services::prepage::get_all(db.clone()).await.unwrap();
+    let initial_prepages = services::prepage::get_all(&db).await.unwrap();
 
     let initial_first_prepage = initial_prepages.first().unwrap();
     let removed_id = initial_first_prepage.id;
 
     // What's tested
-    let remove_query_result = services::prepage::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::prepage::delete(&db, removed_id.clone()).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_prepage = services::prepage::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_prepage = services::prepage::get_by_id(&db, removed_id.clone()).await;
     assert!(
         removed_prepage.is_err(),
         "Database query should fail for removed id"

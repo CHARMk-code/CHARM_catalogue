@@ -3,12 +3,12 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{EnumIter, Display, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
 
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct CompanyWeb {
     pub id: Option<i32>,
     pub last_updated: Option<DateTime<Utc>>,
@@ -17,7 +17,7 @@ pub struct CompanyWeb {
     pub name: Option<String>,
     pub description: Option<String>,
     pub unique_selling_point: Option<String>,
-    pub summer_job_description: Option<String>, // Allow publishing of generic job listings on the
+    pub summer_job_description: Option<String>, // TODO: Allow publishing of generic job listings on the
     pub summer_job_link: Option<String>,        // company page
     pub summer_job_deadline: Option<DateTime<Utc>>,
     pub contacts: Option<String>,
@@ -32,10 +32,36 @@ pub struct CompanyWeb {
     pub tags: Option<Vec<i32>>,
 }
 
+impl Default for CompanyWeb {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            last_updated: Default::default(),
+            active: Default::default(),
+            charmtalk: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            unique_selling_point: Default::default(),
+            summer_job_description: Default::default(),
+            summer_job_link: Default::default(),
+            summer_job_deadline: Default::default(),
+            contacts: Default::default(),
+            contact_email: Default::default(),
+            employees_world: Default::default(),
+            employees_sweden: Default::default(),
+            website: Default::default(),
+            talk_to_us_about: Default::default(),
+            logo: Default::default(),
+            map_image: Default::default(),
+            booth_number: Default::default(),
+            tags: Default::default(),
+        }
+    }
+}
+
 #[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
 pub enum RequiredField {
     Id,
-    Lastupdated,
     Active,
     Charmtalk,
     Name,

@@ -1,5 +1,6 @@
 use actix_web::ResponseError;
 use async_trait::async_trait;
+use core::fmt;
 use futures::future::join_all;
 use sqlx::{Pool, Postgres};
 use std::{
@@ -18,7 +19,19 @@ use thiserror::Error;
 use calamine::{open_workbook_auto_from_rs, DataType, Range, Reader};
 use zip::{read::ZipFile, ZipArchive};
 
-use crate::routes::{company::CompanyWeb, tag::TagWeb};
+use crate::{
+    routes::{
+        company::CompanyWeb, layout::LayoutWeb, map::MapWeb, prepage::PrepageWeb,
+        shortcut::ShortcutWeb, tag::TagWeb,
+    },
+    services::{
+        self,
+        batch::{
+            layout_processor::LayoutProcessor, map_processor::MapProcessor,
+            prepage_processor::PrepageProcessor, shortcut_processor::ShortcutProcessor,
+        },
+    },
+};
 
 use self::{
     check_functions::{check_file_dependencies, check_tag_exist_for_company_tags},
@@ -26,27 +39,42 @@ use self::{
     tag_processor::TagProcessor,
 };
 
+use super::image::create;
+
 pub mod check_functions;
-pub mod company_processor;
-pub mod helper_functions;
-pub mod tag_processor;
+mod company_processor;
+mod helper_functions;
+mod layout_processor;
+mod map_processor;
+mod prepage_processor;
+mod shortcut_processor;
+mod tag_processor;
 
 #[derive(EnumIter, Display, Debug)]
 pub enum SheetNames {
     Companies,
     Tags,
+    Prepages,
+    Layouts,
+    Maps,
+    Shortcuts,
 }
 
 #[derive(Default, Clone, Debug)]
 pub struct ProcessedValues {
     pub companies: Vec<(CompanyWeb, Vec<PathBuf>)>,
     pub tags: Vec<(TagWeb, Vec<PathBuf>)>,
+    pub prepages: Vec<(PrepageWeb, Vec<PathBuf>)>,
+    pub layouts: Vec<(LayoutWeb, Vec<PathBuf>)>,
+    pub maps: Vec<(MapWeb, Vec<PathBuf>)>,
+    pub shortcuts: Vec<(ShortcutWeb, Vec<PathBuf>)>,
 }
 
 pub async fn process_batch_zip(
     db: &Pool<Postgres>,
     zip_path: &Path,
-    base_path: &Path,
+    upload_path: &Path,
+    storage_path: &Path,
 ) -> Result<(), BatchProcessError> {
     //Read the ZipArcive
     let zip_reader =
@@ -68,14 +96,22 @@ pub async fn process_batch_zip(
         match name.extension().and_then(|s| s.to_str()) {
             // If the file is an excel file process it as such
             Some("xlsx") | Some("xlsm") | Some("xlsb") | Some("xls") => {
-                let mut new_processed_values = process_xlsx_file(file)?;
-                processed_values
-                    .companies
-                    .append(&mut new_processed_values.companies);
-                processed_values.tags.append(&mut new_processed_values.tags);
+                let new_processed_values = process_xlsx_file(file, upload_path)?;
+                processed_values = ProcessedValues {
+                    companies: [processed_values.companies, new_processed_values.companies]
+                        .concat(),
+                    tags: [processed_values.tags, new_processed_values.tags].concat(),
+                    layouts: [processed_values.layouts, new_processed_values.layouts].concat(),
+                    maps: [processed_values.maps, new_processed_values.maps].concat(),
+                    prepages: [processed_values.prepages, new_processed_values.prepages].concat(),
+                    shortcuts: [processed_values.shortcuts, new_processed_values.shortcuts]
+                        .concat(),
+                }
             }
             // if not excel file handle it as such
-            _ => provided_files.push(process_other_file(file, base_path)?),
+            _ => {
+                provided_files.push(process_other_file(file, upload_path, storage_path, db).await?)
+            }
         };
     }
 
@@ -106,14 +142,17 @@ async fn apply_proccessed_values_to_db(
         .into_iter()
         .collect()
     }
-    println!("ProcessedValues: {:?}", processed_values);
     let tag_ids = apply_vec_to_database::<TagProcessor>(db, &processed_values.tags).await?;
-
-    println!("Tag_ids: {:?}", tag_ids);
 
     let updated_processed_values = update_tag_ids(processed_values, &tag_ids);
 
     apply_vec_to_database::<CompanyProcessor>(db, &updated_processed_values.companies).await?;
+
+    println!("applying other things aswell {:?}", processed_values);
+    apply_vec_to_database::<LayoutProcessor>(db, &updated_processed_values.layouts).await?;
+    apply_vec_to_database::<MapProcessor>(db, &updated_processed_values.maps).await?;
+    apply_vec_to_database::<PrepageProcessor>(db, &updated_processed_values.prepages).await?;
+    apply_vec_to_database::<ShortcutProcessor>(db, &updated_processed_values.shortcuts).await?;
 
     Ok(())
 }
@@ -161,12 +200,16 @@ fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &Vec<i32>) ->
                 )
             })
             .collect(),
+        ..processed_values.clone()
     };
 
     updated_processed_values
 }
 
-fn process_xlsx_file(mut file: ZipFile) -> Result<ProcessedValues, BatchProcessError> {
+fn process_xlsx_file(
+    mut file: ZipFile,
+    base_file_path: &Path,
+) -> Result<ProcessedValues, BatchProcessError> {
     let mut buf: Vec<u8> = Vec::new();
     file.read_to_end(&mut buf)
         .map_err(|source| BatchProcessError::ZipIoError {
@@ -193,14 +236,39 @@ fn process_xlsx_file(mut file: ZipFile) -> Result<ProcessedValues, BatchProcessE
     }
 
     Ok(ProcessedValues {
-        tags: TagProcessor::process_sheet(get_sheet("tags", &sheets)?, "tags")?,
-        companies: CompanyProcessor::process_sheet(get_sheet("companies", &sheets)?, "companies")?,
+        tags: TagProcessor::process_sheet(get_sheet("tags", &sheets)?, "tags", base_file_path)?,
+        companies: CompanyProcessor::process_sheet(
+            get_sheet("companies", &sheets)?,
+            "companies",
+            base_file_path,
+        )?,
+        prepages: PrepageProcessor::process_sheet(
+            get_sheet("prepages", &sheets)?,
+            "prepages",
+            base_file_path,
+        )?,
+        layouts: LayoutProcessor::process_sheet(
+            get_sheet("layouts", &sheets)?,
+            "layouts",
+            base_file_path,
+        )?,
+        maps: MapProcessor::process_sheet(get_sheet("maps", &sheets)?, "maps", base_file_path)?,
+        shortcuts: ShortcutProcessor::process_sheet(
+            get_sheet("shortcuts", &sheets)?,
+            "shortcuts",
+            base_file_path,
+        )?,
     })
 }
 
 // TODO: Create a table that associates files with references (or maybe) just a table.
 // would be good to have in order to clean unused files so we don't just accumulate old_files.
-fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, BatchProcessError> {
+async fn process_other_file(
+    mut file: ZipFile<'_>,
+    upload_path: &Path,
+    storage_path: &Path,
+    db: &Pool<Postgres>,
+) -> Result<PathBuf, BatchProcessError> {
     let mut buf: Vec<u8> = Vec::new();
     file.read_to_end(&mut buf)
         .map_err(|source| BatchProcessError::ZipIoError {
@@ -220,7 +288,7 @@ fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, Ba
         .next_back()
         .ok_or(BatchProcessError::FileNameError)?;
 
-    let new_path = base_path
+    let new_path = upload_path
         .join(Path::new(&parent_dir))
         .join(Path::new(&file_name));
 
@@ -233,11 +301,18 @@ fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, Ba
     if SheetNames::iter()
         .all(|sheet_name| sheet_name.to_string().as_str().to_lowercase() != parent_as_string)
     {
+        println!(
+            "sheetnames: {:?}",
+            SheetNames::iter()
+                .map(|s| s.to_string())
+                .collect::<Vec<String>>()
+        );
         return Err(BatchProcessError::InvalidParentName {
             name: parent_as_string,
         });
     };
 
+    // Temproarily save the file in the upload path
     let mut directory_path = new_path.clone();
     directory_path.pop();
     std::fs::create_dir_all(directory_path)
@@ -248,8 +323,18 @@ fn process_other_file(mut file: ZipFile, base_path: &Path) -> Result<PathBuf, Ba
     f.write_all(&buf)
         .map_err(|source| BatchProcessError::FileCreationError { source })?;
 
+    services::image::create(
+        db,
+        "images",
+        vec![Path::new(parent_dir).join(file_name)],
+        &upload_path.to_path_buf(),
+        &storage_path.to_path_buf(),
+    )
+    .await.map_err(|source| BatchProcessError::ImageCreationError { source })?;
+
     Ok(new_path)
 }
+
 #[async_trait]
 trait XlsxSheetProcessor {
     type OutputType: Default + std::fmt::Debug;
@@ -271,6 +356,7 @@ trait XlsxSheetProcessor {
     fn process_sheet(
         sheet: &Range<DataType>,
         name: &str,
+        base_file_path: &Path,
     ) -> Result<Vec<(Self::OutputType, Vec<PathBuf>)>, BatchProcessError> {
         // (height, width)
         let height = sheet.height();
@@ -336,7 +422,7 @@ trait XlsxSheetProcessor {
                     value,
                     &mut row_struct,
                     &mut required_files,
-                    Path::new(name),
+                    &base_file_path.join(name),
                 )
             }
             output_rows.push((row_struct, required_files));
@@ -403,8 +489,11 @@ pub enum BatchProcessError {
         missing: Vec<String>,
     },
 
-    #[error("Could not apply new row to database")]
-    ApplyToDatabaseError { source: actix_web::Error },
+    #[error("Could not apply new row to database. Row: {row:?}")]
+    ApplyToDatabaseError {
+        source: actix_web::Error,
+        row: String,
+    },
 
     #[error("Missing Id in row: {value:?}")]
     MissingIdError { value: String },
@@ -412,7 +501,7 @@ pub enum BatchProcessError {
     #[error("Missing tag ids ({tag_ids:?}) for company tags")]
     MissingTagIdsForCompanyTags { tag_ids: Vec<i32> },
 
-    #[error("The Following files for {sheet_name:?} sheet is missing: {missing_files:?} ")]
+    #[error("The Following files for '{sheet_name:?}' sheet is missing: {missing_files:?} ")]
     MissingRequiredFiles {
         sheet_name: SheetNames,
         missing_files: Vec<PathBuf>,
@@ -434,6 +523,9 @@ pub enum BatchProcessError {
 
     #[error("Error reading file name when parsing uploaded file: {path:?}")]
     InvalidFileName { path: PathBuf },
+
+    #[error("Error when handling uploaded file")]
+    ImageCreationError { source: actix_web::Error  },
 }
 
 impl ResponseError for BatchProcessError {}
@@ -477,6 +569,10 @@ mod tests {
                     vec![],
                 ),
             ],
+            prepages: vec![],
+            layouts: vec![],
+            maps: vec![],
+            shortcuts: vec![],
         };
         let new_tag_ids = vec![4, 8];
 
@@ -537,6 +633,10 @@ mod tests {
                     vec![],
                 ),
             ],
+            prepages: vec![],
+            layouts: vec![],
+            maps: vec![],
+            shortcuts: vec![],
         };
         let new_tag_ids = vec![4, 8, 7];
 

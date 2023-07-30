@@ -17,7 +17,7 @@ pub struct PrepageDB {
     pub page: i32,
 }
 
-pub async fn create(db: Pool<Postgres>, data: PrepageWeb) -> Result<i32, actix_web::Error> {
+pub async fn create(db: &Pool<Postgres>, data: &PrepageWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;
     let image = is_valid_required_field(&data.image)?;
     let active = is_valid_required_field(&data.active)?;
@@ -27,18 +27,18 @@ pub async fn create(db: Pool<Postgres>, data: PrepageWeb) -> Result<i32, actix_w
 
     let query_result = sqlx::query!("INSERT INTO prepages (name, image, active, mobile, side, page) VALUES ($1, $2, $3, $4, $5, $6) returning id;",
 name, image, active, mobile, side, page)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn update(db: Pool<Postgres>, data: PrepageWeb) -> Result<i32, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: &PrepageWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
     // (TODO change the second query to only use the data values that will be updated)
     let prepage = sqlx::query_as!(PrepageDB, "SELECT * FROM prepages where id = $1", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 
@@ -58,32 +58,32 @@ pub async fn update(db: Pool<Postgres>, data: PrepageWeb) -> Result<i32, actix_w
                      if side.is_some() {side.unwrap()} else {&prepage.side},
                      if page.is_some() {page.unwrap()} else {&prepage.page},
                      data.id)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn delete(db: Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
+pub async fn delete(db: &Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
     let query_result = sqlx::query!("DELETE FROM prepages WHERE id = $1", id)
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result.rows_affected())
 }
 
-pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<PrepageDB>, actix_web::Error> {
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<PrepageDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(PrepageDB, "SELECT * FROM prepages")
-        .fetch_all(&db)
+        .fetch_all(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result)
 }
 
-pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<PrepageDB, actix_web::Error> {
+pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<PrepageDB, actix_web::Error> {
     let query_result = sqlx::query_as!(PrepageDB, "SELECT * FROM prepages where id = $1", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 

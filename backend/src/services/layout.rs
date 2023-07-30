@@ -14,7 +14,7 @@ pub struct LayoutDB {
     pub placement: i32,
 }
 
-pub async fn create(db: Pool<Postgres>, data: LayoutWeb) -> Result<i32, actix_web::Error> {
+pub async fn create(db: &Pool<Postgres>, data: &LayoutWeb) -> Result<i32, actix_web::Error> {
     let image = is_valid_required_field(&data.image)?;
     let active = is_valid_required_field(&data.active)?;
     let placement = is_valid_required_field(&data.placement)?;
@@ -25,20 +25,20 @@ pub async fn create(db: Pool<Postgres>, data: LayoutWeb) -> Result<i32, actix_we
         active,
         placement
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn update(db: Pool<Postgres>, data: LayoutWeb) -> Result<i32, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: &LayoutWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
     // (TODO change the second query to only use the data values that will be updated)
     let layout = sqlx::query_as!(LayoutDB, "SELECT * FROM layouts where id = $1 ", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 
@@ -65,34 +65,34 @@ pub async fn update(db: Pool<Postgres>, data: LayoutWeb) -> Result<i32, actix_we
         },
         data.id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
     Ok(query_result.id)
 }
 
-pub async fn delete(db: Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
+pub async fn delete(db: &Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
     let query_result = sqlx::query!("DELETE FROM layouts WHERE id = $1", id)
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result.rows_affected())
 }
 
-pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<LayoutDB>, actix_web::Error> {
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<LayoutDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(LayoutDB, "SELECT * FROM layouts")
-        .fetch_all(&db)
+        .fetch_all(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     Ok(query_result)
 }
 
-pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<LayoutDB, actix_web::Error> {
+pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<LayoutDB, actix_web::Error> {
     let query_result = sqlx::query_as!(LayoutDB, "SELECT * FROM layouts where id = $1 ", id)
-        .fetch_one(&db)
+        .fetch_one(db)
         .await
         .map_err(MyError::SQLxError)?;
 

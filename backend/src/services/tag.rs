@@ -4,7 +4,7 @@ use sqlx::{Pool, Postgres};
 use crate::errors::MyError;
 use crate::routes::tag::TagWeb;
 
-use super::is_valid_required_field;
+use super::{is_valid_required_field, is_optional_field_or_default};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct TagDB {
@@ -29,7 +29,7 @@ pub async fn create(db: &Pool<Postgres>, data: &TagWeb) -> Result<i32, actix_web
     let up_votes = is_valid_required_field(&data.up_votes)?;
     let down_votes = is_valid_required_field(&data.down_votes)?;
     let crowd_sourced = is_valid_required_field(&data.crowd_sourced)?;
-    let icon = is_valid_required_field(&data.icon)?;
+    let icon = is_optional_field_or_default(&data.icon, "".to_string())?;
     let division = is_valid_required_field(&data.division)?;
     let business_area = is_valid_required_field(&data.business_area)?;
     let looking_for = is_valid_required_field(&data.looking_for)?;
