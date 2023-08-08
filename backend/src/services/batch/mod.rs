@@ -1,6 +1,5 @@
 use actix_web::ResponseError;
 use async_trait::async_trait;
-use core::fmt;
 use futures::future::join_all;
 use sqlx::{Pool, Postgres};
 use std::{
@@ -38,8 +37,6 @@ use self::{
     company_processor::CompanyProcessor,
     tag_processor::TagProcessor,
 };
-
-use super::image::create;
 
 pub mod check_functions;
 mod company_processor;
@@ -134,13 +131,10 @@ async fn apply_proccessed_values_to_db(
         db: &Pool<Postgres>,
         rows: &Vec<(P::OutputType, Vec<PathBuf>)>,
     ) -> Result<Vec<i32>, BatchProcessError> {
-        join_all(rows.iter().map(|(row, _)| {
-            println!("Apply row: {:?}", row);
-            P::apply_to_database(db, row)
-        }))
-        .await
-        .into_iter()
-        .collect()
+        join_all(rows.iter().map(|(row, _)| P::apply_to_database(db, row)))
+            .await
+            .into_iter()
+            .collect()
     }
     let tag_ids = apply_vec_to_database::<TagProcessor>(db, &processed_values.tags).await?;
 
@@ -148,7 +142,6 @@ async fn apply_proccessed_values_to_db(
 
     apply_vec_to_database::<CompanyProcessor>(db, &updated_processed_values.companies).await?;
 
-    println!("applying other things aswell {:?}", processed_values);
     apply_vec_to_database::<LayoutProcessor>(db, &updated_processed_values.layouts).await?;
     apply_vec_to_database::<MapProcessor>(db, &updated_processed_values.maps).await?;
     apply_vec_to_database::<PrepageProcessor>(db, &updated_processed_values.prepages).await?;
@@ -301,12 +294,6 @@ async fn process_other_file(
     if SheetNames::iter()
         .all(|sheet_name| sheet_name.to_string().as_str().to_lowercase() != parent_as_string)
     {
-        println!(
-            "sheetnames: {:?}",
-            SheetNames::iter()
-                .map(|s| s.to_string())
-                .collect::<Vec<String>>()
-        );
         return Err(BatchProcessError::InvalidParentName {
             name: parent_as_string,
         });
@@ -330,7 +317,8 @@ async fn process_other_file(
         &upload_path.to_path_buf(),
         &storage_path.to_path_buf(),
     )
-    .await.map_err(|source| BatchProcessError::ImageCreationError { source })?;
+    .await
+    .map_err(|source| BatchProcessError::ImageCreationError { source })?;
 
     Ok(new_path)
 }
@@ -362,12 +350,9 @@ trait XlsxSheetProcessor {
         let height = sheet.height();
         let width = u32::try_from(sheet.width()).expect("Conversion from usize to u32 to work");
 
-        println!("Height: {:?}", height);
-
         let sheet_first_row = sheet.range((0, 0), (0, width));
         let header_row = sheet_first_row.cells().map(|(_, x, data)| {
             let formatted_header = format_header_string(data);
-            println!("X: {:?}, Data: {:?} {:?}", x, data, formatted_header);
             (x, formatted_header)
         });
         let mut valid_headers: HashMap<Self::RequiredField, usize> = HashMap::new();
@@ -411,7 +396,6 @@ trait XlsxSheetProcessor {
         // Iterate through all values and add them correctly to output_rows
         let mut output_rows: Vec<(Self::OutputType, Vec<PathBuf>)> = Vec::new();
         for row in 1..height {
-            println!("Row number: {:?}", row);
             let mut row_struct = Self::OutputType::default();
             let mut required_files = Vec::new();
 
@@ -435,8 +419,6 @@ trait XlsxSheetProcessor {
         db: &Pool<Postgres>,
         row: &Self::OutputType,
     ) -> Result<i32, BatchProcessError>;
-
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError>;
 }
 
 fn format_header_string(data: &DataType) -> String {
@@ -466,9 +448,6 @@ pub enum BatchProcessError {
 
     #[error("Error when parsing zip file")]
     ZipIoError { source: zip::result::ZipError },
-
-    #[error("No excel files provided in zip")]
-    NoExcelInZip,
 
     #[error("Wrapped excel (calamine) error")]
     CalamineError { source: calamine::Error },
@@ -510,22 +489,14 @@ pub enum BatchProcessError {
     #[error("Error retrieving file name inside zip archive")]
     FileNameError,
 
-    #[error("Only excel files are allowed in the base directory. Put {name:?} in folder matching the correct sheet")]
-    MissingParent { name: PathBuf },
-
-    #[error(
-        "The files directory (currently {name:?}) must be the same as the sheet using the file"
-    )]
+    #[error("The file dir (currently {name:?}) must be the same as the sheet using the file")]
     InvalidParentName { name: String },
 
     #[error("Error creating file from Zippedfile")]
     FileCreationError { source: std::io::Error },
 
-    #[error("Error reading file name when parsing uploaded file: {path:?}")]
-    InvalidFileName { path: PathBuf },
-
     #[error("Error when handling uploaded file")]
-    ImageCreationError { source: actix_web::Error  },
+    ImageCreationError { source: actix_web::Error },
 }
 
 impl ResponseError for BatchProcessError {}

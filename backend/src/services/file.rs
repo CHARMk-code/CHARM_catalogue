@@ -52,7 +52,6 @@ pub async fn save_files(
                 .map_err(|source| FileServiceError::BlockingError { source })?
                 .map_err(|source| FileServiceError::FileHandlingError { source })?;
         }
-        println!("FilePath: {:?}", &file_paths.last().unwrap().canonicalize());
     }
     Ok(file_paths)
 }

@@ -25,17 +25,12 @@ impl XlsxSheetProcessor for LayoutProcessor {
         db: &Pool<Postgres>,
         row: &Self::OutputType,
     ) -> Result<i32, BatchProcessError> {
-        println!("Applying a layout to database");
         Ok(layout::create(db, row).await.map_err(|source| {
             BatchProcessError::ApplyToDatabaseError {
                 source,
                 row: format!("{:?}",row),
             }
         })?)
-    }
-
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
-        todo!()
     }
 
     fn set_struct_value(

@@ -22,7 +22,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let result = services::tag::get_by_id(db.clone(), initial_db_tag.id).await;
+    let result = services::tag::get_by_id(&db, initial_db_tag.id).await;
     assert!(result.is_ok());
     assert_eq!(initial_db_tag, result.unwrap());
     Ok(())
@@ -38,7 +38,7 @@ async fn get_by_id_when_no_matching_tag_should_fail(db: Pool<Postgres>) -> Resul
     let invalid_id = i32::try_from(initial_row_amount.first().unwrap().count.unwrap()).unwrap() + 1;
 
     // What's tested
-    let queried_tag = services::tag::get_by_id(db.clone(), invalid_id).await;
+    let queried_tag = services::tag::get_by_id(&db, invalid_id).await;
     assert!(
         queried_tag.is_err(),
         "Should fail when querying for nonexisting id"
@@ -50,7 +50,7 @@ async fn get_by_id_when_no_matching_tag_should_fail(db: Pool<Postgres>) -> Resul
 #[sqlx::test(fixtures("Tags"))]
 async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_tags = services::tag::get_all(db.clone()).await.unwrap();
+    let initial_tags = services::tag::get_all(&db).await.unwrap();
 
     let new_tag = routes::tag::TagWeb {
         id: None,
@@ -75,7 +75,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
         "Should not fail on creation of new row"
     );
 
-    let new_tags = services::tag::get_all(db.clone()).await.unwrap();
+    let new_tags = services::tag::get_all(&db).await.unwrap();
     let new_created_tag: &services::tag::TagDB = new_tags
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
@@ -126,7 +126,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_tags = services::tag::get_all(db.clone()).await.unwrap();
+    let initial_tags = services::tag::get_all(&db).await.unwrap();
 
     let initial_first_tag = initial_tags.first().unwrap();
     let initial_other_tags = initial_tags
@@ -153,7 +153,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     // What's tested
 
     // Check output validity
-    let update_query_result = services::tag::update(db.clone(), first_tag_update).await;
+    let update_query_result = services::tag::update(&db, first_tag_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -165,7 +165,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     );
 
     // Check updates of tag table
-    let updated_tags = services::tag::get_all(db.clone()).await.unwrap();
+    let updated_tags = services::tag::get_all(&db).await.unwrap();
     let updated_first_tag = updated_tags
         .iter()
         .cloned()
@@ -209,17 +209,17 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_tags = services::tag::get_all(db.clone()).await.unwrap();
+    let initial_tags = services::tag::get_all(&db).await.unwrap();
 
     let initial_first_tag = initial_tags.first().unwrap();
     let removed_id = initial_first_tag.id;
 
     // What's tested
-    let remove_query_result = services::tag::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::tag::delete(&db, removed_id.clone()).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_tag = services::tag::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_tag = services::tag::get_by_id(&db, removed_id.clone()).await;
     assert!(
         removed_tag.is_err(),
         "Database query should fail for removed id"

@@ -21,6 +21,7 @@ static TEST_STORAGE: &str = "storage/";
 fn create_test_folders() -> Result<PathBuf, std::io::Error> {
     let test_uuid = Uuid::new_v4();
     let mut test_path = PathBuf::new();
+    test_path.push(env!("CARGO_MANIFEST_DIR"));
     test_path.push(TEST_BASE_FOLDER);
     test_path.push(test_uuid.to_string());
 

@@ -75,7 +75,7 @@ mod errors {
                 MyError::SQLxError(ref err) => {
                     HttpResponse::InternalServerError().body(err.to_string())
                 }
-                _ => HttpResponse::InternalServerError().finish(),
+                //_ => HttpResponse::InternalServerError().finish(),
             }
         }
     }

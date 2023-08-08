@@ -6,7 +6,7 @@ use crate::routes::prepage::PrepageWeb;
 
 use super::is_valid_required_field;
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct PrepageDB {
     pub id: i32,
     pub name: String,

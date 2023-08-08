@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 
 use super::is_valid_required_field;
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct CompanyDB {
     pub id: i32,
     pub last_updated: DateTime<Utc>,
@@ -97,7 +97,7 @@ last_updated, active, charmtalk, name, description, unique_selling_point, summer
     Ok(new_company_id)
 }
 
-pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_web::Error> {
+pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 
     // In an optimal world we shouldn't need this query
@@ -112,7 +112,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
         ",
         id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 
@@ -147,7 +147,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
         "SELECT count(id) from tags where id = ANY(select * from UNNEST($1::int[]))",
         &new_tags
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
     if usize::try_from(tag_count.count.unwrap_or(0)) != Ok(new_tags.len()) {
@@ -177,7 +177,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
             if map_image.is_some() {map_image.unwrap()} else {&company.map_image},
             if booth_number.is_some() {booth_number.unwrap()} else {&company.booth_number},
             data.id)
-        .fetch_one(&db).await.map_err(MyError::SQLxError)?;
+        .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     // Update the company (one) to tag (many) relation
     let new_tags_set: HashSet<i32> = HashSet::from_iter(new_tags);
@@ -196,7 +196,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
             data.id,
             &tags_to_remove
         )
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
     }
@@ -217,7 +217,7 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
             &tags_to_add,
             tags_to_add.len() as i32
         )
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
     }
@@ -225,22 +225,22 @@ pub async fn update(db: Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_w
     Ok(query_result.id)
 }
 
-pub async fn delete(db: Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
+pub async fn delete(db: &Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
     let delete_company_result = sqlx::query!("DELETE FROM companies WHERE id = $1", id)
-        .execute(&db)
+        .execute(db)
         .await
         .map_err(MyError::SQLxError)?;
 
     let _delete_companies_tags_result =
         sqlx::query!("DELETE FROM companies_tags WHERE company_id = $1", id)
-            .execute(&db)
+            .execute(db)
             .await
             .map_err(MyError::SQLxError)?;
 
     Ok(delete_company_result.rows_affected())
 }
 
-pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<CompanyDB>, actix_web::Error> {
+pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<CompanyDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(
         CompanyDB,
         "\
@@ -249,7 +249,7 @@ pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<CompanyDB>, actix_web::Er
         left join tags T on C_T.tag_id = T.id \
         group by C.id"
     )
-    .fetch_all(&db)
+    .fetch_all(db)
     .await
     .map_err(MyError::SQLxError)?;
 
@@ -264,7 +264,7 @@ pub async fn get_all(db: Pool<Postgres>) -> Result<Vec<CompanyDB>, actix_web::Er
     Ok(mapped_result)
 }
 
-pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<CompanyDB, actix_web::Error> {
+pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<CompanyDB, actix_web::Error> {
     let query_result = sqlx::query_as!(
         CompanyDB,
         "\
@@ -274,7 +274,7 @@ pub async fn get_by_id(db: Pool<Postgres>, id: i32) -> Result<CompanyDB, actix_w
         where C.id = $1 group by C.id",
         id
     )
-    .fetch_one(&db)
+    .fetch_one(db)
     .await
     .map_err(MyError::SQLxError)?;
 

@@ -6,7 +6,7 @@ use crate::routes::shortcut::ShortcutWeb;
 
 use super::{is_valid_required_field, is_optional_field_or_default};
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct ShortcutDB {
     pub id: i32,
     pub name: String,

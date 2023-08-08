@@ -20,8 +20,6 @@ pub fn check_file_dependencies(
             .flatten()
             .cloned()
             .collect::<HashSet<PathBuf>>();
-        println!("required_files_set: {:?}", required_files_set);
-        println!("provided_files_set: {:?}", provided_files_set);
         required_files_set
             .difference(provided_files_set)
             .cloned()
@@ -59,11 +57,10 @@ pub fn check_file_dependencies(
         })
         .try_for_each(|(sheet_name, missing_files)| match missing_files.len() {
             0 => Ok(()),
-            _ => { println!("Provided files: {:?}", provided_files_set);
-                Err(BatchProcessError::MissingRequiredFiles {
+            _ => Err(BatchProcessError::MissingRequiredFiles {
                 sheet_name,
                 missing_files,
-            })},
+            }),
         })
 }
 
@@ -201,10 +198,10 @@ mod tests {
                 ),
             ],
             tags: vec![],
-            prepages: vec!(),
-            layouts: vec!(),
-            maps: vec!(),
-            shortcuts: vec!(),
+            prepages: vec![],
+            layouts: vec![],
+            maps: vec![],
+            shortcuts: vec![],
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);
@@ -253,10 +250,10 @@ mod tests {
                     Vec::new(),
                 ),
             ],
-            prepages: vec!(),
-            layouts: vec!(),
-            maps: vec!(),
-            shortcuts: vec!(),
+            prepages: vec![],
+            layouts: vec![],
+            maps: vec![],
+            shortcuts: vec![],
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);
@@ -312,10 +309,10 @@ mod tests {
                     Vec::new(),
                 ),
             ],
-            prepages: vec!(),
-            layouts: vec!(),
-            maps: vec!(),
-            shortcuts: vec!(),
+            prepages: vec![],
+            layouts: vec![],
+            maps: vec![],
+            shortcuts: vec![],
         };
 
         let res = check_tag_exist_for_company_tags(&processed_values);

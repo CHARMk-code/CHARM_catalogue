@@ -32,10 +32,6 @@ impl XlsxSheetProcessor for MapProcessor {
         })?)
     }
 
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
-        todo!()
-    }
-
     fn set_struct_value(
         column_name: &Self::RequiredField,
         value: &DataType,

@@ -95,7 +95,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[get("/")]
 async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let companies = services::company::get_all((*db).as_ref().clone()).await?;
+    let companies = services::company::get_all(&db).await?;
 
     Ok(HttpResponse::Ok().json(companies))
 }
@@ -103,7 +103,7 @@ async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
 #[get("/{id}")]
 async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let company = services::company::get_by_id((*db).as_ref().clone(), id).await?;
+    let company = services::company::get_by_id(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(company))
 }
@@ -158,7 +158,7 @@ async fn update_handler(
                 HttpResponse::UnprocessableEntity().finish()
             } else {
                 let company =
-                    services::company::update((*db).as_ref().clone(), input_company).await?;
+                    services::company::update(&db, input_company).await?;
                 HttpResponse::Ok().json(company)
             }
         }
@@ -190,7 +190,7 @@ async fn delete_handler(
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::company::delete((*db).as_ref().clone(), id).await?;
+    let affected_rows = services::company::delete(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

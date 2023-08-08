@@ -53,7 +53,4 @@ impl XlsxSheetProcessor for PrepageProcessor {
         })?)
     }
 
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
-        todo!()
-    }
 }

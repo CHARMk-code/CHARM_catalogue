@@ -32,10 +32,6 @@ impl XlsxSheetProcessor for TagProcessor {
         })?)
     }
 
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
-        todo!()
-    }
-
     fn set_struct_value(
         column_name: &Self::RequiredField,
         value: &DataType,
@@ -54,7 +50,6 @@ impl XlsxSheetProcessor for TagProcessor {
             }
             RequiredField::Offering => {
                 row_struct.offering = value_to_bool(value);
-                println!("value from bool: {:?}", value_to_bool(value))
             }
             RequiredField::Language => row_struct.language = value_to_bool(value),
             RequiredField::Fairarea => row_struct.fair_area = value_to_bool(value),

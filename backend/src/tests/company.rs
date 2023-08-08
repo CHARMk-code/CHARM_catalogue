@@ -36,7 +36,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
     };
 
     // What's tested
-    let queried_company = services::company::get_by_id(db.clone(), initial_company.id).await;
+    let queried_company = services::company::get_by_id(&db, initial_company.id).await;
     assert!(queried_company.is_ok());
     assert_eq!(initial_company, queried_company.unwrap());
     Ok(())
@@ -52,7 +52,7 @@ async fn get_by_id_when_no_matching_company_should_fail(db: Pool<Postgres>) -> R
     let invalid_id = i32::try_from(initial_row_amount.first().unwrap().count.unwrap()).unwrap() + 1;
 
     // What's tested
-    let queried_company = services::company::get_by_id(db.clone(), invalid_id).await;
+    let queried_company = services::company::get_by_id(&db, invalid_id).await;
     assert!(
         queried_company.is_err(),
         "Should fail when querying for nonexisting id"
@@ -68,7 +68,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         tag_id: i32,
     }
     // Setup
-    let initial_companies = services::company::get_all(db.clone()).await.unwrap();
+    let initial_companies = services::company::get_all(&db).await.unwrap();
     let initial_companies_tags = sqlx::query_as!(CompanyTagRel, "SELECT * FROM companies_tags")
         .fetch_all(&db)
         .await?;
@@ -107,7 +107,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         "Should not fail on creation of new row"
     );
 
-    let new_companies = services::company::get_all(db.clone()).await.unwrap();
+    let new_companies = services::company::get_all(&db).await.unwrap();
     let new_created_company: &services::company::CompanyDB = new_companies
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
@@ -202,7 +202,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         tag_id: i32,
     }
     // Setup
-    let initial_companies = services::company::get_all(db.clone()).await.unwrap();
+    let initial_companies = services::company::get_all(&db).await.unwrap();
     let initial_companies_tags = sqlx::query_as!(CompanyTagRel, "SELECT * FROM companies_tags")
         .fetch_all(&db)
         .await?;
@@ -239,7 +239,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     // What's tested
 
     // Check output validity
-    let update_query_result = services::company::update(db.clone(), first_company_update).await;
+    let update_query_result = services::company::update(&db, first_company_update).await;
     assert!(
         update_query_result.is_ok(),
         "Update should not return an error"
@@ -251,7 +251,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     );
 
     // Check updates of company table
-    let updated_companies = services::company::get_all(db.clone()).await.unwrap();
+    let updated_companies = services::company::get_all(&db).await.unwrap();
     let updated_first_company = updated_companies
         .iter()
         .cloned()
@@ -340,7 +340,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
     // Setup
-    let initial_companies = services::company::get_all(db.clone()).await.unwrap();
+    let initial_companies = services::company::get_all(&db).await.unwrap();
     let initial_companies_tags = sqlx::query!("SELECT * FROM companies_tags")
         .fetch_all(&db)
         .await?;
@@ -349,11 +349,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_company.id;
 
     // What's tested
-    let remove_query_result = services::company::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::company::delete(&db, removed_id.clone()).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_company = services::company::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_company = services::company::get_by_id(&db, removed_id.clone()).await;
     assert!(
         removed_company.is_err(),
         "Database query should fail for removed id"

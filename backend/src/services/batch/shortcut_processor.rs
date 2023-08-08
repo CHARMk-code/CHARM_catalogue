@@ -32,16 +32,12 @@ impl XlsxSheetProcessor for ShortcutProcessor {
         })?)
     }
 
-    fn move_associated_files(file_names: Vec<&str>) -> Result<(), BatchProcessError> {
-        todo!()
-    }
-
     fn set_struct_value(
         column_name: &Self::RequiredField,
         value: &DataType,
         row_struct: &mut Self::OutputType,
-        required_files: &mut Vec<PathBuf>,
-        base_file_path: &Path,
+        _required_files: &mut Vec<PathBuf>,
+        _base_file_path: &Path,
     ) -> () {
         match column_name {
             RequiredField::Id => row_struct.id = value_to_i32(value),

@@ -6,7 +6,7 @@ use crate::routes::layout::LayoutWeb;
 
 use super::is_valid_required_field;
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct LayoutDB {
     pub id: i32,
     pub image: String,
