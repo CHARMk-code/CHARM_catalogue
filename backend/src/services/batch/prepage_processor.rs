@@ -48,9 +48,8 @@ impl XlsxSheetProcessor for PrepageProcessor {
         Ok(prepage::create(db, row).await.map_err(|source| {
             BatchProcessError::ApplyToDatabaseError {
                 source,
-                row: format!("{:?}",row),
+                row: format!("{:?}", row),
             }
         })?)
     }
-
 }

@@ -46,7 +46,7 @@ fn create_dummy_file(test_path: &Path, folder: &str, name: &str) -> Result<(), s
     let mut path = test_path.to_path_buf();
     path.push(folder);
     path.push(name);
-    
+
     println!("Created dummy file at: {:?}", path);
     std::fs::File::create(path)?;
     Ok(())

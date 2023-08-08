@@ -157,8 +157,7 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let company =
-                    services::company::update(&db, input_company).await?;
+                let company = services::company::update(&db, input_company).await?;
                 HttpResponse::Ok().json(company)
             }
         }

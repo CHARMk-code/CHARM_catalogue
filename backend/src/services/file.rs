@@ -1,4 +1,8 @@
-use std::{fs, io::Write, path::{PathBuf, Path}};
+use std::{
+    fs,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 use actix_multipart::Multipart;
 use actix_web::{error::BlockingError, web, ResponseError};
@@ -17,7 +21,11 @@ pub enum FileServiceError {
     FileHandlingError { source: std::io::Error },
 
     #[error("Error when moving file: {from:?} -> {to:?}")]
-    FileMovingError { source: std::io::Error, from: PathBuf, to: PathBuf },
+    FileMovingError {
+        source: std::io::Error,
+        from: PathBuf,
+        to: PathBuf,
+    },
 }
 
 // TODO: Possibly add more and better error handling out via the API, this just sends a
@@ -60,8 +68,13 @@ pub async fn move_file(
     old_file_path: PathBuf,
     new_file_path: PathBuf,
 ) -> Result<(), FileServiceError> {
-    std::fs::rename(&old_file_path, &new_file_path)
-        .map_err(|source| FileServiceError::FileMovingError { source, from: old_file_path, to: new_file_path })
+    std::fs::rename(&old_file_path, &new_file_path).map_err(|source| {
+        FileServiceError::FileMovingError {
+            source,
+            from: old_file_path,
+            to: new_file_path,
+        }
+    })
 }
 
 pub async fn remove_file(file_path: &Path) -> Result<(), FileServiceError> {

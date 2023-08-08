@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    fs,
-    path::PathBuf,
-};
+use std::{collections::HashMap, fs, path::PathBuf};
 
 use chrono::DateTime;
 use sqlx::{Pool, Postgres};

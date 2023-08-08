@@ -1,4 +1,4 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use sqlx::Pool;
@@ -45,7 +45,11 @@ pub async fn create(
 
         uuids.push(query_result.id);
 
-        move_file(upload_path.join(saved_file), storage_path.join(query_result.id.to_string())).await?;
+        move_file(
+            upload_path.join(saved_file),
+            storage_path.join(query_result.id.to_string()),
+        )
+        .await?;
     }
 
     Ok(uuids)
@@ -109,8 +113,11 @@ pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<FileDB>, actix_web::Erro
     Ok(query_result)
 }
 
-pub async fn delete(db: &Pool<Postgres>, id: &Uuid, storage_path: &Path) -> Result<u64, actix_web::Error> {
-     
+pub async fn delete(
+    db: &Pool<Postgres>,
+    id: &Uuid,
+    storage_path: &Path,
+) -> Result<u64, actix_web::Error> {
     services::file::remove_file(&storage_path.join(id.to_string())).await?;
 
     let query_result = sqlx::query!("DELETE FROM files WHERE id = $1", id)
@@ -120,4 +127,3 @@ pub async fn delete(db: &Pool<Postgres>, id: &Uuid, storage_path: &Path) -> Resu
 
     Ok(query_result.rows_affected())
 }
-

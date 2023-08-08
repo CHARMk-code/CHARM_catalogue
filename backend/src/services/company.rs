@@ -40,12 +40,12 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
     let charmtalk = is_valid_required_field(&data.charmtalk)?;
     let name = is_valid_required_field(&data.name)?;
     let description = is_valid_required_field(&data.description)?;
-    let unique_selling_point = is_optional_field_or_default(&data.unique_selling_point, "".to_string())?;
+    let unique_selling_point =
+        is_optional_field_or_default(&data.unique_selling_point, "".to_string())?;
     let summer_job_description =
         is_optional_field_or_default(&data.summer_job_description, "".to_string())?;
     let summer_job_link = is_optional_field_or_default(&data.summer_job_link, "".to_string())?;
-    let summer_job_deadline =
-        is_optional_field_or_default(&data.summer_job_deadline, Utc::now())?;
+    let summer_job_deadline = is_optional_field_or_default(&data.summer_job_deadline, Utc::now())?;
     let contacts = is_valid_required_field(&data.contacts)?;
     let contact_email = is_valid_required_field(&data.contact_email)?;
     let employees_world = is_valid_required_field(&data.employees_world)?;

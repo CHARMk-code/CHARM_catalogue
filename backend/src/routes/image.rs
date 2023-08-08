@@ -1,15 +1,18 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use actix_multipart::Multipart;
 use actix_web::{
-    get, post, put,
+    delete, get, post, put,
     web::{self, Json},
-    HttpResponse, Responder, Result, delete,
+    HttpResponse, Responder, Result,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Uuid, PgPool};
 
-use crate::{services::{self, auth::AuthedUser, file::save_files}, config::Config};
+use crate::{
+    config::Config,
+    services::{self, auth::AuthedUser, file::save_files},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/image").service(get_by_id_handler));
@@ -65,12 +68,13 @@ async fn create_handler(
     config: web::Data<Config>,
     payload: Multipart,
 ) -> Result<impl Responder> {
-    let upload_path: PathBuf = config.upload_path.clone().into(); 
-    let storage_path: PathBuf = config.storage_path.clone().into(); 
+    let upload_path: PathBuf = config.upload_path.clone().into();
+    let storage_path: PathBuf = config.storage_path.clone().into();
 
     let saved_files = save_files(payload, &upload_path).await?;
 
-    let uuids = services::image::create(&db, "images", saved_files, &upload_path, &storage_path).await?;
+    let uuids =
+        services::image::create(&db, "images", saved_files, &upload_path, &storage_path).await?;
 
     Ok(HttpResponse::Ok().json(uuids))
 }
@@ -81,10 +85,9 @@ async fn delete_handler(
     db: web::Data<PgPool>,
     config: web::Data<Config>,
     path: web::Path<Uuid>,
-
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    
+
     let affected_rows = services::image::delete(&db, &id, Path::new(&config.storage_path)).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))

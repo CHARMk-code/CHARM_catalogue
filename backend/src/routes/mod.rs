@@ -1,14 +1,14 @@
 pub mod auth;
+pub mod batch;
 pub mod company;
 pub mod feedback;
+pub mod image;
 pub mod layout;
 pub mod map;
 pub mod prepage;
 pub mod settings;
 pub mod shortcut;
 pub mod tag;
-pub mod batch;
-pub mod image;
 
 use actix_web::web;
 

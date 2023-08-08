@@ -27,7 +27,7 @@ impl XlsxSheetProcessor for ShortcutProcessor {
         Ok(shortcut::create(db, row).await.map_err(|source| {
             BatchProcessError::ApplyToDatabaseError {
                 source,
-                row: format!("{:?}",row),
+                row: format!("{:?}", row),
             }
         })?)
     }

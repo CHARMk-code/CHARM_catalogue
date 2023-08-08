@@ -2,7 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{EnumIter, EnumString, Display};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -96,8 +96,7 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let prepage =
-                    services::prepage::update(&db, &input_prepage).await?;
+                let prepage = services::prepage::update(&db, &input_prepage).await?;
                 HttpResponse::Ok().json(prepage)
             }
         }

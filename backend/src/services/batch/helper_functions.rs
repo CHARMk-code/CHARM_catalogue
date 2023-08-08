@@ -1,4 +1,7 @@
-use std::{str::FromStr, path::{Path, PathBuf}};
+use std::{
+    path::{Path, PathBuf},
+    str::FromStr,
+};
 
 use calamine::DataType;
 use chrono::{DateTime, Utc};
@@ -21,7 +24,11 @@ pub fn value_to_i32(value: &DataType) -> Option<i32> {
     }
 }
 
-pub fn value_to_file_path(value: &DataType, required_files: &mut Vec<PathBuf>, base_file_path: &Path) -> Option<String> {
+pub fn value_to_file_path(
+    value: &DataType,
+    required_files: &mut Vec<PathBuf>,
+    base_file_path: &Path,
+) -> Option<String> {
     match value.get_string() {
         None => None,
         Some(str) => {

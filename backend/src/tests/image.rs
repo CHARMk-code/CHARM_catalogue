@@ -107,7 +107,9 @@ async fn creating_a_valid_image_file_should_create_row_in_db(
         "Other rows should NOT have been changed"
     );
 
-    let expected_file_path = test_path.join(TEST_STORAGE).join(expected_files.id.to_string());
+    let expected_file_path = test_path
+        .join(TEST_STORAGE)
+        .join(expected_files.id.to_string());
     assert!(
         Path::new(&expected_file_path).is_file(),
         "The created file ({:?}) should exist in the storage folder",

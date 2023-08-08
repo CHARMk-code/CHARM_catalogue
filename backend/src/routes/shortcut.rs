@@ -2,7 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{EnumIter, EnumString, Display};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::services;
 use crate::services::auth::AuthedUser;
@@ -81,14 +81,12 @@ async fn update_handler(
             if name.and(description).and(link).and(icon).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let shortcut =
-                    services::shortcut::update(&db, &input_shortcut).await?;
+                let shortcut = services::shortcut::update(&db, &input_shortcut).await?;
                 HttpResponse::Ok().json(shortcut)
             }
         }
         None => {
-            let shortcut =
-                services::shortcut::create(&db, &input_shortcut).await?;
+            let shortcut = services::shortcut::create(&db, &input_shortcut).await?;
             HttpResponse::Created().json(shortcut)
         }
     };

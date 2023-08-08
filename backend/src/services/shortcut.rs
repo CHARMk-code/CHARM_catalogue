@@ -4,7 +4,7 @@ use sqlx::{Pool, Postgres};
 use crate::errors::MyError;
 use crate::routes::shortcut::ShortcutWeb;
 
-use super::{is_valid_required_field, is_optional_field_or_default};
+use super::{is_optional_field_or_default, is_valid_required_field};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct ShortcutDB {

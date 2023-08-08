@@ -27,9 +27,12 @@ impl XlsxSheetProcessor for CompanyProcessor {
         db: &Pool<Postgres>,
         row: &Self::OutputType,
     ) -> Result<i32, BatchProcessError> {
-        Ok(company::create(db, row)
-            .await
-            .map_err(|source| BatchProcessError::ApplyToDatabaseError { source, row: format!("{:?}",row) })?)
+        Ok(company::create(db, row).await.map_err(|source| {
+            BatchProcessError::ApplyToDatabaseError {
+                source,
+                row: format!("{:?}", row),
+            }
+        })?)
     }
 
     fn set_struct_value(
