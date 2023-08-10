@@ -1,0 +1,136 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT C.*, array_remove(array_agg(T.id), NULL) as tags FROM Companies as C left join companies_tags C_T on C_T.company_id = C.id left join tags T on C_T.tag_id = T.id where C.id = $1 group by C.id ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "last_updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "charmtalk",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "unique_selling_point",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "summer_job_description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "summer_job_link",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "summer_job_deadline",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "contacts",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "contact_email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "employees_world",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "employees_sweden",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 14,
+        "name": "website",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "talk_to_us_about",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "logo",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "map_image",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 18,
+        "name": "booth_number",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 19,
+        "name": "tags",
+        "type_info": "Int4Array"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "f8f42434e2587fc73ee7b3e16489baff0da1f8dd3247e3e151a558b683c75009"
+}
