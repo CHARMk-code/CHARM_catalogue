@@ -53,6 +53,8 @@ pub struct UserDB {
 }
 
 pub async fn get_user(db: &Pool<Postgres>) -> Result<UserDB, actix_web::Error> {
+    // HACK: This should be fixed when a proper authorization system is set up. Currently creates a
+    // password "password" if the db returns an error (most likely, no password has previously been set)
     let user = query_as!(UserDB, "SELECT * FROM users")
         .fetch_one(db)
         .await

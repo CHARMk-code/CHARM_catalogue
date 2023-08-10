@@ -48,7 +48,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
         if (force || this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/settings/company_view")
+            .get("/v2/settings/company_view/")
             .then((resp: any) => {
               this.settings.company_view.cards = resp.data;
               resolve(resp);
@@ -79,7 +79,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
       return new Promise<void>((resolve, reject) => {
         const cards = this.settings.company_view.cards;
         this.axios
-          .put("/settings/company_view", cards)
+          .put("/v2/settings/company_view/", cards)
           .then(() => {
             resolve();
           })
@@ -91,7 +91,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
     resetCompanyCards() {
       return new Promise((resolve, reject) => {
         this.axios
-          .get("/settings/company_view/reset")
+          .get("/v2/settings/company_view/reset/")
           .then(() => {
             resolve(this.getCompanyCards(true));
           })

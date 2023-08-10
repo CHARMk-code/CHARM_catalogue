@@ -9,6 +9,8 @@ edition = "2021"
 actix-web = { version = "4"}  
 actix-web-httpauth = { version = "0.8"}
 actix-multipart = "0.6"
+actix-cors = "0.6"
+actix-files = "0.6"
 env_logger = { version = "0.10" }
 sqlx = { version = "0.6", default-features = false, features = ["postgres", "runtime-tokio-rustls",  "macros", "offline", "migrate", "chrono", "uuid"]}
 serde = { version = "1.0" }

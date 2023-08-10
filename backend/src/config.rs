@@ -7,7 +7,8 @@ pub struct Config {
     pub database_url: Option<String>,
     pub upload_path: String,
     pub storage_path: String,
-    pub password_salt: Vec<u8>,
+    pub password_salt: String,
+    pub cors: CorsConfig,
 }
 
 impl Default for Config {
@@ -16,9 +17,17 @@ impl Default for Config {
             database_url: None,
             upload_path: "upload/".to_string(),
             storage_path: "storage/".to_string(),
-            password_salt: b"NOT A GOOD SALT".to_vec(),
+            password_salt: "NOT A GOOD SALT".to_string(),
+            cors: CorsConfig {
+                allowed_origin: "localhost".to_string(),
+            },
         }
     }
+}
+
+#[derive(Deserialize, Clone)]
+pub struct CorsConfig {
+    pub allowed_origin: String,
 }
 
 pub fn read_config(path: &str) -> Result<Config, std::io::Error> {

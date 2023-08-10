@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import axios from "@/plugins/axios";
-const base_URL = axios.defaults.baseURL + "/manage/image/";
+const base_URL = axios.defaults.baseURL + "/v2/image/";
 
 defineProps<{
   imageName: string;

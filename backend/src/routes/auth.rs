@@ -10,7 +10,10 @@ use sqlx::PgPool;
 
 use crate::{
     config::Config,
-    services::{self, auth::AuthedUser},
+    services::{
+        self,
+        auth::{create_user, AuthedUser},
+    },
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -39,11 +42,26 @@ async fn get_token(
     config: web::Data<Config>,
     data: Json<UserLoginWeb>,
 ) -> Result<impl Responder> {
-    let possible_user = services::auth::get_user(db.as_ref()).await?;
-    let salt: &[u8] = config.password_salt.as_slice();
+    let salt: &[u8] = config.password_salt.as_bytes();
 
-    let is_valid_pass =
-        services::auth::validate_password(&data.password, &possible_user.password, salt);
+    let possible_user = services::auth::get_user(db.as_ref()).await;
+
+    let user = match possible_user {
+        Ok(user) => user,
+        Err(..) => {
+            create_user(
+                &db,
+                UserWeb {
+                    password: "password".to_string(),
+                },
+                &salt,
+            )
+            .await?;
+            services::auth::get_user(db.as_ref()).await?
+        }
+    };
+
+    let is_valid_pass = services::auth::validate_password(&data.password, &user.password, salt);
 
     if is_valid_pass.is_ok() && is_valid_pass.unwrap() {
         let token = services::auth::generate_token(keypair.as_ref().clone());

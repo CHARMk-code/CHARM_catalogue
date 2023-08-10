@@ -1,6 +1,6 @@
 CREATE TABLE users (
   id serial NOT NULL ,
-  password varchar(100) DEFAULT NULL NOT NULL,
+  password varchar(107) DEFAULT NULL NOT NULL,
   PRIMARY KEY (id)
 );
 

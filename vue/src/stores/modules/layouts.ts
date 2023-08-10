@@ -34,7 +34,7 @@ export const useLayoutsStore = defineStore("layouts", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/layout")
+            .get("/v2/layout/")
             .then((resp: any) => {
               this.removeAllLayouts();
               const layouts = resp.data;
@@ -54,7 +54,7 @@ export const useLayoutsStore = defineStore("layouts", {
     modifyLayout(layout: Layout) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/layout", layout)
+          .put("/v2/layout/", layout)
           .then((resp: any) => {
             if (!this.layouts.some((p) => (p.id = layout.id))) {
               this.layouts.push(layout);
@@ -71,7 +71,7 @@ export const useLayoutsStore = defineStore("layouts", {
     deleteLayout(layout: Layout) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/layout/" + layout.id)
+          .delete("/v2/layout/" + layout.id)
           .then((resp: any) => {
             this.removeLayout(layout.id);
             resolve(resp);

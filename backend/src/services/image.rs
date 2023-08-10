@@ -104,6 +104,15 @@ pub async fn get_by_id(db: &Pool<Postgres>, id: &Uuid) -> Result<FileDB, actix_w
     Ok(query_result)
 }
 
+pub async fn get_by_name(db: &Pool<Postgres>, name: &str) -> Result<FileDB, actix_web::Error> {
+    let query_result = sqlx::query_as!(FileDB, "SELECT * FROM files where name = $1", name)
+        .fetch_one(db)
+        .await
+        .map_err(MyError::SQLxError)?;
+
+    Ok(query_result)
+}
+
 pub async fn get_all(db: &Pool<Postgres>) -> Result<Vec<FileDB>, actix_web::Error> {
     let query_result = sqlx::query_as!(FileDB, "SELECT * FROM files where image = true")
         .fetch_all(db)

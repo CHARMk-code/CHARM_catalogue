@@ -1,8 +1,11 @@
 use std::path::{Path, PathBuf};
 
+use actix_files::NamedFile;
 use actix_multipart::Multipart;
 use actix_web::{
-    delete, get, post, put,
+    delete, get,
+    http::header::{ContentDisposition, DispositionParam, DispositionType},
+    post, put,
     web::{self, Json},
     HttpResponse, Responder, Result,
 };
@@ -15,7 +18,11 @@ use crate::{
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/image").service(get_by_id_handler));
+    cfg.service(
+        web::scope("/image")
+            // .service(get_by_uuid_handler)
+            .service(get_by_name_handler),
+    );
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
@@ -26,12 +33,24 @@ pub struct FileWeb {
     pub image: Option<bool>,
 }
 
-#[get("/")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<Uuid>) -> Result<impl Responder> {
-    let id = path.into_inner();
-    let image = services::image::get_by_id(&db, &id).await?;
+#[get("/{name}")]
+async fn get_by_name_handler(
+    db: web::Data<PgPool>,
+    config: web::Data<Config>,
+    path: web::Path<String>,
+) -> Result<impl Responder> {
+    let name = path.into_inner();
+    let image_meta = services::image::get_by_name(&db, &name).await?;
 
-    Ok(HttpResponse::Ok().json(image))
+    let image_path = Path::new(&config.storage_path).join(image_meta.id.to_string());
+
+    let file = NamedFile::open_async(image_path)
+        .await
+        .map_err(|e| Into::<actix_web::Error>::into(e))?
+        .file()
+        .try_clone()?;
+
+    Ok(NamedFile::from_file(file, image_meta.name))
 }
 
 #[put("/")]

@@ -4,6 +4,7 @@ mod config;
 mod routes;
 mod services;
 
+use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::HttpServer;
 use actix_web::{middleware::Logger, App};
@@ -37,9 +38,17 @@ async fn main() -> std::io::Result<()> {
     let bearer_config = bearer::Config::default();
 
     HttpServer::new(move || {
+        // CORS setup
+        let cors = Cors::default()
+            .allowed_origin(&config.cors.allowed_origin)
+            .allow_any_method()
+            .allow_any_header()
+            .max_age(3600);
+
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
+            .wrap(cors)
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(config.clone()))
             .app_data(bearer_config.clone())
