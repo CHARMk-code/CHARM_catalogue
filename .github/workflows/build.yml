@@ -20,9 +20,9 @@ jobs:
 
       # Create latested vesion
       - name: Build the latest Docker image
-        run: docker build --file docker/flask/Dockerfile_production --tag ghcr.io/charmk-code/catalogue_flask:latest docker/flask/
+        run: docker build --file backend/Dockerfile --tag ghcr.io/charmk-code/catalogue_backend:latest backend/
       - name: Push the latest Docker image
-        run: docker push ghcr.io/charmk-code/catalogue_flask:latest
+        run: docker push ghcr.io/charmk-code/catalogue_backend:latest
 
   build-frontend:
     runs-on: self-hosted
@@ -38,6 +38,6 @@ jobs:
 
       # Create latested vesion
       - name: Build the latest Docker image
-        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest
+        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest vue/
       - name: Push the latest Docker image
         run: docker push ghcr.io/charmk-code/catalogue_vue:latest

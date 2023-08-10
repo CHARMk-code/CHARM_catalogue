@@ -1,6 +1,6 @@
-upload_path = "upload/"
-storage_path = "storage/"
+upload_path = "files/upload/"
+storage_path = "files/storage/"
 password_salt = "A freaking fantastic salt"
 
 [cors]
-allowed_origin = "http://localhost:5173"
+allowed_origin = "http://localhost:8080"

@@ -1,31 +1,5 @@
 version: "3"
 services:
-  flask:
-    build: ./docker/flask
-    ports:
-      - "5008:5000"
-    links:
-      - db
-    volumes:
-      - ./docker/flask/src:/catalogue
-      - /static
-      - /upload
-    environment:
-      FLASK_ENV: development
-      FLASK_APP: .
-
-  db:
-    image: "mysql"
-    command: --default-authentication-plugin=mysql_native_password
-    ports:
-      - "3306:3306"
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: catalogue
-      MYSQL_USER: catalogue
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: rootpass
-
   postgres:
     image: "postgres"
     ports:

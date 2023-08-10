@@ -1,0 +1,6 @@
+*
+!src/
+!Cargo.lock
+!*.toml
+!migrations/
+!.sqlx/
