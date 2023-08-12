@@ -1,11 +1,14 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::map::{MapDB, MapWeb},
+    services,
+};
 
 #[sqlx::test(fixtures("Maps"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_map = services::map::MapDB {
+    let initial_db_map = MapDB {
         id: 1,
         name: "VOLVO 1".to_string(),
         image: "volvo1.svg".to_string(),
@@ -43,7 +46,7 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
     //Setup
     let initial_maps = services::map::get_all(&db).await.unwrap();
 
-    let new_map = routes::map::MapWeb {
+    let new_map = MapWeb {
         id: None,
         name: Some("Scania".to_string()),
         image: Some("scania.svg".to_string()),
@@ -58,19 +61,19 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
     );
 
     let new_maps = services::map::get_all(&db).await.unwrap();
-    let new_created_map: &services::map::MapDB = new_maps
+    let new_created_map: &MapDB = new_maps
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::map::MapDB>>()
+        .collect::<Vec<&MapDB>>()
         .first()
         .unwrap();
-    let new_other_maps: Vec<services::map::MapDB> = new_maps
+    let new_other_maps: Vec<MapDB> = new_maps
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_map = services::map::MapDB {
+    let expected_map = MapDB {
         id: created_query_result.unwrap(),
         name: "Scania".to_string(),
         image: "scania.svg".to_string(),
@@ -105,9 +108,9 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     let initial_other_maps = initial_maps
         .iter()
         .filter(|r| r.id != initial_first_map.id)
-        .collect::<Vec<&services::map::MapDB>>();
+        .collect::<Vec<&MapDB>>();
 
-    let first_map_update = routes::map::MapWeb {
+    let first_map_update = MapWeb {
         id: Some(initial_first_map.id),
         name: Some("Ljusgården".to_string()),
         image: Some("ljusgården.svg".to_string()),
@@ -139,11 +142,11 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     let updated_other_maps = updated_maps
         .iter()
         .filter(|r| r.id != initial_first_map.id)
-        .collect::<Vec<&services::map::MapDB>>();
+        .collect::<Vec<&MapDB>>();
 
     assert_eq!(
         updated_first_map,
-        services::map::MapDB {
+        MapDB {
             id: initial_first_map.id,
             name: "Ljusgården".to_string(),
             image: "ljusgården.svg".to_string(),

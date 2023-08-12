@@ -12,7 +12,7 @@ use super::{
     BatchProcessError, XlsxSheetProcessor,
 };
 use crate::{
-    routes::company::{CompanyWeb, RequiredField},
+    models::company::{CompanyWeb, RequiredField},
     services::company,
 };
 

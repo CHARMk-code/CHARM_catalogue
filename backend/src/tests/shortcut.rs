@@ -1,12 +1,13 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::routes;
+use crate::models::shortcut::ShortcutDB;
+use crate::models::shortcut::ShortcutWeb;
 use crate::services;
 
 #[sqlx::test(fixtures("Shortcuts"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_shortcut = services::shortcut::ShortcutDB {
+    let initial_db_shortcut = ShortcutDB {
         id: 1,
         name: "Favorites".to_string(),
         description: "Your favorite companies".to_string(),
@@ -47,7 +48,7 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(
     //Setup
     let initial_shortcuts = services::shortcut::get_all(&db).await.unwrap();
 
-    let new_shortcut = routes::shortcut::ShortcutWeb {
+    let new_shortcut = ShortcutWeb {
         id: None,
         name: Some("New shortcut".to_string()),
         description: Some("New shortcut description".to_string()),
@@ -63,19 +64,19 @@ async fn creating_a_valid_shortcut_should_create_row_in_db(
     );
 
     let new_shortcuts = services::shortcut::get_all(&db).await.unwrap();
-    let new_created_shortcut: &services::shortcut::ShortcutDB = new_shortcuts
+    let new_created_shortcut: &ShortcutDB = new_shortcuts
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::shortcut::ShortcutDB>>()
+        .collect::<Vec<&ShortcutDB>>()
         .first()
         .unwrap();
-    let new_other_shortcuts: Vec<services::shortcut::ShortcutDB> = new_shortcuts
+    let new_other_shortcuts: Vec<ShortcutDB> = new_shortcuts
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_shortcut = services::shortcut::ShortcutDB {
+    let expected_shortcut = ShortcutDB {
         id: created_query_result.unwrap(),
         name: "New shortcut".to_string(),
         description: "New shortcut description".to_string(),
@@ -111,9 +112,9 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     let initial_other_shortcuts = initial_shortcuts
         .iter()
         .filter(|r| r.id != initial_first_shortcut.id)
-        .collect::<Vec<&services::shortcut::ShortcutDB>>();
+        .collect::<Vec<&ShortcutDB>>();
 
-    let first_shortcut_update = routes::shortcut::ShortcutWeb {
+    let first_shortcut_update = ShortcutWeb {
         id: Some(initial_first_shortcut.id),
         name: Some("Updated_Favorites".to_string()),
         description: Some("Updated_Description".to_string()),
@@ -146,11 +147,11 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     let updated_other_shortcuts = updated_shortcuts
         .iter()
         .filter(|r| r.id != initial_first_shortcut.id)
-        .collect::<Vec<&services::shortcut::ShortcutDB>>();
+        .collect::<Vec<&ShortcutDB>>();
 
     assert_eq!(
         updated_first_shortcut,
-        services::shortcut::ShortcutDB {
+        ShortcutDB {
             id: initial_first_shortcut.id,
             name: "Updated_Favorites".to_string(),
             description: "Updated_Description".to_string(),

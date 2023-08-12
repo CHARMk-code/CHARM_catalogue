@@ -3,17 +3,15 @@ use std::path::{Path, PathBuf};
 use actix_files::NamedFile;
 use actix_multipart::Multipart;
 use actix_web::{
-    delete, get,
-    http::header::{ContentDisposition, DispositionParam, DispositionType},
-    post, put,
+    delete, get, post, put,
     web::{self, Json},
     HttpResponse, Responder, Result,
 };
-use serde::{Deserialize, Serialize};
 use sqlx::{types::Uuid, PgPool};
 
 use crate::{
     config::Config,
+    models::file::FileWeb,
     services::{self, auth::AuthedUser, file::save_files},
 };
 
@@ -23,14 +21,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             // .service(get_by_uuid_handler)
             .service(get_by_name_handler),
     );
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct FileWeb {
-    pub id: Option<Uuid>,
-    pub name: Option<String>,
-    pub namespace: Option<String>,
-    pub image: Option<bool>,
 }
 
 #[get("/{name}")]

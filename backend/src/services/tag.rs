@@ -1,27 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::tag::TagWeb;
+use crate::{
+    errors::MyError,
+    models::tag::{TagDB, TagWeb},
+};
 
 use super::{is_optional_field_or_default, is_valid_required_field};
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct TagDB {
-    pub id: i32,
-    pub name: String,
-    pub parent_tag: i32, //TODO Remove these 3 columns
-    pub up_votes: i32,
-    pub down_votes: i32,
-    pub crowd_sourced: bool,
-    pub icon: String,
-    pub division: bool,
-    pub business_area: bool,
-    pub looking_for: bool,
-    pub offering: bool,
-    pub language: bool,
-    pub fair_area: bool,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &TagWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;

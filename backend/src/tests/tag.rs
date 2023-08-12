@@ -1,11 +1,14 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::tag::{TagDB, TagWeb},
+    services,
+};
 
 #[sqlx::test(fixtures("Tags"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_tag = services::tag::TagDB {
+    let initial_db_tag = TagDB {
         id: 1,
         name: "A".to_string(),
         parent_tag: 0,
@@ -52,7 +55,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     //Setup
     let initial_tags = services::tag::get_all(&db).await.unwrap();
 
-    let new_tag = routes::tag::TagWeb {
+    let new_tag = TagWeb {
         id: None,
         name: Some("NEW TAG".to_string()),
         parent_tag: Some(0),
@@ -76,19 +79,19 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     );
 
     let new_tags = services::tag::get_all(&db).await.unwrap();
-    let new_created_tag: &services::tag::TagDB = new_tags
+    let new_created_tag: &TagDB = new_tags
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::tag::TagDB>>()
+        .collect::<Vec<&TagDB>>()
         .first()
         .unwrap();
-    let new_other_tags: Vec<services::tag::TagDB> = new_tags
+    let new_other_tags: Vec<TagDB> = new_tags
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_tag = services::tag::TagDB {
+    let expected_tag = TagDB {
         id: created_query_result.unwrap(),
         name: "NEW TAG".to_string(),
         parent_tag: 0,
@@ -132,9 +135,9 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     let initial_other_tags = initial_tags
         .iter()
         .filter(|r| r.id != initial_first_tag.id)
-        .collect::<Vec<&services::tag::TagDB>>();
+        .collect::<Vec<&TagDB>>();
 
-    let first_tag_update = routes::tag::TagWeb {
+    let first_tag_update = TagWeb {
         id: Some(initial_first_tag.id),
         name: Some("NEW A".to_string()),
         parent_tag: None,
@@ -175,11 +178,11 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     let updated_other_tags = updated_tags
         .iter()
         .filter(|r| r.id != initial_first_tag.id)
-        .collect::<Vec<&services::tag::TagDB>>();
+        .collect::<Vec<&TagDB>>();
 
     assert_eq!(
         updated_first_tag,
-        services::tag::TagDB {
+        TagDB {
             id: initial_first_tag.id,
             name: "NEW A".to_string(),
             parent_tag: 0,

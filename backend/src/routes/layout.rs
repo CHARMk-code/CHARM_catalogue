@@ -1,38 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{Display, EnumIter, EnumString};
 
+use crate::models::layout::LayoutWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
-
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
-pub struct LayoutWeb {
-    pub id: Option<i32>,
-    pub image: Option<String>,
-    pub active: Option<bool>,
-    pub placement: Option<i32>,
-}
-
-impl Default for LayoutWeb {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            image: Default::default(),
-            active: Default::default(),
-            placement: Default::default(),
-        }
-    }
-}
-
-#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
-pub enum RequiredField {
-    Id,
-    Image,
-    Active,
-    Placement,
-}
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

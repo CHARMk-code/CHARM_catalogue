@@ -1,24 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::feedback::FeedbackWeb;
-
-use chrono::offset::Utc;
-use chrono::DateTime;
+use crate::{
+    errors::MyError,
+    models::feedback::{FeedbackDB, FeedbackWeb},
+};
 
 use super::is_valid_required_field;
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct FeedbackDB {
-    pub id: i32,
-    pub title: String,
-    pub text: String,
-    pub meta: String,
-    pub received: DateTime<Utc>,
-    pub important: bool,
-    pub archived: bool,
-}
 
 pub async fn create(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_web::Error> {
     let title = is_valid_required_field(&data.title)?;

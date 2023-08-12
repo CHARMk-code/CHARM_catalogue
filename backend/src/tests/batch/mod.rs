@@ -4,15 +4,13 @@ use chrono::DateTime;
 use sqlx::{Pool, Postgres};
 
 use crate::{
+    models::{
+        company::CompanyDB, layout::LayoutDB, map::MapDB, prepage::PrepageDB, shortcut::ShortcutDB,
+        tag::TagDB,
+    },
     services::{
         self,
         batch::{process_batch_zip, BatchProcessError},
-        company::CompanyDB,
-        layout::LayoutDB,
-        map::MapDB,
-        prepage::PrepageDB,
-        shortcut::ShortcutDB,
-        tag::TagDB,
     },
     tests::{create_test_folders, TEST_STORAGE, TEST_UPLOAD},
 };

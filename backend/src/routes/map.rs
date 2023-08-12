@@ -1,38 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{Display, EnumIter, EnumString};
 
+use crate::models::map::MapWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
-
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
-pub struct MapWeb {
-    pub id: Option<i32>,
-    pub name: Option<String>,
-    pub image: Option<String>,
-    pub reference: Option<i32>,
-}
-
-impl Default for MapWeb {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            name: Default::default(),
-            image: Default::default(),
-            reference: Default::default(),
-        }
-    }
-}
-
-#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
-pub enum RequiredField {
-    Id,
-    Name,
-    Image,
-    Reference,
-}
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

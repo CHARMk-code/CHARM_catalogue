@@ -5,7 +5,7 @@ use calamine::DataType;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    routes::layout::{LayoutWeb, RequiredField},
+    models::layout::{LayoutWeb, RequiredField},
     services::layout,
 };
 

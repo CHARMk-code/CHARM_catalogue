@@ -97,7 +97,7 @@ pub fn check_tag_exist_for_company_tags(
 mod tests {
     use super::*;
     use crate::{
-        routes::{company::CompanyWeb, tag::TagWeb},
+        models::{company::CompanyWeb, tag::TagWeb},
         services::batch::{BatchProcessError, ProcessedValues},
     };
 

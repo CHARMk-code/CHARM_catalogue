@@ -1,38 +1,15 @@
 use std::collections::HashSet;
 
-use serde::{Deserialize, Serialize};
+use chrono::Utc;
 use sqlx::{Pool, Postgres};
 
-use crate::routes::company::CompanyWeb;
-use crate::{errors::MyError, services::is_optional_field_or_default};
-
-use chrono::{DateTime, Utc};
+use crate::{
+    errors::MyError,
+    models::company::{CompanyDB, CompanyWeb},
+    services::is_optional_field_or_default,
+};
 
 use super::is_valid_required_field;
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct CompanyDB {
-    pub id: i32,
-    pub last_updated: DateTime<Utc>,
-    pub active: bool,
-    pub charmtalk: bool,
-    pub name: String,
-    pub description: String,
-    pub unique_selling_point: String,
-    pub summer_job_description: String, // Allow publishing of generic job listings on the
-    pub summer_job_link: String,        // company page
-    pub summer_job_deadline: DateTime<Utc>,
-    pub contacts: String,
-    pub contact_email: String,
-    pub employees_world: i32,
-    pub employees_sweden: i32,
-    pub website: String,
-    pub talk_to_us_about: String,
-    pub logo: String,
-    pub map_image: i32,
-    pub booth_number: i32,
-    pub tags: Option<Vec<i32>>,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix_web::Error> {
     let last_updated = Utc::now();

@@ -1,11 +1,14 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::company_card::{CompanyCardDB, CompanyCardWeb},
+    services,
+};
 
 #[sqlx::test()]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_company_card = services::settings::company_view::CompanyCardDB {
+    let initial_db_company_card = CompanyCardDB {
         id: 1,
         name: "logo".to_string(),
         text: "Logo".to_string(),
@@ -54,9 +57,9 @@ async fn valid_update_on_existing_company_view_should_update_row_in_db(
     let initial_other_company_views = initial_company_views
         .iter()
         .filter(|r| r.id != initial_first_company_view.id)
-        .collect::<Vec<&services::settings::company_view::CompanyCardDB>>();
+        .collect::<Vec<&CompanyCardDB>>();
 
-    let first_company_view_update = routes::settings::company_view::CompanyCardWeb {
+    let first_company_view_update = CompanyCardWeb {
         id: Some(initial_first_company_view.id),
         name: Some("UPDATED Logo".to_string()),
         text: Some("UPDATED logo".to_string()),
@@ -91,11 +94,11 @@ async fn valid_update_on_existing_company_view_should_update_row_in_db(
     let updated_other_company_views = updated_company_views
         .iter()
         .filter(|r| r.id != initial_first_company_view.id)
-        .collect::<Vec<&services::settings::company_view::CompanyCardDB>>();
+        .collect::<Vec<&CompanyCardDB>>();
 
     assert_eq!(
         updated_first_company_view,
-        services::settings::company_view::CompanyCardDB {
+        CompanyCardDB {
             id: initial_first_company_view.id,
             name: "UPDATED Logo".to_string(),
             text: "UPDATED logo".to_string(),

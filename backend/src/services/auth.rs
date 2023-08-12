@@ -15,7 +15,7 @@ use serde::Serialize;
 use sqlx::{query, query_as, Pool, Postgres};
 
 use crate::errors::MyError;
-use crate::routes::auth::UserWeb;
+use crate::models::user::{UserDB, UserWeb};
 
 pub struct AuthedUser(JWTClaims<NoCustomClaims>);
 
@@ -45,11 +45,6 @@ impl FromRequest for AuthedUser {
             Ok(AuthedUser(claims))
         })())
     }
-}
-
-pub struct UserDB {
-    pub id: i32,
-    pub password: String,
 }
 
 pub async fn get_user(db: &Pool<Postgres>) -> Result<UserDB, actix_web::Error> {

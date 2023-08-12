@@ -1,19 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::shortcut::ShortcutWeb;
+use crate::{
+    errors::MyError,
+    models::shortcut::{ShortcutDB, ShortcutWeb},
+};
 
 use super::{is_optional_field_or_default, is_valid_required_field};
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct ShortcutDB {
-    pub id: i32,
-    pub name: String,
-    pub description: String,
-    pub link: String,
-    pub icon: String,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &ShortcutWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;

@@ -1,7 +1,8 @@
 use sqlx::{Error, Pool, Postgres};
 
 use crate::{
-    routes, services,
+    models::file::{FileDB, FileWeb},
+    services,
     tests::{
         create_dummy_file, create_test_folders, remove_test_folders, TEST_STORAGE, TEST_UPLOAD,
     },
@@ -13,7 +14,7 @@ use uuid::{uuid, Uuid};
 #[sqlx::test(fixtures("Files"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_file = services::image::FileDB {
+    let initial_db_file = FileDB {
         id: uuid!("00000000-0000-0000-0000-000000000001"),
         name: "File1".to_string(),
         namespace: "images".to_string(),
@@ -74,19 +75,19 @@ async fn creating_a_valid_image_file_should_create_row_in_db(
     );
 
     let new_files = services::image::get_all(&db).await.unwrap();
-    let new_created_files: &services::image::FileDB = new_files
+    let new_created_files: &FileDB = new_files
         .iter()
         .filter(|r| &vec![r.id] == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::image::FileDB>>()
+        .collect::<Vec<&FileDB>>()
         .first()
         .unwrap();
-    let new_other_files: Vec<services::image::FileDB> = new_files
+    let new_other_files: Vec<FileDB> = new_files
         .iter()
         .cloned()
         .filter(|r| &vec![r.id] != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_files = services::image::FileDB {
+    let expected_files = FileDB {
         id: created_query_result.unwrap().iter().next().unwrap().clone(),
         name: "New file".to_string(),
         namespace: "images".to_string(),
@@ -132,9 +133,9 @@ async fn valid_update_on_existing_image_file_should_update_row_in_db(
     let initial_other_images = initial_images
         .iter()
         .filter(|r| r.id != initial_first_image.id)
-        .collect::<Vec<&services::image::FileDB>>();
+        .collect::<Vec<&FileDB>>();
 
-    let first_image_update = routes::image::FileWeb {
+    let first_image_update = FileWeb {
         id: Some(initial_first_image.id),
         name: Some("Updated file name".to_string()),
         namespace: None,
@@ -166,11 +167,11 @@ async fn valid_update_on_existing_image_file_should_update_row_in_db(
     let updated_other_images = updated_images
         .iter()
         .filter(|r| r.id != initial_first_image.id)
-        .collect::<Vec<&services::image::FileDB>>();
+        .collect::<Vec<&FileDB>>();
 
     assert_eq!(
         updated_first_image,
-        services::image::FileDB {
+        FileDB {
             id: initial_first_image.id,
             name: "Updated file name".to_string(),
             namespace: "images".to_string(),

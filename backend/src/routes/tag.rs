@@ -1,61 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{Display, EnumIter, EnumString};
 
+use crate::models::tag::TagWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
-
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
-pub struct TagWeb {
-    pub id: Option<i32>,
-    pub name: Option<String>,
-    pub parent_tag: Option<i32>, //TODO Remove these 3 columns
-    pub up_votes: Option<i32>,
-    pub down_votes: Option<i32>,
-    pub crowd_sourced: Option<bool>,
-    pub icon: Option<String>,
-    pub division: Option<bool>,
-    pub business_area: Option<bool>,
-    pub looking_for: Option<bool>,
-    pub offering: Option<bool>,
-    pub language: Option<bool>,
-    pub fair_area: Option<bool>,
-}
-
-impl Default for TagWeb {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            name: Default::default(),
-            parent_tag: Some(0),
-            up_votes: Some(0),
-            down_votes: Some(0),
-            crowd_sourced: Some(false),
-            icon: Default::default(),
-            division: Default::default(),
-            business_area: Default::default(),
-            looking_for: Default::default(),
-            offering: Default::default(),
-            language: Default::default(),
-            fair_area: Default::default(),
-        }
-    }
-}
-
-#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
-pub enum RequiredField {
-    Id,
-    Name,
-    Icon,
-    Division,
-    Businessarea,
-    Lookingfor,
-    Offering,
-    Language,
-    Fairarea,
-}
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

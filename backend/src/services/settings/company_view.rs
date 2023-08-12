@@ -1,15 +1,9 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, Pool, Postgres};
 
-use crate::{errors::MyError, routes::settings::company_view::CompanyCardWeb};
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct CompanyCardDB {
-    pub id: i32,
-    pub name: String,
-    pub text: String,
-    pub active: bool,
-}
+use crate::{
+    errors::MyError,
+    models::company_card::{CompanyCardDB, CompanyCardWeb},
+};
 
 pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<CompanyCardDB, actix_web::Error> {
     let cards = query_as!(

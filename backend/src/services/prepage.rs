@@ -1,21 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::prepage::PrepageWeb;
+use crate::{
+    errors::MyError,
+    models::prepage::{PrepageDB, PrepageWeb},
+};
 
 use super::is_valid_required_field;
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct PrepageDB {
-    pub id: i32,
-    pub name: String,
-    pub image: String,
-    pub active: bool,
-    pub mobile: bool,
-    pub side: String,
-    pub page: i32,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &PrepageWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;

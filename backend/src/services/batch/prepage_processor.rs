@@ -5,7 +5,7 @@ use calamine::DataType;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    routes::prepage::{PrepageWeb, RequiredField},
+    models::prepage::{PrepageWeb, RequiredField},
     services::prepage,
 };
 

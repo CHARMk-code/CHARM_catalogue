@@ -8,7 +8,7 @@ use super::{
     BatchProcessError, XlsxSheetProcessor,
 };
 use crate::{
-    routes::map::{MapWeb, RequiredField},
+    models::map::{MapWeb, RequiredField},
     services::map,
 };
 use sqlx::{Pool, Postgres};

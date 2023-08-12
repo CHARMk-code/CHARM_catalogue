@@ -1,18 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::map::MapWeb;
+use crate::{
+    errors::MyError,
+    models::map::{MapDB, MapWeb},
+};
 
 use super::{is_optional_field_or_default, is_valid_required_field};
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct MapDB {
-    pub id: i32,
-    pub name: String,
-    pub image: String,
-    pub reference: i32,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &MapWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;

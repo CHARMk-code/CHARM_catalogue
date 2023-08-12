@@ -3,12 +3,15 @@ use std::collections::HashSet;
 use chrono::DateTime;
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::company::{CompanyDB, CompanyWeb},
+    services,
+};
 
 #[sqlx::test(fixtures("Companies", "Tags", "Companies_tags"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     // Setup
-    let initial_company = services::company::CompanyDB {
+    let initial_company = CompanyDB {
         id: 1,
         last_updated: DateTime::parse_from_str("2023-06-25 21:00:00+02", "%F %T%#z")
             .unwrap()
@@ -73,7 +76,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         .fetch_all(&db)
         .await?;
 
-    let new_company = routes::company::CompanyWeb {
+    let new_company = CompanyWeb {
         id: None,
         last_updated: None,
         active: Some(true),
@@ -108,19 +111,19 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
     );
 
     let new_companies = services::company::get_all(&db).await.unwrap();
-    let new_created_company: &services::company::CompanyDB = new_companies
+    let new_created_company: &CompanyDB = new_companies
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::company::CompanyDB>>()
+        .collect::<Vec<&CompanyDB>>()
         .first()
         .unwrap();
-    let new_other_companies: Vec<services::company::CompanyDB> = new_companies
+    let new_other_companies: Vec<CompanyDB> = new_companies
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_company = services::company::CompanyDB {
+    let expected_company = CompanyDB {
         id: created_query_result.unwrap(),
         last_updated: new_created_company.last_updated,
         active: true,
@@ -211,9 +214,9 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     let initial_other_companies = initial_companies
         .iter()
         .filter(|r| r.id != initial_first_company.id)
-        .collect::<Vec<&services::company::CompanyDB>>();
+        .collect::<Vec<&CompanyDB>>();
 
-    let first_company_update = routes::company::CompanyWeb {
+    let first_company_update = CompanyWeb {
         id: Some(initial_first_company.id),
         last_updated: None,
         active: Some(true),
@@ -261,11 +264,11 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     let updated_other_companies = updated_companies
         .iter()
         .filter(|r| r.id != initial_first_company.id)
-        .collect::<Vec<&services::company::CompanyDB>>();
+        .collect::<Vec<&CompanyDB>>();
 
     assert_eq!(
         updated_first_company,
-        services::company::CompanyDB {
+        CompanyDB {
             id: initial_first_company.id,
             last_updated: updated_first_company.last_updated,
             active: true,

@@ -1,47 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use strum_macros::{Display, EnumIter, EnumString};
 
+use crate::models::prepage::PrepageWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
-
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
-pub struct PrepageWeb {
-    pub id: Option<i32>,
-    pub name: Option<String>,
-    pub image: Option<String>,
-    pub active: Option<bool>,
-    pub mobile: Option<bool>,
-    pub side: Option<String>,
-    pub page: Option<i32>,
-}
-
-impl Default for PrepageWeb {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            name: Default::default(),
-            image: Default::default(),
-            active: Default::default(),
-            mobile: Default::default(),
-            side: Default::default(),
-            page: Default::default(),
-        }
-    }
-}
-
-#[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
-pub enum RequiredField {
-    Id,
-    Name,
-    Image,
-    Active,
-    Mobile,
-    Side,
-    Page,
-}
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

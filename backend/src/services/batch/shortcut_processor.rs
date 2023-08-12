@@ -8,7 +8,7 @@ use super::{
     BatchProcessError, XlsxSheetProcessor,
 };
 use crate::{
-    routes::shortcut::{RequiredField, ShortcutWeb},
+    models::{shortcut::RequiredField, shortcut::ShortcutWeb},
     services::shortcut,
 };
 use sqlx::{Pool, Postgres};

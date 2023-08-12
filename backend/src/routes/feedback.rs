@@ -1,24 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+use crate::models::feedback::FeedbackWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
-
-use chrono::offset::Utc;
-use chrono::DateTime;
-
-#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
-pub struct FeedbackWeb {
-    pub id: Option<i32>,
-    pub title: Option<String>,
-    pub text: Option<String>,
-    pub meta: Option<String>,
-    pub received: Option<DateTime<Utc>>,
-    pub important: Option<bool>,
-    pub archived: Option<bool>,
-}
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

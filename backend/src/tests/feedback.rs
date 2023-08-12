@@ -1,13 +1,16 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::feedback::{FeedbackDB, FeedbackWeb},
+    services,
+};
 
 use chrono::DateTime;
 
 #[sqlx::test(fixtures("Feedback"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_feedback = services::feedback::FeedbackDB {
+    let initial_db_feedback = FeedbackDB {
         id: 1,
         title: "Feedback 1".to_string(),
         text: "This is some great feedback".to_string(),
@@ -52,7 +55,7 @@ async fn creating_a_valid_feedback_should_create_row_in_db(
     //Setup
     let initial_feedbacks = services::feedback::get_all(db.clone()).await.unwrap();
 
-    let new_feedback = routes::feedback::FeedbackWeb {
+    let new_feedback = FeedbackWeb {
         id: None,
         title: Some("New Feedback".to_string()),
         text: Some("New but bad feedback".to_string()),
@@ -74,19 +77,19 @@ async fn creating_a_valid_feedback_should_create_row_in_db(
     );
 
     let new_feedbacks = services::feedback::get_all(db.clone()).await.unwrap();
-    let new_created_feedback: &services::feedback::FeedbackDB = new_feedbacks
+    let new_created_feedback: &FeedbackDB = new_feedbacks
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::feedback::FeedbackDB>>()
+        .collect::<Vec<&FeedbackDB>>()
         .first()
         .unwrap();
-    let new_other_feedbacks: Vec<services::feedback::FeedbackDB> = new_feedbacks
+    let new_other_feedbacks: Vec<FeedbackDB> = new_feedbacks
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_feedback = services::feedback::FeedbackDB {
+    let expected_feedback = FeedbackDB {
         id: created_query_result.unwrap(),
         title: "New Feedback".to_string(),
         text: "New but bad feedback".to_string(),
@@ -126,9 +129,9 @@ async fn valid_update_on_existing_feedback_should_update_row_in_db(
     let initial_other_feedbacks = initial_feedbacks
         .iter()
         .filter(|r| r.id != initial_first_feedback.id)
-        .collect::<Vec<&services::feedback::FeedbackDB>>();
+        .collect::<Vec<&FeedbackDB>>();
 
-    let first_feedback_update = routes::feedback::FeedbackWeb {
+    let first_feedback_update = FeedbackWeb {
         id: Some(initial_first_feedback.id),
         title: Some("Updated Feedback 1".to_string()),
         text: None,
@@ -163,11 +166,11 @@ async fn valid_update_on_existing_feedback_should_update_row_in_db(
     let updated_other_feedbacks = updated_feedbacks
         .iter()
         .filter(|r| r.id != initial_first_feedback.id)
-        .collect::<Vec<&services::feedback::FeedbackDB>>();
+        .collect::<Vec<&FeedbackDB>>();
 
     assert_eq!(
         updated_first_feedback,
-        services::feedback::FeedbackDB {
+        FeedbackDB {
             id: initial_first_feedback.id,
             title: "Updated Feedback 1".to_string(),
             text: "This is some great feedback".to_string(),

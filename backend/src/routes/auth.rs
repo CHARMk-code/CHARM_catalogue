@@ -5,11 +5,11 @@ use actix_web::{
 };
 
 use jwt_simple::prelude::Ed25519KeyPair;
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::{
     config::Config,
+    models::user::{UserLoginWeb, UserWeb},
     services::{
         self,
         auth::{create_user, AuthedUser},
@@ -21,18 +21,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         web::scope("/auth").service(get_token), // .service(register_handler)
                                                 // .service(update_password_handler),
     );
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct UserLoginWeb {
-    pub password: String,
-}
-
-// NOTE: Currently the same as UserLoginWeb but with more sofisticated accounts a user
-// will be more than a password and most likely more than what's needed for login
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UserWeb {
-    pub password: String,
 }
 
 #[post("/")]

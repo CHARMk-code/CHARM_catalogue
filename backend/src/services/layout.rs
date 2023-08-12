@@ -1,18 +1,11 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-use crate::errors::MyError;
-use crate::routes::layout::LayoutWeb;
+use crate::{
+    errors::MyError,
+    models::layout::{LayoutDB, LayoutWeb},
+};
 
 use super::is_valid_required_field;
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct LayoutDB {
-    pub id: i32,
-    pub image: String,
-    pub active: bool,
-    pub placement: i32,
-}
 
 pub async fn create(db: &Pool<Postgres>, data: &LayoutWeb) -> Result<i32, actix_web::Error> {
     let image = is_valid_required_field(&data.image)?;

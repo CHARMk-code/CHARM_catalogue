@@ -1,6 +1,7 @@
 extern crate argon2;
 
 mod config;
+mod models;
 mod routes;
 mod services;
 

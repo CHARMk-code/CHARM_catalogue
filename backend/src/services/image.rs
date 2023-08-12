@@ -1,22 +1,13 @@
 use std::path::{Path, PathBuf};
 
-use serde::{Deserialize, Serialize};
 use sqlx::Pool;
 use sqlx::{types::Uuid, Postgres};
 
 use crate::errors::MyError;
-use crate::routes::image::FileWeb;
+use crate::models::file::{FileDB, FileWeb};
 use crate::services;
 
 use super::file::move_file;
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct FileDB {
-    pub id: Uuid,
-    pub name: String,
-    pub namespace: String,
-    pub image: bool,
-}
 
 pub async fn create(
     db: &Pool<Postgres>,

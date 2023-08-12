@@ -1,11 +1,14 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::{routes, services};
+use crate::{
+    models::prepage::{PrepageDB, PrepageWeb},
+    services,
+};
 
 #[sqlx::test(fixtures("Prepages"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_prepage = services::prepage::PrepageDB {
+    let initial_db_prepage = PrepageDB {
         id: 1,
         name: "First prepage".to_string(),
         image: "1.png".to_string(),
@@ -46,7 +49,7 @@ async fn creating_a_valid_prepage_should_create_row_in_db(db: Pool<Postgres>) ->
     //Setup
     let initial_prepages = services::prepage::get_all(&db).await.unwrap();
 
-    let new_prepage = routes::prepage::PrepageWeb {
+    let new_prepage = PrepageWeb {
         id: None,
         name: Some("New page".to_string()),
         image: Some("new.png".to_string()),
@@ -64,19 +67,19 @@ async fn creating_a_valid_prepage_should_create_row_in_db(db: Pool<Postgres>) ->
     );
 
     let new_prepages = services::prepage::get_all(&db).await.unwrap();
-    let new_created_prepage: &services::prepage::PrepageDB = new_prepages
+    let new_created_prepage: &PrepageDB = new_prepages
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::prepage::PrepageDB>>()
+        .collect::<Vec<&PrepageDB>>()
         .first()
         .unwrap();
-    let new_other_prepages: Vec<services::prepage::PrepageDB> = new_prepages
+    let new_other_prepages: Vec<PrepageDB> = new_prepages
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_prepage = services::prepage::PrepageDB {
+    let expected_prepage = PrepageDB {
         id: created_query_result.unwrap(),
         name: "New page".to_string(),
         image: "new.png".to_string(),
@@ -114,9 +117,9 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     let initial_other_prepages = initial_prepages
         .iter()
         .filter(|r| r.id != initial_first_prepage.id)
-        .collect::<Vec<&services::prepage::PrepageDB>>();
+        .collect::<Vec<&PrepageDB>>();
 
-    let first_prepage_update = routes::prepage::PrepageWeb {
+    let first_prepage_update = PrepageWeb {
         id: Some(initial_first_prepage.id),
         name: Some("Updated First".to_string()),
         image: Some("new_1.png".to_string()),
@@ -151,11 +154,11 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     let updated_other_prepages = updated_prepages
         .iter()
         .filter(|r| r.id != initial_first_prepage.id)
-        .collect::<Vec<&services::prepage::PrepageDB>>();
+        .collect::<Vec<&PrepageDB>>();
 
     assert_eq!(
         updated_first_prepage,
-        services::prepage::PrepageDB {
+        PrepageDB {
             id: initial_first_prepage.id,
             name: "Updated First".to_string(),
             image: "new_1.png".to_string(),

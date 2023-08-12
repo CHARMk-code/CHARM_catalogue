@@ -1,12 +1,13 @@
 use sqlx::{Error, Pool, Postgres};
 
-use crate::routes;
+use crate::models::layout::LayoutDB;
+use crate::models::layout::LayoutWeb;
 use crate::services;
 
 #[sqlx::test(fixtures("Layouts"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_layout = services::layout::LayoutDB {
+    let initial_db_layout = LayoutDB {
         id: 1,
         image: "LEFT".to_string(),
         active: true,
@@ -44,7 +45,7 @@ async fn creating_a_valid_layout_should_create_row_in_db(db: Pool<Postgres>) -> 
     //Setup
     let initial_layouts = services::layout::get_all(&db).await.unwrap();
 
-    let new_layout = routes::layout::LayoutWeb {
+    let new_layout = LayoutWeb {
         id: None,
         image: Some("New layout".to_string()),
         active: Some(false),
@@ -59,19 +60,19 @@ async fn creating_a_valid_layout_should_create_row_in_db(db: Pool<Postgres>) -> 
     );
 
     let new_layouts = services::layout::get_all(&db).await.unwrap();
-    let new_created_layout: &services::layout::LayoutDB = new_layouts
+    let new_created_layout: &LayoutDB = new_layouts
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&services::layout::LayoutDB>>()
+        .collect::<Vec<&LayoutDB>>()
         .first()
         .unwrap();
-    let new_other_layouts: Vec<services::layout::LayoutDB> = new_layouts
+    let new_other_layouts: Vec<LayoutDB> = new_layouts
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_layout = services::layout::LayoutDB {
+    let expected_layout = LayoutDB {
         id: created_query_result.unwrap(),
         image: "New layout".to_string(),
         active: false,
@@ -106,9 +107,9 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     let initial_other_layouts = initial_layouts
         .iter()
         .filter(|r| r.id != initial_first_layout.id)
-        .collect::<Vec<&services::layout::LayoutDB>>();
+        .collect::<Vec<&LayoutDB>>();
 
-    let first_layout_update = routes::layout::LayoutWeb {
+    let first_layout_update = LayoutWeb {
         id: Some(initial_first_layout.id),
         image: Some("Updated LEFT".to_string()),
         active: Some(true),
@@ -140,11 +141,11 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     let updated_other_layouts = updated_layouts
         .iter()
         .filter(|r| r.id != initial_first_layout.id)
-        .collect::<Vec<&services::layout::LayoutDB>>();
+        .collect::<Vec<&LayoutDB>>();
 
     assert_eq!(
         updated_first_layout,
-        services::layout::LayoutDB {
+        LayoutDB {
             id: initial_first_layout.id,
             image: "Updated LEFT".to_string(),
             active: true,

@@ -3,10 +3,12 @@ use actix_web::{
     web::{self, Json},
     HttpResponse, Responder, Result,
 };
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::services::{self, auth::AuthedUser};
+use crate::{
+    models::company_card::CompanyCardWeb,
+    services::{self, auth::AuthedUser},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -15,14 +17,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(reset_company_view_handler)
             .service(update_company_view_handler),
     );
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct CompanyCardWeb {
-    pub id: Option<i32>,
-    pub name: Option<String>,
-    pub text: Option<String>,
-    pub active: Option<bool>,
 }
 
 #[get("/")]
