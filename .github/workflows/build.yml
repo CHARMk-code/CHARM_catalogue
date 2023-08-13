@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Extract branch name
         shell: bash
-        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
         id: extract_branch
 
       - name: Login to GitHub Container Registry
@@ -27,7 +27,7 @@ jobs:
 
       # Create latest vesion
       - name: Build the Docker image
-        run: docker build --file backend/Dockerfile --tag ghcr.io/charmk-code/catalogue_backend:latest --tag ghcr.io/charmk-code/catalogue_backend:{$BRANCH_NAME} backend/
+        run: docker build backend/ --file backend/Dockerfile --tag ghcr.io/charmk-code/catalogue_backend:latest --tag ghcr.io/charmk-code/catalogue_backend:$BRANCH_NAME
       # push latest version
       - name: Push the Docker image
         run: docker push ghcr.io/charmk-code/catalogue_backend -a
@@ -36,6 +36,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
+        id: extract_branch
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -46,6 +51,6 @@ jobs:
 
       # Create latested vesion
       - name: Build the Docker image
-        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest --tag ghcr.io/charmk-code/catalogue_vue:{$BRANCH_NAME} vue/
+        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest --tag ghcr.io/charmk-code/catalogue_vue:$BRANCH_NAME
       - name: Push the Docker image
         run: docker push ghcr.io/charmk-code/catalogue_vue -a 
