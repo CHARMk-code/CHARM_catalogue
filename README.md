@@ -1,6 +1,8 @@
 # CHARMcatalogue
 
-A fully fledged digital catalogue for the CHARM fair at Chalmers. The system is built to be easily usable and customizable by an administrator with no programming understanding. The current published version in production should be available on http://catalogue.charm.chalmers.se . The vision is easy for students to find the companies that are relevent to them, with is an issue in the paper version due to the amount of companies that attend the fair.
+A digital catalogue for the CHARM fair at Chalmers. The system is built foe ease of use and customizability by an administrator without programming background. The current published version in production should be available on [https://catalogue.charm.chalmers.se](https://catalogue.charm.chalmers.se).
+
+The main goal is to make the relevant companies more accessible to students by offering all the functionality from the physical book along with functionality not possible to have in a book such as searching, filtering, and links.
 
 
 # Setup
@@ -12,7 +14,9 @@ A system configured with `Docker`
 
 ### Running 
 
-Download and the `production.yml` file found in `.` and run it with `docker compose up` 
+Either run the `production.yml` file found in `.` with `docker compose -f production.yml up`. This will build the containers from source allowing you to deploy any version easily.
+
+Or you can make use of the package `charm_catalogue-backend` and `charm_catalogue-vue` (associated with this repo) along with a postgres database. For configuration either look at the `production.yml` file or the configuration instructions below
 
 
 ## Development
@@ -22,7 +26,7 @@ Download and the `production.yml` file found in `.` and run it with `docker comp
 A system configured with `Docker`, `cargo` and `yarn`
 
 ### Running 
-The database is started by simple running 
+The database is started by running 
 ```
 docker compose up 
 ```
@@ -32,7 +36,7 @@ To start the backend service go into `backend/` and run
 cargo run
 ```
 
-For the frontend go in to the `vue/` directorty and run 
+For the frontend go into the `vue/` directorty and run 
 ```
 yarn dev 
 ```
@@ -40,17 +44,17 @@ yarn dev
 
 
 ## Configuration
-The system can configured either via the `config.toml` or by setting enviroment varibles, if a value is not set in on of this ways then it will use default values. Values set via enviroment variable override those in the file, this to provide an easy way to configure producation enviroments through docker-compose files.
+The system can configured either via the `config.toml` or by setting enviroment variables. If the config file is incomplete a default config will be loadeed instead. Values set via enviroment variable override those in the file (or set by default), this to provide an easy way to configure a production enviroments through for example docker compose files.
 
 ### Parameters
 | Name | Default | Purpose|
 |-|-|-|
-|database_url || This specifics the how to connect to the database including url, port, and which database on the given server |
-|upload_path | upload/ | This specifics where upload file should be temparily storage while processing |
-|storage_path | storage/ | This specifics where upload file should be storage while serving them |
-|password_salt|NOT A GOOD SALT| This should be a random generated string, which is used to improve password security |
+|database_url |  | This specifics the how to connect to the database including url, port, and which database on the given server. |
+|upload_path | upload/ | This specifies where uploaded files should be temporarily saved while processing. |
+|storage_path | storage/ | This specifies where uploade file should be saved after processing, in order to be served. |
+|password_salt| NOT A GOOD SALT | This should be a random generated string, which is used to improve password security |
 
-The enviroment variables have the same name but uppercase.
+To set environment variables the same name but uppercase is used.
 
 ## Usage
 ### Batch uploading
