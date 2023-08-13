@@ -86,7 +86,7 @@ function onUploadFile() {
 
   // sending file to the backend
   axios
-    .post("/manage/upload", formData)
+    .post("/v2/batch/", formData)
     .then((res) => {
       feedback.value = res.data;
     })

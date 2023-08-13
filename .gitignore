@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 doc/html
 doc/latex
+
+backend/upload/
+backend/storage/

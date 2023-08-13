@@ -51,7 +51,7 @@ export const useCompaniesStore = defineStore("companies", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/company")
+            .get("/v2/company/")
             .then((resp: any) => {
               //TODO Remove this any and replace with actual type
               this.removeAllCompanies();
@@ -85,7 +85,7 @@ export const useCompaniesStore = defineStore("companies", {
         //changes tags in to array in order to send to backend
         const sendableTags = Array.from(company.tags);
         this.axios
-          .put("/company", { ...company, tags: sendableTags })
+          .put("/v2/company/", { ...company, tags: sendableTags })
           .then((resp: any) => {
             this.companies.set(company.id, company);
             resolve(resp);
@@ -98,7 +98,7 @@ export const useCompaniesStore = defineStore("companies", {
     removeCompany(company: Company) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/company/" + company.id)
+          .delete("/v2/company/" + company.id)
           .then((resp: any) => {
             this.removeCompanyById(company.id);
             resolve(resp);

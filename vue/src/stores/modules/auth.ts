@@ -20,14 +20,14 @@ export const useAuthStore = defineStore("auth", {
     setAuthorizationHeader() {
       if (this.token) {
         this.axios.defaults.headers.common["Authorization"] =
-          "basic " + this.token;
+          "Bearer " + this.token;
       }
     },
     login(user: any) {
       return new Promise((resolve, reject) => {
         this.status = "loading";
         this.axios
-          .post("auth", user)
+          .post("/v2/auth/", user)
           .then((resp: any) => {
             this.token = resp.data;
             this.status = "success";
@@ -46,7 +46,7 @@ export const useAuthStore = defineStore("auth", {
     changePass(password: string) {
       return new Promise<void>((resolve, reject) => {
         this.axios
-          .put("auth", { password })
+          .put("/v2/auth/", { password })
           .then(() => {
             resolve();
           })
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore("auth", {
       return new Promise<void>((resolve) => {
         this.status = "";
         this.token = "";
-        //Should, when implemented in backend send the token to the backend for blacklisting
+        //TODO: Should, when implemented in backend send the token to the backend for blacklisting
         localStorage.removeItem("token");
         delete this.axios.defaults.headers.common["Authorization"];
         resolve();

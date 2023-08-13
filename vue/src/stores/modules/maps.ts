@@ -34,7 +34,7 @@ export const useMapsStore = defineStore("maps", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/map")
+            .get("/v2/map/")
             .then((resp: any) => {
               this.removeAllMaps();
               const maps = resp.data;
@@ -54,7 +54,7 @@ export const useMapsStore = defineStore("maps", {
     updateMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/map", map)
+          .put("/v2/map/", map)
           .then((resp: any) => {
             this.maps.set(map.id, map);
             resolve(resp);
@@ -67,7 +67,7 @@ export const useMapsStore = defineStore("maps", {
     removeMap(map: Company_Map) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/map/" + map.id)
+          .delete("/v2/map/" + map.id)
           .then((resp: any) => {
             this.removeMapById(map.id);
             resolve(resp);

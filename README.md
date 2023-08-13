@@ -1,77 +1,65 @@
 # CHARMcatalogue
 
-A fully fledged digital catalogue for the CHARMfair at Chalmers. The system is built to be easily usable and customizable by an administrator with minimal programming understanding. The current published version in production should be available on http://catalogue.charm.chalmers.se
+A digital catalogue for the CHARM fair at Chalmers. The system is built foe ease of use and customizability by an administrator without programming background. The current published version in production should be available on [https://catalogue.charm.chalmers.se](https://catalogue.charm.chalmers.se).
 
-## Features
+The main goal is to make the relevant companies more accessible to students by offering all the functionality from the physical book along with functionality not possible to have in a book such as searching, filtering, and links.
 
-- Company pages
-    - Individually hideable for users
-    - Company Logo
-    - Description of the company
-    - Show relevant tags (such as Programs, Offering, Business Areas, Looking for)
-    - Summer jobs, if relevant
-    - Map of where at the fair the company is located
-    - Link to their website
-    - Save favorite companies
-    - Take notes (only saved locally)
-- Pre pages (Custom png for other information)
-- Searching and filtering companies
-- Shortcuts 
-    - To premade search and filtering query
-    - To anywhere on the web
-- Batch updates 
-    - Upload a csv to update any information saved in database
-    - Download current configuration (to save or upload later)
-- Customizable layout 
-    - Choose which company information to show on company pages
-    - Adds customized art for all pages
-- Tagging system
-    - Explicitly handles:
-        - Programs the company is interested in
-        - Business areas they operate in
-        - The level of study they're looking for (Bachelor, Masters, PhD)
-        - Types of job the offer
-    - Can handle generic tags as well
-- Easy to use admin interface
-    - Allows configuration and changing of most (if not all) information entered about companies, tags, prepages, shortcuts, etc.
-
-## Batch uploading
-
-When the system is setup it can easily be populated by uploading a `.zip` file containing a `.csv` file along with all the images (named correctly) as an administrator. 
-
-An example of such a file can be found [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing)
 
 # Setup
 ## Production
 
 ### Requirements
 
-A system configured with `Docker` and `Docker-compose`
+A system configured with `Docker`
 
 ### Running 
 
-Download and the `production.yml` file found in `.` and run it with `docker-compose up` 
+Either run the `production.yml` file found in `.` with `docker compose -f production.yml up`. This will build the containers from source allowing you to deploy any version easily.
+
+Or you can make use of the package `charm_catalogue-backend` and `charm_catalogue-vue` (associated with this repo) along with a postgres database. For configuration either look at the `production.yml` file or the configuration instructions below
 
 
 ## Development
 
 ### Requirements
 
-A system configured with `Docker`, `Docker-compose` and `yarn`
+A system configured with `Docker`, `cargo` and `yarn`
 
 ### Running 
-The backend is started by simple running 
+The database is started by running 
 ```
-docker-compose up
-```
-
-For the frontend go in to the `vue` directorty and run 
-```
-yarn install 
-```
-Followed by 
-```
-yarn serve
+docker compose up 
 ```
 
+To start the backend service go into `backend/` and run 
+```
+cargo run
+```
+
+For the frontend go into the `vue/` directorty and run 
+```
+yarn dev 
+```
+
+
+
+## Configuration
+The system can configured either via the `config.toml` or by setting enviroment variables. If the config file is incomplete a default config will be loadeed instead. Values set via enviroment variable override those in the file (or set by default), this to provide an easy way to configure a production enviroments through for example docker compose files.
+
+### Parameters
+| Name | Default | Purpose|
+|-|-|-|
+|database_url |  | This specifics the how to connect to the database including url, port, and which database on the given server. |
+|upload_path | upload/ | This specifies where uploaded files should be temporarily saved while processing. |
+|storage_path | storage/ | This specifies where uploade file should be saved after processing, in order to be served. |
+|password_salt| NOT A GOOD SALT | This should be a random generated string, which is used to improve password security |
+
+To set environment variables the same name but uppercase is used.
+
+## Usage
+### Batch uploading
+
+When the system is setup it can easily be populated by uploading a `.zip` file containing a `.xlsx` file along with all the images (named correctly) as an administrator. 
+
+An example of such a file can be found [here](https://drive.google.com/drive/folders/1ARqpngACz8koJlrudFBCM7jHow94vemY?usp=sharing)
 

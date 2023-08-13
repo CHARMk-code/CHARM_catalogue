@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO company_cards (name, text, active) \n            (SELECT * FROM UNNEST($1::varchar[], $2::varchar[], $3::boolean[]))",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "VarcharArray",
+        "VarcharArray",
+        "BoolArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b8fdbe4983cfab70d097d778d4ec2e303defcedfb2564d75f0369188e9252e7c"
+}

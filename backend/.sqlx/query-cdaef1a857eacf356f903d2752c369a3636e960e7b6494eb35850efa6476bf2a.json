@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tags SET name = $1, parent_tag = $2, up_votes = $3, down_votes = $4, crowd_sourced = $5, icon = $6, division = $7, business_area = $8, looking_for = $9, offering = $10, language = $11, fair_area = $12 where id = $13 returning id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Bool",
+        "Varchar",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "cdaef1a857eacf356f903d2752c369a3636e960e7b6494eb35850efa6476bf2a"
+}

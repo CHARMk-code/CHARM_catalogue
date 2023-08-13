@@ -1,36 +1,10 @@
 version: "3"
 services:
-  flask:
-    build: ./docker/flask
+  postgres:
+    image: "postgres"
     ports:
-      - "5008:5000"
-    depends_on:
-      flyway:
-        condition: service_completed_successfully
-    links:
-      - db
-    volumes:
-      - ./docker/flask/src:/catalogue
-      - /static
-      - /upload
-    environment:
-      FLASK_ENV: development
-      FLASK_APP: .
-  flyway:
-    image: flyway/flyway
-    depends_on:
-      - db
-    links:
-      - db
-    volumes:
-      - ./flyway:/flyway/sql
-    command: -url=jdbc:mysql://db:3306/catalogue -user=catalogue -password=password -connectRetries=60 migrate
-  db:
-    image: "mysql"
-    command: --default-authentication-plugin=mysql_native_password
+      - "5432:5432"
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: catalogue
-      MYSQL_USER: catalogue
-      MYSQL_PASSWORD: password
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      POSTGRES_USER: catalogue
+      POSTGRES_PASSWORD: password

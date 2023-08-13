@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM tags where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "parent_tag",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "up_votes",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "down_votes",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "crowd_sourced",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "icon",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "division",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "business_area",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "looking_for",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "offering",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "language",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 12,
+        "name": "fair_area",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b96d0f207c0a8be3bbbc015e7e3af9e38871439b4b6a20a423c3eabf5c9135d4"
+}
