@@ -9,6 +9,8 @@ services:
       - postgres 
     environment:
       DATABASE_URL: postgres://catalogue:password@postgres:5432/catalogue
+      CORS_ALLOWED_ORIGIN: http://localhost:8080
+
   postgres:
     image: "postgres"
     restart: unless-stopped

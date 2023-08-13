@@ -5,6 +5,8 @@ mod models;
 mod routes;
 mod services;
 
+use std::fs;
+
 use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::HttpServer;
@@ -17,6 +19,10 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
     let config = config::get_config("config.toml".into());
+
+    // File storage setup
+    fs::create_dir_all(&config.upload_path)?;
+    fs::create_dir_all(&config.storage_path)?;
 
     // DB setup
     let pool = PgPoolOptions::new()

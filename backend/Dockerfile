@@ -1,21 +1,30 @@
-FROM rust:1.71
+FROM rust:1.71 as builder
 
-WORKDIR /usr/src/backend
-COPY . .
+# Build binary
+WORKDIR /src
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt-get update && apt-get install -y musl-dev musl-tools
 
-RUN cargo build -r
+# Pre build the project dependencies, doing this ahead of project build 
+# allows us to skip it if no dependencies have changed
+RUN USER=root cargo new backend
+WORKDIR /src/backend
+COPY Cargo.toml Cargo.lock ./
+RUN cargo build --release
 
-WORKDIR /usr/src
-RUN cp ./backend/migrations/ ./migrations/ -r
-RUN cp ./backend/config.toml .
-RUN cp /usr/src/backend/target/release/backend ./backend-bin
+# Build the actual project
+COPY . ./
+RUN RUSTFLAGS='-C relocation-model=static' cargo build --release --target x86_64-unknown-linux-musl
 
-RUN rm ./backend -r 
+RUN mkdir files/upload -p && mkdir files/storage -p
 
-RUN mkdir /usr/src/files/upload -p && mkdir /usr/src/files/storage -p
-VOLUME /usr/src/files/
+FROM scratch as cleanup
 
-CMD ["./backend-bin"]
+COPY --from=builder /src/backend/target/x86_64-unknown-linux-musl/release/backend /backend-bin 
+
+VOLUME /usr/src/app/files/
+ENV UPLOAD_PATH="files/upload" STORAGE_PATH="files/storage"
+CMD ["/backend-bin"]
 
 
 

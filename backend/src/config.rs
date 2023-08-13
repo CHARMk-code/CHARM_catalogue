@@ -37,7 +37,7 @@ pub fn get_config(path: &str) -> Config {
             })
         })
         .unwrap_or(Config::default());
-        
+
     // override the created config with new values from env variables when one exists
     let new_config = Config {
         database_url: replace_with_env_if_exist("DATABASE_URL", config.database_url),
@@ -49,11 +49,10 @@ pub fn get_config(path: &str) -> Config {
             config.cors_allowed_origin,
         ),
     };
-    
+
     info!("Config set to: {:?}", new_config);
 
     new_config
-
 }
 
 pub fn replace_with_env_if_exist<T: From<String>>(name: &str, config_value: T) -> T {

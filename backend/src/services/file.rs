@@ -8,6 +8,8 @@ use actix_multipart::Multipart;
 use actix_web::{error::BlockingError, web, ResponseError};
 use futures::StreamExt;
 
+use crate::config;
+
 #[derive(thiserror::Error, Debug)]
 pub enum FileServiceError {
     #[error("MultipartError received when reading incoming file data")]
