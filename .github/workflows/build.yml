@@ -4,25 +4,33 @@ on:
   push:
     branches:
       - master
+      - beta
 
 jobs:
   build-backend:
     runs-on: self-hosted
 
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v2
 
-      # Create latested vesion
-      - name: Build the latest Docker image
-        run: docker build --file backend/Dockerfile --tag ghcr.io/charmk-code/catalogue_backend:latest backend/
-      - name: Push the latest Docker image
-        run: docker push ghcr.io/charmk-code/catalogue_backend:latest
+      # Create latest vesion
+      - name: Build the Docker image
+        run: docker build --file backend/Dockerfile --tag ghcr.io/charmk-code/catalogue_backend:latest --tag ghcr.io/charmk-code/catalogue_backend:{$BRANCH_NAME} backend/
+      # push latest version
+      - name: Push the Docker image
+        run: docker push ghcr.io/charmk-code/catalogue_backend -a
 
   build-frontend:
     runs-on: self-hosted
@@ -37,7 +45,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Create latested vesion
-      - name: Build the latest Docker image
-        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest vue/
-      - name: Push the latest Docker image
-        run: docker push ghcr.io/charmk-code/catalogue_vue:latest
+      - name: Build the Docker image
+        run: docker build vue/ --tag ghcr.io/charmk-code/catalogue_vue:latest --tag ghcr.io/charmk-code/catalogue_vue:{$BRANCH_NAME} vue/
+      - name: Push the Docker image
+        run: docker push ghcr.io/charmk-code/catalogue_vue -a 

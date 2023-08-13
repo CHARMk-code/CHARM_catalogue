@@ -17,6 +17,7 @@ services:
     environment:
       POSTGRES_USER: catalogue
       POSTGRES_PASSWORD: password
+
   vue:
     build: ./vue
     restart: unless-stopped
