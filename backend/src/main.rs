@@ -11,19 +11,17 @@ use actix_web::HttpServer;
 use actix_web::{middleware::Logger, App};
 use actix_web_httpauth::extractors::bearer;
 use sqlx::postgres::PgPoolOptions;
-use std::env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
-    let config = config::read_config("config.toml".into())?;
+    let config = config::get_config("config.toml".into());
 
     // DB setup
-    let database_url = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect(database_url)
+        .connect(&config.database_url)
         .await
         .expect("Failed to initialize Database pool");
 
@@ -41,7 +39,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         // CORS setup
         let cors = Cors::default()
-            .allowed_origin(&config.cors.allowed_origin)
+            .allowed_origin(&config.cors_allowed_origin)
             .allow_any_method()
             .allow_any_header()
             .max_age(3600);

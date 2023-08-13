@@ -34,6 +34,8 @@ async fn get_token(
 
     let possible_user = services::auth::get_user(db.as_ref()).await;
 
+    // HACK: This should be fixed when a proper authorization system is set up. Currently creates a
+    // password "password" if the db returns an error (most likely, no password has previously been set)
     let user = match possible_user {
         Ok(user) => user,
         Err(..) => {

@@ -72,7 +72,7 @@ async fn update_handler(
     Ok(response)
 }
 
-#[post("/")] // TODO Deprecatea in favor of put
+#[post("/")] // TODO: Deprecatea in favor of put
 async fn create_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,

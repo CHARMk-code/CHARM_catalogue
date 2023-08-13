@@ -21,7 +21,8 @@ name, image, active, mobile, side, page)
 
     Ok(query_result.id)
 }
-
+// TODO: Bulk updates should probably be possible, some actions make upwards of 30 requests to
+// update objects in db
 pub async fn update(db: &Pool<Postgres>, data: &PrepageWeb) -> Result<i32, actix_web::Error> {
     let id = data.id.expect("Should have id to update");
 

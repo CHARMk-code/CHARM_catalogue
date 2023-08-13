@@ -28,8 +28,6 @@ pub enum FileServiceError {
     },
 }
 
-// TODO: Possibly add more and better error handling out via the API, this just sends a
-// INTERNAL_SERVER_ERROR in the API response
 impl ResponseError for FileServiceError {}
 
 pub async fn save_files(
