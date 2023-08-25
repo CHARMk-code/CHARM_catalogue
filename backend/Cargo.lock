@@ -438,6 +438,7 @@ dependencies = [
  "log",
  "rust-argon2",
  "serde",
+ "serde_json",
  "sqlx",
  "strum",
  "strum_macros",

@@ -1,1 +1,1 @@
-pub mod company_view;
+pub mod blob;

@@ -9,3 +9,4 @@ pub mod prepage;
 pub mod shortcut;
 pub mod tag;
 pub mod user;
+pub mod blob;

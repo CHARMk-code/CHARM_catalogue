@@ -157,10 +157,10 @@ function setNextRoute() {
     filtersStore.filterCompanies();
     if (filtersStore.filteredCompanies.length < 1) return; //go nowhere if there are no companypages
 
-    settingsStore.settings.navigation.next =
+    settingsStore.session_settings.navigation.next =
       "/company/" + filtersStore.filteredCompanies[0].name;
   } else {
-    settingsStore.settings.navigation.next = `/prepage/${nextPage}${
+    settingsStore.session_settings.navigation.next = `/prepage/${nextPage}${
       $q.screen.lt.md ? "?p=" + nextP : ""
     }`;
   }
@@ -196,7 +196,7 @@ function setPrevRoute() {
     prevP = 0;
   }
 
-  settingsStore.settings.navigation.prev = `/prepage/${prevPage}${
+  settingsStore.session_settings.navigation.prev = `/prepage/${prevPage}${
     $q.screen.lt.md ? "?p=" + prevP : ""
   }`;
 }

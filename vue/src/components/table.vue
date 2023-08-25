@@ -141,7 +141,7 @@ const tablePagination = computed({
     return siteSettingsStore.getTablePagination();
   },
   set(v) {
-    siteSettingsStore.settings.tables.rowsPerPage = v.rowsPerPage;
+    siteSettingsStore.session_settings.tables.rowsPerPage = v.rowsPerPage;
   },
 });
 

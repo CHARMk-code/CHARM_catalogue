@@ -12,7 +12,14 @@
 
         <q-btn to="/" flat>
           <q-toolbar-title>
-            <img class="logo" src="@/assets/CHARM_logo.png" />
+            <img
+              class="logo"
+              :src="
+                axios.defaults.baseURL +
+                '/manage/image/' +
+                useSite_settingsStore().server_settings.theme.logo
+              "
+            />
           </q-toolbar-title>
         </q-btn>
         <q-space></q-space>
@@ -149,6 +156,7 @@ import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import feedback from "@/components/feedback.vue";
 import { useQuasar } from "quasar";
+import axios from "@/plugins/axios";
 
 const $q = useQuasar();
 
@@ -168,11 +176,11 @@ const links = [
 const leftLayout = computed(() => layoutsStore.getSide("left"));
 const rightLayout = computed(() => layoutsStore.getSide("right"));
 const hasNext = computed(
-  () => site_settingsStore.settings.navigation.next !== undefined
+  () => site_settingsStore.session_settings.navigation.next !== undefined
 );
 
 const hasPrev = computed(
-  () => site_settingsStore.settings.navigation.prev !== undefined
+  () => site_settingsStore.session_settings.navigation.prev !== undefined
 );
 
 function next() {

@@ -4,7 +4,14 @@
       <q-toolbar>
         <q-btn to="/" flat>
           <q-toolbar-title>
-            <img class="logo" src="@/assets/CHARM_logo.png" />
+            <img
+              class="logo"
+              :src="
+                axios.defaults.baseURL +
+                '/manage/image/' +
+                useSite_settingsStore().server_settings.theme.logo
+              "
+            />
           </q-toolbar-title>
         </q-btn>
         <q-space></q-space>
@@ -74,6 +81,8 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { useRoute, useRouter } from "vue-router";
 import feedback from "@/components/feedback.vue";
 import { useQuasar } from "quasar";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
+import axios from "@/plugins/axios";
 
 const $q = useQuasar();
 
@@ -88,18 +97,19 @@ const authStore = useAuthStore();
 
 const links: { name: string; route: string; icon: string }[] = [
   {
-    name: "prepages",
+    name: "Prepages",
     route: "/admin/prepages",
     icon: "mdi-book-open-page-variant",
   },
-  { name: "companies", route: "/admin/companies", icon: "mdi-account-group" },
+  { name: "Companies", route: "/admin/companies", icon: "mdi-account-group" },
   { name: "Tags", route: "/admin/tags", icon: "mdi-tag-heart-outline" },
-  { name: "maps", route: "/admin/maps", icon: "mdi-map" },
-  { name: "layout", route: "/admin/layout", icon: "mdi-human-male-board" },
-  { name: "shortcuts", route: "/admin/shortcuts", icon: "mdi-star" },
-  { name: "feedback", route: "/admin/feedback", icon: "mdi-forum" },
-  { name: "batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
-  { name: "account", route: "/admin/account", icon: "mdi-account" },
+  { name: "Maps", route: "/admin/maps", icon: "mdi-map" },
+  { name: "Layout", route: "/admin/layout", icon: "mdi-human-male-board" },
+  { name: "Shortcuts", route: "/admin/shortcuts", icon: "mdi-star" },
+  { name: "Feedback", route: "/admin/feedback", icon: "mdi-forum" },
+  { name: "Batch", route: "/admin/batch", icon: "mdi-tray-arrow-up" },
+  { name: "Account", route: "/admin/account", icon: "mdi-account" },
+  { name: "Site settings", route: "/admin/site", icon: "mdi-cog" },
 ];
 
 function logout() {
