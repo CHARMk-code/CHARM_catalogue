@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM company_cards where id = $1",
+  "query": "select * from blobs where name = $1",
   "describe": {
     "columns": [
       {
@@ -15,26 +15,20 @@
       },
       {
         "ordinal": 2,
-        "name": "text",
-        "type_info": "Varchar"
-      },
-      {
-        "ordinal": 3,
-        "name": "active",
-        "type_info": "Bool"
+        "name": "blob",
+        "type_info": "Json"
       }
     ],
     "parameters": {
       "Left": [
-        "Int4"
+        "Text"
       ]
     },
     "nullable": [
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "3bdef04ed20dda4d54032e4e3ffd06813c0d9b35c45766491bd0606adc2a495a"
+  "hash": "5b3f9fca91d71a01158ce8bce7c64207bbf94475e5ef7b84ff793eb2ae4698c1"
 }

@@ -43,6 +43,5 @@ pub fn value_to_vec<T: FromStr>(value: &DataType) -> Option<Vec<T>> {
 }
 
 pub fn value_to_chrono_date(value: &DataType) -> Option<DateTime<Utc>> {
-    value
-        .as_datetime().map(|naive_dt| naive_dt.and_utc())
+    value.as_datetime().map(|naive_dt| naive_dt.and_utc())
 }

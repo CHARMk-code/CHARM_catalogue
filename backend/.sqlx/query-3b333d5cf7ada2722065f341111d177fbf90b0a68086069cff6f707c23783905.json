@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE company_cards SET name = $1, text = $2, active = $3 where id = $4 returning id",
+  "query": "INSERT INTO blobs (name, blob) values ($1, $2) returning id",
   "describe": {
     "columns": [
       {
@@ -12,14 +12,12 @@
     "parameters": {
       "Left": [
         "Varchar",
-        "Varchar",
-        "Bool",
-        "Int4"
+        "Json"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "8ce5d18d8df3c1e043ed3b132c0caf3dbea789762bb5194516ebecb0ca16da8c"
+  "hash": "3b333d5cf7ada2722065f341111d177fbf90b0a68086069cff6f707c23783905"
 }

@@ -134,7 +134,8 @@ async fn valid_update_on_existing_blob_should_update_row_in_db(
         .await?;
     let updated_first_blob = updated_blobs
         .iter()
-        .cloned().find(|r| r.id == initial_first_blob.id)
+        .cloned()
+        .find(|r| r.id == initial_first_blob.id)
         .unwrap();
     let updated_other_blobs = updated_blobs
         .iter()
@@ -171,7 +172,8 @@ async fn delete_on_existing_name_should_remove_correct_row_in_db(
     let removed_id = initial_first_blob.id;
 
     // What's tested
-    let remove_query_result = services::settings::blob::delete_by_name(&db, &initial_first_blob.name).await;
+    let remove_query_result =
+        services::settings::blob::delete_by_name(&db, &initial_first_blob.name).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
@@ -184,9 +186,7 @@ async fn delete_on_existing_name_should_remove_correct_row_in_db(
     //Check that blob has been removed
     let remaining_blob_rows = sqlx::query!("SELECT id FROM blobs").fetch_all(&db).await?;
     assert!(
-        remaining_blob_rows
-            .iter()
-            .all(|r| r.id != removed_id),
+        remaining_blob_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

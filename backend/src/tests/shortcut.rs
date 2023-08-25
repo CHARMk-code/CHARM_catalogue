@@ -140,7 +140,8 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     let updated_shortcuts = services::shortcut::get_all(&db).await.unwrap();
     let updated_first_shortcut = updated_shortcuts
         .iter()
-        .cloned().find(|r| r.id == initial_first_shortcut.id)
+        .cloned()
+        .find(|r| r.id == initial_first_shortcut.id)
         .unwrap();
     let updated_other_shortcuts = updated_shortcuts
         .iter()
@@ -192,9 +193,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
         .fetch_all(&db)
         .await?;
     assert!(
-        remaining_shortcut_rows
-            .iter()
-            .all(|r| r.id != removed_id),
+        remaining_shortcut_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

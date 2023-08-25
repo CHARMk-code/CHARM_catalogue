@@ -1,7 +1,14 @@
-use actix_web::{web::{self, Json}, get, Responder, Result, HttpResponse, put, delete};
+use actix_web::{
+    delete, get, put,
+    web::{self, Json},
+    HttpResponse, Responder, Result,
+};
 use sqlx::PgPool;
 
-use crate::{services::{self, auth::AuthedUser}, models::blob::JSONBlobWeb};
+use crate::{
+    models::blob::JSONBlobWeb,
+    services::{self, auth::AuthedUser},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -12,9 +19,11 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
     );
 }
 
-
 #[get("/{name}")]
-async fn get_by_name_handler(db: web::Data<PgPool>, path: web::Path<String>) -> Result<impl Responder> {
+async fn get_by_name_handler(
+    db: web::Data<PgPool>,
+    path: web::Path<String>,
+) -> Result<impl Responder> {
     let name = path.into_inner();
     let prepage = services::settings::blob::get_by_name(&db, &name).await?;
 

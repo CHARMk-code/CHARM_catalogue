@@ -134,7 +134,8 @@ async fn valid_update_on_existing_layout_should_update_row_in_db(
     let updated_layouts = services::layout::get_all(&db).await.unwrap();
     let updated_first_layout = updated_layouts
         .iter()
-        .cloned().find(|r| r.id == initial_first_layout.id)
+        .cloned()
+        .find(|r| r.id == initial_first_layout.id)
         .unwrap();
     let updated_other_layouts = updated_layouts
         .iter()
@@ -185,9 +186,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
         .fetch_all(&db)
         .await?;
     assert!(
-        remaining_layout_rows
-            .iter()
-            .all(|r| r.id != removed_id),
+        remaining_layout_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

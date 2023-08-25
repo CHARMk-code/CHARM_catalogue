@@ -1,3 +1,4 @@
+pub mod blob;
 pub mod company;
 pub mod company_card;
 pub mod feedback;
@@ -9,4 +10,3 @@ pub mod prepage;
 pub mod shortcut;
 pub mod tag;
 pub mod user;
-pub mod blob;

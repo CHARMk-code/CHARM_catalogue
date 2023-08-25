@@ -166,9 +166,11 @@ fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &[i32]) -> Pr
             .map(|(c, f)| {
                 (
                     CompanyWeb {
-                        tags: c.tags.as_ref().map(|cts| cts.iter()
-                                    .map(|ct| *tag_id_mapper.get(ct).unwrap())
-                                    .collect()),
+                        tags: c.tags.as_ref().map(|cts| {
+                            cts.iter()
+                                .map(|ct| *tag_id_mapper.get(ct).unwrap())
+                                .collect()
+                        }),
                         ..c.clone()
                     },
                     f.clone(),
