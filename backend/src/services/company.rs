@@ -59,7 +59,7 @@ last_updated, active, charmtalk, name, description, unique_selling_point, summer
     let new_company_id = create_company_query_result.id;
 
     // Create the company (one) to tag (many) relation
-    if tags.len() > 0 {
+    if !tags.is_empty() {
         let _create_tag_relation_query_result = sqlx::query!(
             "INSERT INTO companies_tags (company_id, tag_id) (SELECT * FROM UNNEST(array_fill($1::int, ARRAY[$3::int]), $2::int[]))",
             &new_company_id,
@@ -165,7 +165,7 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
         .difference(&new_tags_set)
         .copied()
         .collect();
-    if tags_to_remove.len() > 0 {
+    if !tags_to_remove.is_empty() {
         sqlx::query!(
             "DELETE FROM companies_tags where company_id = $1 \
             AND tag_id = ANY (SELECT * FROM UNNEST($2::int[])) \
@@ -183,7 +183,7 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
         .difference(&current_tags_set)
         .copied()
         .collect();
-    if tags_to_add.len() > 0 {
+    if !tags_to_add.is_empty() {
         sqlx::query!(
             "INSERT INTO companies_tags (company_id, tag_id) 
             (SELECT * FROM UNNEST( 

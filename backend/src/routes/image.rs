@@ -36,7 +36,7 @@ async fn get_by_name_handler(
 
     let file = NamedFile::open_async(image_path)
         .await
-        .map_err(|e| Into::<actix_web::Error>::into(e))?
+        .map_err(Into::<actix_web::Error>::into)?
         .file()
         .try_clone()?;
 

@@ -13,8 +13,8 @@ pub async fn create(
     db: &Pool<Postgres>,
     namespace: &str,
     saved_files: Vec<PathBuf>,
-    upload_path: &PathBuf,
-    storage_path: &PathBuf,
+    upload_path: &Path,
+    storage_path: &Path,
 ) -> Result<Vec<Uuid>, actix_web::Error> {
     let mut uuids: Vec<Uuid> = Vec::new();
 

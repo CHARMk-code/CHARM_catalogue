@@ -38,7 +38,7 @@ impl XlsxSheetProcessor for ShortcutProcessor {
         row_struct: &mut Self::OutputType,
         _required_files: &mut Vec<PathBuf>,
         _base_file_path: &Path,
-    ) -> () {
+    ) {
         match column_name {
             RequiredField::Id => row_struct.id = value_to_i32(value),
             RequiredField::Name => row_struct.name = value_to_string(value),

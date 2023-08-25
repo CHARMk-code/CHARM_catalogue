@@ -160,8 +160,7 @@ async fn valid_update_on_existing_feedback_should_update_row_in_db(
     let updated_first_feedback = updated_feedbacks
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_feedback.id)
-        .next()
+        .find(|r| r.id == initial_first_feedback.id)
         .unwrap();
     let updated_other_feedbacks = updated_feedbacks
         .iter()
@@ -202,11 +201,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_feedback.id;
 
     // What's tested
-    let remove_query_result = services::feedback::delete(db.clone(), removed_id.clone()).await;
+    let remove_query_result = services::feedback::delete(db.clone(), removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_feedback = services::feedback::get_by_id(db.clone(), removed_id.clone()).await;
+    let removed_feedback = services::feedback::get_by_id(db.clone(), removed_id).await;
     assert!(
         removed_feedback.is_err(),
         "Database query should fail for removed id"
@@ -217,9 +216,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
         .fetch_all(&db)
         .await?;
     assert!(
-        remaining_feedback_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_feedback_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

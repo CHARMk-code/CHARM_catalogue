@@ -136,8 +136,7 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     let updated_first_map = updated_maps
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_map.id)
-        .next()
+        .find(|r| r.id == initial_first_map.id)
         .unwrap();
     let updated_other_maps = updated_maps
         .iter()
@@ -186,9 +185,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     //Check that map has been removed
     let remaining_map_rows = sqlx::query!("SELECT id FROM maps").fetch_all(&db).await?;
     assert!(
-        remaining_map_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_map_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

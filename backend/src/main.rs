@@ -18,7 +18,7 @@ use sqlx::postgres::PgPoolOptions;
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
-    let config = config::get_config("config.toml".into());
+    let config = config::get_config("config.toml");
 
     // File storage setup
     fs::create_dir_all(&config.upload_path)?;

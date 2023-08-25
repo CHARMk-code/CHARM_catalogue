@@ -140,9 +140,7 @@ async fn valid_update_on_existing_shortcut_should_update_row_in_db(
     let updated_shortcuts = services::shortcut::get_all(&db).await.unwrap();
     let updated_first_shortcut = updated_shortcuts
         .iter()
-        .cloned()
-        .filter(|r| r.id == initial_first_shortcut.id)
-        .next()
+        .cloned().find(|r| r.id == initial_first_shortcut.id)
         .unwrap();
     let updated_other_shortcuts = updated_shortcuts
         .iter()
@@ -179,11 +177,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_shortcut.id;
 
     // What's tested
-    let remove_query_result = services::shortcut::delete(&db, removed_id.clone()).await;
+    let remove_query_result = services::shortcut::delete(&db, removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_shortcut = services::shortcut::get_by_id(&db, removed_id.clone()).await;
+    let removed_shortcut = services::shortcut::get_by_id(&db, removed_id).await;
     assert!(
         removed_shortcut.is_err(),
         "Database query should fail for removed id"
@@ -196,7 +194,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     assert!(
         remaining_shortcut_rows
             .iter()
-            .all(|r| r.id != removed_id.clone()),
+            .all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

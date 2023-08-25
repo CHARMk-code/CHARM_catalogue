@@ -258,8 +258,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     let updated_first_company = updated_companies
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_company.id)
-        .next()
+        .find(|r| r.id == initial_first_company.id)
         .unwrap();
     let updated_other_companies = updated_companies
         .iter()
@@ -352,11 +351,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_company.id;
 
     // What's tested
-    let remove_query_result = services::company::delete(&db, removed_id.clone()).await;
+    let remove_query_result = services::company::delete(&db, removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_company = services::company::get_by_id(&db, removed_id.clone()).await;
+    let removed_company = services::company::get_by_id(&db, removed_id).await;
     assert!(
         removed_company.is_err(),
         "Database query should fail for removed id"
@@ -367,9 +366,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
         .fetch_all(&db)
         .await?;
     assert!(
-        remaining_company_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_company_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

@@ -1,7 +1,6 @@
 use sqlx::{Error, Pool, Postgres};
 
 use crate::{
-    errors::MyError,
     models::blob::{JSONBlobDB, JSONBlobWeb},
     services,
 };
@@ -135,9 +134,7 @@ async fn valid_update_on_existing_blob_should_update_row_in_db(
         .await?;
     let updated_first_blob = updated_blobs
         .iter()
-        .cloned()
-        .filter(|r| r.id == initial_first_blob.id)
-        .next()
+        .cloned().find(|r| r.id == initial_first_blob.id)
         .unwrap();
     let updated_other_blobs = updated_blobs
         .iter()
@@ -189,7 +186,7 @@ async fn delete_on_existing_name_should_remove_correct_row_in_db(
     assert!(
         remaining_blob_rows
             .iter()
-            .all(|r| r.id != removed_id.clone()),
+            .all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

@@ -148,8 +148,7 @@ async fn valid_update_on_existing_prepage_should_update_row_in_db(
     let updated_first_prepage = updated_prepages
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_prepage.id)
-        .next()
+        .find(|r| r.id == initial_first_prepage.id)
         .unwrap();
     let updated_other_prepages = updated_prepages
         .iter()
@@ -188,11 +187,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_prepage.id;
 
     // What's tested
-    let remove_query_result = services::prepage::delete(&db, removed_id.clone()).await;
+    let remove_query_result = services::prepage::delete(&db, removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_prepage = services::prepage::get_by_id(&db, removed_id.clone()).await;
+    let removed_prepage = services::prepage::get_by_id(&db, removed_id).await;
     assert!(
         removed_prepage.is_err(),
         "Database query should fail for removed id"
@@ -203,9 +202,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
         .fetch_all(&db)
         .await?;
     assert!(
-        remaining_prepage_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_prepage_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

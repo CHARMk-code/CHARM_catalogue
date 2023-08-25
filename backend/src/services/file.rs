@@ -8,8 +8,6 @@ use actix_multipart::Multipart;
 use actix_web::{error::BlockingError, web, ResponseError};
 use futures::StreamExt;
 
-use crate::config;
-
 #[derive(thiserror::Error, Debug)]
 pub enum FileServiceError {
     #[error("MultipartError received when reading incoming file data")]
@@ -34,7 +32,7 @@ impl ResponseError for FileServiceError {}
 
 pub async fn save_files(
     mut payload: Multipart,
-    base_path: &PathBuf,
+    base_path: &Path,
 ) -> Result<Vec<PathBuf>, FileServiceError> {
     let mut file_paths = Vec::new();
 

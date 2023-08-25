@@ -93,11 +93,11 @@ pub fn validate_password(
 pub fn generate_token(key_pair: Ed25519KeyPair) -> Result<String, jwt_simple::Error> {
     let claims = Claims::create(Duration::from_days(1));
 
-    Ok(key_pair.sign(claims)?)
+    key_pair.sign(claims)
 }
 
 pub fn validate_token<CustomClaims: Serialize + DeserializeOwned>(
-    token: &String,
+    token: &str,
     key_pair: Ed25519KeyPair,
 ) -> Result<JWTClaims<CustomClaims>, jwt_simple::Error> {
     let public_key = key_pair.public_key();

@@ -172,8 +172,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     let updated_first_tag = updated_tags
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_tag.id)
-        .next()
+        .find(|r| r.id == initial_first_tag.id)
         .unwrap();
     let updated_other_tags = updated_tags
         .iter()
@@ -218,11 +217,11 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     let removed_id = initial_first_tag.id;
 
     // What's tested
-    let remove_query_result = services::tag::delete(&db, removed_id.clone()).await;
+    let remove_query_result = services::tag::delete(&db, removed_id).await;
     assert!(remove_query_result.is_ok());
     assert_eq!(remove_query_result.unwrap(), 1, "Should affect one row");
 
-    let removed_tag = services::tag::get_by_id(&db, removed_id.clone()).await;
+    let removed_tag = services::tag::get_by_id(&db, removed_id).await;
     assert!(
         removed_tag.is_err(),
         "Database query should fail for removed id"
@@ -231,9 +230,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     //Check that tag has been removed
     let remaining_tag_rows = sqlx::query!("SELECT id FROM tags").fetch_all(&db).await?;
     assert!(
-        remaining_tag_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_tag_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

@@ -41,7 +41,7 @@ impl XlsxSheetProcessor for CompanyProcessor {
         row_struct: &mut Self::OutputType,
         required_files: &mut Vec<PathBuf>,
         file_base_path: &Path,
-    ) -> () {
+    ) {
         match column_name {
             RequiredField::Active => row_struct.active = value_to_bool(value),
             RequiredField::Charmtalk => row_struct.charmtalk = value_to_bool(value),

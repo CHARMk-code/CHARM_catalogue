@@ -27,8 +27,8 @@ fn create_test_folders() -> Result<PathBuf, std::io::Error> {
 
     std::fs::create_dir_all(&test_path)?;
 
-    std::fs::create_dir(&test_path.join(TEST_UPLOAD))?;
-    std::fs::create_dir(&test_path.join(TEST_STORAGE))?;
+    std::fs::create_dir(test_path.join(TEST_UPLOAD))?;
+    std::fs::create_dir(test_path.join(TEST_STORAGE))?;
 
     println!("Directory uuid: {:?}", test_uuid);
     Ok(test_path.to_path_buf())

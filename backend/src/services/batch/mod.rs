@@ -129,7 +129,7 @@ async fn apply_proccessed_values_to_db(
 ) -> Result<(), BatchProcessError> {
     async fn apply_vec_to_database<'a, P: XlsxSheetProcessor>(
         db: &Pool<Postgres>,
-        rows: &Vec<(P::OutputType, Vec<PathBuf>)>,
+        rows: &[(P::OutputType, Vec<PathBuf>)],
     ) -> Result<Vec<i32>, BatchProcessError> {
         join_all(rows.iter().map(|(row, _)| P::apply_to_database(db, row)))
             .await
@@ -150,7 +150,7 @@ async fn apply_proccessed_values_to_db(
     Ok(())
 }
 
-fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &Vec<i32>) -> ProcessedValues {
+fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &[i32]) -> ProcessedValues {
     let tag_id_mapper: HashMap<i32, i32> = HashMap::from_iter(
         processed_values
             .tags
@@ -166,14 +166,9 @@ fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &Vec<i32>) ->
             .map(|(c, f)| {
                 (
                     CompanyWeb {
-                        tags: match &c.tags {
-                            None => None,
-                            Some(cts) => Some(
-                                cts.iter()
-                                    .map(|ct| tag_id_mapper.get(ct).unwrap().clone())
-                                    .collect(),
-                            ),
-                        },
+                        tags: c.tags.as_ref().map(|cts| cts.iter()
+                                    .map(|ct| *tag_id_mapper.get(ct).unwrap())
+                                    .collect()),
                         ..c.clone()
                     },
                     f.clone(),
@@ -186,7 +181,7 @@ fn update_tag_ids(processed_values: &ProcessedValues, new_tag_ids: &Vec<i32>) ->
             .map(|(c, f)| {
                 (
                     TagWeb {
-                        id: Some(tag_id_mapper.get(&c.id.unwrap()).unwrap().clone()),
+                        id: Some(*tag_id_mapper.get(&c.id.unwrap()).unwrap()),
                         ..c.clone()
                     },
                     f.clone(),
@@ -216,7 +211,7 @@ fn process_xlsx_file(
 
     fn get_sheet<'a>(
         name: &str,
-        sheets: &'a Vec<(String, Range<DataType>)>,
+        sheets: &'a [(String, Range<DataType>)],
     ) -> Result<&'a Range<DataType>, BatchProcessError> {
         sheets
             .iter()
@@ -314,8 +309,8 @@ async fn process_other_file(
         db,
         "images",
         vec![Path::new(parent_dir).join(file_name)],
-        &upload_path.to_path_buf(),
-        &storage_path.to_path_buf(),
+        upload_path,
+        storage_path,
     )
     .await
     .map_err(|source| BatchProcessError::ImageCreationError { source })?;
@@ -339,7 +334,7 @@ trait XlsxSheetProcessor {
         row_struct: &mut Self::OutputType,
         required_files: &mut Vec<PathBuf>,
         base_file_path: &Path,
-    ) -> ();
+    );
 
     fn process_sheet(
         sheet: &Range<DataType>,
@@ -400,9 +395,9 @@ trait XlsxSheetProcessor {
             let mut required_files = Vec::new();
 
             for (col_name, col_index) in valid_headers.iter() {
-                let value = sheet.index((row, col_index.clone()));
+                let value = sheet.index((row, *col_index));
                 Self::set_struct_value(
-                    &col_name,
+                    col_name,
                     value,
                     &mut row_struct,
                     &mut required_files,
@@ -617,7 +612,7 @@ mod tests {
             updated_processed_values
                 .tags
                 .iter()
-                .map(|(t, _)| t.id.clone().unwrap())
+                .map(|(t, _)| t.id.unwrap())
                 .collect::<Vec<i32>>(),
             new_tag_ids,
             "Tags should have beed updated in companies"

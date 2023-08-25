@@ -44,7 +44,7 @@ async fn get_token(
                 UserWeb {
                     password: "password".to_string(),
                 },
-                &salt,
+                salt,
             )
             .await?;
             services::auth::get_user(db.as_ref()).await?

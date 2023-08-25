@@ -88,7 +88,7 @@ async fn creating_a_valid_image_file_should_create_row_in_db(
         .collect();
 
     let expected_files = FileDB {
-        id: created_query_result.unwrap().iter().next().unwrap().clone(),
+        id: *created_query_result.unwrap().first().unwrap(),
         name: "New file".to_string(),
         namespace: "images".to_string(),
         image: true,
@@ -161,8 +161,7 @@ async fn valid_update_on_existing_image_file_should_update_row_in_db(
     let updated_first_image = updated_images
         .iter()
         .cloned()
-        .filter(|r| r.id == initial_first_image.id)
-        .next()
+        .find(|r| r.id == initial_first_image.id)
         .unwrap();
     let updated_other_images = updated_images
         .iter()
@@ -222,9 +221,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     //Check that image has been removed
     let remaining_image_rows = sqlx::query!("SELECT id FROM files").fetch_all(&db).await?;
     assert!(
-        remaining_image_rows
-            .iter()
-            .all(|r| r.id != removed_id.clone()),
+        remaining_image_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"
     );
     assert_eq!(

@@ -8,16 +8,15 @@ use super::{BatchProcessError, ProcessedValues};
 
 pub fn check_file_dependencies(
     processed_values: &ProcessedValues,
-    provided_files: &Vec<PathBuf>,
+    provided_files: &[PathBuf],
 ) -> Result<(), BatchProcessError> {
     fn get_missing_files<T>(
-        values: &Vec<(T, Vec<PathBuf>)>,
+        values: &[(T, Vec<PathBuf>)],
         provided_files_set: &HashSet<PathBuf>,
     ) -> Vec<PathBuf> {
         let required_files_set = values
             .iter()
-            .map(|(_, req_files)| req_files)
-            .flatten()
+            .flat_map(|(_, req_files)| req_files)
             .cloned()
             .collect::<HashSet<PathBuf>>();
         required_files_set
