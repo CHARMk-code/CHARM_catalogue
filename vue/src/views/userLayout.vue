@@ -17,7 +17,7 @@
               :src="
                 axios.defaults.baseURL +
                 '/manage/image/' +
-                useSite_settingsStore().settings.theme.logo
+                useSite_settingsStore().server_settings.theme.logo
               "
             />
           </q-toolbar-title>
@@ -176,11 +176,11 @@ const links = [
 const leftLayout = computed(() => layoutsStore.getSide("left"));
 const rightLayout = computed(() => layoutsStore.getSide("right"));
 const hasNext = computed(
-  () => site_settingsStore.settings.navigation.next !== undefined
+  () => site_settingsStore.session_settings.navigation.next !== undefined
 );
 
 const hasPrev = computed(
-  () => site_settingsStore.settings.navigation.prev !== undefined
+  () => site_settingsStore.session_settings.navigation.prev !== undefined
 );
 
 function next() {

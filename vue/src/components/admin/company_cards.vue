@@ -40,7 +40,7 @@
               <q-btn v-close-popup flat label="Cancel" />
               <q-btn
                 flat
-                label="Reset"
+                label="DISABLED Reset"
                 color="primary"
                 :loading="resetting"
                 @click="reset()"
@@ -67,7 +67,7 @@ let error = "";
 
 const site_settingsStore = useSite_settingsStore();
 
-const company_cards = site_settingsStore.settings.company_view.cards;
+const company_cards = site_settingsStore.server_settings.company_view.cards;
 
 // const selected = ref([]);
 const selected = computed<Card[]>({

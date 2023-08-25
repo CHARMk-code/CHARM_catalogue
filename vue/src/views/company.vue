@@ -48,6 +48,7 @@ import Note from "@/components/company/Note.vue";
 import Map from "@/components/company/Map.vue";
 import Summerjob from "@/components/company/summerjob.vue";
 import Layout from "@/components/company/Layout.vue";
+import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
 import { computed, h, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useRoute, useRouter } from "vue-router";
@@ -78,7 +79,7 @@ const component_layout: Ref<{ left: any; right: any }> = ref({
 });
 
 function isVisible(card_name: string) {
-  const visibleCards = settingsStore.settings.company_view.cards;
+  const visibleCards = settingsStore.server_settings.company_view.cards;
   return visibleCards.some((card) =>
     card.name === card_name ? card.active : false
   );
@@ -246,18 +247,19 @@ function handleSwipe({ direction }) {
 function setNextRoute() {
   // Set next route
   if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
-    settingsStore.settings.navigation.next =
+    settingsStore.session_settings.navigation.next =
       "/company/" + filterStore.filteredCompanies[currentIndex.value + 1].name;
   } else {
-    settingsStore.settings.navigation.next = undefined;
+    settingsStore.session_settings.navigation.next = undefined;
   }
 }
+
 const $q = useQuasar();
 
 function setPrevRoute() {
   //set prev route
   if (currentIndex.value > 0) {
-    settingsStore.settings.navigation.prev =
+    settingsStore.session_settings.navigation.prev =
       "/company/" + filterStore.filteredCompanies[currentIndex.value - 1].name;
   } else {
     if (Object.values(prepagesStore.pageGroups).length !== 0) {
@@ -275,14 +277,14 @@ function setPrevRoute() {
           );
         }
         if (mobilePages.length > 1) {
-          settingsStore.settings.navigation.prev =
+          settingsStore.session_settings.navigation.prev =
             "/prepage/" + lastPageGroupIndex + "?p=" + (mobilePages.length - 1);
           return;
         }
       }
-      settingsStore.settings.navigation.prev = "/prepage/" + pageGroups.length;
+      settingsStore.session_settings.navigation.prev = "/prepage/" + pageGroups.length;
     } else {
-      settingsStore.settings.navigation.prev = undefined;
+      settingsStore.session_settings.navigation.prev = undefined;
     }
   }
 }
@@ -299,6 +301,12 @@ function prev() {
   if (maybePrev) {
     router.push(maybePrev);
   }
+}
+
+// Logic for swipe instructions on mobile
+// has saved thing in localStorage
+if ($q.screen.lt.md && !(localStorage.getItem("swipeInstructions") || false)) {
+  $q.dialog({ component: SwipeOverlay });
 }
 </script>
 

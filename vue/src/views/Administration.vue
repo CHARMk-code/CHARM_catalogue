@@ -9,7 +9,7 @@
               :src="
                 axios.defaults.baseURL +
                 '/manage/image/' +
-                useSite_settingsStore().settings.theme.logo
+                useSite_settingsStore().server_settings.theme.logo
               "
             />
           </q-toolbar-title>

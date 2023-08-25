@@ -30,7 +30,7 @@ export const useShortcutsStore = defineStore("shortcuts", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/shortcut")
+            .get("/v2/shortcut/")
             .then((resp: any) => {
               this.shortcuts = [];
               const shortcuts = resp.data;
@@ -50,7 +50,7 @@ export const useShortcutsStore = defineStore("shortcuts", {
     modifyShortcut(shortcut: Shortcut) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/shortcut", shortcut)
+          .put("/v2/shortcut/", shortcut)
           .then((resp: any) => {
             if (!shortcut.id) {
               shortcut.id = resp.data.id;
@@ -72,7 +72,7 @@ export const useShortcutsStore = defineStore("shortcuts", {
     deleteShortcut(shortcut: Shortcut) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/shortcut/" + shortcut.id)
+          .delete("/v2/shortcut/" + shortcut.id)
           .then((resp: any) => {
             this.shortcuts = this.shortcuts.filter((p) => p.id != shortcut.id);
             resolve(resp);

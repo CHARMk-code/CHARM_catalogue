@@ -18,7 +18,7 @@ const props = withDefaults(
 
 const isVisible = computed(() => {
   const site_settingsStore = useSite_settingsStore();
-  const visibleCards = site_settingsStore.settings.company_view.cards;
+  const visibleCards = site_settingsStore.server_settings.company_view.cards;
   return visibleCards.some((card) =>
     card.name === props.name ? card.active : false
   );

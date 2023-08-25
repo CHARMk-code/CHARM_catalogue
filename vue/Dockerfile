@@ -15,9 +15,10 @@ RUN yarn build
 
 RUN mv /app/dist /dist && rm /app /tmp -r
 
+FROM joseluisq/static-web-server:2
 WORKDIR /
-RUN yarn global add http-server
+COPY --from=builder /dist /dist
+COPY --from=builder /bin/sh /bin/sh
 
-ADD ./setup_analytics.sh .
 
-entrypoint /setup_analytics.sh; http-server -P http://localhost:8080? /dist
+CMD ["--port", "8080", "--host", "0.0.0.0", "--root", "/dist"]

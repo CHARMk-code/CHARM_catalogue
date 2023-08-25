@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO companies_tags (company_id, tag_id) (SELECT * FROM UNNEST(array_fill($1::int, ARRAY[$3::int]), $2::int[]))",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4Array",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a36a7ae6518fe3e8437d815848f5b91bf832d90361cb913323eea3cd146c9385"
+}

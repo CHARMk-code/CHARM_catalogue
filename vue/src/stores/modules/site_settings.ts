@@ -10,18 +10,23 @@ export interface Card {
   active: boolean;
 }
 
-interface State {
-  settings: {
+export interface State {
+  server_settings: {
     company_view: {
       cards: Card[];
-    };
-    navigation: {
-      next: string | undefined;
-      prev: string | undefined;
     };
     theme: {
       logo: string;
       primary: string;
+    };
+  };
+  session_settings: {
+    tables: {
+      rowsPerPage: number;
+    };
+    navigation: {
+      next: string | undefined;
+      prev: string | undefined;
     };
   };
   load_wait: number;
@@ -29,7 +34,7 @@ interface State {
 
 export const useSite_settingsStore = defineStore("site_settings", {
   state: (): State => ({
-    settings: {
+    server_settings: {
       company_view: {
         cards: [
           { text: "Logo", name: "logo", active: true },
@@ -49,13 +54,18 @@ export const useSite_settingsStore = defineStore("site_settings", {
           { text: "Fair Areas", name: "fair_area", active: true },
         ],
       },
+      theme: {
+        logo: "logo.png",
+        primary: "#d6d600",
+      },
+    },
+    session_settings: {
+      tables: {
+        rowsPerPage: 20,
+      },
       navigation: {
         next: undefined,
         prev: undefined,
-      },
-      theme: {
-        logo: "prepage0.png",
-        primary: "#d60000",
       },
     },
     load_wait: 0,
@@ -65,7 +75,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
       console.log("test");
       return new Promise<void>((resolve, reject) => {
         this.axios
-          .put("/settings/site", { name: "settings", blob: this.settings })
+          .put("/v2/settings/blob/", { name: "settings", blob: this.server_settings })
           .then(() => {
             resolve();
           })
@@ -79,11 +89,11 @@ export const useSite_settingsStore = defineStore("site_settings", {
         if (force || this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/settings/site")
+            .get("/v2/settings/blob/settings")
             .then((resp: any) => {
               if (resp.data.name === "settings") {
-                this.settings = JSON.parse(resp.blob);
-                setCssVar("primary", this.settings.theme.primary);
+                this.server_settings = resp.data.blob; 
+                setCssVar("primary", this.server_settings.theme.primary);
                 res(resp);
               }
               rej("Didn't receive settings blob");
@@ -96,7 +106,7 @@ export const useSite_settingsStore = defineStore("site_settings", {
     },
     setCompanyCards(active_cards: Card[]) {
       return new Promise<void>((resolve) => {
-        const all_cards = this.settings.company_view.cards;
+        const all_cards = this.server_settings.company_view.cards;
         all_cards.forEach((card) => {
           if (
             active_cards.some((active_card) => active_card.name === card.name)
@@ -111,14 +121,22 @@ export const useSite_settingsStore = defineStore("site_settings", {
       });
     },
     consumeNext() {
-      const temp = unref(this.settings.navigation.next);
-      this.settings.navigation.next = undefined;
+      const temp = unref(this.session_settings.navigation.next);
+      this.session_settings.navigation.next = undefined;
       return temp;
     },
     consumePrev() {
-      const temp = unref(this.settings.navigation.prev);
-      this.settings.navigation.prev = undefined;
+      const temp = unref(this.session_settings.navigation.prev);
+      this.session_settings.navigation.prev = undefined;
       return temp;
+    },
+    getTablePagination() {
+      return {
+        sortBy: "desc",
+        descending: false,
+        page: 1,
+        rowsPerPage: this.session_settings.tables.rowsPerPage,
+      };
     },
   },
 });

@@ -10,8 +10,7 @@ const config = {
 // If we are in a local dev env then change config to match
 if (location.hostname == "localhost") {
   config.withCredentials = false;
-  config.baseURL = "http://localhost:5008/api";
-  //  config.baseURL = "https://catalogue.charm.chalmers.se/api";
+  config.baseURL = "http://localhost:8080/api";
 }
 
 const axios_instance: AxiosInstance = axios.create(config);

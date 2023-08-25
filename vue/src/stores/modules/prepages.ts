@@ -55,7 +55,7 @@ export const usePrepagesStore = defineStore("prepages", {
         if (force || this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/prepage")
+            .get("/v2/prepage/")
             .then((resp: any) => {
               this.pageGroups = [];
               const prepages: Prepage[] = resp.data;
@@ -97,7 +97,7 @@ export const usePrepagesStore = defineStore("prepages", {
         }
 
         this.axios
-          .put("/prepage", prepage)
+          .put("/v2/prepage/", prepage)
           .then((resp: any) => {
             if (!prepage.id) {
               this.getPrepages(true); //Force reload of prepages (no ID is returned from backend upon creation)
@@ -123,7 +123,7 @@ export const usePrepagesStore = defineStore("prepages", {
         }
 
         this.axios
-          .delete("/prepage/" + prepage.id)
+          .delete("/v2/prepage/" + prepage.id)
           .then((resp: any) => {
             const pagesInGroup = this.pageGroups[prepage.page].pages;
             if (pagesInGroup.length === 1) {

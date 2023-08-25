@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, summer_job_description = $7, summer_job_link = $8, summer_job_deadline = $9, contacts = $10, contact_email = $11, employees_world = $12, employees_sweden = $13, website = $14, talk_to_us_about = $15, logo = $16, map_image = $17, booth_number = $18 where id = $19 returning id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Bool",
+        "Bool",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Timestamptz",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5e42a96423243547da6826c8fc7734df8166fa10ac3ac8d5a46161a31b3b791a"
+}

@@ -43,7 +43,7 @@ export const useTagsStore = defineStore("tags", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/tag")
+            .get("/v2/tag/")
             .then((resp: any) => {
               const tags = resp.data;
               if (tags.length > 0) this.setAllTags(tags);
@@ -60,7 +60,7 @@ export const useTagsStore = defineStore("tags", {
     updateTag(tag: Tag) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/tag", tag)
+          .put("/v2/tag/", tag)
           .then((resp: any) => {
             this.tags.set(tag.id, tag);
             resolve(resp);
@@ -73,7 +73,7 @@ export const useTagsStore = defineStore("tags", {
     removeTag(tag: Tag) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/tag/" + tag.id)
+          .delete("/v2/tag/" + tag.id)
           .then((resp: any) => {
             this.removeTagById(tag.id);
             resolve(resp);

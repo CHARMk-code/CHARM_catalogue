@@ -59,6 +59,17 @@
             />
           </template>
 
+
+          <template v-if="col.type == 'external-link'">
+            <q-input
+              filled
+              v-model="rawRow[col.model]"
+              :label="col.label"
+              :rules="[(val) => (isValidExternalLink(val) || val == '') || 'External lins must start with http or https' ]"
+              />
+          </template>
+
+
           <template v-if="col.type == 'single-select'">
             <q-select
               :key="col.model"
@@ -190,6 +201,7 @@ export interface TableColMeta {
     | "number"
     | "icon"
     | "textarea"
+    | "external-link"
     | "single-select"
     | "multiple-select"
     | "radio"
@@ -247,5 +259,10 @@ async function save() {
 
     emit("save-row", rawRow);
   });
+}
+
+function isValidExternalLink(url: String):boolean {
+  const linkValidationRegex = "https?:\/\/.*"
+  return url.match(linkValidationRegex) != null
 }
 </script>

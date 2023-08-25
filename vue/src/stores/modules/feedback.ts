@@ -31,7 +31,7 @@ export const useFeedbackStore = defineStore("feedback", {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/feedback")
+            .get("/v2/feedback/")
             .then((resp: any) => {
               this.feedback = resp.data;
               resolve(resp);
@@ -50,7 +50,7 @@ export const useFeedbackStore = defineStore("feedback", {
           reject("No id");
         } else {
           this.axios
-            .delete("/feedback/" + feedback.id)
+            .delete("/v2/feedback/" + feedback.id)
             .then((resp: any) => {
               this.removeFeedbackById(feedback.id);
               resolve(resp);
@@ -64,7 +64,7 @@ export const useFeedbackStore = defineStore("feedback", {
     sendUserFeedback(feedback: Feedback) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/feedback", feedback)
+          .put("/v2/feedback", feedback)
           .then((resp: any) => {
             resolve(resp);
           })
@@ -76,7 +76,7 @@ export const useFeedbackStore = defineStore("feedback", {
     sendAdminFeedback(feedback) {
       return new Promise((resolve, reject) => {
         this.axios
-          .post("/feedback", feedback)
+          .post("/v2/feedback", feedback)
           .then((resp: any) => {
             resolve(resp);
           })

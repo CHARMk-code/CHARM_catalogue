@@ -193,7 +193,6 @@ router.beforeEach(async (to, from, next) => {
     ])
       .then(() => {
         useFilterStore().filterCompanies();
-        useSite_settingsStore().getCompanyCards();
       })
       .catch(() => {}); // add some error here in the future?
   }

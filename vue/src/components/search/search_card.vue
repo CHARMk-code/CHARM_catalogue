@@ -166,7 +166,7 @@ function search() {
   });
 }
 
-const visibleCards = site_settingsStore.settings.company_view.cards.filter(
+const visibleCards = site_settingsStore.server_settings.company_view.cards.filter(
   (card) => card.active
 );
 

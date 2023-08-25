@@ -8,11 +8,11 @@
       <q-card-section>
         <span class="block text-h6">Results</span>
         <q-table
+          v-model:pagination="searchPagination"
           flat
           :rows="filterStore.filteredCompanies"
           :columns="columns"
           wrap-cells
-          :pagination="initialPagination"
           @row-click="
             (_event, row, _index) => router.push('/company/' + row.name)
           "
@@ -88,17 +88,21 @@ import { useTagsStore } from "@/stores/modules/tags";
 import TagGroup from "@/components/Tag_group.vue";
 import Image from "@/components/utils/Image.vue";
 import { useQuasar } from "quasar";
+import { useSite_settingsStore } from "@/stores/modules/site_settings";
 
 const filterStore = useFilterStore();
 const favoritesStore = useFavoritesStore();
 const tagsStore = useTagsStore();
+const siteSettingsStore = useSite_settingsStore();
 
-const initialPagination = {
-  sortBy: "desc",
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-};
+const searchPagination = computed({
+  get() {
+    return siteSettingsStore.getTablePagination();
+  },
+  set(v) {
+    siteSettingsStore.session_settings.tables.rowsPerPage = v.rowsPerPage;
+  },
+});
 
 const $q = useQuasar();
 const columns = computed(() => {

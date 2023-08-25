@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM companies_tags where company_id = $1 AND tag_id = ANY (SELECT * FROM UNNEST($2::int[])) ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9dcb7614ca44e91f4321e3ce6ee40155525ce43fe5d78a2454fcb754ee7a2750"
+}

@@ -4,7 +4,7 @@
     <q-card-section class="row">
       <Image
         class="col-6"
-        :image-name="site_settingsStore.settings.theme.logo"
+        :image-name="site_settingsStore.server_settings.theme.logo"
         height="150px"
         fit="contain"
       >
@@ -26,7 +26,7 @@
     </q-card-section>
     <q-card-section>
       <q-input
-        v-model="site_settingsStore.settings.theme.primary"
+        v-model="site_settingsStore.server_settings.theme.primary"
         label="Primary theme colour"
       >
         <template #after
@@ -67,7 +67,7 @@ function onSubmit() {
     .post("/manage/upload", formData)
     .then((res) => {
       feedback.value = res.data;
-      site_settingsStore.settings.theme.logo = fileName;
+      site_settingsStore.server_settings.theme.logo = fileName;
       site_settingsStore.saveSettings();
     })
     .catch((err) => {
@@ -77,6 +77,6 @@ function onSubmit() {
 
 function saveColors() {
   site_settingsStore.saveSettings();
-  setCssVar("primary", site_settingsStore.settings.theme.primary);
+  setCssVar("primary", site_settingsStore.server_settings.theme.primary);
 }
 </script>
