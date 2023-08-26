@@ -1,21 +1,12 @@
 <template>
-  <v-main>
-    <v-sheet class="pa-6">
-      <Image
-        v-if="maps.length > 0"
-        contain
-        justify="center"
-        :image-name="maps[0].image"
-      />
-    </v-sheet>
-  </v-main>
+      <MapViewer/>
 </template>
 
 <script lang="ts" setup>
 import { useMapsStore } from "@/stores/modules/maps";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-import Image from "@/components/utils/Image.vue";
+import MapViewer from "@/components/map/MapViewer.vue";
 
 const mapsStore = useMapsStore();
 

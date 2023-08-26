@@ -85,7 +85,7 @@ const router = createRouter({
           },
         },
         {
-          path: "/maps/:page",
+          path: "/maps",
           name: "Map",
           component: Map_view,
           meta: {
