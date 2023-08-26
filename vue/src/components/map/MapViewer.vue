@@ -3,95 +3,93 @@
 </template>
 
 <script setup lang="ts">
-import Layer from "ol/layer/Layer.js";
 import { Vector as VectorLayer } from "ol/layer.js";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import Feature from "ol/Feature.js";
-import { LineString, Point } from "ol/geom.js";
+import { Circle } from "ol/geom.js";
 import { Vector as VectorSource } from "ol/source.js";
-import { composeCssTransform } from "ol/transform.js";
 import { onMounted, ref } from "vue";
 import "ol/ol.css";
 import axios from "@/plugins/axios";
+import ImageLayer from "ol/layer/Image";
+import Static from "ol/source/ImageStatic";
+import Projection from "ol/proj/Projection";
+import { Style, Fill, Text } from "ol/style.js";
 
 const mapRoot = ref<string | HTMLElement | undefined>(undefined);
 
-const svgContainer = document.createElement("div");
-svgContainer.classList.add("svgContainer");
+// Styling
+const companyStyle = new Style({
+    text: new Text({
+      font: 'bold 9px sans-serif',
+      textAlign: "center",
+      justify: "center",
+      text: "100",
+      fill: new Fill({
+        color: [0, 0, 0, 1],
+      }),
+    }),
+    fill: new Fill({ color: 'red'}),
+})
 
-const company_points = [
-  new Feature(
-    new LineString([
-      [-1, -1],
-      [1, 1],
-    ])
-  )
-];
-axios
-  .get("/v2/image/Alten_Complete_original_colour_1de005d3ba579871270c897abd025912.svg")
-  .then((resp: any) => {
-    const svg = resp.request.responseXML.documentElement;
-    svgContainer.ownerDocument.importNode(svg);
-    svgContainer.appendChild(svg);
-  })
-  .catch((err: any) => {
-    console.log("shit broke!", err);
+
+// Company Layer
+function createCompanyPoint(company, position, color) {
+  const company_feature = new Feature({
+    geometry: position,
   });
 
-const width = 500;
-const height = 1280;
-const svgResolution = 360 / width;
-svgContainer.style.width = width + "px";
-svgContainer.style.height = height + "px";
-svgContainer.style.transformOrigin = "top left";
-svgContainer.className = "svg-layer";
+  return company_feature;
+}
 
-
-const svgLayer = new Layer({
-  render: function (frameState) {
-    const scale = svgResolution / frameState.viewState.resolution;
-    const center = frameState.viewState.center;
-    const size = frameState.size;
-    const cssTransform = composeCssTransform(
-      size[0] / 2,
-      size[1] / 2,
-      scale,
-      scale,
-      frameState.viewState.rotation,
-      -center[0] / svgResolution - width / 2,
-      center[1] / svgResolution - height / 2
-    );
-    svgContainer.style.transform = cssTransform;
-    svgContainer.style.opacity = this.getOpacity();
-    return svgContainer;
-  },
-  zIndex: 2,
-});
+const company_points = [
+];
+company_points.push(createCompanyPoint(undefined, new Circle([0, -100], 16, 'XY'), undefined));
 
 const vecLayer = new VectorLayer({
-    source: new VectorSource({
-      features: company_points,
-    }),
-    style: {
-      "stroke-width": 20,
-      "fill-color": [0, 0, 255, 0.8],
-      "stroke-color": [0, 0 , 0, 1],
-    },
-    zIndex: 4
-  })
+  source: new VectorSource({
+    features: company_points,
+  }),
+  style: function(feature, resolution) {
+    console.log("feature", feature)
+    companyStyle.getText().setScale(2 / resolution )
+    return companyStyle;
+  },
+  updateWhileAnimating: true,
+  updateWhileInteracting: true,
+});
 
 
+
+// MapLayer
+const extent = [-500, -500, 500, 500];
+const projection = new Projection({
+  code: "SB-image",
+  units: "pixels",
+  extent: extent,
+});
+
+const imgLayer = new ImageLayer({
+  source: new Static({
+    url: axios.defaults.baseURL + "/v2/image/SB.png",
+    projection: projection,
+    imageExtent: extent,
+  }),
+});
+
+
+
+// Map engine
 const map = new Map({
-  layers: [vecLayer, svgLayer],
+  layers: [imgLayer, vecLayer],
   view: new View({
     center: [0, 0],
-    extent: [-180, -180, 180, 180],
-    projection: "EPSG:4326",
+    extent: extent,
+    projection: projection,
     zoom: 2,
   }),
 });
-console.log(map)
 
 onMounted(() => {
   map.setTarget(mapRoot?.value);
