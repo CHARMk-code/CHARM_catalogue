@@ -10,22 +10,20 @@
     <q-card-section
       v-if="props.map"
       flat
-      :to="'/maps/' + mapsStore.getMapFromId(props.map.ref)"
     >
-      <Image :ratio="1" fit="contain" :image-name="props.map.image" />
+      <Image :ratio="1" fit="contain" :image-name="LOL" />
     </q-card-section>
   </company_card_wrapper>
 </template>
 
 <script lang="ts" setup>
 import company_card_wrapper from "@/components/company/card_wrapper.vue";
-import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 import Image from "../utils/Image.vue";
 
 const props = defineProps<{
   boothNumber: number;
-  map: Company_Map | undefined;
+  map: undefined;
 }>();
 
-const mapsStore = useMapsStore();
+// const mapsStore = useMapsStore();
 </script>
