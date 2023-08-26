@@ -16,40 +16,63 @@ import ImageLayer from "ol/layer/Image";
 import Static from "ol/source/ImageStatic";
 import Projection from "ol/proj/Projection";
 import { Style, Fill, Text } from "ol/style.js";
-import type { FairMap, MapGeometry } from "../../stores/modules/fairMaps";
+import type {
+  FairMap,
+  FairMapStyle,
+  MapGeometry,
+} from "../../stores/modules/fairMaps";
 import { useFairMapsStore } from "../../stores/modules/fairMaps";
+import { useCompaniesStore, type Company } from "@/stores/modules/companies";
+import type { Extent } from "ol/extent";
 
 const mapRoot = ref<string | HTMLElement | undefined>(undefined);
+const companiesStore = useCompaniesStore();
 
-// MapLayer
-const extent = [-500, -500, 500, 500]; // TODO: Define sane defaults here
-const projection = new Projection({
-  code: "SB-image",
-  units: "pixels",
-  extent: extent,
-});
-
+function extentFromSize(
+  size: number[]
+): [number, number, number, number] {
+  return [-size[0] / 2, -size[1] / 2, size[0] / 2, size[1] / 2];
+}
 const fairMapsStore = useFairMapsStore();
 
 function setupMap(fairmap: FairMap): Map {
+
+  const viewExtent = extentFromSize(fairmap.styling.mapSize.map((n) => n*2));
+  const viewProjection = new Projection({
+    code: "FairMap",
+    units: "pixels",
+    extent: viewExtent,
+  });
+
   const backgroundLayer = createBackgroundLayer(fairmap);
+
   const companyMarkers = fairmap.mapGeometry.filter(
     (geom: MapGeometry) => geom.type == "company"
   );
-  const companyLayer = createCompanyLayer(companyMarkers);
+  const companyLayer = createCompanyLayer(companyMarkers, fairmap.styling);
 
   return new Map({
     layers: [backgroundLayer, companyLayer],
     view: new View({
       center: [0, 0],
-      extent: extent,
-      projection: projection,
-      zoom: 2, // TODO: Define scale factor depending on background sizing
+      extent: viewExtent,
+      projection: viewProjection,
+      zoom: 1.5, // TODO: Define scale factor depending on background sizing
+      maxZoom: fairmap.styling.maxZoom || 3 
     }),
   });
 }
 
-function createBackgroundLayer(fairmap: FairMap): ImageLayer<Static> {
+function createBackgroundLayer(
+  fairmap: FairMap,
+): ImageLayer<Static> {
+  const extent = extentFromSize(fairmap.styling.mapSize);
+  const projection = new Projection({
+    code: "FairMap",
+    units: "pixels",
+    extent: extent,
+  });
+
   return new ImageLayer({
     source: new Static({
       url: axios.defaults.baseURL + "/v2/image/" + fairmap.background,
@@ -60,28 +83,32 @@ function createBackgroundLayer(fairmap: FairMap): ImageLayer<Static> {
 }
 
 function createCompanyLayer(
-  companyMarkers: MapGeometry[]
+  companyMarkers: MapGeometry[],
+  mapStyling: FairMapStyle
 ): VectorLayer<VectorSource<Geometry>> {
   const features = companyMarkers.map((geom) => {
     const styling = geom.styling;
+
+    const company = companiesStore.companies.get(geom.refId);
+
     const feature = new Feature({
-      geometry: new Circle(geom.position, 24, "XY"), // TODO: Define scale factor depending on background sizing
+      geometry: new Circle(geom.position, mapStyling.circleSize || 24, "XY"), // TODO: Define scale factor depending on background sizing
     });
 
     feature.setStyle((feature, resolution): Style => {
-
       return new Style({
         text: new Text({
-          font: styling.text?.font || "bold 10px sans-serif",
+          font: styling.text?.font || "bold 22px sans-serif",
           textAlign: styling.text?.textAlign || "center",
           justify: styling.text?.justify || "center",
-          text: "100",
-          scale: 2 / resolution,
+          text: company?.booth_number.toString(),
+
+          scale: ((mapStyling.circleSize || 24)/24) / resolution,
           fill: new Fill({
             color: styling.text?.color || [0, 0, 0, 1],
           }),
         }),
-        fill: new Fill({ color: styling.backgroundColor || "lightgray"}),
+        fill: new Fill({ color: styling.backgroundColor || "lightgray" }),
       });
     });
     return feature;
