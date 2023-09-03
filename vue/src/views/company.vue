@@ -55,7 +55,6 @@ import { useRoute, useRouter } from "vue-router";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useTagsStore } from "@/stores/modules/tags";
-import { useFairMapsStore } from "@/stores/modules/fairMaps";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useQuasar } from "quasar";
 
@@ -63,7 +62,6 @@ const filterStore = useFilterStore();
 const prepagesStore = usePrepagesStore();
 const companiesStore = useCompaniesStore();
 const tagsStore = useTagsStore();
-const fairMapsStore = useFairMapsStore();
 const settingsStore = useSite_settingsStore();
 
 const route = useRoute();
@@ -143,8 +141,7 @@ function renderCompanyCards() {
     // Map
     if (isVisible("map")) {
       const vnode = h(Map, {
-        map: null, //TODO : FIX This so the map actually displays
-        boothNumber: company.value.booth_number,
+        boothNumber: company.value.booth_number
       });
       addComponent("right", vnode);
     }
@@ -282,7 +279,8 @@ function setPrevRoute() {
           return;
         }
       }
-      settingsStore.session_settings.navigation.prev = "/prepage/" + pageGroups.length;
+      settingsStore.session_settings.navigation.prev =
+        "/prepage/" + pageGroups.length;
     } else {
       settingsStore.session_settings.navigation.prev = undefined;
     }

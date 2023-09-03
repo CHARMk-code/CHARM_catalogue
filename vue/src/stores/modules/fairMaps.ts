@@ -14,13 +14,15 @@ export interface FairMap {
 export interface FairMapStyle {
   circleSize?: number;
   maxZoom?: number;
-  mapSize: [number, number]
+  mapSize: [number, number];
 }
+
+export type GeometryTypes = "company" | "other";
 
 export interface MapGeometry {
   id: number;
   position: [number, number];
-  type: "company" | "other";
+  type: GeometryTypes;
   refId: number;
   styling: GeometryStyle;
 }
@@ -35,11 +37,28 @@ export interface GeometryStyle {
     color?: RGBA;
   };
   backgroundColor?: RGBA;
+  backgroundColorClicked?: RGBA;
 }
 
 interface State {
   fairMaps: FairMap[];
   last_load: number;
+}
+
+function generateMapGeometry(n: number, m: number, margin: number): MapGeometry[] {
+  const geoms: MapGeometry[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < m; j++) {
+      geoms.push({
+        id: i,
+        position: [(i * margin) - (n * margin / 2), (j * margin) - (m * margin / 2)],
+        type: "company",
+        refId: 1+j+(i*m),
+        styling: { backgroundColor: [255, 0, 0, 1] },
+      });
+    }
+  }
+  return geoms;
 }
 
 const example: FairMap = {
@@ -49,10 +68,7 @@ const example: FairMap = {
   styling: {
     mapSize: [1526, 678],
   },
-  mapGeometry: [
-    { id: 1, position: [0, 0], type: "company", refId: 87, styling: {backgroundColor: [255,0,0,1]} },
-  ],
-
+  mapGeometry: generateMapGeometry(10,15, 50)
 };
 
 export const useFairMapsStore = defineStore("fairMaps", {
