@@ -60,7 +60,7 @@ function setupMap(fairmap: FairMap): Map {
       extent: viewExtent,
       projection: viewProjection,
       zoom: 1.5, // TODO: Define scale factor depending on background sizing
-      maxZoom: fairmap.styling.maxZoom || 3,
+      maxZoom: fairmap.styling.maxZoom || 4,
     }),
   });
 
