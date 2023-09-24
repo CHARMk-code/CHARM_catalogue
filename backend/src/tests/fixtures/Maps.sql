@@ -1,5 +1,5 @@
-INSERT INTO maps (name, image, reference)
+INSERT INTO fair_maps (name, background, styling)
 VALUES
-  ('VOLVO 1', 'volvo1.svg',1),
-  ('VOLVO 2', 'volvo2.svg',2),
-  ('VOLVO 3', 'volvo3.svg',3);
+  ('VOLVO 1', 'volvo1.svg','{}'),
+  ('VOLVO 2', 'volvo2.svg','{}'),
+  ('VOLVO 3', 'volvo3.svg','{}');

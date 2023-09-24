@@ -20,7 +20,7 @@ use zip::{read::ZipFile, ZipArchive};
 
 use crate::{
     models::{
-        company::CompanyWeb, layout::LayoutWeb, map::MapWeb, prepage::PrepageWeb,
+        company::CompanyWeb, layout::LayoutWeb, map::FairMapWeb, prepage::PrepageWeb,
         shortcut::ShortcutWeb, tag::TagWeb,
     },
     services::{
@@ -63,7 +63,7 @@ pub struct ProcessedValues {
     pub tags: Vec<(TagWeb, Vec<PathBuf>)>,
     pub prepages: Vec<(PrepageWeb, Vec<PathBuf>)>,
     pub layouts: Vec<(LayoutWeb, Vec<PathBuf>)>,
-    pub maps: Vec<(MapWeb, Vec<PathBuf>)>,
+    pub maps: Vec<(FairMapWeb, Vec<PathBuf>)>,
     pub shortcuts: Vec<(ShortcutWeb, Vec<PathBuf>)>,
 }
 

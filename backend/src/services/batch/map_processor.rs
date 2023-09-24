@@ -4,11 +4,11 @@ use async_trait::async_trait;
 use calamine::DataType;
 
 use super::{
-    helper_functions::{value_to_file_path, value_to_i32, value_to_string},
+    helper_functions::{value_to_file_path, value_to_i32, value_to_string, value_to_json},
     BatchProcessError, XlsxSheetProcessor,
 };
 use crate::{
-    models::map::{MapWeb, RequiredField},
+    models::map::{FairMapWeb, RequiredField},
     services::map,
 };
 use sqlx::{Pool, Postgres};
@@ -17,7 +17,7 @@ pub struct MapProcessor();
 
 #[async_trait]
 impl XlsxSheetProcessor for MapProcessor {
-    type OutputType = MapWeb;
+    type OutputType = FairMapWeb;
     type RequiredField = RequiredField;
 
     async fn apply_to_database(
@@ -42,10 +42,8 @@ impl XlsxSheetProcessor for MapProcessor {
         match column_name {
             RequiredField::Id => row_struct.id = value_to_i32(value),
             RequiredField::Name => row_struct.name = value_to_string(value),
-            RequiredField::Image => {
-                row_struct.image = value_to_file_path(value, required_files, base_file_path)
-            }
-            RequiredField::Reference => row_struct.reference = value_to_i32(value),
+            RequiredField::Background => row_struct.background = value_to_string(value),
+            RequiredField::Styling => row_struct.styling = value_to_json(value),
         };
     }
 }

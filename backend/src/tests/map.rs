@@ -1,31 +1,31 @@
 use sqlx::{Error, Pool, Postgres};
-
+use serde_json::json;
 use crate::{
-    models::map::{MapDB, MapWeb},
+    models::map::{FairMapDB, FairMapWeb},
     services,
 };
 
-#[sqlx::test(fixtures("Maps"))]
+#[sqlx::test(fixtures("Fair_maps"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
-    let initial_db_map = MapDB {
+    let initial_db_fair_map = FairMapDB {
         id: 1,
         name: "VOLVO 1".to_string(),
-        image: "volvo1.svg".to_string(),
-        reference: 1,
+        background: "volvo1.svg".to_string(),
+        styling: json!({"maxZoom": 4}),
     };
 
     // What's tested
-    let result = services::map::get_by_id(&db, initial_db_map.id).await;
+    let result = services::map::get_by_id(&db, initial_db_fair_map.id).await;
     assert!(result.is_ok());
-    assert_eq!(initial_db_map, result.unwrap());
+    assert_eq!(initial_db_fair_map, result.unwrap());
     Ok(())
 }
 
 #[sqlx::test()]
 async fn get_by_id_when_no_matching_map_should_fail(db: Pool<Postgres>) -> Result<(), Error> {
     // Setup
-    let initial_row_amount = sqlx::query!("SELECT count(*) FROM maps")
+    let initial_row_amount = sqlx::query!("SELECT count(*) FROM fair_maps")
         .fetch_all(&db)
         .await?;
 
@@ -41,16 +41,16 @@ async fn get_by_id_when_no_matching_map_should_fail(db: Pool<Postgres>) -> Resul
     Ok(())
 }
 
-#[sqlx::test(fixtures("Maps"))]
+#[sqlx::test(fixtures("Fair_maps"))]
 async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_maps = services::map::get_all(&db).await.unwrap();
 
-    let new_map = MapWeb {
+    let new_map = FairMapWeb {
         id: None,
         name: Some("Scania".to_string()),
-        image: Some("scania.svg".to_string()),
-        reference: Some(2), // This should be nullable
+        background: Some("scania.svg".to_string()),
+        styling: Some(json!({"maxZoom": 4})), // This should be nullable
     };
 
     // What's tested
@@ -61,23 +61,23 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
     );
 
     let new_maps = services::map::get_all(&db).await.unwrap();
-    let new_created_map: &MapDB = new_maps
+    let new_created_map: &FairMapDB = new_maps
         .iter()
         .filter(|r| &r.id == created_query_result.as_ref().unwrap())
-        .collect::<Vec<&MapDB>>()
+        .collect::<Vec<&FairMapDB>>()
         .first()
         .unwrap();
-    let new_other_maps: Vec<MapDB> = new_maps
+    let new_other_maps: Vec<FairMapDB> = new_maps
         .iter()
         .cloned()
         .filter(|r| &r.id != created_query_result.as_ref().unwrap())
         .collect();
 
-    let expected_map = MapDB {
+    let expected_map = FairMapDB {
         id: created_query_result.unwrap(),
         name: "Scania".to_string(),
-        image: "scania.svg".to_string(),
-        reference: 2, // This should be nullable
+        background: "scania.svg".to_string(),
+        styling: json!({"maxZoom": 4}) // This should be nullable
     };
 
     assert_eq!(
@@ -97,7 +97,7 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
     Ok(())
 }
 
-#[sqlx::test(fixtures("Maps"))]
+#[sqlx::test(fixtures("Fair_maps"))]
 async fn valid_update_on_existing_map_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -108,13 +108,13 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     let initial_other_maps = initial_maps
         .iter()
         .filter(|r| r.id != initial_first_map.id)
-        .collect::<Vec<&MapDB>>();
+        .collect::<Vec<&FairMapDB>>();
 
-    let first_map_update = MapWeb {
+    let first_map_update = FairMapWeb {
         id: Some(initial_first_map.id),
         name: Some("Ljusgården".to_string()),
-        image: Some("ljusgården.svg".to_string()),
-        reference: None,
+        background: Some("ljusgården.svg".to_string()),
+        styling: Some(json!({"maxZoom": 3})),
     };
 
     // What's tested
@@ -141,15 +141,15 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     let updated_other_maps = updated_maps
         .iter()
         .filter(|r| r.id != initial_first_map.id)
-        .collect::<Vec<&MapDB>>();
+        .collect::<Vec<&FairMapDB>>();
 
     assert_eq!(
         updated_first_map,
-        MapDB {
+        FairMapDB {
             id: initial_first_map.id,
             name: "Ljusgården".to_string(),
-            image: "ljusgården.svg".to_string(),
-            reference: 1
+            background: "ljusgården.svg".to_string(),
+            styling: json!({"maxZoom": 3})
         },
         "The updated sure the map has been properly updated in the database"
     );
@@ -161,7 +161,7 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
     Ok(())
 }
 
-#[sqlx::test(fixtures("Maps"))]
+#[sqlx::test(fixtures("Fair_maps"))]
 async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -183,7 +183,7 @@ async fn delete_on_existing_id_should_remove_correct_row_in_db(
     );
 
     //Check that map has been removed
-    let remaining_map_rows = sqlx::query!("SELECT id FROM maps").fetch_all(&db).await?;
+    let remaining_map_rows = sqlx::query!("SELECT id FROM fair_maps").fetch_all(&db).await?;
     assert!(
         remaining_map_rows.iter().all(|r| r.id != removed_id),
         "Should not return removed id when querying remaining rows"

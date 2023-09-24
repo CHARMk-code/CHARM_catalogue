@@ -3,6 +3,7 @@ use std::{
     str::FromStr,
 };
 
+use serde_json::json;
 use calamine::DataType;
 use chrono::{DateTime, Utc};
 
@@ -16,6 +17,10 @@ pub fn value_to_string(value: &DataType) -> Option<String> {
 
 pub fn value_to_i32(value: &DataType) -> Option<i32> {
     value.as_i64().map(|v| v as i32)
+}
+
+pub fn value_to_json(value: &DataType) -> Option<serde_json::Value> {
+    serde_json::from_str(value.to_string().as_str()).ok()?
 }
 
 pub fn value_to_file_path(

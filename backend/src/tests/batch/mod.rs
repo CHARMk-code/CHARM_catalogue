@@ -2,10 +2,11 @@ use std::{collections::HashMap, fs, path::PathBuf};
 
 use chrono::DateTime;
 use sqlx::{Pool, Postgres};
+use serde_json::json;
 
 use crate::{
     models::{
-        company::CompanyDB, layout::LayoutDB, map::MapDB, prepage::PrepageDB, shortcut::ShortcutDB,
+        company::CompanyDB, layout::LayoutDB, map::FairMapDB, prepage::PrepageDB, shortcut::ShortcutDB,
         tag::TagDB,
     },
     services::{
@@ -210,29 +211,29 @@ async fn full_parsing_of_zip_file_should_populate_db(
 
     let expected_maps_amount = 4;
     let expected_maps = vec![
-        MapDB {
+        FairMapDB {
             id: 1,
             name: "SB".to_string(),
-            image: "SB.png".to_string(),
-            reference: 0,
+            background: "SB.png".to_string(),
+            styling: json!({"maxZoom": 3}),
         },
-        MapDB {
+        FairMapDB {
             id: 2,
             name: "SU2".to_string(),
-            image: "SU2.png".to_string(),
-            reference: 0,
+            background: "SU2.png".to_string(),
+            styling: json!({}),
         },
-        MapDB {
+        FairMapDB {
             id: 3,
             name: "SU1".to_string(),
-            image: "SU1.png".to_string(),
-            reference: 0,
+            background: "SU1.png".to_string(),
+            styling: json!({}),
         },
-        MapDB {
+        FairMapDB {
             id: 4,
             name: "SU3".to_string(),
-            image: "SU3.png".to_string(),
-            reference: 0,
+            background: "SU3.png".to_string(),
+            styling: json!({}),
         },
     ];
 
@@ -557,7 +558,7 @@ async fn full_parsing_of_zip_file_should_populate_db(
     );
 
     let map_tuple_iter = maps.iter().map(|c| c.name.clone()).zip(maps.iter());
-    let maps_set: HashMap<String, &MapDB> = HashMap::from_iter(map_tuple_iter);
+    let maps_set: HashMap<String, &FairMapDB> = HashMap::from_iter(map_tuple_iter);
 
     for expected_map in expected_maps.iter() {
         let option_map = maps_set.get(&expected_map.name).copied();
@@ -570,7 +571,7 @@ async fn full_parsing_of_zip_file_should_populate_db(
 
         let map = option_map.unwrap();
 
-        let actual_expected_map = &MapDB {
+        let actual_expected_map = &FairMapDB {
             id: map.id,
             ..expected_map.clone()
         };

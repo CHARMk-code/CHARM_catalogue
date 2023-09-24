@@ -2,7 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use sqlx::PgPool;
 
-use crate::models::map::MapWeb;
+use crate::models::map::FairMapWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
 
@@ -36,17 +36,16 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 async fn update_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<MapWeb>,
+    data: Json<FairMapWeb>,
 ) -> Result<impl Responder> {
     let input_map = data.into_inner();
 
     let response = match input_map.id {
         Some(_) => {
             let name = input_map.name.as_ref();
-            let image = input_map.image.as_ref();
-            let reference = input_map.reference.as_ref();
+            let background = input_map.background.as_ref();
 
-            if name.and(image).and(reference).is_none() {
+            if name.and(background).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
                 let map = services::map::update(&db, &input_map).await?;
@@ -66,7 +65,7 @@ async fn update_handler(
 async fn create_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<MapWeb>,
+    data: Json<FairMapWeb>,
 ) -> Result<impl Responder> {
     let input_map = data.into_inner();
     let affected_rows = services::map::create(&db, &input_map).await?;
