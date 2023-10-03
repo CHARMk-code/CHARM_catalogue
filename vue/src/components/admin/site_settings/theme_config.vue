@@ -64,7 +64,7 @@ function onSubmit() {
 
   // sending file to the backend
   axios
-    .post("/manage/upload", formData)
+    .post("/v2/image/", formData)
     .then((res) => {
       feedback.value = res.data;
       site_settingsStore.server_settings.theme.logo = fileName;

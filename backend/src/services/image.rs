@@ -37,7 +37,7 @@ pub async fn create(
         uuids.push(query_result.id);
 
         move_file(
-            upload_path.join(saved_file),
+            saved_file,
             storage_path.join(query_result.id.to_string()),
         )
         .await?;

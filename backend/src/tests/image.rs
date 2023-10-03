@@ -58,11 +58,16 @@ async fn creating_a_valid_image_file_should_create_row_in_db(
         create_dummy_file(&test_path, TEST_UPLOAD, image.as_os_str().to_str().unwrap())?;
     }
 
+    let new_image_paths: Vec<PathBuf> = new_images.iter().map(|new_image| test_path.join(TEST_UPLOAD).join(new_image)).collect();
+
+    println!("{:?}", new_image_paths);
+    println!("{:?}", new_images);
+
     // What's tested
     let created_query_result = services::image::create(
         &db,
         "images",
-        new_images,
+        new_image_paths,
         &test_path.join(TEST_UPLOAD),
         &test_path.join(TEST_STORAGE),
     )
