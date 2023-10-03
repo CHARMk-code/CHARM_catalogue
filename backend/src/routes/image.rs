@@ -18,8 +18,8 @@ use crate::{
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/image")
-            // .service(get_by_uuid_handler)
-            .service(get_by_name_handler),
+            .service(get_by_name_handler)
+            .service(create_handler)
     );
 }
 
