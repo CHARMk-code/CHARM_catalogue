@@ -243,7 +243,7 @@ async function save() {
         const formData = new FormData();
         formData.append("file", file);
         return axios
-          .post("/manage/upload", formData)
+          .post("/v2/image/", formData)
           .then(() => {
             rawRow[col.model] = file.name;
           })

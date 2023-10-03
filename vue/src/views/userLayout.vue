@@ -12,14 +12,11 @@
 
         <q-btn to="/" flat>
           <q-toolbar-title>
-            <img
+            <img 
               class="logo"
-              :src="
-                axios.defaults.baseURL +
-                '/manage/image/' +
-                useSite_settingsStore().server_settings.theme.logo
-              "
-            />
+              :src="axios.defaults.baseURL + '/v2/image/' + useSite_settingsStore().server_settings.theme.logo"
+
+            >
           </q-toolbar-title>
         </q-btn>
         <q-space></q-space>
@@ -203,7 +200,7 @@ function logout() {
 <style scoped>
 .logo {
   height: 40px;
-  padding: 6.5px 1px;
+  object-fit: contain;
 }
 .navigation {
   text-decoration: none;

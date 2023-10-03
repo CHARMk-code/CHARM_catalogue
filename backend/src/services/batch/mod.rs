@@ -310,7 +310,7 @@ async fn process_other_file(
     services::image::create(
         db,
         "images",
-        vec![Path::new(parent_dir).join(file_name)],
+        vec![upload_path.join(parent_dir).join(file_name)],
         upload_path,
         storage_path,
     )
