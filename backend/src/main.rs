@@ -79,6 +79,7 @@ mod errors {
     pub enum MyError {
         NotFound,
         SQLxError(sqlx::Error),
+        FileDeletionError
     }
 
     impl std::error::Error for MyError {}
@@ -89,7 +90,11 @@ mod errors {
                 MyError::NotFound => HttpResponse::NotFound().finish(),
                 MyError::SQLxError(ref err) => {
                     HttpResponse::InternalServerError().body(err.to_string())
-                } //_ => HttpResponse::InternalServerError().finish(),
+                }, 
+                MyError::FileDeletionError => {
+                    HttpResponse::InternalServerError().finish()
+                },
+                //_ => HttpResponse::InternalServerError().finish(),
             }
         }
     }
