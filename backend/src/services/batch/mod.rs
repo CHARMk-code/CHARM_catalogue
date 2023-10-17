@@ -144,8 +144,12 @@ pub async fn process_batch_zip(
                 processed_sheets.extend(new_processed_sheets);
             }
 
+            // Ignore files without extension
+            None => {},
+            
             // if not excel file handle it as such
             _ => {
+                println!("{:?}: {:?}",name, name.extension());
                 provided_files.push(process_other_file(file, upload_path, storage_path, db).await?)
             }
         };
@@ -315,16 +319,16 @@ async fn process_other_file(
 
     let mut full_path = file
         .enclosed_name()
-        .ok_or(BatchProcessError::FileNameError)?
+        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?
         .iter();
 
     let file_name = full_path
         .next_back()
-        .ok_or(BatchProcessError::FileNameError)?;
+        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?;
 
     let parent_dir = full_path
         .next_back()
-        .ok_or(BatchProcessError::FileNameError)?;
+        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?;
 
     let new_path = upload_path
         .join(Path::new(&parent_dir))
@@ -332,7 +336,7 @@ async fn process_other_file(
 
     let parent_as_string = parent_dir
         .to_str()
-        .ok_or(BatchProcessError::FileNameError)?
+        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?
         .to_lowercase();
 
     // Error if parent is not the name of a sheet
@@ -542,8 +546,10 @@ pub enum BatchProcessError {
         missing_files: Vec<PathBuf>,
     },
 
-    #[error("Error retrieving file name inside zip archive")]
-    FileNameError,
+    #[error("Error retrieving valid name to file '{file_name:?}' inside zip archive. Try renaming it")]
+    FileNameError {
+        file_name: String 
+    },
 
     #[error("The file dir (currently {name:?}) must be the same as the sheet using the file")]
     InvalidParentName { name: String },
