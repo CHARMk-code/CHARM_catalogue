@@ -52,6 +52,8 @@ export const useSite_settingsStore = defineStore("site_settings", {
           { text: "CHARMtalks", name: "CHARMtalks", active: true },
           { text: "Language", name: "language", active: true },
           { text: "Fair Areas", name: "fair_area", active: true },
+          { text: "Contacts", name: "contacts", active: true },
+          { text: "Trivia", name: "trivia", active: true },
         ],
       },
       theme: {
@@ -119,6 +121,31 @@ export const useSite_settingsStore = defineStore("site_settings", {
 
         resolve();
       });
+    },
+    resetCompanyCards() {
+      return new Promise<void>((resolve) => {
+      this.server_settings.company_view.cards = [
+          { text: "Logo", name: "logo", active: true },
+          { text: "Name", name: "name", active: true },
+          { text: "Description", name: "desc", active: true },
+          { text: "Did you know", name: "didyouknow", active: true },
+          { text: "Divisions", name: "tag_divisions", active: true },
+          { text: "Business Areas", name: "tag_business_areas", active: true },
+          { text: "Offering", name: "tag_offering", active: true },
+          { text: "Looking for", name: "tag_looking_for", active: true },
+          { text: "Website", name: "website", active: true },
+          { text: "Map", name: "map", active: true },
+          { text: "Summer job", name: "summerjob", active: true },
+          { text: "Notes", name: "notes", active: true },
+          { text: "CHARMtalks", name: "CHARMtalks", active: true },
+          { text: "Language", name: "language", active: true },
+          { text: "Fair Areas", name: "fair_area", active: true },
+          { text: "Contacts", name: "contacts", active: true },
+          { text: "Trivia", name: "trivia", active: true },
+      ]
+      this.saveSettings()
+      resolve()
+      })
     },
     consumeNext() {
       const temp = unref(this.session_settings.navigation.next);

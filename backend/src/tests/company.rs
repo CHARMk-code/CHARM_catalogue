@@ -36,6 +36,8 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         map_image: 0,
         booth_number: 15,
         tags: Some(vec![1, 2]),
+        founded: Some("2023".to_string()),
+        location: Some("Gothenburg".to_string()),
     };
 
     // What's tested
@@ -101,6 +103,8 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         map_image: Some(4),
         booth_number: Some(42),
         tags: Some([1, 2].to_vec()),
+        founded: Some("2023".to_string()),
+        location: Some("Gothenburg".to_string()),
     };
 
     // What's tested
@@ -146,6 +150,8 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         map_image: 4,
         booth_number: 42,
         tags: Some([1, 2].to_vec()),
+        founded: Some("2023".to_string()),
+        location: Some("Gothenburg".to_string()),
     };
 
     assert_eq!(
@@ -237,6 +243,8 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         map_image: None,
         booth_number: None,
         tags: Some(vec![3]),
+        founded: None,
+        location: None,
     };
 
     // What's tested
@@ -289,7 +297,9 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
             logo: "logo.png".to_string(),
             map_image: 0,
             booth_number: 15,
-            tags: Some(vec![3])
+            tags: Some(vec![3]),
+            founded: Some("2023".to_string()),
+            location: Some("Gothenburg".to_string()),
         },
         "The updated sure the company has been properly updated in the database"
     );

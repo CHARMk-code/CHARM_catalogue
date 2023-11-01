@@ -24,6 +24,8 @@ pub struct CompanyWeb {
     pub map_image: Option<i32>,
     pub booth_number: Option<i32>,
     pub tags: Option<Vec<i32>>,
+    pub location: Option<String>,
+    pub founded: Option<String>,
 }
 
 impl Default for CompanyWeb {
@@ -49,6 +51,8 @@ impl Default for CompanyWeb {
             map_image: Default::default(),
             booth_number: Default::default(),
             tags: Default::default(),
+            location: Default::default(),
+            founded: Default::default()
         }
     }
 }
@@ -74,6 +78,9 @@ pub enum RequiredField {
     Mapimage,
     Boothnumber,
     Tags,
+    Location,
+    Founded,
+
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -98,4 +105,6 @@ pub struct CompanyDB {
     pub map_image: i32,
     pub booth_number: i32,
     pub tags: Option<Vec<i32>>,
+    pub location: Option<String>,
+    pub founded: Option<String>,
 }

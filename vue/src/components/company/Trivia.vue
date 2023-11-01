@@ -1,22 +1,26 @@
 <template>
   <company_card_wrapper
-    v-if="!(talk_to_us_about == '' && sweden == -1 && world == -1)"
+    v-if="!(talkToUsAbout == '' && sweden == -1 && world == -1)"
     name="didyouknow"
   >
-    <q-card-section v-if="talk_to_us_about != ''">
+    <q-card-section v-if="talkToUsAbout != ''">
       <div class="text-h6">Did you know...</div>
       <div class="q-pb-sm">
-        <span class="text-bold">Talk to us about:</span>
-        {{ talk_to_us_about }}
+        {{ talkToUsAbout }}
       </div>
-      <div v-if="sweden != -1 || world != -1">
-        <span class="text-bold"> Employees: </span>
-        <span v-if="sweden != -1">{{ sweden }} in Sweden</span>
-        <span v-if="sweden != -1 && world != -1"> and </span>
-        <span v-if="world != -1">{{ world }} in the world</span>.
+      <div v-if="location" class="q-pb-sm">
+          <span class="text-bold"> We have</span> offices in {{ location }}
+      </div>
+      <div v-if="sweden != -1" class="q-pb-sm">
+        <span class="text-bold">We have</span> {{ sweden }} employees in Sweden
+      </div>
+      <div v-if="world != -1" class="q-pb-sm">
+        <span class="text-bold">We have</span> {{ world }} employees worldwide
+      </div>
+      <div v-if="founded" class="q-pb-sm">
+        <span class="text-bold"> We were</span> founded in {{ founded }}
       </div>
     </q-card-section>
-    <q-card-section v-if="world != -1"> </q-card-section>
   </company_card_wrapper>
 </template>
 
@@ -27,5 +31,7 @@ defineProps<{
   talkToUsAbout: string;
   sweden: number;
   world: number;
+  founded: number;
+  location: string;
 }>();
 </script>

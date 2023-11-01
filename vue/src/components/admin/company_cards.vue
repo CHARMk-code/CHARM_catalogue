@@ -12,7 +12,7 @@
         v-model="selected"
         filled
         :options="company_cards"
-        option-label="name"
+        option-label="text"
         option-value="id"
         label="Select the elements that should be visible for users"
         multiple

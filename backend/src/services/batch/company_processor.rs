@@ -43,6 +43,7 @@ impl XlsxSheetProcessor for CompanyProcessor {
         file_base_path: &Path,
     ) {
         match column_name {
+            RequiredField::Id => {}
             RequiredField::Active => row_struct.active = value_to_bool(value),
             RequiredField::Charmtalk => row_struct.charmtalk = value_to_bool(value),
             RequiredField::Name => row_struct.name = value_to_string(value),
@@ -69,7 +70,8 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Mapimage => row_struct.map_image = value_to_i32(value),
             RequiredField::Boothnumber => row_struct.booth_number = value_to_i32(value),
             RequiredField::Tags => row_struct.tags = value_to_vec::<i32>(value),
-            _ => (),
+            RequiredField::Founded => row_struct.founded = value_to_string(value),
+            RequiredField::Location => row_struct.location = value_to_string(value),
         };
     }
 }

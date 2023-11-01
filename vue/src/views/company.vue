@@ -58,6 +58,7 @@ import { useTagsStore } from "@/stores/modules/tags";
 import { useMapsStore } from "@/stores/modules/maps";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useQuasar } from "quasar";
+import dayjs from "dayjs";
 
 const filterStore = useFilterStore();
 const prepagesStore = usePrepagesStore();
@@ -162,7 +163,10 @@ function renderCompanyCards() {
         name: "summerjob",
         desc: company.value.summer_job_description,
         link: company.value.summer_job_link,
-        deadline: company.value.summer_job_deadline,
+        deadline: dayjs(company.value.summer_job_deadline,
+                  "DD MMM YYYY HH:mm:ss",
+                  false
+                ).format("YYYY-MM-DD"),
       });
       addComponent("right", vnode);
     }
@@ -187,6 +191,8 @@ function renderCompanyCards() {
         talkToUsAbout: company.value.talk_to_us_about,
         sweden: company.value.employees_sweden,
         world: company.value.employees_world,
+        founded: company.value.founded,
+        location: company.value.location,
       });
       addComponent("right", vnode);
     }

@@ -33,6 +33,8 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
     let map_image = is_valid_required_field(&data.map_image)?;
     let booth_number = is_valid_required_field(&data.booth_number)?;
     let tags = is_valid_required_field(&data.tags)?;
+    let founded = is_valid_required_field(&data.founded)?;
+    let location = is_valid_required_field(&data.location)?;
 
     //check that tags exist, fail if not
     struct QueryReturn {
@@ -52,8 +54,8 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
         ));
     };
 
-    let create_company_query_result = sqlx::query!("INSERT INTO companies (last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) returning id",
-last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number)
+    let create_company_query_result = sqlx::query!("INSERT INTO companies (last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number, founded, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) returning id",
+last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number, founded, location)
         .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     let new_company_id = create_company_query_result.id;
@@ -114,6 +116,8 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
     let logo = data.logo.as_ref();
     let map_image = data.map_image.as_ref();
     let booth_number = data.booth_number.as_ref();
+    let founded = data.founded.as_ref();
+    let location = data.location.as_ref();
 
     //check that updated tags exist, fail if not
     struct QueryReturn {
@@ -134,7 +138,7 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
     };
 
     let query_result =
-        sqlx::query!("UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, summer_job_description = $7, summer_job_link = $8, summer_job_deadline = $9, contacts = $10, contact_email = $11, employees_world = $12, employees_sweden = $13, website = $14, talk_to_us_about = $15, logo = $16, map_image = $17, booth_number = $18 where id = $19 returning id",
+        sqlx::query!("UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, summer_job_description = $7, summer_job_link = $8, summer_job_deadline = $9, contacts = $10, contact_email = $11, employees_world = $12, employees_sweden = $13, website = $14, talk_to_us_about = $15, logo = $16, map_image = $17, booth_number = $18, founded = $19, location = $20 where id = $21 returning id",
             if last_updated.is_some() {last_updated.unwrap()} else {company.last_updated},
             if active.is_some() {active.unwrap()} else {&company.active},
             if charmtalk.is_some() {charmtalk.unwrap()} else {&company.charmtalk},
@@ -153,6 +157,8 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
             if logo.is_some() {logo.unwrap()} else {&company.logo},
             if map_image.is_some() {map_image.unwrap()} else {&company.map_image},
             if booth_number.is_some() {booth_number.unwrap()} else {&company.booth_number},
+            if founded.is_some() {founded} else {company.founded.as_ref()},
+            if location.is_some() {location} else {company.location.as_ref()},
             data.id)
         .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
@@ -255,6 +261,7 @@ pub async fn get_by_id(db: &Pool<Postgres>, id: i32) -> Result<CompanyDB, actix_
     .await
     .map_err(MyError::SQLxError)?;
 
+    println!("{:?}", query_result);
     Ok(CompanyDB {
         tags: Some(query_result.tags.unwrap_or(Vec::new())),
         ..query_result
