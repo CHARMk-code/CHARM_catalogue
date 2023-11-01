@@ -39,7 +39,7 @@
             round
             size="sm"
             icon="mdi-pencil"
-            @click="editRow(props.rowIndex)"
+            @click="editRow(props.row.id)"
           >
           </q-btn>
           <q-btn
@@ -47,7 +47,7 @@
             round
             size="sm"
             icon="mdi-delete"
-            @click="deleteRow(props.rowIndex)"
+            @click="deleteRow(props.row.id)"
           >
           </q-btn>
         </div>
@@ -154,16 +154,18 @@ const editDialog = ref(false);
 const deleteDialog = ref(false);
 const newRow = ref(false);
 
-function editRow(index: number) {
-  clickedRow.value.row = props.rows[index];
-  clickedRow.value.meta = props.metaRows ? props.metaRows[index] : {};
+function editRow(id: number) {
+  const rowIndex = props.rows.findIndex((row) => row.id === id);
+  clickedRow.value.row = props.rows[rowIndex]
+  clickedRow.value.meta = props.metaRows ? props.metaRows[rowIndex] : {};
   newRow.value = false;
   editDialog.value = true;
 }
 
-function deleteRow(index: number) {
-  clickedRow.value.row = props.rows[index];
-  clickedRow.value.meta = props.metaRows ? props.metaRows[index] : {};
+function deleteRow(id: number) {
+  const rowIndex = props.rows.findIndex((row) => row.id === id);
+  clickedRow.value.row = props.rows[rowIndex];
+  clickedRow.value.meta = props.metaRows ? props.metaRows[rowIndex] : {};
   deleteDialog.value = true;
 }
 
