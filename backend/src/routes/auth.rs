@@ -12,14 +12,15 @@ use crate::{
     models::user::{UserLoginWeb, UserWeb},
     services::{
         self,
-        auth::{create_user, AuthedUser},
+        auth::{create_user,update_user, AuthedUser},
     },
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/auth").service(get_token), // .service(register_handler)
-                                                // .service(update_password_handler),
+        web::scope("/auth")
+        .service(get_token)                                
+        .service(update_password_handler),
     );
 }
 
@@ -63,18 +64,39 @@ async fn get_token(
     Ok(HttpResponse::Unauthorized().into())
 }
 
-// #[put("/")]
-// async fn update_password_handler(
-//     _db: web::Data<PgPool>,
-//     _user: AuthedUser,
-// ) -> Result<impl Responder> {
-//     Ok(HttpResponse::Ok())
-// }
-//
-// #[get("/")]
-// async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, config: web::Data<Config>, data: Json<UserWeb>) -> Result<impl Responder> {
-//
-//     let user_id = services::auth::create_user(&db, data.into_inner(), salt).await?;
-//
-//     Ok(HttpResponse::Ok().json(user_id))
-// }
+ #[put("/")]
+ async fn update_password_handler(
+     db: web::Data<PgPool>,
+     user: AuthedUser,
+     config: web::Data<Config>,
+     data: Json<UserWeb>
+ ) -> Result<impl Responder> {
+    let salt: &[u8] = config.password_salt.as_bytes();
+
+    let possible_user = services::auth::get_user(db.as_ref()).await;
+
+    match possible_user {
+        Ok(user) => {
+         Ok(HttpResponse::Ok().json(
+            update_user(
+                &db,
+                UserWeb{
+                    password: data.password.clone()
+                },
+                salt,
+            )
+            .await?
+        ))
+        },
+        Err(..) => Ok(HttpResponse::NotFound().into())
+    }
+ }
+
+ /*#[get("/")]
+ async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, config: web::Data<Config>, data: Json<UserWeb>) -> Result<impl Responder> {
+
+     let user_id = services::auth::create_user(&db, data.into_inner(), salt).await?;
+
+     Ok(HttpResponse::Ok().json(user_id))
+ }
+*/
