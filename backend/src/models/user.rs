@@ -7,7 +7,7 @@ pub struct UserLoginWeb {
 
 // NOTE: Currently the same as UserLoginWeb but with more sofisticated accounts a user
 // will be more than a password and most likely more than what's needed for login
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub struct UserWeb {
     pub password: String,
 }
