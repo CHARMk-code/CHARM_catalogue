@@ -33,8 +33,8 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
     let map_image = is_valid_required_field(&data.map_image)?;
     let booth_number = is_valid_required_field(&data.booth_number)?;
     let tags = is_valid_required_field(&data.tags)?;
-    let founded = is_valid_required_field(&data.founded)?;
-    let location = is_valid_required_field(&data.location)?;
+    let founded = is_optional_field_or_default(&data.founded, "".to_string())?;
+    let location = is_optional_field_or_default(&data.location, "".to_string())?;
 
     //check that tags exist, fail if not
     struct QueryReturn {
