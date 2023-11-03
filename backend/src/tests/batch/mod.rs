@@ -55,7 +55,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "AFRY-Logotype-Horizontal_Explainer_Black_ac97e95afec665f301d8e16073c76b74.svg".to_string(),
             map_image:  3,
             booth_number:  225,
-            tags: Some(vec![7,4,2,3,6,9,11,13,16,20,19,17,21,22,23,25,26,27,28,40])
+            tags: Some(vec![7,4,2,3,6,9,11,13,16,20,19,17,21,22,23,25,26,27,28,40]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
             },
             CompanyDB {
             id:  17,
@@ -77,7 +79,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "bg_positiv_cmyk_19faf3f62c7fdae75db3f0d417a778e3.svg".to_string(),
             map_image:  1,
             booth_number:  10,
-            tags: Some(vec![4,2,3,16,17,21,22,23,27,28,29,37])
+            tags: Some(vec![4,2,3,16,17,21,22,23,27,28,29,37]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
             },
             CompanyDB {
             id:  44,
@@ -99,7 +103,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "EasyMining_logotyp_tagline_v2_1a76e258d0006e1784af09ef4b46c046.svg".to_string(),
             map_image:  1,
             booth_number:  8,
-            tags: Some(vec![4,2,3,9,16,20,19,17,22,23,25,24,28,29,31])
+            tags: Some(vec![4,2,3,9,16,20,19,17,22,23,25,24,28,29,31]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
             },
             CompanyDB {
             id:  53,
@@ -121,7 +127,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "Eurocon_st_ende_logo_RGB_48d8bf504493ca3f3c8847cb0c20a328.svg".to_string(),
             map_image:  1,
             booth_number:  41,
-            tags: Some(vec![7,4,2,3,6,9,8,12,11,15,13,16,20,19,17,21,22,23,27,28,29,32])
+            tags: Some(vec![7,4,2,3,6,9,8,12,11,15,13,16,20,19,17,21,22,23,27,28,29,32]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
             },
             CompanyDB {
             id:  94,
@@ -143,8 +151,11 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "logga_h_guppl_st_e530f618058a728a4b8515f7df9e6790.svg".to_string(),
             map_image:  3,
             booth_number:  251,
-            tags: Some(vec![4,3,9,13,16,19,17,22,23,28,29,31])
-            },           CompanyDB {
+            tags: Some(vec![4,3,9,13,16,19,17,22,23,28,29,31]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
+            },           
+            CompanyDB {
             id:  109,
             last_updated:  DateTime::parse_from_str("2023-08-07T15:11:57.825Z", "%+").unwrap().into(),
             active:  true,
@@ -164,7 +175,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
             logo:  "Preem_logo_RGB_d93952d1ac9a9e5f4fc65feb0935bdc5.svg".to_string(),
             map_image:  2,
             booth_number:  111,
-            tags: Some(vec![4,2,3,9,15,16,20,19,17,22,28,40])
+            tags: Some(vec![4,2,3,9,15,16,20,19,17,22,28,40]),
+            founded: Some("".to_string()),
+            location: Some("".to_string())
             },
     ];
 
