@@ -4,7 +4,7 @@
     name="didyouknow"
   >
     <q-card-section v-if="talkToUsAbout != ''">
-      <div class="text-h6">Did you know...</div>
+      <div class="text-h6">Company</div>
       <div class="q-pb-sm">
         {{ talkToUsAbout }}
       </div>
