@@ -149,10 +149,10 @@ function renderCompanyCards() {
       });
       addComponent("right", vnode);
     }
-    // What makes us special
+    // Talk to us about
     if (isVisible("desc")) {
       const vnode = h(Textblock, {
-        title: "What Makes Us Special",
+        title: "Talk to us about",
         body: company.value.unique_selling_point,
       });
       addComponent("right", vnode);
