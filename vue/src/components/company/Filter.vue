@@ -39,7 +39,7 @@
       clickable
       @click="clearCharmtalk()"
     >
-      CHARMtalk
+      Speakers Week
     </q-chip>
     <TagGroup :tags="tags" :removeable="true" @tag-click="removeTag"></TagGroup>
   </div>
