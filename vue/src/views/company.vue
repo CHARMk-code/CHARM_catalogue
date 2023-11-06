@@ -6,8 +6,7 @@
           setNextRoute();
           setPrevRoute();
         }
-      "
-    />
+      " />
     <div v-if="company != undefined && company.active" class="row">
       <Logo class="col-12 col-md-6" :src="company.logo" />
 
@@ -155,7 +154,7 @@ function renderCompanyCards() {
         title: "Talk to us about",
         body: company.value.unique_selling_point,
       });
-      addComponent("right", vnode);
+      addComponent("left", vnode);
     }
     // Summerjob
     if (isVisible("summerjob")) {
@@ -194,7 +193,7 @@ function renderCompanyCards() {
         founded: company.value.founded,
         location: company.value.location,
       });
-      addComponent("right", vnode);
+      addComponent("left", vnode);
     }
     // Notes
     if (isVisible("notes")) {
