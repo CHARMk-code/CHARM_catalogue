@@ -11,8 +11,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         web::scope("/feedback")
             .service(get_all_handler)
             .service(get_by_id_handler)
-            .service(update_handler)
-            .service(create_handler)
+            .service(create_user_handler)
+            .service(update_admin_handler)
             .service(delete_handler),
     );
 }
@@ -32,8 +32,8 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
     Ok(HttpResponse::Ok().json(feedback))
 }
 
-#[put("/")]
-async fn update_handler(
+#[put("/admin")]
+async fn update_admin_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
     data: Json<FeedbackWeb>,
@@ -74,16 +74,15 @@ async fn update_handler(
     Ok(response)
 }
 
-#[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(
-    _user: AuthedUser,
+#[put("/user")]
+async fn create_user_handler(
     db: web::Data<PgPool>,
     data: Json<FeedbackWeb>,
 ) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
-    let affected_rows = services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
-
-    Ok(HttpResponse::Created().json(affected_rows))
+    let feedback =
+        services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
+    Ok(HttpResponse::Created().json(feedback))
 }
 
 #[delete("/{id}")]

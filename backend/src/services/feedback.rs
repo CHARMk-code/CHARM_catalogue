@@ -10,10 +10,10 @@ use super::is_valid_required_field;
 pub async fn create(db: Pool<Postgres>, data: FeedbackWeb) -> Result<i32, actix_web::Error> {
     let title = is_valid_required_field(&data.title)?;
     let text = is_valid_required_field(&data.text)?;
-    let meta = is_valid_required_field(&data.meta)?;
-    let received = is_valid_required_field(&data.received)?;
-    let important = is_valid_required_field(&data.important)?;
-    let archived = is_valid_required_field(&data.archived)?;
+    let meta = is_valid_required_field(&data.meta).unwrap_or("".to_string());
+    let received = is_valid_required_field(&data.received).unwrap_or(chrono::offset::Utc::now());
+    let important = is_valid_required_field(&data.important).unwrap_or(false);
+    let archived = is_valid_required_field(&data.archived).unwrap_or(false);
 
     let query_result = sqlx::query!("INSERT INTO feedback (title, text, meta, received, important, archived) VALUES ($1, $2, $3, $4, $5, $6) returning id;",
 title, text, meta, received, important, archived)
