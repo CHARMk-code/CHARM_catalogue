@@ -42,8 +42,8 @@ impl XlsxSheetProcessor for MapProcessor {
         match column_name {
             RequiredField::Id => row_struct.id = value_to_i32(value),
             RequiredField::Name => row_struct.name = value_to_string(value),
-            RequiredField::Background => row_struct.background = value_to_string(value),
-            RequiredField::Styling => row_struct.styling = value_to_json(value),
+            RequiredField::Background => row_struct.background = value_to_file_path(value, required_files, base_file_path),
+            RequiredField::MapData => row_struct.map_data = value_to_json(value),
         };
     }
 }

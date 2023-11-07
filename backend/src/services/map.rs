@@ -2,7 +2,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     errors::MyError,
-    models::map::{MapGeomartyDB, FairMapDB, FairMapWeb},
+    models::map::{FairMapDB, FairMapWeb},
 };
 
 use super::{is_optional_field_or_default, is_valid_required_field};
@@ -10,13 +10,13 @@ use super::{is_optional_field_or_default, is_valid_required_field};
 pub async fn create(db: &Pool<Postgres>, data: &FairMapWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;
     let background = is_valid_required_field(&data.background)?;
-    let styling = is_valid_required_field(&data.styling)?;
+    let map_data = is_valid_required_field(&data.map_data)?;
 
     let query_result = sqlx::query!(
-        "INSERT INTO fair_maps (name, background, styling) VALUES ($1, $2, $3) returning id;",
+        "INSERT INTO fair_maps (name, background, map_data) VALUES ($1, $2, $3) returning id;",
         name,
         background,
-        styling
+        map_data
     )
     .fetch_one(db)
     .await
@@ -37,10 +37,10 @@ pub async fn update(db: &Pool<Postgres>, data: &FairMapWeb) -> Result<i32, actix
 
     let name = data.name.as_ref();
     let background = data.background.as_ref();
-    let styling = data.styling.as_ref();
+    let map_data = data.map_data.as_ref();
 
     let query_result = sqlx::query!(
-        "UPDATE fair_maps SET name = $1, background = $2, styling = $3 where id = $4 returning id",
+        "UPDATE fair_maps SET name = $1, background = $2, map_data = $3 where id = $4 returning id",
         if name.is_some() {
             name.unwrap()
         } else {
@@ -51,10 +51,10 @@ pub async fn update(db: &Pool<Postgres>, data: &FairMapWeb) -> Result<i32, actix
         } else {
             &map.background
         },
-        if styling.is_some() {
-            styling.unwrap()
+        if map_data.is_some() {
+            map_data.unwrap()
         } else {
-            &map.styling
+            &map.map_data
         },
         data.id
     )
@@ -66,12 +66,6 @@ pub async fn update(db: &Pool<Postgres>, data: &FairMapWeb) -> Result<i32, actix
 }
 
 pub async fn delete(db: &Pool<Postgres>, id: i32) -> Result<u64, actix_web::Error> {
-    let sub_result = sqlx:: query!("DELETE FROM map_geomarty WHERE map_ref = $1", id)
-        // TODO: Do proper error handling
-        .execute(db)
-        .await
-        .map_err(MyError::SQLxError)?;
-
     let query_result = sqlx::query!("DELETE FROM fair_maps WHERE id = $1", id)
         .execute(db)
         .await

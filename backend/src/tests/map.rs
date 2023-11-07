@@ -12,7 +12,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         id: 1,
         name: "VOLVO 1".to_string(),
         background: "volvo1.svg".to_string(),
-        styling: json!({"maxZoom": 4}),
+        map_data: json!({"maxZoom": 4}),
     };
 
     // What's tested
@@ -50,7 +50,7 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
         id: None,
         name: Some("Scania".to_string()),
         background: Some("scania.svg".to_string()),
-        styling: Some(json!({"maxZoom": 4})), // This should be nullable
+        map_data: Some(json!({"maxZoom": 4})), // This should be nullable
     };
 
     // What's tested
@@ -77,7 +77,7 @@ async fn creating_a_valid_map_should_create_row_in_db(db: Pool<Postgres>) -> Res
         id: created_query_result.unwrap(),
         name: "Scania".to_string(),
         background: "scania.svg".to_string(),
-        styling: json!({"maxZoom": 4}) // This should be nullable
+        map_data: json!({"maxZoom": 4}) // This should be nullable
     };
 
     assert_eq!(
@@ -114,7 +114,7 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
         id: Some(initial_first_map.id),
         name: Some("Ljusgården".to_string()),
         background: Some("ljusgården.svg".to_string()),
-        styling: Some(json!({"maxZoom": 3})),
+        map_data: Some(json!({"maxZoom": 3})),
     };
 
     // What's tested
@@ -149,7 +149,7 @@ async fn valid_update_on_existing_map_should_update_row_in_db(
             id: initial_first_map.id,
             name: "Ljusgården".to_string(),
             background: "ljusgården.svg".to_string(),
-            styling: json!({"maxZoom": 3})
+            map_data: json!({"maxZoom": 3})
         },
         "The updated sure the map has been properly updated in the database"
     );

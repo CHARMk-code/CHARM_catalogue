@@ -215,25 +215,25 @@ async fn full_parsing_of_zip_file_should_populate_db(
             id: 1,
             name: "SB".to_string(),
             background: "SB.png".to_string(),
-            styling: json!({"maxZoom": 3}),
+            map_data: json!({"maxZoom": 3}),
         },
         FairMapDB {
             id: 2,
             name: "SU2".to_string(),
             background: "SU2.png".to_string(),
-            styling: json!({}),
+            map_data: json!({}),
         },
         FairMapDB {
             id: 3,
             name: "SU1".to_string(),
             background: "SU1.png".to_string(),
-            styling: json!({}),
+            map_data: json!({}),
         },
         FairMapDB {
             id: 4,
             name: "SU3".to_string(),
             background: "SU3.png".to_string(),
-            styling: json!({}),
+            map_data: json!({}),
         },
     ];
 
