@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "TRUNCATE blobs, companies, companies_tags, company_cards, files, layouts, maps, prepages, shortcuts, tags",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "385a2f336a04b5e10a79989ce343f354a381222360b4537ae45aea4131f9f857"
+}

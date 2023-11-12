@@ -100,6 +100,16 @@
       },
       {
         "ordinal": 19,
+        "name": "founded",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 20,
+        "name": "location",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 21,
         "name": "tags",
         "type_info": "Int4Array"
       }
@@ -129,6 +139,8 @@
       false,
       false,
       false,
+      true,
+      true,
       null
     ]
   },
