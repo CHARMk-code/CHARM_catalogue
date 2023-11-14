@@ -151,7 +151,7 @@ const checkbox_options = computed(() => {
   if (!isVisible("favorites"))
     tmp.push({ label: "Favorites", value: "favorites" });
   if (!isVisible("charmtalk"))
-    tmp.push({ label: "Attending CHARMtalks", value: "charmtalk" });
+    tmp.push({ label: "Attending Speakers Week", value: "charmtalk" });
   if (!isVisible("sweden")) tmp.push({ label: "Sweden", value: "sweden" });
   return tmp;
 });
