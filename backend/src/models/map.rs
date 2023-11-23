@@ -27,7 +27,7 @@ pub enum RequiredField {
     Id,
     Name,
     Background,
-    MapData
+    Mapdata,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]

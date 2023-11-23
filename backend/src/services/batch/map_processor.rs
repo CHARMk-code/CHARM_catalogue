@@ -49,7 +49,7 @@ impl XlsxSheetProcessor for MapProcessor {
             RequiredField::Background => {
                 row_struct.background = value_to_file_path(value, required_files, base_file_path)
             }
-            RequiredField::MapData => row_struct.map_data = value_to_json(value),
+            RequiredField::Mapdata => row_struct.map_data = value_to_json(value),
         };
     }
 
