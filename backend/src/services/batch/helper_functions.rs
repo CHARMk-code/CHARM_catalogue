@@ -3,7 +3,6 @@ use std::{
     str::FromStr,
 };
 
-use serde_json::json;
 use calamine::DataType;
 use chrono::{DateTime, Utc};
 
@@ -49,4 +48,70 @@ pub fn value_to_vec<T: FromStr>(value: &DataType) -> Option<Vec<T>> {
 
 pub fn value_to_chrono_date(value: &DataType) -> Option<DateTime<Utc>> {
     value.as_datetime().map(|naive_dt| naive_dt.and_utc())
+}
+
+
+#[macro_export]
+macro_rules! get_column_in_sheet {
+    ($all_values:expr, $sheet:ident, $column:ident) => {
+        $all_values.$sheet.rows.iter().map(|(row, _)| row.$column.clone())
+    };
+}
+
+#[macro_export]
+macro_rules! get_id_mapper {
+    ($original_values:expr, $updated_values:expr, $sheet:ident, $column:ident) => {{
+        let uploaded_ids = get_column_in_sheet!($original_values, $sheet, $column).flatten();
+        let db_ids = get_column_in_sheet!($updated_values, $sheet, $column).flatten();
+
+        uploaded_ids.zip(db_ids).collect()
+    }};
+}
+
+#[macro_export]
+macro_rules! update_id_values {
+    ($id_mapper:expr, $updated_values:expr, $sheet:ident, $column:ident) => {
+        $updated_values
+            .$sheet
+            .rows
+            .iter_mut()
+            .try_for_each(|(value, _)| {
+                let original_id =
+                    value
+                        .$column
+                        .ok_or(BatchProcessError::ForeignKeyUpdateFailed {
+                            key_sheet: stringify!($sheet).to_string(),
+                            key_column: stringify!($column).to_string(),
+                        })?;
+                let updated_id = $id_mapper.get(&original_id).cloned();
+                value.map_image = updated_id;
+                Ok(())
+            })
+    };
+}
+
+#[macro_export]
+macro_rules! update_vec_id_values {
+    ($id_mapper:expr, $updated_values:expr, $sheet:ident, $column:ident) => {
+        $updated_values
+            .$sheet
+            .rows
+            .iter_mut()
+            .try_for_each(|(value, _)| {
+                let original_ids =
+                    value
+                        .$column 
+                        .clone()
+                        .ok_or(BatchProcessError::ForeignKeyUpdateFailed {
+                            key_sheet: stringify!($sheet).to_string(),
+                            key_column: stringify!($column).to_string(),
+                        })?;
+                let updated_ids: Option<Vec<i32>> = original_ids
+                    .iter()
+                    .map(|id| $id_mapper.get(id).cloned())
+                    .collect();
+                value.tags = updated_ids;
+                Ok(())
+            })
+    };
 }

@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    collections::{HashMap, HashSet},
+    path::{Path, PathBuf},
+};
 
 use async_trait::async_trait;
 use calamine::DataType;
@@ -9,11 +12,13 @@ use super::{
         value_to_bool, value_to_chrono_date, value_to_file_path, value_to_i32, value_to_string,
         value_to_vec,
     },
-    BatchProcessError, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
 };
 use crate::{
+    get_column_in_sheet, get_id_mapper,
     models::company::{CompanyWeb, RequiredField},
     services::company,
+    update_id_values, update_vec_id_values,
 };
 
 pub struct CompanyProcessor();
@@ -22,18 +27,6 @@ pub struct CompanyProcessor();
 impl XlsxSheetProcessor for CompanyProcessor {
     type OutputType = CompanyWeb;
     type RequiredField = RequiredField;
-
-    async fn apply_to_database(
-        db: &Pool<Postgres>,
-        row: &Self::OutputType,
-    ) -> Result<i32, BatchProcessError> {
-        Ok(company::create(db, row).await.map_err(|source| {
-            BatchProcessError::ApplyToDatabaseError {
-                source,
-                row: format!("{:?}", row),
-            }
-        })?)
-    }
 
     fn set_struct_value(
         column_name: &Self::RequiredField,
@@ -71,5 +64,84 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Tags => row_struct.tags = value_to_vec::<i32>(value),
             _ => (),
         };
+    }
+
+    async fn apply_to_database(
+        db: &Pool<Postgres>,
+        row: &Self::OutputType,
+    ) -> Result<Self::OutputType, BatchProcessError> {
+        let mut inserted_row = row.clone();
+
+        inserted_row.id = Some(company::create(db, row).await.map_err(|source| {
+            BatchProcessError::ApplyToDatabaseError {
+                source,
+                row: format!("{:?}", row),
+            }
+        })?);
+
+        Ok(inserted_row)
+    }
+
+    fn check_foreign_key_deps(processed_values: &ProcessedSheets) -> Result<(), BatchProcessError> {
+        // check that map ids referenced in company map_image are a subset of available maps
+        let valid_map_ids: HashSet<i32> = get_column_in_sheet!(processed_values, maps, id)
+            .flatten()
+            .collect();
+        let used_map_ids: HashSet<i32> =
+            get_column_in_sheet!(processed_values, companies, map_image)
+                .flatten()
+                .collect();
+
+        if valid_map_ids.is_superset(&used_map_ids) {
+            return Err(BatchProcessError::InvalidForeignKey {
+                valid_key_sheet: "maps".to_string(),
+                valid_key_column: "id".to_string(),
+                used_key_sheet: "companies".to_string(),
+                used_key_column: "map_image".to_string(),
+            });
+        }
+
+        // check that tags referenced in companies are a subset of available tags
+        let valid_tag_ids: HashSet<i32> = get_column_in_sheet!(processed_values, tags, id)
+            .flatten()
+            .collect();
+        let used_tag_ids: HashSet<i32> = get_column_in_sheet!(processed_values, companies, tags)
+            .flatten()
+            .flatten()
+            .collect();
+        if valid_tag_ids.is_superset(&used_tag_ids) {
+            return Err(BatchProcessError::InvalidForeignKey {
+                valid_key_sheet: "tags".to_string(),
+                valid_key_column: "id".to_string(),
+                used_key_sheet: "companies".to_string(),
+                used_key_column: "tags".to_string(),
+            });
+        }
+
+        Ok(())
+    }
+
+    fn update_foreign_keys<'a>(
+        updated_values: &'a mut ProcessedSheets,
+        original_values: &ProcessedSheets,
+    ) -> Result<&'a mut ProcessedSheets, BatchProcessError> {
+        if updated_values.maps.process_stage == ProcessStage::Finished
+            && updated_values.tags.process_stage == ProcessStage::Finished
+        {
+            // Try updating map_image id to db values
+            let map_id_mapper: HashMap<i32, i32> =
+                get_id_mapper!(original_values, updated_values, maps, id);
+            update_id_values!(map_id_mapper, updated_values, companies, id)?;
+
+            // Try updating tag ids to db values
+            let tag_id_mapper: HashMap<i32, i32> =
+                get_id_mapper!(original_values, updated_values, tags, id);
+
+            update_vec_id_values!(tag_id_mapper, updated_values, companies, tags)?;
+
+            updated_values.companies.process_stage = ProcessStage::ForeignKeysUpdated
+        }
+
+        Ok(updated_values)
     }
 }
