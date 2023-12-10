@@ -11,7 +11,7 @@ use crate::{
 
 use super::{
     helper_functions::{value_to_bool, value_to_file_path, value_to_i32},
-    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheet, ProcessedSheets, XlsxSheetProcessor,
 };
 
 pub struct LayoutProcessor();
@@ -54,15 +54,20 @@ impl XlsxSheetProcessor for LayoutProcessor {
         };
     }
 
-    fn check_foreign_key_deps(_processed_values: &ProcessedSheets) -> Result<(), BatchProcessError> {
+    fn check_foreign_key_deps(
+        _processed_values: &ProcessedSheets,
+    ) -> Result<(), BatchProcessError> {
         Ok(())
     }
 
-    fn update_foreign_keys<'a>(
-        updated_values: &'a mut ProcessedSheets,
+    fn update_foreign_keys(
+        updated_values: &mut ProcessedSheets,
         _original_values: &ProcessedSheets,
-    ) -> Result<&'a mut ProcessedSheets, BatchProcessError> {
+    ) -> Result<(), BatchProcessError> {
+        if updated_values.layouts.process_stage >= ProcessStage::ForeignKeysUpdated {
+            return Ok(());
+        }
         updated_values.layouts.process_stage = ProcessStage::ForeignKeysUpdated;
-        Ok(updated_values)
+        Ok(())
     }
 }

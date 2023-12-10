@@ -5,7 +5,7 @@ use calamine::DataType;
 
 use super::{
     helper_functions::{value_to_i32, value_to_string},
-    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor, ProcessedSheet,
 };
 use crate::{
     models::{shortcut::RequiredField, shortcut::ShortcutWeb},
@@ -56,11 +56,14 @@ impl XlsxSheetProcessor for ShortcutProcessor {
         Ok(())
     }
 
-    fn update_foreign_keys<'a>(
-        updated_values: &'a mut ProcessedSheets,
+    fn update_foreign_keys(
+        updated_values: &mut ProcessedSheets,
         _original_values: &ProcessedSheets,
-    ) -> Result<&'a mut ProcessedSheets, BatchProcessError> {
-        updated_values.layouts.process_stage = ProcessStage::ForeignKeysUpdated;
-        Ok(updated_values)
+    ) -> Result<(), BatchProcessError> {
+        if updated_values.shortcuts.process_stage >= ProcessStage::ForeignKeysUpdated {
+            return Ok(());
+        }
+        updated_values.shortcuts.process_stage = ProcessStage::ForeignKeysUpdated;
+        Ok(())
     }
 }

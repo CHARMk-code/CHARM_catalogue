@@ -5,6 +5,7 @@ use std::{
 
 use async_trait::async_trait;
 use calamine::DataType;
+use itertools::Itertools;
 use sqlx::{Pool, Postgres};
 
 use super::{
@@ -12,7 +13,7 @@ use super::{
         value_to_bool, value_to_chrono_date, value_to_file_path, value_to_i32, value_to_string,
         value_to_vec,
     },
-    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheet, ProcessedSheets, XlsxSheetProcessor,
 };
 use crate::{
     get_column_in_sheet, get_id_mapper,
@@ -92,12 +93,18 @@ impl XlsxSheetProcessor for CompanyProcessor {
                 .flatten()
                 .collect();
 
-        if valid_map_ids.is_superset(&used_map_ids) {
+        if !valid_map_ids.is_superset(&used_map_ids) {
+            let invalid_maps: Vec<i32> = used_map_ids
+                .difference(&valid_map_ids)
+                .cloned()
+                .into_iter()
+                .collect();
             return Err(BatchProcessError::InvalidForeignKey {
                 valid_key_sheet: "maps".to_string(),
                 valid_key_column: "id".to_string(),
                 used_key_sheet: "companies".to_string(),
                 used_key_column: "map_image".to_string(),
+                invalid_keys: invalid_maps,
             });
         }
 
@@ -109,29 +116,42 @@ impl XlsxSheetProcessor for CompanyProcessor {
             .flatten()
             .flatten()
             .collect();
-        if valid_tag_ids.is_superset(&used_tag_ids) {
+        if !valid_tag_ids.is_superset(&used_tag_ids) {
+            let invalid_tags = used_tag_ids.difference(&valid_tag_ids);
+            let valid_used_tags = used_tag_ids.intersection(&valid_tag_ids);
+            println!("invalid: {:?}", invalid_tags);
+            println!("valid_used: {:?}", valid_used_tags.sorted());
+            println!("used: {:?}", used_tag_ids);
+            println!("valid: {:?}", valid_tag_ids);
             return Err(BatchProcessError::InvalidForeignKey {
                 valid_key_sheet: "tags".to_string(),
                 valid_key_column: "id".to_string(),
                 used_key_sheet: "companies".to_string(),
                 used_key_column: "tags".to_string(),
+                invalid_keys: invalid_tags.cloned().into_iter().collect::<Vec<i32>>(),
             });
         }
 
         Ok(())
     }
 
-    fn update_foreign_keys<'a>(
-        updated_values: &'a mut ProcessedSheets,
+    fn update_foreign_keys(
+        updated_values: &mut ProcessedSheets,
         original_values: &ProcessedSheets,
-    ) -> Result<&'a mut ProcessedSheets, BatchProcessError> {
+    ) -> Result<(), BatchProcessError> {
+        if updated_values.companies.process_stage >= ProcessStage::ForeignKeysUpdated {
+            return Ok(())
+        }
+
         if updated_values.maps.process_stage == ProcessStage::Finished
             && updated_values.tags.process_stage == ProcessStage::Finished
         {
             // Try updating map_image id to db values
             let map_id_mapper: HashMap<i32, i32> =
                 get_id_mapper!(original_values, updated_values, maps, id);
-            update_id_values!(map_id_mapper, updated_values, companies, id)?;
+            update_id_values!(map_id_mapper, updated_values, companies, map_image)?;
+
+            println!("map_id_mapper: {:?}", map_id_mapper);
 
             // Try updating tag ids to db values
             let tag_id_mapper: HashMap<i32, i32> =
@@ -139,9 +159,9 @@ impl XlsxSheetProcessor for CompanyProcessor {
 
             update_vec_id_values!(tag_id_mapper, updated_values, companies, tags)?;
 
-            updated_values.companies.process_stage = ProcessStage::ForeignKeysUpdated
+            updated_values.companies.process_stage = ProcessStage::ForeignKeysUpdated;
         }
 
-        Ok(updated_values)
+        Ok(())
     }
 }

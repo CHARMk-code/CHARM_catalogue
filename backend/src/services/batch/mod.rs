@@ -59,10 +59,10 @@ pub enum SheetNames {
 
 #[derive(Default, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ProcessStage {
-    Finished,
-    ForeignKeysUpdated,
     #[default]
     NotStarted,
+    ForeignKeysUpdated,
+    Finished,
 }
 
 #[derive(Default, Clone, Debug)]
@@ -145,11 +145,11 @@ pub async fn process_batch_zip(
             }
 
             // Ignore files without extension
-            None => {},
-            
+            None => {}
+
             // if not excel file handle it as such
             _ => {
-                println!("{:?}: {:?}",name, name.extension());
+                println!("{:?}: {:?}", name, name.extension());
                 provided_files.push(process_other_file(file, upload_path, storage_path, db).await?)
             }
         };
@@ -173,8 +173,13 @@ async fn apply_proccessed_sheets_to_db(
     // Helper function to handle ProcessedSheet instead of single row
     async fn apply_processed_sheet<'a, P: XlsxSheetProcessor>(
         db: &Pool<Postgres>,
-        processed_sheet: &ProcessedSheet<P::OutputType>,
+        processed_sheet: ProcessedSheet<P::OutputType>,
     ) -> Result<ProcessedSheet<P::OutputType>, BatchProcessError> {
+        println!("Updating {:?}, process_stage: {:?}", std::any::type_name::<P>(), processed_sheet.process_stage);
+        if processed_sheet.process_stage != ProcessStage::ForeignKeysUpdated {
+            return Ok(processed_sheet);
+        }
+
         let updated_rows = join_all(processed_sheet.rows.iter().map(|(row, paths)| {
             P::apply_to_database(db, row).then(|new_row_result| async {
                 new_row_result.map(|new_row| (new_row, paths.clone()))
@@ -195,18 +200,60 @@ async fn apply_proccessed_sheets_to_db(
         processed_sheets: ProcessedSheets,
     ) -> Result<ProcessedSheets, BatchProcessError> {
         let updated_processed_sheets = ProcessedSheets {
-            companies: apply_processed_sheet::<CompanyProcessor>(db, &processed_sheets.companies)
+            companies: apply_processed_sheet::<CompanyProcessor>(db, processed_sheets.companies)
                 .await?,
-            tags: apply_processed_sheet::<TagProcessor>(db, &processed_sheets.tags).await?,
-            prepages: apply_processed_sheet::<PrepageProcessor>(db, &processed_sheets.prepages)
+            tags: apply_processed_sheet::<TagProcessor>(db, processed_sheets.tags).await?,
+            prepages: apply_processed_sheet::<PrepageProcessor>(db, processed_sheets.prepages)
                 .await?,
-            layouts: apply_processed_sheet::<LayoutProcessor>(db, &processed_sheets.layouts)
-                .await?,
-            maps: apply_processed_sheet::<MapProcessor>(db, &processed_sheets.maps).await?,
-            shortcuts: apply_processed_sheet::<ShortcutProcessor>(db, &processed_sheets.shortcuts)
+            layouts: apply_processed_sheet::<LayoutProcessor>(db, processed_sheets.layouts).await?,
+            maps: apply_processed_sheet::<MapProcessor>(db, processed_sheets.maps).await?,
+            shortcuts: apply_processed_sheet::<ShortcutProcessor>(db, processed_sheets.shortcuts)
                 .await?,
         };
         Ok(updated_processed_sheets)
+    }
+
+    fn update_foreign_keys(
+        mut processed_sheets: ProcessedSheets,
+        original_processed_sheets: &ProcessedSheets,
+    ) -> Result<ProcessedSheets, BatchProcessError> {
+
+        SheetNames::iter().try_for_each(|name| match name {
+            SheetNames::Companies => CompanyProcessor::update_foreign_keys(
+                &mut processed_sheets,
+                original_processed_sheets,
+            ),
+            SheetNames::Tags => {
+                TagProcessor::update_foreign_keys(&mut processed_sheets, original_processed_sheets)
+            }
+            SheetNames::Prepages => PrepageProcessor::update_foreign_keys(
+                &mut processed_sheets,
+                original_processed_sheets,
+            ),
+            SheetNames::Layouts => LayoutProcessor::update_foreign_keys(
+                &mut processed_sheets,
+                original_processed_sheets,
+            ),
+            SheetNames::Maps => {
+                MapProcessor::update_foreign_keys(&mut processed_sheets, original_processed_sheets)
+            }
+            SheetNames::Shortcuts => ShortcutProcessor::update_foreign_keys(
+                &mut processed_sheets,
+                original_processed_sheets,
+            ),
+        })?;
+
+        Ok(processed_sheets)
+    }
+
+    async fn apply_to_db_then_update_foreign_keys(
+        db: &Pool<Postgres>,
+        original_processed_sheets: &ProcessedSheets,
+        updated_processed_sheets: ProcessedSheets,
+    ) -> Result<ProcessedSheets, BatchProcessError> {
+        let after_apply_sheets = apply_processed_sheets(db, updated_processed_sheets).await?;
+
+        update_foreign_keys(after_apply_sheets, original_processed_sheets)
     }
 
     // Initalize a transaction so we can reset if anything goes wrong.
@@ -215,8 +262,7 @@ async fn apply_proccessed_sheets_to_db(
         .await
         .map_err(|_| BatchProcessError::InitializeDbTransaction)?;
 
-    let mut updated_processed_sheets: Result<ProcessedSheets, BatchProcessError> =
-        Ok(original_processed_sheets.clone());
+    let mut updated_processed_sheets = Ok(original_processed_sheets.clone());
 
     while updated_processed_sheets
         .as_ref()
@@ -224,9 +270,10 @@ async fn apply_proccessed_sheets_to_db(
             processed_sheets.get_min_process_stage() != &ProcessStage::Finished
         })
     {
-        updated_processed_sheets = apply_processed_sheets(
+        updated_processed_sheets = apply_to_db_then_update_foreign_keys(
             db,
-            updated_processed_sheets.expect("Value to have been just checked to be ok"),
+            original_processed_sheets,
+            updated_processed_sheets.expect("Already checked to be ok"),
         )
         .await
     }
@@ -319,16 +366,22 @@ async fn process_other_file(
 
     let mut full_path = file
         .enclosed_name()
-        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?
+        .ok_or(BatchProcessError::FileNameError {
+            file_name: file.name().to_string(),
+        })?
         .iter();
 
     let file_name = full_path
         .next_back()
-        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?;
+        .ok_or(BatchProcessError::FileNameError {
+            file_name: file.name().to_string(),
+        })?;
 
     let parent_dir = full_path
         .next_back()
-        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?;
+        .ok_or(BatchProcessError::FileNameError {
+            file_name: file.name().to_string(),
+        })?;
 
     let new_path = upload_path
         .join(Path::new(&parent_dir))
@@ -336,7 +389,9 @@ async fn process_other_file(
 
     let parent_as_string = parent_dir
         .to_str()
-        .ok_or(BatchProcessError::FileNameError {file_name: file.name().to_string()})?
+        .ok_or(BatchProcessError::FileNameError {
+            file_name: file.name().to_string(),
+        })?
         .to_lowercase();
 
     // Error if parent is not the name of a sheet
@@ -394,10 +449,10 @@ trait XlsxSheetProcessor {
     fn check_foreign_key_deps(processed_sheets: &ProcessedSheets) -> Result<(), BatchProcessError>;
 
     // How should circular dependencies
-    fn update_foreign_keys<'a>(
-        updated_sheets: &'a mut ProcessedSheets,
+    fn update_foreign_keys(
+        updated_sheets: &mut ProcessedSheets,
         original_sheets: &ProcessedSheets,
-    ) -> Result<&'a mut ProcessedSheets, BatchProcessError>;
+    ) -> Result<(), BatchProcessError>;
 
     fn process_sheet(
         sheet: &Range<DataType>,
@@ -532,12 +587,13 @@ pub enum BatchProcessError {
         row: String,
     },
 
-    #[error("Invalid id specified: \ncolumn {used_key_column:?} in {used_key_sheet:?} must be a subset of ids \nin column {valid_key_column:?} in {valid_key_sheet:?}")]
+    #[error("Invalid id specified: \ncolumn {used_key_column:?} in {used_key_sheet:?} must be a subset of ids \nin column {valid_key_column:?} in {valid_key_sheet:?} The following invalid keys were found: {invalid_keys:?}")]
     InvalidForeignKey {
         valid_key_sheet: String,
         valid_key_column: String,
         used_key_sheet: String,
         used_key_column: String,
+        invalid_keys: Vec<i32>,
     },
 
     #[error("The Following files for '{sheet_name:?}' sheet is missing: {missing_files:?} ")]
@@ -546,10 +602,10 @@ pub enum BatchProcessError {
         missing_files: Vec<PathBuf>,
     },
 
-    #[error("Error retrieving valid name to file '{file_name:?}' inside zip archive. Try renaming it")]
-    FileNameError {
-        file_name: String 
-    },
+    #[error(
+        "Error retrieving valid name to file '{file_name:?}' inside zip archive. Try renaming it"
+    )]
+    FileNameError { file_name: String },
 
     #[error("The file dir (currently {name:?}) must be the same as the sheet using the file")]
     InvalidParentName { name: String },
@@ -646,74 +702,74 @@ mod tests {
     //     Ok(())
     // }
 
-//     #[test]
-//     fn update_tags_ids_should_update_tag_id_values() -> Result<(), BatchProcessError> {
-//         let processed_sheets = ProcessedSheets {
-//             companies: ProcessedSheet {
-//                 rows: vec![
-//                     (
-//                         CompanyWeb {
-//                             tags: Some(vec![1, 3]),
-//                             ..CompanyWeb::default()
-//                         },
-//                         Vec::new(),
-//                     ),
-//                     (
-//                         CompanyWeb {
-//                             tags: Some(vec![1, 2]),
-//                             ..CompanyWeb::default()
-//                         },
-//                         Vec::new(),
-//                     ),
-//                 ],
-//                 process_stage: ProcessStage::NotStarted,
-//             },
-//             tags: ProcessedSheet {
-//                 rows: vec![
-//                     (
-//                         TagWeb {
-//                             id: Some(1),
-//                             ..TagWeb::default()
-//                         },
-//                         vec![],
-//                     ),
-//                     (
-//                         TagWeb {
-//                             id: Some(2),
-//                             ..TagWeb::default()
-//                         },
-//                         vec![],
-//                     ),
-//                     (
-//                         TagWeb {
-//                             id: Some(3),
-//                             ..TagWeb::default()
-//                         },
-//                         vec![],
-//                     ),
-//                 ],
-//                 process_stage: ProcessStage::NotStarted,
-//             },
-//             prepages: ProcessedSheet::default(),
-//             layouts: ProcessedSheet::default(),
-//             maps: ProcessedSheet::default(),
-//             shortcuts: ProcessedSheet::default(),
-//         };
-//         let new_tag_ids = vec![4, 8, 7];
-//
-//         let updated_processed_sheets = update_tag_ids(&processed_sheets, &new_tag_ids);
-//
-//         assert_eq!(
-//             updated_processed_sheets
-//                 .tags
-//                 .rows
-//                 .iter()
-//                 .map(|(t, _)| t.id.unwrap())
-//                 .collect::<Vec<i32>>(),
-//             new_tag_ids,
-//             "Tags should have beed updated in companies"
-//         );
-//
-//         Ok(())
-//     }
+    //     #[test]
+    //     fn update_tags_ids_should_update_tag_id_values() -> Result<(), BatchProcessError> {
+    //         let processed_sheets = ProcessedSheets {
+    //             companies: ProcessedSheet {
+    //                 rows: vec![
+    //                     (
+    //                         CompanyWeb {
+    //                             tags: Some(vec![1, 3]),
+    //                             ..CompanyWeb::default()
+    //                         },
+    //                         Vec::new(),
+    //                     ),
+    //                     (
+    //                         CompanyWeb {
+    //                             tags: Some(vec![1, 2]),
+    //                             ..CompanyWeb::default()
+    //                         },
+    //                         Vec::new(),
+    //                     ),
+    //                 ],
+    //                 process_stage: ProcessStage::NotStarted,
+    //             },
+    //             tags: ProcessedSheet {
+    //                 rows: vec![
+    //                     (
+    //                         TagWeb {
+    //                             id: Some(1),
+    //                             ..TagWeb::default()
+    //                         },
+    //                         vec![],
+    //                     ),
+    //                     (
+    //                         TagWeb {
+    //                             id: Some(2),
+    //                             ..TagWeb::default()
+    //                         },
+    //                         vec![],
+    //                     ),
+    //                     (
+    //                         TagWeb {
+    //                             id: Some(3),
+    //                             ..TagWeb::default()
+    //                         },
+    //                         vec![],
+    //                     ),
+    //                 ],
+    //                 process_stage: ProcessStage::NotStarted,
+    //             },
+    //             prepages: ProcessedSheet::default(),
+    //             layouts: ProcessedSheet::default(),
+    //             maps: ProcessedSheet::default(),
+    //             shortcuts: ProcessedSheet::default(),
+    //         };
+    //         let new_tag_ids = vec![4, 8, 7];
+    //
+    //         let updated_processed_sheets = update_tag_ids(&processed_sheets, &new_tag_ids);
+    //
+    //         assert_eq!(
+    //             updated_processed_sheets
+    //                 .tags
+    //                 .rows
+    //                 .iter()
+    //                 .map(|(t, _)| t.id.unwrap())
+    //                 .collect::<Vec<i32>>(),
+    //             new_tag_ids,
+    //             "Tags should have beed updated in companies"
+    //         );
+    //
+    //         Ok(())
+    //     }
 }
