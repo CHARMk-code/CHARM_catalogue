@@ -2,7 +2,7 @@ use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
 use sqlx::PgPool;
 
-use crate::models::tag::TagWeb;
+use crate::models::tag_category::TagCategoryWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
 
@@ -19,15 +19,15 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[get("/")]
 async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let tags = services::tag::get_all(&db).await?;
+    let tag_categories = services::tag_category::get_all(&db).await?;
 
-    Ok(HttpResponse::Ok().json(tags))
+    Ok(HttpResponse::Ok().json(tag_categories))
 }
 
 #[get("/{id}")]
 async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let tag = services::tag::get_by_id(&db, id).await?;
+    let tag_category= services::tag_category::get_by_id(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(tag))
 }
@@ -36,29 +36,25 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 async fn update_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<TagWeb>,
+    data: Json<TagCategory>,
 ) -> Result<impl Responder> {
-    let input_tag = data.into_inner();
+    let input_tag_category = data.into_inner();
 
-    let response = match input_tag.id {
+    let response = match input_tag_category .id {
         Some(_) => {
-            let name = input_tag.name.as_ref();
-            let icon = input_tag.icon.as_ref();
-            let category = input_tag.category.as_ref();
+            let name = input_tag_category.name.as_ref();
 
             if name
-                .and(icon)
-                .and(category)
                 .is_none()
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let tag = services::tag::update(&db, input_tag).await?;
+                let tag_category= services::tag_category::update(&db, input_tag_category).await?;
                 HttpResponse::Ok().json(tag)
             }
         }
         None => {
-            let tag = services::tag::create(&db, &input_tag).await?;
+            let tag_category= services::tag_category::create(&db, &input_tag_category).await?;
             HttpResponse::Created().json(tag)
         }
     };
@@ -70,10 +66,10 @@ async fn update_handler(
 async fn create_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<TagWeb>,
+    data: Json<TagCategory>,
 ) -> Result<impl Responder> {
-    let input_tag = data.into_inner();
-    let affected_rows = services::tag::create(&db, &input_tag).await?;
+    let input_tag_category = data.into_inner();
+    let affected_rows = services::tag_category::create(&db, &input_tag_category).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -85,7 +81,7 @@ async fn delete_handler(
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::tag::delete(&db, id).await?;
+    let affected_rows = services::tag_category::delete(&db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

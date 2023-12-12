@@ -5,23 +5,13 @@ use crate::{
     services,
 };
 
-#[sqlx::test(fixtures("Tags"))]
+#[sqlx::test(fixtures("Tags", "Tag_categories"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_db_tag = TagDB {
         id: 1,
         name: "A".to_string(),
-        parent_tag: 0,
-        up_votes: 0,
-        down_votes: 0,
-        crowd_sourced: false,
         icon: "A.svg".to_string(),
-        division: true,
-        business_area: false,
-        looking_for: false,
-        offering: false,
-        language: false,
-        fair_area: false,
     };
 
     // What's tested
@@ -50,7 +40,7 @@ async fn get_by_id_when_no_matching_tag_should_fail(db: Pool<Postgres>) -> Resul
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags"))]
+#[sqlx::test(fixtures("Tags", "Tag_categories"))]
 async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_tags = services::tag::get_all(&db).await.unwrap();
@@ -58,17 +48,9 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     let new_tag = TagWeb {
         id: None,
         name: Some("NEW TAG".to_string()),
-        parent_tag: Some(0),
-        up_votes: Some(0),
-        down_votes: Some(0),
-        crowd_sourced: Some(false),
         icon: Some("NEW_TAG.svg".to_string()),
-        division: Some(false),
-        business_area: Some(false),
-        looking_for: Some(false),
-        offering: Some(false),
-        language: Some(false),
-        fair_area: Some(true),
+        category: Some(2)
+
     };
 
     // What's tested
@@ -94,17 +76,8 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     let expected_tag = TagDB {
         id: created_query_result.unwrap(),
         name: "NEW TAG".to_string(),
-        parent_tag: 0,
-        up_votes: 0,
-        down_votes: 0,
-        crowd_sourced: false,
         icon: "NEW_TAG.svg".to_string(),
-        division: false,
-        business_area: false,
-        looking_for: false,
-        offering: false,
-        language: false,
-        fair_area: true,
+        category: 2
     };
 
     assert_eq!(
@@ -124,7 +97,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags"))]
+#[sqlx::test(fixtures("Tags", "Tag_categories"))]
 async fn valid_update_on_existing_tag_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -140,17 +113,8 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     let first_tag_update = TagWeb {
         id: Some(initial_first_tag.id),
         name: Some("NEW A".to_string()),
-        parent_tag: None,
-        up_votes: None,
-        down_votes: None,
-        crowd_sourced: None,
         icon: None,
-        division: None,
-        business_area: None,
-        looking_for: None,
-        offering: None,
-        language: None,
-        fair_area: None,
+        category: Some(3),
     };
 
     // What's tested
@@ -184,17 +148,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
         TagDB {
             id: initial_first_tag.id,
             name: "NEW A".to_string(),
-            parent_tag: 0,
-            up_votes: 0,
-            down_votes: 0,
-            crowd_sourced: false,
             icon: "A.svg".to_string(),
-            division: true,
-            business_area: false,
-            looking_for: false,
-            offering: false,
-            language: false,
-            fair_area: false
         },
         "The updated sure the tag has been properly updated in the database"
     );
@@ -206,7 +160,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags"))]
+#[sqlx::test(fixtures("Tags", "Tag_categories"))]
 async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {

@@ -4,25 +4,13 @@ const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones a
 export interface Tag {
   id: number;
   name: string;
-  parent_tag: number;
-  up_votes: number;
-  down_votes: number;
-  crowd_sourced: boolean;
   icon: string;
-  division: boolean;
-  business_area: boolean;
-  looking_for: boolean;
-  offering: boolean;
-  language: boolean;
-  fair_area: boolean;
+  category: string;
 }
 interface State {
   tags: Map<number, Tag>;
   load_wait: number;
 }
-/*
-tagsStore.modifyTag({"name": "test", "desc": "testarmycket", "link": "https://coollink.se", "icon": "mdi-search"})
-*/
 export const useTagsStore = defineStore("tags", {
   state: (): State => ({
     tags: new Map(),
@@ -99,7 +87,7 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.division) {
+        if (tag && tag.category == 0) {
           result.push(tag);
         }
       }
@@ -109,7 +97,7 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.business_area) {
+        if (tag && tag.category == 1) {
           result.push(tag);
         }
       }
@@ -119,7 +107,7 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.looking_for) {
+        if (tag && tag.category == 2) {
           result.push(tag);
         }
       }
@@ -129,7 +117,7 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.offering) {
+        if (tag && tag.category == 3) {
           result.push(tag);
         }
       }
@@ -139,7 +127,7 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.language) {
+        if (tag && tag.category == 4) {
           result.push(tag);
         }
       }
@@ -149,29 +137,29 @@ export const useTagsStore = defineStore("tags", {
       const result: Tag[] = [];
       for (const id of ids) {
         const tag = state.tags.get(id);
-        if (tag && tag.fair_area) {
+        if (tag && tag.category == 5) {
           result.push(tag);
         }
       }
       return result;
     },
     divisions: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.division);
+      return Array.from(state.tags.values()).filter((t) => t.category == 0);
     },
     business_areas: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.business_area);
+      return Array.from(state.tags.values()).filter((t) => t.category == 1);
     },
     looking_for: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.looking_for);
+      return Array.from(state.tags.values()).filter((t) => t.category == 2);
     },
     offering: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.offering);
+      return Array.from(state.tags.values()).filter((t) => t.category == 3);
     },
     languages: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.language);
+      return Array.from(state.tags.values()).filter((t) => t.category == 4);
     },
     fair_areas: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.fair_area);
+      return Array.from(state.tags.values()).filter((t) => t.category == 5);
     },
   },
 });
