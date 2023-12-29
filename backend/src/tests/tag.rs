@@ -5,13 +5,14 @@ use crate::{
     services,
 };
 
-#[sqlx::test(fixtures("Tags", "Tag_categories"))]
+#[sqlx::test(fixtures("Tag_categories", "Tags"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_db_tag = TagDB {
-        id: 1,
+        id: 0,
         name: "A".to_string(),
         icon: "A.svg".to_string(),
+        category: 0,
     };
 
     // What's tested
@@ -40,7 +41,7 @@ async fn get_by_id_when_no_matching_tag_should_fail(db: Pool<Postgres>) -> Resul
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags", "Tag_categories"))]
+#[sqlx::test(fixtures("Tag_categories", "Tags"))]
 async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_tags = services::tag::get_all(&db).await.unwrap();
@@ -49,12 +50,12 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
         id: None,
         name: Some("NEW TAG".to_string()),
         icon: Some("NEW_TAG.svg".to_string()),
-        category: Some(2)
-
+        category: Some(2),
     };
 
     // What's tested
     let created_query_result = services::tag::create(&db, &new_tag).await;
+    println!("{:?}", created_query_result);
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"
@@ -77,7 +78,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
         id: created_query_result.unwrap(),
         name: "NEW TAG".to_string(),
         icon: "NEW_TAG.svg".to_string(),
-        category: 2
+        category: 2,
     };
 
     assert_eq!(
@@ -97,7 +98,7 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags", "Tag_categories"))]
+#[sqlx::test(fixtures("Tag_categories", "Tags"))]
 async fn valid_update_on_existing_tag_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -149,6 +150,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
             id: initial_first_tag.id,
             name: "NEW A".to_string(),
             icon: "A.svg".to_string(),
+            category: 3,
         },
         "The updated sure the tag has been properly updated in the database"
     );
@@ -160,7 +162,7 @@ async fn valid_update_on_existing_tag_should_update_row_in_db(
     Ok(())
 }
 
-#[sqlx::test(fixtures("Tags", "Tag_categories"))]
+#[sqlx::test(fixtures("Tag_categories", "Tags"))]
 async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {

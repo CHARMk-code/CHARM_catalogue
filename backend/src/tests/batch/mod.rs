@@ -6,7 +6,7 @@ use sqlx::{Pool, Postgres};
 use crate::{
     models::{
         company::CompanyDB, layout::LayoutDB, map::MapDB, prepage::PrepageDB, shortcut::ShortcutDB,
-        tag::TagDB,
+        tag::TagDB, tag_category::TagCategoryDB,
     },
     services::{
         self,
@@ -315,66 +315,47 @@ async fn full_parsing_of_zip_file_should_populate_db(
         TagDB {
             id: 1,
             name: "A".to_string(),
-            parent_tag: 0,
-            up_votes: 0,
-            down_votes: 0,
-            crowd_sourced: false,
             icon: "a.svg".to_string(),
-            division: true,
-            business_area: false,
-            looking_for: false,
-            offering: false,
-            language: false,
-            fair_area: false,
+            category: 0,
         },
         TagDB {
             id: 15,
             name: "MT".to_string(),
-            parent_tag: 0,
-            up_votes: 0,
-            down_votes: 0,
-            crowd_sourced: false,
             icon: "mt.svg".to_string(),
-            division: true,
-            business_area: false,
-            looking_for: false,
-            offering: false,
-            language: false,
-            fair_area: false,
+            category: 0,
         },
         TagDB {
             id: 28,
             name: "Swedish".to_string(),
-            parent_tag: 0,
-            up_votes: 0,
-            down_votes: 0,
-            crowd_sourced: false,
             icon: "".to_string(),
-            division: false,
-            business_area: false,
-            looking_for: false,
-            offering: false,
-            language: true,
-            fair_area: false,
+            category: 4,
         },
         TagDB {
             id: 41,
             name: "Volvo 3".to_string(),
-            parent_tag: 0,
-            up_votes: 0,
-            down_votes: 0,
-            crowd_sourced: false,
             icon: "".to_string(),
-            division: false,
-            business_area: false,
-            looking_for: false,
-            offering: false,
-            language: false,
-            fair_area: true,
+            category: 5,
         },
     ];
 
     let expected_images_amount = 257;
+
+    // Tag category
+    let expected_tag_categories_amount = 6;
+    let expected_tag_categories = vec![
+        TagCategoryDB {
+            id: 0,
+            name: "Division".to_string(),
+        },
+        TagCategoryDB {
+            id: 3,
+            name: "Offering".to_string(),
+        },
+        TagCategoryDB {
+            id: 5,
+            name: "Fair Area".to_string(),
+        },
+    ];
 
     // Companies
     let companies = services::company::get_all(&db)
@@ -447,6 +428,43 @@ async fn full_parsing_of_zip_file_should_populate_db(
 
         assert_eq!(tag, actual_expected_tag)
     }
+
+    // Tag category
+    let tag_categories = services::tag_category::get_all(&db)
+        .await
+        .expect("to have been tested elsewhere");
+    assert_eq!(
+        tag_categories.len(),
+        expected_tag_categories_amount,
+        "Different amount of tags than expected"
+    );
+
+    let tag_categories_tuple_iter = tag_categories
+        .iter()
+        .map(|c| c.name.clone())
+        .zip(tag_categories.iter());
+    let tag_categories_set: HashMap<String, &TagCategoryDB> =
+        HashMap::from_iter(tag_categories_tuple_iter);
+
+    for expected_tag_category in expected_tag_categories.iter() {
+        let option_tag_category = tag_categories_set.get(&expected_tag_category.name).copied();
+
+        assert!(
+            option_tag_category.is_some(),
+            "missing an expected tag: {:?}",
+            expected_tag_category
+        );
+
+        let tag_category = option_tag_category.unwrap();
+
+        let actual_expected_tag_category = &TagCategoryDB {
+            id: tag_category.id,
+            ..expected_tag_category.clone()
+        };
+
+        assert_eq!(tag_category, actual_expected_tag_category)
+    }
+
     // Prepages
     let prepages = services::prepage::get_all(&db)
         .await

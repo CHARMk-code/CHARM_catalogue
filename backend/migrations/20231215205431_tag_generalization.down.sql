@@ -23,4 +23,4 @@ ALTER TABLE tags DROP CONSTRAINT fk_tag_category;
 ALTER TABLE tags DROP COLUMN category;
 
 -- Create new categories
-DROP TABLE tag_category;
+DROP TABLE tag_category

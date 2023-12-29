@@ -24,7 +24,7 @@ pub enum RequiredField {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub struct TagCategoryWeb {
+pub struct TagCategoryDB {
     pub id: i32,
     pub name: String,
 }

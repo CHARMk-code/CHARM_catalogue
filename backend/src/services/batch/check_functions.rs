@@ -37,6 +37,10 @@ pub fn check_file_dependencies(
                 sheet_name,
                 get_missing_files(&processed_values.tags, &provided_files_set),
             ),
+            SheetNames::TagCategories => (
+                sheet_name,
+                get_missing_files(&processed_values.tag_categories, &provided_files_set),
+            ),
             SheetNames::Prepages => (
                 sheet_name,
                 get_missing_files(&processed_values.prepages, &provided_files_set),
@@ -121,6 +125,7 @@ mod tests {
         let processed_values = ProcessedValues {
             companies: vec![(CompanyWeb::default(), vec![PathBuf::from("FILENAME")])],
             tags: Vec::new(),
+            tag_categories: Vec::new(),
             prepages: Vec::new(),
             layouts: Vec::new(),
             maps: Vec::new(),
@@ -144,6 +149,7 @@ mod tests {
         let processed_values = ProcessedValues {
             companies: vec![(CompanyWeb::default(), vec![PathBuf::from("FILENAME")])],
             tags: Vec::new(),
+            tag_categories: Vec::new(),
             prepages: Vec::new(),
             layouts: Vec::new(),
             maps: Vec::new(),
@@ -197,6 +203,7 @@ mod tests {
                 ),
             ],
             tags: vec![],
+            tag_categories: vec![],
             prepages: vec![],
             layouts: vec![],
             maps: vec![],
@@ -249,6 +256,7 @@ mod tests {
                     Vec::new(),
                 ),
             ],
+            tag_categories: vec![],
             prepages: vec![],
             layouts: vec![],
             maps: vec![],
@@ -308,6 +316,7 @@ mod tests {
                     Vec::new(),
                 ),
             ],
+            tag_categories: vec![],
             prepages: vec![],
             layouts: vec![],
             maps: vec![],

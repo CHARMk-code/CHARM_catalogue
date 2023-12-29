@@ -42,17 +42,10 @@ impl XlsxSheetProcessor for TagProcessor {
         match column_name {
             RequiredField::Id => row_struct.id = value_to_i32(value),
             RequiredField::Name => row_struct.name = value_to_string(value),
-            RequiredField::Division => row_struct.division = value_to_bool(value),
-            RequiredField::Businessarea => row_struct.business_area = value_to_bool(value),
-            RequiredField::Lookingfor => row_struct.looking_for = value_to_bool(value),
             RequiredField::Icon => {
                 row_struct.icon = value_to_file_path(value, required_files, base_file_path)
             }
-            RequiredField::Offering => {
-                row_struct.offering = value_to_bool(value);
-            }
-            RequiredField::Language => row_struct.language = value_to_bool(value),
-            RequiredField::Fairarea => row_struct.fair_area = value_to_bool(value),
+            RequiredField::Category => row_struct.category = value_to_i32(value),
         };
     }
 }
