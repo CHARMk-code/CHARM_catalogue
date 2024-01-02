@@ -31,9 +31,9 @@
         <!-- <OtherMarkerInformation v-else /> -->
       </q-drawer>
 
-      <q-page-container style="height: 100%">
-        <q-page>
-          <MapViewer :fair-map-id="0" @marker-clicked="markerClicked" />
+      <q-page-container >
+          <q-page style="height: calc(100vh - 100px)">
+              <MapViewer :fair-map-id="1" style="height: 100%" @marker-clicked="markerClicked"/>
         </q-page>
       </q-page-container>
     </q-layout>

@@ -1,12 +1,17 @@
 import { defineStore } from "pinia";
+import { useTagCategoriesStore } from "./tag_category";
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
 export interface Tag {
   id: number;
   name: string;
   icon: string;
-  category: string;
+  category: number;
 }
+
+// TODO: Replace this with a mapping from database
+export type Category = "division" | "business_area" | "looking_for" | "offering" | "language" | "fair_area"
+
 interface State {
   tags: Map<number, Tag>;
   load_wait: number;
@@ -83,83 +88,13 @@ export const useTagsStore = defineStore("tags", {
       }
       return result;
     },
-    getDivisionsFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 0) {
-          result.push(tag);
-        }
-      }
-      return result;
+    getTagsByCategoryFromIds: (state) => (category: Category, ids: Set<number>) => {
+      const category_id = [...useTagCategoriesStore().tags_categories.values()].find(({name}) => name === category)?.id
+      return [...state.tags.values()].filter((tag) => ids.has(tag.id) && category_id === tag.category) 
     },
-    getBusinessAreasFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 1) {
-          result.push(tag);
-        }
-      }
-      return result;
-    },
-    getLookingForFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 2) {
-          result.push(tag);
-        }
-      }
-      return result;
-    },
-    getOfferingsFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 3) {
-          result.push(tag);
-        }
-      }
-      return result;
-    },
-    getLanguagesFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 4) {
-          result.push(tag);
-        }
-      }
-      return result;
-    },
-    getFairAreasFromIds: (state) => (ids: Iterable<number>) => {
-      const result: Tag[] = [];
-      for (const id of ids) {
-        const tag = state.tags.get(id);
-        if (tag && tag.category == 5) {
-          result.push(tag);
-        }
-      }
-      return result;
-    },
-    divisions: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 0);
-    },
-    business_areas: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 1);
-    },
-    looking_for: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 2);
-    },
-    offering: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 3);
-    },
-    languages: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 4);
-    },
-    fair_areas: (state) => {
-      return Array.from(state.tags.values()).filter((t) => t.category == 5);
-    },
+    getTagsInCategory: (state) => (category: Category) => {
+      const category_id = [...useTagCategoriesStore().tags_categories.values()].find(({name}) => name === category)?.id
+      return Array.from(state.tags.values()).filter((t) => t.category === category_id);
+    }
   },
 });

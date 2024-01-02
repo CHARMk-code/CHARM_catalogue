@@ -35,14 +35,14 @@
             <template
               v-if="
                 !props.value ||
-                tagsStore.getDivisionsFromIds(props.value).length < 1
+                tagsStore.getTagsByCategoryFromIds('division',props.value).length < 1
               "
             >
               None
             </template>
             <template v-else>
               <TagGroup
-                :tags="tagsStore.getDivisionsFromIds(props.value)"
+                :tags="tagsStore.getTagsByCategoryFromIds('division',props.value)"
               ></TagGroup>
             </template>
           </q-td>
@@ -181,22 +181,22 @@ const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
     return reactive({
       meta_map_image,
       divisions: tagsStore
-        .getDivisionsFromIds(row.tags)
+        .getTagsByCategoryFromIds("division",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       looking_for: tagsStore
-        .getLookingForFromIds(row.tags)
+        .getTagsByCategoryFromIds("looking_for",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       business_areas: tagsStore
-        .getBusinessAreasFromIds(row.tags)
+        .getTagsByCategoryFromIds("business_area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       offering: tagsStore
-        .getOfferingsFromIds(row.tags)
+        .getTagsByCategoryFromIds("offering",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       language: tagsStore
-        .getLanguagesFromIds(row.tags)
+        .getTagsByCategoryFromIds("language",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       fair_area: tagsStore
-        .getFairAreasFromIds(row.tags)
+        .getTagsByCategoryFromIds("fair_area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
     });
   }
@@ -325,7 +325,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "divisions",
-    items: tagsStore.divisions.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("division").map((t) => ({ value: t.id, label: t })),
     label: "Programs",
     hint: "Programs the company are interested in",
     meta: true,
@@ -333,7 +333,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "looking_for",
-    items: tagsStore.looking_for.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("looking_for").map((t) => ({ value: t.id, label: t })),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
     meta: true,
@@ -341,7 +341,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "business_areas",
-    items: tagsStore.business_areas.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("business_area").map((t) => ({ value: t.id, label: t })),
     label: "Business areas",
     hint: "The company's business areas",
     meta: true,
@@ -349,7 +349,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "offering",
-    items: tagsStore.offering.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("offering").map((t) => ({ value: t.id, label: t })),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
     meta: true,
@@ -357,7 +357,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "language",
-    items: tagsStore.languages.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("language").map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
     meta: true,
@@ -365,7 +365,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "fair_area",
-    items: tagsStore.fair_areas.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("fair_area").map((t) => ({ value: t.id, label: t })),
     label: "Fair Area",
     hint: "Which Fair Area is the company on",
     meta: true,

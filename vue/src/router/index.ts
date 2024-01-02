@@ -11,6 +11,8 @@ import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useFavoritesStore } from "@/stores/modules/favorites";
 import { useFeedbackStore } from "@/stores/modules/feedback";
+import { useFairMapsStore } from "@/stores/modules/fairMaps";
+import { useTagCategoriesStore } from "@/stores/modules/tag_category";
 
 const UserLayout = () => import("@/views/userLayout.vue");
 const Company_view = () => import("@/views/company.vue");
@@ -19,13 +21,12 @@ const Login_view = () => import("@/views/login.vue");
 const Landing_view = () => import("@/views/Landing.vue");
 const Map_view = () => import("@/views/Map.vue");
 const Prepage_view = () => import("@/views/Prepage.vue");
-
 const Admin_view = () => import("@/views/Administration.vue");
 const Companies_admin = () => import("@/views/admin/Companies.vue");
 const Prepage_admin = () => import("@/views/admin/Prepage.vue");
 const Tags_admin = () => import("@/views/admin/Tags.vue");
 const Account_admin = () => import("@/components/admin/Account.vue");
-// const Map_admin = () => import("@/views/admin/Map.vue");
+const Map_admin = () => import("@/views/admin/AdminMap.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
@@ -126,11 +127,11 @@ const router = createRouter({
           name: "Tags",
           component: Tags_admin,
         },
-        // {
-        //   path: "maps",
-        //   name: "Maps",
-        //   component: Map_admin,
-        // },
+        {
+          path: "maps",
+          name: "Maps",
+          component: Map_admin,
+        },
         {
           path: "shortcuts",
           name: "Shortcuts",
@@ -183,13 +184,14 @@ router.beforeEach(async (to, from, next) => {
 //    const mapsStore = useMapsStore();
 
     await Promise.all([
-//      mapsStore.getMaps(),
       useTagsStore().getTags(), // This one fails if db is empty, check why
+      useTagCategoriesStore().getTagCategories(),
       useCompaniesStore().fetchCompanies(),
       usePrepagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),
       useShortcutsStore().getShortcuts(),
       useSite_settingsStore().fetchSettings(),
+      useFairMapsStore().fetchMaps()
     ])
       .then(() => {
         useFilterStore().filterCompanies();

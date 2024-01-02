@@ -9,7 +9,7 @@
     </q-card-section>
     <q-card-section>
       <q-responsive :ratio="1" style="position: relative;">
-        <MapViewer :fair-map-id="0" />
+        <MapViewer :fair-map-id="1" no-selection :selected-marker="boothNumber"/>
       </q-responsive>
     </q-card-section>
   </company_card_wrapper>

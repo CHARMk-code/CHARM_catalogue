@@ -9,7 +9,7 @@ interface State {
   tags_categories: Map<number, Tag_category>;
   load_wait: number;
 }
-export const useTagsStore = defineStore("tags", {
+export const useTagCategoriesStore = defineStore("tagCategories", {
   state: (): State => ({
     tags_categories: new Map(),
     load_wait: 0,
@@ -24,7 +24,7 @@ export const useTagsStore = defineStore("tags", {
     removeAllTagCategories() {
       this.tags_categories = new Map();
     },
-    getTagCategories() {
+    fetchTagCategories() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;

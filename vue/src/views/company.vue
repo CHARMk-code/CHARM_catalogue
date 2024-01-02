@@ -106,7 +106,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Divisions",
         name: "tag_divisions",
-        tags: tagsStore.getDivisionsFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("division",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -115,7 +115,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Looking For",
         name: "tag_looking_for",
-        tags: tagsStore.getLookingForFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("looking_for",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -124,7 +124,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Offering",
         name: "tag_offering",
-        tags: tagsStore.getOfferingsFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("offering",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -133,7 +133,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Business areas",
         name: "tag_business_areas",
-        tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("business_area",company.value.tags),
       });
       addComponent("left", vnode);
     }
