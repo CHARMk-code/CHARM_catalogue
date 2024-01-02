@@ -1,20 +1,68 @@
 <template>
-      <MapViewer/>
+  <q-card class="q-ma-md">
+    <q-layout id="mapLayoutContainer" container view="hHh lpR fFf">
+      <q-drawer
+        v-model="markerInformationSlider"
+        behavior="desktop"
+        bordered
+        side="right"
+      >
+        <q-toolbar>
+          <q-btn
+            flat
+            round
+            dense
+            icon="mdi-window-close"
+            color="primary"
+            @click="
+              () => {
+                markerInformationSlider = false;
+              }
+            "
+          />
+          <q-toolbar-title v-if="markerType === 'other'"
+            >Marker Information</q-toolbar-title
+          >
+          <q-toolbar-title v-if="markerType === 'company'"
+            >Company Information</q-toolbar-title
+          >
+        </q-toolbar>
+        <CompanyMarkerInformation :company-id="markerId" />
+        <!-- <OtherMarkerInformation v-else /> -->
+      </q-drawer>
+
+      <q-page-container style="height: 100%">
+        <q-page>
+          <MapViewer :fair-map-id="0" @marker-clicked="markerClicked" />
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
-import { useMapsStore } from "@/stores/modules/maps";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import CompanyMarkerInformation from "@/components/map/CompanyMarkerInformation.vue";
 import MapViewer from "@/components/map/MapViewer.vue";
+import type { GeometryTypes } from "@/stores/modules/fairMaps";
+import type Feature from "ol/Feature";
+import { ref, type Ref } from "vue";
 
-const mapsStore = useMapsStore();
+const markerInformationSlider = ref(false);
 
-const route = useRoute();
+const markerType: Ref<GeometryTypes> = ref("other");
 
-const maps = computed(() => {
-  return Array.from(mapsStore.maps.values()).filter(
-    (m) => m.name === route.params.page
-  );
-});
+const markerId: Ref<number> = ref(0);
+
+function markerClicked(feature: Feature) {
+  markerInformationSlider.value = true;
+  markerType.value = "company";
+  markerId.value = feature.get("refId");
+  console.log(markerId, markerType);
+}
 </script>
+
+<style scoped lang="scss">
+#mapLayoutContainer {
+  height: calc(100vh - 90px);
+}
+</style>

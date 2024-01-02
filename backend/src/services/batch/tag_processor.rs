@@ -5,7 +5,7 @@ use calamine::DataType;
 
 use super::{
     helper_functions::{value_to_bool, value_to_file_path, value_to_i32, value_to_string},
-    BatchProcessError, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor, ProcessedSheet,
 };
 use crate::{
     models::tag::{RequiredField, TagWeb},
@@ -23,13 +23,17 @@ impl XlsxSheetProcessor for TagProcessor {
     async fn apply_to_database(
         db: &Pool<Postgres>,
         row: &Self::OutputType,
-    ) -> Result<i32, BatchProcessError> {
-        Ok(tag::create(db, row).await.map_err(|source| {
+    ) -> Result<Self::OutputType, BatchProcessError> {
+        let mut inserted_row = row.clone();
+
+        inserted_row.id = Some(tag::create(db, row).await.map_err(|source| {
             BatchProcessError::ApplyToDatabaseError {
                 source,
                 row: format!("{:?}", row),
             }
-        })?)
+        })?);
+
+        Ok(inserted_row)
     }
 
     fn set_struct_value(
@@ -47,5 +51,21 @@ impl XlsxSheetProcessor for TagProcessor {
             }
             RequiredField::Category => row_struct.category = value_to_i32(value),
         };
+    }
+
+    fn check_foreign_key_deps(_processed_values: &ProcessedSheets) -> Result<(), BatchProcessError> {
+        Ok(())
+    }
+
+    fn update_foreign_keys(
+        updated_values: &mut ProcessedSheets,
+        _original_values: &ProcessedSheets,
+    ) -> Result<(), BatchProcessError> {
+        if updated_values.tags.process_stage >= ProcessStage::ForeignKeysUpdated {
+            return Ok(());
+        }
+
+        updated_values.tags.process_stage = ProcessStage::ForeignKeysUpdated;
+        Ok(())
     }
 }

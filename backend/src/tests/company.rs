@@ -33,7 +33,7 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         website: "frennfjord.se".to_string(),
         talk_to_us_about: "CHARM and this Catalogue".to_string(),
         logo: "logo.png".to_string(),
-        map_image: 0,
+        map_image: 1,
         booth_number: 15,
         tags: Some(vec![1, 2]),
     };
@@ -98,7 +98,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         website: Some("null.se".to_string()),
         talk_to_us_about: Some("New things".to_string()),
         logo: Some("new_logo.png".to_string()),
-        map_image: Some(4),
+        map_image: Some(2),
         booth_number: Some(42),
         tags: Some([1, 2].to_vec()),
     };
@@ -143,7 +143,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         website: "null.se".to_string(),
         talk_to_us_about: "New things".to_string(),
         logo: "new_logo.png".to_string(),
-        map_image: 4,
+        map_image: 2,
         booth_number: 42,
         tags: Some([1, 2].to_vec()),
     };
@@ -287,7 +287,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
             website: "frennfjord.se".to_string(),
             talk_to_us_about: "CHARM and this Catalogue".to_string(),
             logo: "logo.png".to_string(),
-            map_image: 0,
+            map_image: 1,
             booth_number: 15,
             tags: Some(vec![3])
         },

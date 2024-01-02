@@ -104,7 +104,7 @@ import TagGroup from "@/components/Tag_group.vue";
 import { reactive } from "vue";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
-import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
+// import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const headers = [
@@ -141,7 +141,7 @@ const headers = [
 
 const tagsStore = useTagsStore();
 const companiesStore = useCompaniesStore();
-const mapsStore = useMapsStore();
+// const mapsStore = useMapsStore();
 
 // const hasNonValidValue = (value: any): boolean => {
 //   return value === null || value === "" || value.length === 0 || value === -1;
@@ -168,15 +168,16 @@ type metaRow = {
   offering: selectedTag[];
   language: selectedTag[];
   fair_area: selectedTag[];
-  meta_map_image: { label: Company_Map; value: number };
+  meta_map_image: any | { label: any; value: number };
 };
 
 const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
   (row) => {
-    const map_image_obj = mapsStore.getMapFromId(row.map_image);
-    const meta_map_image = map_image_obj
-      ? { label: map_image_obj, value: map_image_obj.id }
-      : { label: { name: "None" }, value: -1 };
+    // const map_image_obj = 
+    // const meta_map_image = map_image_obj
+    //   ? { label: map_image_obj, value: map_image_obj.id }
+    //   : { label: { name: "None" }, value: -1 };
+    const meta_map_image = null;
     return reactive({
       meta_map_image,
       divisions: tagsStore
@@ -311,11 +312,11 @@ const colMeta: TableColMeta[] = [
   {
     type: "single-select",
     model: "meta_map_image",
-    items: [{ label: { name: "None" }, value: -1 }].concat(
-      Array.from(mapsStore.maps.values()).map((m) => ({
-        label: m,
-        value: m.id,
-      }))
+    items: [{ label: { name: "None" }, value: -1 }].concat( // TODO: Fix 
+      // Array.from(mapsStore.maps.values()).map((m) => ({ 
+      //   label: m,
+      //   value: m.id,
+      // }))
     ),
     label: "Map",
     hint: "Map for company location",

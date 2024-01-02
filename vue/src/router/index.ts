@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "@/stores/modules/auth";
-import { useMapsStore } from "@/stores/modules/maps";
+// import { useMapsStore } from "@/stores/modules/maps";
 import { useTagsStore } from "@/stores/modules/tags";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { usePrepagesStore } from "@/stores/modules/prepages";
@@ -25,7 +25,7 @@ const Companies_admin = () => import("@/views/admin/Companies.vue");
 const Prepage_admin = () => import("@/views/admin/Prepage.vue");
 const Tags_admin = () => import("@/views/admin/Tags.vue");
 const Account_admin = () => import("@/components/admin/Account.vue");
-const Map_admin = () => import("@/views/admin/Map.vue");
+// const Map_admin = () => import("@/views/admin/Map.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
@@ -126,11 +126,11 @@ const router = createRouter({
           name: "Tags",
           component: Tags_admin,
         },
-        {
-          path: "maps",
-          name: "Maps",
-          component: Map_admin,
-        },
+        // {
+        //   path: "maps",
+        //   name: "Maps",
+        //   component: Map_admin,
+        // },
         {
           path: "shortcuts",
           name: "Shortcuts",
@@ -180,10 +180,10 @@ router.beforeEach(async (to, from, next) => {
     useAuthStore().setAuthorizationHeader();
     useFavoritesStore().loadFromStorage();
 
-    const mapsStore = useMapsStore();
+//    const mapsStore = useMapsStore();
 
     await Promise.all([
-      mapsStore.getMaps(),
+//      mapsStore.getMaps(),
       useTagsStore().getTags(), // This one fails if db is empty, check why
       useCompaniesStore().fetchCompanies(),
       usePrepagesStore().getPrepages(),
