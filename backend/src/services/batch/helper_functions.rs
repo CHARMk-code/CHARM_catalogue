@@ -84,7 +84,7 @@ macro_rules! update_id_values {
                             key_column: stringify!($column).to_string(),
                         })?;
                 let updated_id = $id_mapper.get(&original_id).cloned();
-                value.map_image = updated_id;
+                value.$column = updated_id;
                 Ok(())
             })
     };

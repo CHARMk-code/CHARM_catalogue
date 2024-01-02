@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::{
     models::{
         company::CompanyDB, layout::LayoutDB, map::FairMapDB, prepage::PrepageDB, shortcut::ShortcutDB,
-        tag::TagDB,
+        tag::TagDB, tag_category::TagCategoryDB,
     },
     services::{
         self,
@@ -39,24 +39,9 @@ async fn full_parsing_of_zip_file_should_populate_db(
     let expected_prepages_amount = 49;
     let expected_shortcuts_amount = 3;
     let expected_tags_amount = 41;
+    let expected_tag_categories_amount = 6;
     let expected_images_amount = 257;
 
-    // Tag category
-    let expected_tag_categories_amount = 6;
-    let expected_tag_categories = vec![
-        TagCategoryDB {
-            id: 0,
-            name: "Division".to_string(),
-        },
-        TagCategoryDB {
-            id: 3,
-            name: "Offering".to_string(),
-        },
-        TagCategoryDB {
-            id: 5,
-            name: "Fair Area".to_string(),
-        },
-    ];
 
     // Companies
     let companies = services::company::get_all(&db)
@@ -77,6 +62,17 @@ async fn full_parsing_of_zip_file_should_populate_db(
         expected_tags_amount,
         "Different amount of tags than expected"
     );
+    
+    // Tag category
+    let tag_categories = services::tag_category::get_all(&db)
+        .await
+        .expect("to have been tested elsewhere");
+    assert_eq!(
+        tag_categories.len(),
+        expected_tag_categories_amount,
+        "Different amount of tag categories than expected"
+    );
+
 
     // Prepages
     let prepages = services::prepage::get_all(&db)

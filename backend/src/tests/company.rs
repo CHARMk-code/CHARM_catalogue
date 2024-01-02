@@ -8,7 +8,7 @@ use crate::{
     services,
 };
 
-#[sqlx::test(fixtures("Companies", "Tag_categories", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     // Setup
     let initial_company = CompanyDB {
@@ -63,7 +63,7 @@ async fn get_by_id_when_no_matching_company_should_fail(db: Pool<Postgres>) -> R
 
     Ok(())
 }
-#[sqlx::test(fixtures("Companies", "Tag_categories", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     #[derive(Debug, PartialEq, Eq, Clone)]
     struct CompanyTagRel {
@@ -195,7 +195,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
     Ok(())
 }
 
-#[sqlx::test(fixtures("Companies", "Tag_categories", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn valid_update_on_existing_company_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -337,7 +337,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     Ok(())
 }
 
-#[sqlx::test(fixtures("Companies", "Tag_categories", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {

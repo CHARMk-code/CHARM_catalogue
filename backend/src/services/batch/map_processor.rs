@@ -5,7 +5,7 @@ use calamine::DataType;
 
 use super::{
     helper_functions::{value_to_file_path, value_to_i32, value_to_json, value_to_string},
-    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor, ProcessedSheet,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
 };
 use crate::{
     models::map::{FairMapWeb, RequiredField},
@@ -59,7 +59,7 @@ impl XlsxSheetProcessor for MapProcessor {
         Ok(())
     }
 
-fn update_foreign_keys(
+    fn update_foreign_keys(
         updated_values: &mut ProcessedSheets,
         _original_values: &ProcessedSheets,
     ) -> Result<(), BatchProcessError> {

@@ -11,7 +11,7 @@ use crate::{
 
 use super::{
     helper_functions::{value_to_bool, value_to_file_path, value_to_i32},
-    BatchProcessError, ProcessStage, ProcessedSheet, ProcessedSheets, XlsxSheetProcessor,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
 };
 
 pub struct LayoutProcessor();

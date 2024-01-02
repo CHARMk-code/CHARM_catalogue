@@ -8,7 +8,7 @@ use super::{
     company_processor::CompanyProcessor, layout_processor::LayoutProcessor,
     map_processor::MapProcessor, prepage_processor::PrepageProcessor,
     shortcut_processor::ShortcutProcessor, tag_processor::TagProcessor, BatchProcessError,
-    ProcessedSheets, XlsxSheetProcessor,
+    ProcessedSheets, XlsxSheetProcessor, tag_category_processor::TagCategoryProcessor,
 };
 
 pub fn check_file_dependencies(
@@ -44,7 +44,7 @@ pub fn check_file_dependencies(
             ),
             SheetNames::TagCategories => (
                 sheet_name,
-                get_missing_files(&processed_values.tag_categories, &provided_files_set),
+                get_missing_files(&processed_values.tag_categories.rows, &provided_files_set),
             ),
             SheetNames::Prepages => (
                 sheet_name,
@@ -76,6 +76,7 @@ pub fn check_foreign_key_deps(processed_values: &ProcessedSheets) -> Result<(), 
     SheetNames::iter().try_for_each(|sheet_name| match sheet_name {
         SheetNames::Companies => CompanyProcessor::check_foreign_key_deps(processed_values),
         SheetNames::Tags => TagProcessor::check_foreign_key_deps(processed_values),
+        SheetNames::TagCategories => TagCategoryProcessor::check_foreign_key_deps(processed_values),
         SheetNames::Prepages => PrepageProcessor::check_foreign_key_deps(processed_values),
         SheetNames::Layouts => LayoutProcessor::check_foreign_key_deps(processed_values),
         SheetNames::Maps => MapProcessor::check_foreign_key_deps(processed_values),
@@ -115,6 +116,7 @@ mod tests {
                 process_stage: ProcessStage::NotStarted,
             },
             tags: ProcessedSheet::default(),
+            tag_categories: ProcessedSheet::default(),
             prepages: ProcessedSheet::default(),
             layouts: ProcessedSheet::default(),
             maps: ProcessedSheet::default(),
@@ -141,6 +143,7 @@ mod tests {
                 process_stage: ProcessStage::NotStarted,
             },
             tags: ProcessedSheet::default(),
+            tag_categories: ProcessedSheet::default(),
             prepages: ProcessedSheet::default(),
             layouts: ProcessedSheet::default(),
             maps: ProcessedSheet::default(),

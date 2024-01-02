@@ -15,7 +15,7 @@ impl Default for TagWeb {
             id: Default::default(),
             name: Default::default(),
             icon: Default::default(),
-            category: Default::default(), // TODO: This is probably not 100% correct
+            category: Default::default(), 
         }
     }
 }

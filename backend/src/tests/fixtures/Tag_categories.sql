@@ -1,7 +1,7 @@
-INSERT INTO tag_category VALUES 
-(0, 'Division'),
-(1,'Business Area'),
-(2, 'Looking For'),
-(3, 'Offering'),
-(4, 'Language'),
-(5, 'Fair Area');
+INSERT INTO tag_category (name) VALUES 
+('Division'),
+('Business Area'),
+('Looking For'),
+('Offering'),
+('Language'),
+('Fair Area');

@@ -5,7 +5,7 @@ use crate::{
     models::map::{FairMapDB, FairMapWeb},
 };
 
-use super::{is_optional_field_or_default, is_valid_required_field};
+use super::is_valid_required_field;
 
 pub async fn create(db: &Pool<Postgres>, data: &FairMapWeb) -> Result<i32, actix_web::Error> {
     let name = is_valid_required_field(&data.name)?;

@@ -21,30 +21,22 @@ use zip::{read::ZipFile, ZipArchive};
 use crate::{
     models::{
         company::CompanyWeb, layout::LayoutWeb, map::FairMapWeb, prepage::PrepageWeb,
-        shortcut::ShortcutWeb, tag::TagWeb,
+        shortcut::ShortcutWeb, tag::TagWeb, tag_category::TagCategoryWeb,
     },
     services::{
         self,
         batch::{
-            check_functions::{check_file_dependencies, check_tag_exist_for_company_tags},
-            company_processor::CompanyProcessor,
-            layout_processor::LayoutProcessor,
-            map_processor::MapProcessor,
-            prepage_processor::PrepageProcessor,
-            shortcut_processor::ShortcutProcessor,
-            tag_category_processor::TagCategoryProcessor,
+            company_processor::CompanyProcessor, layout_processor::LayoutProcessor,
+            map_processor::MapProcessor, prepage_processor::PrepageProcessor,
+            shortcut_processor::ShortcutProcessor, tag_category_processor::TagCategoryProcessor,
             tag_processor::TagProcessor,
         },
     },
 };
 
-use self::{
-    check_functions::{check_file_dependencies, check_foreign_key_deps},
-    company_processor::CompanyProcessor,
-    tag_processor::TagProcessor,
-};
+use self::check_functions::{check_file_dependencies, check_foreign_key_deps};
 
-pub mod check_functions;
+mod check_functions;
 mod company_processor;
 mod helper_functions;
 mod layout_processor;
@@ -90,6 +82,7 @@ impl<T> ProcessedSheet<T> {
 pub struct ProcessedSheets {
     pub companies: ProcessedSheet<CompanyWeb>,
     pub tags: ProcessedSheet<TagWeb>,
+    pub tag_categories: ProcessedSheet<TagCategoryWeb>,
     pub prepages: ProcessedSheet<PrepageWeb>,
     pub layouts: ProcessedSheet<LayoutWeb>,
     pub maps: ProcessedSheet<FairMapWeb>,
@@ -100,6 +93,7 @@ impl ProcessedSheets {
     fn extend(&mut self, additional_rows: ProcessedSheets) -> &Self {
         self.companies.extend(additional_rows.companies);
         self.tags.extend(additional_rows.tags);
+        self.tag_categories.extend(additional_rows.tag_categories);
         self.prepages.extend(additional_rows.prepages);
         self.layouts.extend(additional_rows.layouts);
         self.maps.extend(additional_rows.maps);
@@ -113,6 +107,9 @@ impl ProcessedSheets {
             |min_stage, sheet_name| match sheet_name {
                 SheetNames::Companies => std::cmp::min(min_stage, &self.companies.process_stage),
                 SheetNames::Tags => std::cmp::min(min_stage, &self.tags.process_stage),
+                SheetNames::TagCategories => {
+                    std::cmp::min(min_stage, &self.tag_categories.process_stage)
+                }
                 SheetNames::Prepages => std::cmp::min(min_stage, &self.prepages.process_stage),
                 SheetNames::Layouts => std::cmp::min(min_stage, &self.layouts.process_stage),
                 SheetNames::Maps => std::cmp::min(min_stage, &self.maps.process_stage),
@@ -157,7 +154,6 @@ pub async fn process_batch_zip(
 
             // if not excel file handle it as such
             _ => {
-                println!("{:?}: {:?}", name, name.extension());
                 provided_files.push(process_other_file(file, upload_path, storage_path, db).await?)
             }
         };
@@ -183,7 +179,6 @@ async fn apply_proccessed_sheets_to_db(
         db: &Pool<Postgres>,
         processed_sheet: ProcessedSheet<P::OutputType>,
     ) -> Result<ProcessedSheet<P::OutputType>, BatchProcessError> {
-        println!("Updating {:?}, process_stage: {:?}", std::any::type_name::<P>(), processed_sheet.process_stage);
         if processed_sheet.process_stage != ProcessStage::ForeignKeysUpdated {
             return Ok(processed_sheet);
         }
@@ -211,6 +206,11 @@ async fn apply_proccessed_sheets_to_db(
             companies: apply_processed_sheet::<CompanyProcessor>(db, processed_sheets.companies)
                 .await?,
             tags: apply_processed_sheet::<TagProcessor>(db, processed_sheets.tags).await?,
+            tag_categories: apply_processed_sheet::<TagCategoryProcessor>(
+                db,
+                processed_sheets.tag_categories,
+            )
+            .await?,
             prepages: apply_processed_sheet::<PrepageProcessor>(db, processed_sheets.prepages)
                 .await?,
             layouts: apply_processed_sheet::<LayoutProcessor>(db, processed_sheets.layouts).await?,
@@ -225,7 +225,6 @@ async fn apply_proccessed_sheets_to_db(
         mut processed_sheets: ProcessedSheets,
         original_processed_sheets: &ProcessedSheets,
     ) -> Result<ProcessedSheets, BatchProcessError> {
-
         SheetNames::iter().try_for_each(|name| match name {
             SheetNames::Companies => CompanyProcessor::update_foreign_keys(
                 &mut processed_sheets,
@@ -234,6 +233,10 @@ async fn apply_proccessed_sheets_to_db(
             SheetNames::Tags => {
                 TagProcessor::update_foreign_keys(&mut processed_sheets, original_processed_sheets)
             }
+            SheetNames::TagCategories => TagCategoryProcessor::update_foreign_keys(
+                &mut processed_sheets,
+                original_processed_sheets,
+            ),
             SheetNames::Prepages => PrepageProcessor::update_foreign_keys(
                 &mut processed_sheets,
                 original_processed_sheets,
@@ -600,12 +603,13 @@ pub enum BatchProcessError {
         row: String,
     },
 
-    #[error("Invalid id specified: \ncolumn {used_key_column:?} in {used_key_sheet:?} must be a subset of ids \nin column {valid_key_column:?} in {valid_key_sheet:?} The following invalid keys were found: {invalid_keys:?}")]
+    #[error("Invalid id specified: \ncolumn {used_key_column:?} in {used_key_sheet:?} must be a subset of ids \nin column {valid_key_column:?} in {valid_key_sheet:?} With the following Available: {available_keys:?} and invalid keys: {invalid_keys:?}.")]
     InvalidForeignKey {
         valid_key_sheet: String,
         valid_key_column: String,
         used_key_sheet: String,
         used_key_column: String,
+        available_keys: Vec<i32>,
         invalid_keys: Vec<i32>,
     },
 

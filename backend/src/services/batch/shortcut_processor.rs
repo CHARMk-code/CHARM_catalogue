@@ -5,7 +5,7 @@ use calamine::DataType;
 
 use super::{
     helper_functions::{value_to_i32, value_to_string},
-    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor, ProcessedSheet,
+    BatchProcessError, ProcessStage, ProcessedSheets, XlsxSheetProcessor,
 };
 use crate::{
     models::{shortcut::RequiredField, shortcut::ShortcutWeb},

@@ -9,10 +9,10 @@ use crate::{
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     //Setup
     let initial_db_tag = TagDB {
-        id: 0,
+        id: 1,
         name: "A".to_string(),
         icon: "A.svg".to_string(),
-        category: 0,
+        category: 1,
     };
 
     // What's tested
@@ -52,10 +52,9 @@ async fn creating_a_valid_tag_should_create_row_in_db(db: Pool<Postgres>) -> Res
         icon: Some("NEW_TAG.svg".to_string()),
         category: Some(2),
     };
-
+    
     // What's tested
     let created_query_result = services::tag::create(&db, &new_tag).await;
-    println!("{:?}", created_query_result);
     assert!(
         created_query_result.is_ok(),
         "Should not fail on creation of new row"

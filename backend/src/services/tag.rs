@@ -12,6 +12,8 @@ pub async fn create(db: &Pool<Postgres>, data: &TagWeb) -> Result<i32, actix_web
     let icon = is_optional_field_or_default(&data.icon, "".to_string())?;
     let category = is_valid_required_field(&data.category)?;
 
+    println!("{} {} {}", name, icon, category);
+
     let query_result = sqlx::query!("INSERT INTO tags (name, icon, category) VALUES ($1, $2, $3) returning id;",
 name, icon, category)
         .fetch_one(db).await.map_err(MyError::SQLxError)?;
