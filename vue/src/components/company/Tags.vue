@@ -1,5 +1,5 @@
 <template>
-  <company_card_wrapper :name="name">
+  <q-card >
     <q-card-section>
       <div class="text-h6">{{ title }}</div>
       <div>
@@ -11,17 +11,15 @@
         </template>
       </div>
     </q-card-section>
-  </company_card_wrapper>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
-import company_card_wrapper from "@/components/company/card_wrapper.vue";
-import type { Tag } from "@/stores/modules/tags";
-import TagGroup from "../Tag_group.vue";
+import type { Tag } from "@/stores/modules/tags"
+import TagGroup from "../Tag_group.vue"
 
 defineProps<{
-  title: string;
-  name: string;
-  tags: Tag[];
-}>();
+  title: string
+  tags: Tag[]
+}>()
 </script>

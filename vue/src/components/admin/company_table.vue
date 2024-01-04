@@ -35,14 +35,14 @@
             <template
               v-if="
                 !props.value ||
-                tagsStore.getTagsByCategoryFromIds('division',props.value).length < 1
+                tagsStore.getTagsByCategoryFromIds('Division',props.value).length < 1
               "
             >
               None
             </template>
             <template v-else>
               <TagGroup
-                :tags="tagsStore.getTagsByCategoryFromIds('division',props.value)"
+                :tags="tagsStore.getTagsByCategoryFromIds('Division',props.value)"
               ></TagGroup>
             </template>
           </q-td>
@@ -168,35 +168,28 @@ type metaRow = {
   offering: selectedTag[];
   language: selectedTag[];
   fair_area: selectedTag[];
-  meta_map_image: any | { label: any; value: number };
 };
 
 const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
   (row) => {
-    // const map_image_obj = 
-    // const meta_map_image = map_image_obj
-    //   ? { label: map_image_obj, value: map_image_obj.id }
-    //   : { label: { name: "None" }, value: -1 };
-    const meta_map_image = null;
     return reactive({
-      meta_map_image,
       divisions: tagsStore
-        .getTagsByCategoryFromIds("division",row.tags)
+        .getTagsByCategoryFromIds("Division",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       looking_for: tagsStore
-        .getTagsByCategoryFromIds("looking_for",row.tags)
+        .getTagsByCategoryFromIds("Looking For",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       business_areas: tagsStore
-        .getTagsByCategoryFromIds("business_area",row.tags)
+        .getTagsByCategoryFromIds("Business Area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       offering: tagsStore
-        .getTagsByCategoryFromIds("offering",row.tags)
+        .getTagsByCategoryFromIds("Offering",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       language: tagsStore
-        .getTagsByCategoryFromIds("language",row.tags)
+        .getTagsByCategoryFromIds("Language",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       fair_area: tagsStore
-        .getTagsByCategoryFromIds("fair_area",row.tags)
+        .getTagsByCategoryFromIds("Fair Area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
     });
   }
@@ -217,26 +210,25 @@ function updateWithMetaModels(meta: metaRow, row: Company) {
     meta.language
   ) {
     if (meta.divisions) {
-      var allTags = allTags.concat(meta.divisions.map((v) => v.value));
+      allTags = allTags.concat(meta.divisions.map((v) => v.value));
     }
     if (meta.looking_for) {
-      var allTags = allTags.concat(meta.looking_for.map((v) => v.value));
+      allTags = allTags.concat(meta.looking_for.map((v) => v.value));
     }
     if (meta.business_areas) {
-      var allTags = allTags.concat(meta.business_areas.map((v) => v.value));
+      allTags = allTags.concat(meta.business_areas.map((v) => v.value));
     }
     if (meta.offering) {
-      var allTags = allTags.concat(meta.offering.map((v) => v.value));
+      allTags = allTags.concat(meta.offering.map((v) => v.value));
     }
     if (meta.language) {
-      var allTags = allTags.concat(meta.language.map((v) => v.value));
+      allTags = allTags.concat(meta.language.map((v) => v.value));
     }
     if (meta.fair_area) {
-      var allTags = allTags.concat(meta.fair_area.map((v) => v.value));
+      allTags = allTags.concat(meta.fair_area.map((v) => v.value));
     }
     row.tags = new Set(allTags);
   }
-  row.map_image = meta.meta_map_image.value;
 }
 
 const colMeta: TableColMeta[] = [
@@ -279,16 +271,6 @@ const colMeta: TableColMeta[] = [
   },
   {
     type: "textarea",
-    model: "summer_job_description",
-    label: "Description of summer job",
-  },
-  {
-    type: "external-link",
-    model: "summer_job_link",
-    label: "Link to summer job application",
-  },
-  {
-    type: "textarea",
     model: "talk_to_us_about",
     label: "Talk to us about",
   },
@@ -310,22 +292,9 @@ const colMeta: TableColMeta[] = [
     label: "Number of Employees in Sweden",
   },
   {
-    type: "single-select",
-    model: "meta_map_image",
-    items: [{ label: { name: "None" }, value: -1 }].concat( // TODO: Fix 
-      // Array.from(mapsStore.maps.values()).map((m) => ({ 
-      //   label: m,
-      //   value: m.id,
-      // }))
-    ),
-    label: "Map",
-    hint: "Map for company location",
-    meta: true,
-  },
-  {
     type: "multiple-select",
     model: "divisions",
-    items: tagsStore.getTagsInCategory("division").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Division").map((t) => ({ value: t.id, label: t })),
     label: "Programs",
     hint: "Programs the company are interested in",
     meta: true,
@@ -333,7 +302,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "looking_for",
-    items: tagsStore.getTagsInCategory("looking_for").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Looking For").map((t) => ({ value: t.id, label: t })),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
     meta: true,
@@ -341,7 +310,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "business_areas",
-    items: tagsStore.getTagsInCategory("business_area").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Business Area").map((t) => ({ value: t.id, label: t })),
     label: "Business areas",
     hint: "The company's business areas",
     meta: true,
@@ -349,7 +318,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "offering",
-    items: tagsStore.getTagsInCategory("offering").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Offering").map((t) => ({ value: t.id, label: t })),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
     meta: true,
@@ -357,7 +326,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "language",
-    items: tagsStore.getTagsInCategory("language").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Language").map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
     meta: true,
@@ -365,7 +334,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "fair_area",
-    items: tagsStore.getTagsInCategory("fair_area").map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Fair Area").map((t) => ({ value: t.id, label: t })),
     label: "Fair Area",
     hint: "Which Fair Area is the company on",
     meta: true,

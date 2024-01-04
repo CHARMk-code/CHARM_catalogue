@@ -43,13 +43,6 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Uniquesellingpoint => {
                 row_struct.unique_selling_point = value_to_string(value)
             }
-            RequiredField::Summerjobdescription => {
-                row_struct.summer_job_description = value_to_string(value)
-            }
-            RequiredField::Summerjoblink => row_struct.summer_job_link = value_to_string(value),
-            RequiredField::Summerjobdeadline => {
-                row_struct.summer_job_deadline = value_to_chrono_date(value)
-            }
             RequiredField::Contacts => row_struct.contacts = value_to_string(value),
             RequiredField::Contactemail => row_struct.contact_email = value_to_string(value),
             RequiredField::Employeesworld => row_struct.employees_world = value_to_i32(value),

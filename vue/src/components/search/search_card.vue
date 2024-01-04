@@ -32,42 +32,42 @@
           <tagSelector
             v-if="isVisible('tag_divisions')"
             v-model:selectedTags="selectedDivisions"
-            :tags="tagsStore.getTagsInCategory('division')"
+            :tags="tagsStore.getTagsInCategory('Division')"
             label="Programs"
             :max-shown="8"
           />
           <tagSelector
             v-if="isVisible('tag_business_areas')"
             v-model:selectedTags="selectedBusiness_areas"
-            :tags="tagsStore.getTagsInCategory('business_area')"
+            :tags="tagsStore.getTagsInCategory('Business Area')"
             label="Business areas"
             :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('tag_looking_for')"
             v-model:selectedTags="selectedLooking_for"
-            :tags="tagsStore.getTagsInCategory('looking_for')"
+            :tags="tagsStore.getTagsInCategory('Looking For')"
             label="Looking for"
             :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('tag_offering')"
             v-model:selectedTags="selectedOfferings"
-            :tags="tagsStore.getTagsInCategory('offering')"
+            :tags="tagsStore.getTagsInCategory('Offering')"
             label="Offering"
             :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('language')"
             v-model:selectedTags="selectedLanguages"
-            :tags="tagsStore.getTagsInCategory('language')"
+            :tags="tagsStore.getTagsInCategory('Language')"
             label="Language"
             :max-shown="2"
           />
           <tagSelector
             v-if="isVisible('fair_area')"
             v-model:selectedTags="selectedFairAreas"
-            :tags="tagsStore.getTagsInCategory('fair_area')"
+            :tags="tagsStore.getTagsInCategory('Fair Area')"
             label="Fair Areas"
             :max-shown="2"
           />
@@ -172,7 +172,7 @@ const visibleCards = site_settingsStore.server_settings.company_view.cards.filte
 
 const selectedDivisions = computed({
   get() {
-    return tagsStore.getTagsByCategoryFromIds("division", new Set(filterStore.filters.tags.divisions));
+    return tagsStore.getTagsByCategoryFromIds("Division", new Set(filterStore.filters.tags.divisions));
   },
   set(v) {
     if (v) {
@@ -184,7 +184,7 @@ const selectedDivisions = computed({
 });
 const selectedBusiness_areas = computed({
   get() {
-    return tagsStore.getTagsByCategoryFromIds("business_area", new Set(filterStore.filters.tags.business_areas));
+    return tagsStore.getTagsByCategoryFromIds("Business Area", new Set(filterStore.filters.tags.business_areas));
   },
   set(v) {
     if (v) {
@@ -196,7 +196,7 @@ const selectedBusiness_areas = computed({
 });
 const selectedLooking_for = computed({
   get() {
-    return tagsStore.getTagsByCategoryFromIds("looking_for", new Set(filterStore.filters.tags.looking_for))
+    return tagsStore.getTagsByCategoryFromIds("Looking For", new Set(filterStore.filters.tags.looking_for))
   },
   set(v) {
     if (v) {
@@ -208,7 +208,7 @@ const selectedLooking_for = computed({
 });
 const selectedOfferings = computed({
   get() {
-    return tagsStore.getTagsByCategoryFromIds("offering", new Set(filterStore.filters.tags.offerings));
+    return tagsStore.getTagsByCategoryFromIds("Offering", new Set(filterStore.filters.tags.offerings));
   },
   set(v) {
     if (v) {
@@ -220,7 +220,7 @@ const selectedOfferings = computed({
 });
 const selectedLanguages = computed({
   get() {
-    return tagsStore.getTagsByCategoryFromIds("language", new Set(filterStore.filters.tags.languages));
+    return tagsStore.getTagsByCategoryFromIds("Language", new Set(filterStore.filters.tags.languages));
   },
   set(v) {
     if (v) {

@@ -6,23 +6,23 @@ export interface Tag_category {
   name: string;
 }
 interface State {
-  tags_categories: Map<number, Tag_category>;
+  tag_categories: Map<number, Tag_category>;
   load_wait: number;
 }
 export const useTagCategoriesStore = defineStore("tagCategories", {
   state: (): State => ({
-    tags_categories: new Map(),
+    tag_categories: new Map(),
     load_wait: 0,
   }),
   actions: {
-    setAllTagCategories(tags_categories: Tag_category[]) {
-      this.tags_categories = new Map(tags_categories.map((t) => [t.id, t]));
+    setAllTagCategories(tag_categories: Tag_category[]) {
+      this.tag_categories = new Map(tag_categories.map((t) => [t.id, t]));
     },
     removeTagCategoryById(id: number) {
-      this.tags_categories.delete(id);
+      this.tag_categories.delete(id);
     },
     removeAllTagCategories() {
-      this.tags_categories = new Map();
+      this.tag_categories = new Map();
     },
     fetchTagCategories() {
       return new Promise<void>((resolve, reject) => {
@@ -31,8 +31,8 @@ export const useTagCategoriesStore = defineStore("tagCategories", {
           this.axios
             .get("/v2/tag_category/")
             .then((resp: any) => {
-              const tags_categories = resp.data;
-              if (tags_categories.length > 0) this.setAllTagCategories(tags_categories);
+              const tag_categories = resp.data;
+              if (tag_categories.length > 0) this.setAllTagCategories(tag_categories);
               resolve(resp);
             })
             .catch((err: any) => {
@@ -43,12 +43,12 @@ export const useTagCategoriesStore = defineStore("tagCategories", {
         }
       });
     },
-    updateTag(tag_category: Tag_category) {
+    updateTagCategory(tag_category: Tag_category) {
       return new Promise((resolve, reject) => {
         this.axios
           .put("/v2/tag_category/", tag_category)
           .then((resp: any) => {
-            this.tags.set(tag_category.id, tag_category);
+            this.tag_categories.set(tag_category.id, tag_category);
             resolve(resp);
           })
           .catch((err: any) => {
@@ -56,12 +56,12 @@ export const useTagCategoriesStore = defineStore("tagCategories", {
           });
       });
     },
-    removeTag(tag_category: Tag_category) {
+    removeTagCategory(tag_category: Tag_category) {
       return new Promise((resolve, reject) => {
         this.axios
           .delete("/v2/tag_category/" + tag_category.id)
           .then((resp: any) => {
-            this.removeTagById(tag_category.id);
+            this.removeTagCategoryById(tag_category.id);
             resolve(resp);
           })
           .catch((err: any) => {

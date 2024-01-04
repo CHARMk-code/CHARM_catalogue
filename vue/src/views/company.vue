@@ -139,27 +139,17 @@ function renderCompanyCards() {
     }
 
     // Map
-    if (isVisible("map")) {
-      const vnode = h(Map, {
-        boothNumber: company.value.booth_number
-      });
-      addComponent("right", vnode);
-    }
+    // if (isVisible("map")) {
+    //   const vnode = h(Map, {
+    //     boothNumber: company.value.booth_number
+    //   });
+    //   addComponent("right", vnode);
+    // }
     // What makes us special
     if (isVisible("desc")) {
       const vnode = h(Textblock, {
         title: "What Makes Us Special",
         body: company.value.unique_selling_point,
-      });
-      addComponent("right", vnode);
-    }
-    // Summerjob
-    if (isVisible("summerjob")) {
-      const vnode = h(Summerjob, {
-        name: "summerjob",
-        desc: company.value.summer_job_description,
-        link: company.value.summer_job_link,
-        deadline: company.value.summer_job_deadline,
       });
       addComponent("right", vnode);
     }

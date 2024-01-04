@@ -19,10 +19,6 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
     let description = is_valid_required_field(&data.description)?;
     let unique_selling_point =
         is_optional_field_or_default(&data.unique_selling_point, "".to_string())?;
-    let summer_job_description =
-        is_optional_field_or_default(&data.summer_job_description, "".to_string())?;
-    let summer_job_link = is_optional_field_or_default(&data.summer_job_link, "".to_string())?;
-    let summer_job_deadline = is_optional_field_or_default(&data.summer_job_deadline, Utc::now())?;
     let contacts = is_valid_required_field(&data.contacts)?;
     let contact_email = is_valid_required_field(&data.contact_email)?;
     let employees_world = is_valid_required_field(&data.employees_world)?;
@@ -52,8 +48,8 @@ pub async fn create(db: &Pool<Postgres>, data: &CompanyWeb) -> Result<i32, actix
         ));
     };
 
-    let create_company_query_result = sqlx::query!("INSERT INTO companies (last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) returning id",
-last_updated, active, charmtalk, name, description, unique_selling_point, summer_job_description, summer_job_link, summer_job_deadline, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number)
+    let create_company_query_result = sqlx::query!("INSERT INTO companies (last_updated, active, charmtalk, name, description, unique_selling_point, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
+last_updated, active, charmtalk, name, description, unique_selling_point, contacts, contact_email, employees_world, employees_sweden, website, talk_to_us_about, logo, map_image, booth_number)
         .fetch_one(db).await.map_err(MyError::SQLxError)?;
 
     let new_company_id = create_company_query_result.id;
@@ -102,9 +98,6 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
     let name = data.name.as_ref();
     let description = data.description.as_ref();
     let unique_selling_point = data.unique_selling_point.as_ref();
-    let summer_job_description = data.summer_job_description.as_ref();
-    let summer_job_link = data.summer_job_link.as_ref();
-    let summer_job_deadline = data.summer_job_deadline.as_ref();
     let contacts = data.contacts.as_ref();
     let contact_email = data.contact_email.as_ref();
     let employees_world = data.employees_world.as_ref();
@@ -134,16 +127,13 @@ pub async fn update(db: &Pool<Postgres>, data: CompanyWeb) -> Result<i32, actix_
     };
 
     let query_result =
-        sqlx::query!("UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, summer_job_description = $7, summer_job_link = $8, summer_job_deadline = $9, contacts = $10, contact_email = $11, employees_world = $12, employees_sweden = $13, website = $14, talk_to_us_about = $15, logo = $16, map_image = $17, booth_number = $18 where id = $19 returning id",
+        sqlx::query!("UPDATE companies SET last_updated = $1, active = $2, charmtalk = $3, name = $4, description = $5, unique_selling_point = $6, contacts = $7, contact_email = $8, employees_world = $9, employees_sweden = $10, website = $11, talk_to_us_about = $12, logo = $13, map_image = $14, booth_number = $15 where id = $16 returning id",
             if last_updated.is_some() {last_updated.unwrap()} else {company.last_updated},
             if active.is_some() {active.unwrap()} else {&company.active},
             if charmtalk.is_some() {charmtalk.unwrap()} else {&company.charmtalk},
             if name.is_some() {name.unwrap()} else {&company.name},
             if description.is_some() {description.unwrap()} else {&company.description},
             if unique_selling_point.is_some() {unique_selling_point.unwrap()} else {&company.unique_selling_point},
-            if summer_job_description.is_some() {summer_job_description.unwrap()} else {&company.summer_job_description},
-            if summer_job_link.is_some() {summer_job_link.unwrap()} else {&company.summer_job_link},
-            if summer_job_deadline.is_some() {summer_job_deadline.unwrap()} else {&company.summer_job_deadline},
             if contacts.is_some() {contacts.unwrap()} else {&company.contacts},
             if contact_email.is_some() {contact_email.unwrap()} else {&company.contact_email},
             if employees_world.is_some() {employees_world.unwrap()} else {&company.employees_world},

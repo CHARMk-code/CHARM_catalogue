@@ -47,9 +47,6 @@ async fn update_handler(
             let name = input_company.name.as_ref();
             let description = input_company.description.as_ref();
             let unique_selling_point = input_company.unique_selling_point.as_ref();
-            let summer_job_description = input_company.summer_job_description.as_ref();
-            let summer_job_link = input_company.summer_job_link.as_ref();
-            let summer_job_deadline = input_company.summer_job_deadline.as_ref();
             let contacts = input_company.contacts.as_ref();
             let contact_email = input_company.contact_email.as_ref();
             let employees_world = input_company.employees_world.as_ref();
@@ -65,9 +62,6 @@ async fn update_handler(
                 .and(name)
                 .and(description)
                 .and(unique_selling_point)
-                .and(summer_job_description)
-                .and(summer_job_link)
-                .and(summer_job_deadline)
                 .and(contacts)
                 .and(contact_email)
                 .and(employees_world)

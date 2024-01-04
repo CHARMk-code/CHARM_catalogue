@@ -15,7 +15,7 @@ import { useFairMapsStore } from "@/stores/modules/fairMaps";
 import { useTagCategoriesStore } from "@/stores/modules/tag_category";
 
 const UserLayout = () => import("@/views/userLayout.vue");
-const Company_view = () => import("@/views/company.vue");
+const Company_view = () => import("@/views/company2.vue");
 const Search_view = () => import("@/views/search.vue");
 const Login_view = () => import("@/views/login.vue");
 const Landing_view = () => import("@/views/Landing.vue");
@@ -185,7 +185,7 @@ router.beforeEach(async (to, from, next) => {
 
     await Promise.all([
       useTagsStore().getTags(), // This one fails if db is empty, check why
-      useTagCategoriesStore().getTagCategories(),
+      useTagCategoriesStore().fetchTagCategories(),
       useCompaniesStore().fetchCompanies(),
       usePrepagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),

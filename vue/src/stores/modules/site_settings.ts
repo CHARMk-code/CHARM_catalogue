@@ -47,7 +47,6 @@ export const useSite_settingsStore = defineStore("site_settings", {
           { text: "Looking for", name: "tag_looking_for", active: true },
           { text: "Website", name: "website", active: true },
           { text: "Map", name: "map", active: true },
-          { text: "Summer job", name: "summerjob", active: true },
           { text: "Notes", name: "notes", active: true },
           { text: "CHARMtalks", name: "CHARMtalks", active: true },
           { text: "Language", name: "language", active: true },

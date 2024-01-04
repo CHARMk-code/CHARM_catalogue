@@ -8,7 +8,7 @@ use crate::services::auth::AuthedUser;
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/tag")
+        web::scope("/tag_category")
             .service(get_all_handler)
             .service(get_by_id_handler)
             .service(update_handler)
@@ -29,14 +29,14 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
     let id = path.into_inner();
     let tag_category= services::tag_category::get_by_id(&db, id).await?;
 
-    Ok(HttpResponse::Ok().json(tag))
+    Ok(HttpResponse::Ok().json(tag_category))
 }
 
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<TagCategory>,
+    data: Json<TagCategoryWeb>,
 ) -> Result<impl Responder> {
     let input_tag_category = data.into_inner();
 
@@ -49,13 +49,13 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let tag_category= services::tag_category::update(&db, input_tag_category).await?;
-                HttpResponse::Ok().json(tag)
+                let tag_category = services::tag_category::update(&db, input_tag_category).await?;
+                HttpResponse::Ok().json(tag_category)
             }
         }
         None => {
-            let tag_category= services::tag_category::create(&db, &input_tag_category).await?;
-            HttpResponse::Created().json(tag)
+            let tag_category = services::tag_category::create(&db, &input_tag_category).await?;
+            HttpResponse::Created().json(tag_category)
         }
     };
 
@@ -66,7 +66,7 @@ async fn update_handler(
 async fn create_handler(
     _user: AuthedUser,
     db: web::Data<PgPool>,
-    data: Json<TagCategory>,
+    data: Json<TagCategoryWeb>,
 ) -> Result<impl Responder> {
     let input_tag_category = data.into_inner();
     let affected_rows = services::tag_category::create(&db, &input_tag_category).await?;

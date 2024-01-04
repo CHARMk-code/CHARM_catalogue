@@ -11,9 +11,6 @@ pub struct CompanyWeb {
     pub name: Option<String>,
     pub description: Option<String>,
     pub unique_selling_point: Option<String>,
-    pub summer_job_description: Option<String>, // TODO: Allow publishing of generic job listings on the
-    pub summer_job_link: Option<String>,        // company page
-    pub summer_job_deadline: Option<DateTime<Utc>>,
     pub contacts: Option<String>,
     pub contact_email: Option<String>,
     pub employees_world: Option<i32>,
@@ -36,9 +33,6 @@ impl Default for CompanyWeb {
             name: Default::default(),
             description: Default::default(),
             unique_selling_point: Default::default(),
-            summer_job_description: Default::default(),
-            summer_job_link: Default::default(),
-            summer_job_deadline: Default::default(),
             contacts: Default::default(),
             contact_email: Default::default(),
             employees_world: Default::default(),
@@ -61,9 +55,6 @@ pub enum RequiredField {
     Name,
     Description,
     Uniquesellingpoint,
-    Summerjobdescription,
-    Summerjoblink,
-    Summerjobdeadline,
     Contacts,
     Contactemail,
     Employeesworld,
@@ -85,9 +76,6 @@ pub struct CompanyDB {
     pub name: String,
     pub description: String,
     pub unique_selling_point: String,
-    pub summer_job_description: String, // Allow publishing of generic job listings on the
-    pub summer_job_link: String,        // company page
-    pub summer_job_deadline: DateTime<Utc>,
     pub contacts: String,
     pub contact_email: String,
     pub employees_world: i32,

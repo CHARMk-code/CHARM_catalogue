@@ -118,25 +118,25 @@ const columns = computed(() => {
     {
       name: "Programs",
       label: "Programs",
-      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("division", row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Division", row.tags),
       align: "left",
     },
     {
       name: "Looking_for",
       label: "Looking for",
-      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("looking_for", row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Looking For", row.tags),
       align: "left",
     },
     {
       name: "Offering",
       label: "Offering",
-      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("offering", row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Offering", row.tags),
       align: "left",
     },
     {
       name: "Fair_area",
       label: "Fair Area",
-      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("fair_area", row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Fair Area", row.tags),
       align: "left",
     },
     {

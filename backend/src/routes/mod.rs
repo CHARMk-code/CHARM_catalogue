@@ -9,6 +9,7 @@ pub mod prepage;
 pub mod settings;
 pub mod shortcut;
 pub mod tag;
+pub mod tag_category;
 
 use actix_web::web;
 
@@ -17,6 +18,7 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
         web::scope("/api/v2")
             .configure(shortcut::routes)
             .configure(tag::routes)
+            .configure(tag_category::routes)
             .configure(map::routes)
             .configure(layout::routes)
             .configure(prepage::routes)
