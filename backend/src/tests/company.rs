@@ -31,6 +31,14 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         map_image: 1,
         booth_number: 15,
         tags: Some(vec![1, 2]),
+        image_office: "aimage.png".to_string(),
+        image_product: "ascreenshot.png".to_string(),
+        founded: 2022,
+        office_location: "Gothenburg".to_string(),
+        male_board_share: 100,
+        female_board_share: 0,
+        nonbinary_board_share: 0,
+        qr_link: "a qr link".to_string(),
     };
 
     // What's tested
@@ -89,6 +97,14 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         map_image: Some(2),
         booth_number: Some(42),
         tags: Some([1, 2].to_vec()),
+        image_office: Some("aimage.png".to_string()),
+        image_product: Some("ascreenshot.png".to_string()),
+        founded: Some(1920),
+        office_location: Some("New York".to_string()),
+        male_board_share: Some(40),
+        female_board_share: Some(30),
+        nonbinary_board_share: Some(30),
+        qr_link: Some("a qr".to_string()),
     };
 
     // What's tested
@@ -129,6 +145,14 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         map_image: 2,
         booth_number: 42,
         tags: Some([1, 2].to_vec()),
+        image_office: "aimage.png".to_string(),
+        image_product: "ascreenshot.png".to_string(),
+        founded: 1920,
+        office_location: "New York".to_string(),
+        male_board_share: 40,
+        female_board_share: 30,
+        nonbinary_board_share: 30,
+        qr_link: "a qr".to_string(),
     };
 
     assert_eq!(
@@ -217,6 +241,14 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         map_image: None,
         booth_number: None,
         tags: Some(vec![3]),
+        image_office: None,
+        image_product: None,
+        founded: Some(1920),
+        office_location: None,
+        male_board_share: Some(40),
+        female_board_share: Some(30),
+        nonbinary_board_share: Some(30),
+        qr_link: None,
     };
 
     // What's tested
@@ -264,7 +296,15 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
             logo: "logo.png".to_string(),
             map_image: 1,
             booth_number: 15,
-            tags: Some(vec![3])
+            tags: Some(vec![3]),
+            image_office: "aimage.png".to_string(),
+            image_product: "ascreenshot.png".to_string(),
+            founded: 1920,
+            office_location: "Gothenburg".to_string(),
+            male_board_share: 40,
+            female_board_share: 30,
+            nonbinary_board_share: 30,
+            qr_link: "a qr link".to_string(),
         },
         "The updated sure the company has been properly updated in the database"
     );

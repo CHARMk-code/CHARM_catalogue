@@ -21,6 +21,14 @@ pub struct CompanyWeb {
     pub map_image: Option<i32>,
     pub booth_number: Option<i32>,
     pub tags: Option<Vec<i32>>,
+    pub image_office: Option<String>,
+    pub image_product: Option<String>,
+    pub founded: Option<i32>,
+    pub office_location: Option<String>,
+    pub male_board_share: Option<i32>,
+    pub female_board_share: Option<i32>,
+    pub nonbinary_board_share: Option<i32>,
+    pub qr_link: Option<String>,
 }
 
 impl Default for CompanyWeb {
@@ -43,9 +51,18 @@ impl Default for CompanyWeb {
             map_image: Default::default(),
             booth_number: Default::default(),
             tags: Default::default(),
+            image_office: Default::default(),
+            image_product: Default::default(),
+            founded: Default::default(),
+            office_location: Default::default(),
+            male_board_share: Default::default(),
+            female_board_share: Default::default(),
+            nonbinary_board_share: Default::default(),
+            qr_link: Default::default(),
         }
     }
 }
+
 
 #[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
 pub enum RequiredField {
@@ -65,6 +82,14 @@ pub enum RequiredField {
     Mapimage,
     Boothnumber,
     Tags,
+    Imageoffice,
+    Imageproduct,
+    Founded,
+    Officelocation,
+    Maleboardshare,
+    Femaleboardshare,
+    Nonbinaryboardshare,
+    Qrlink
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -86,4 +111,12 @@ pub struct CompanyDB {
     pub map_image: i32,
     pub booth_number: i32,
     pub tags: Option<Vec<i32>>,
+    pub image_office: String,
+    pub image_product: String,
+    pub founded: i32,
+    pub office_location: String,
+    pub male_board_share: i32,
+    pub female_board_share: i32,
+    pub nonbinary_board_share: i32,
+    pub qr_link: String,
 }

@@ -32,14 +32,14 @@ async fn full_parsing_of_zip_file_should_populate_db(
 
     // Expected results
 
-    // Doesn't verify all data entered only the amount of rows 
+    // Doesn't verify all data entered only the amount of rows
     let expected_companies_amount = 160;
     let expected_layouts_amount = 6;
     let expected_maps_amount = 4;
     let expected_prepages_amount = 49;
     let expected_shortcuts_amount = 3;
-    let expected_tags_amount = 41;
-    let expected_tag_categories_amount = 6;
+    let expected_tags_amount = 47;
+    let expected_tag_categories_amount = 8;
     let expected_images_amount = 257;
 
 
@@ -62,7 +62,7 @@ async fn full_parsing_of_zip_file_should_populate_db(
         expected_tags_amount,
         "Different amount of tags than expected"
     );
-    
+
     // Tag category
     let tag_categories = services::tag_category::get_all(&db)
         .await

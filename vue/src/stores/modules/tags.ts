@@ -9,8 +9,7 @@ export interface Tag {
   category: number;
 }
 
-// TODO: Replace this with a mapping from database
-export type Category = "Division" | "Business Area" | "Looking For" | "Offering" | "Language" | "Fair Area"
+export type Category = "Division" | "Business Area" | "Looking For" | "Offering" | "Language" | "Fair Area" | "Perk" | "Value Word"
 
 interface State {
   tags: Map<number, Tag>;
@@ -91,7 +90,7 @@ export const useTagsStore = defineStore("tags", {
     },
     getTagsByCategoryFromIds: (state) => (category: Category, ids: Set<number>) => {
       const category_id = [...useTagCategoriesStore().tag_categories.values()].find(({name}) => name === category)?.id
-      return [...state.tags.values()].filter((tag) => ids.has(tag.id) && category_id === tag.category) 
+      return [...state.tags.values()].filter((tag) => ids.has(tag.id) && category_id === tag.category)
     },
     getTagsInCategory: (state) => (category: Category) => {
       const category_id = [...useTagCategoriesStore().tag_categories.values()].find(({name}) => name === category)?.id

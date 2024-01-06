@@ -21,6 +21,14 @@ export interface Company {
   map_image: number;
   booth_number: number;
   tags: Set<number>;
+  image_office: string,
+  image_product: string,
+  founded: number,
+  office_location: string,
+  male_board_share: number,
+  female_board_share: number,
+  nonbinary_board_share: number,
+  qr_link: string,
 }
 
 interface State {

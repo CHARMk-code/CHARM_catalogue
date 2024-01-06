@@ -55,6 +55,14 @@ impl XlsxSheetProcessor for CompanyProcessor {
             RequiredField::Mapimage => row_struct.map_image = value_to_i32(value),
             RequiredField::Boothnumber => row_struct.booth_number = value_to_i32(value),
             RequiredField::Tags => row_struct.tags = value_to_vec::<i32>(value),
+			RequiredField::Imageoffice => row_struct.image_office = value_to_string(value),
+			RequiredField::Imageproduct => row_struct.image_product = value_to_string(value),
+			RequiredField::Founded => row_struct.founded = value_to_i32(value),
+			RequiredField::Officelocation => row_struct.office_location = value_to_string(value),
+			RequiredField::Maleboardshare => row_struct.male_board_share = value_to_i32(value),
+			RequiredField::Femaleboardshare => row_struct.female_board_share = value_to_i32(value),
+			RequiredField::Nonbinaryboardshare => row_struct.nonbinary_board_share = value_to_i32(value),
+			RequiredField::Qrlink => row_struct.qr_link = value_to_string(value),
             _ => (),
         };
     }

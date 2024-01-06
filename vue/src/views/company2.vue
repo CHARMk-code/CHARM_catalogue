@@ -67,13 +67,13 @@ const available_components = computed(() => {
   return [
     {
       name: "image_office",
-      component: h(CompanyImage, { image: company.value?.logo ?? "" }),
+      component: h(CompanyImage, { image: company.value?.image_office ?? "" }),
       cols: 1,
       rows: 2,
     },
     {
       name: "image_product",
-      component: h(CompanyImage, { image: company.value?.logo ?? "" }),
+      component: h(CompanyImage, { image: company.value?.image_product ?? "" }),
       cols: 1,
       rows: 2,
     },
@@ -82,7 +82,7 @@ const available_components = computed(() => {
       component: h(Tags, {
         title: "Our words",
         tags: tagsStore.getTagsByCategoryFromIds(
-          "Division",
+          "Value Word",
           company.value?.tags ?? new Set([]),
         ),
       }),
@@ -131,7 +131,7 @@ const available_components = computed(() => {
       component: h(Tags, {
         title: "Our Perks",
         tags: tagsStore.getTagsByCategoryFromIds(
-          "Our Perks",
+          "Perk",
           company.value?.tags ?? new Set([]),
         ),
       }),
