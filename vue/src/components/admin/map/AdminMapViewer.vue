@@ -51,6 +51,7 @@ function setupMap(): Map {
 
 // Initializes map with information from the store
 function InitializeMap(fairMap: FairMap) {
+  console.log(fairMap)
   emptyMap.value = false
   const viewExtent = extentFromSize(fairMap.styling.mapSize.map((n) => n * 2))
   const viewProjection = new Projection({
@@ -85,26 +86,47 @@ function InitializeMap(fairMap: FairMap) {
 
   map.value.addInteraction(clickSelect)
   clickSelect.on("select", (e) => {
-    if (e.selected[0]) {
-      const selectedFeature = e.selected[0]
-      const refId = selectedFeature.getProperties().refId
+    const fairMapId = fairMapsStore.currentState.selectedMap ?? 0
 
-      fairMapsStore.currentState.selectedMarker = {
-        refId,
-        newPosition: selectedFeature
+    e.deselected.forEach((feature) => {
+      feature.setStyle(defaultMarkerStyle)
+
+      fairMapsStore.currentState.selectedMarker = undefined
+      emit("update:selectedMarker", undefined)
+    })
+
+    e.selected.forEach((feature) => {
+      const refId = feature.getProperties().refId
+      const newPosition = feature
+        .getProperties()
+        .geometry.flatCoordinates.slice(0, 2)
+
+      // this will be overwritten if multiple markers are selected simultaneously
+      fairMapsStore.currentState.selectedMarker = { refId, newPosition }
+
+      const selectedMarker = fairMapsStore.findMarker(fairMapId, refId)
+
+      if (selectedMarker) {
+        console.log("saving New position")
+        selectedMarker.position = newPosition
+      }
+      emit("update:selectedMarker", selectedMarker)
+    })
+
+    if (props.enableDrag) {
+      e.selected.concat(e.deselected).forEach((feature) => {
+        const refId = feature.getProperties().refId
+        const newPosition = feature
           .getProperties()
-          .geometry.flatCoordinates.slice(0, 2),
-      }
+          .geometry.flatCoordinates.slice(0, 2)
 
-      const fairMapId = fairMapsStore.currentState.selectedMap
-      if (fairMapId) {
-        const selectedMarker = fairMapsStore.findMarker(fairMapId, refId)
+        const savedMarker = fairMapsStore.findMarker(fairMapId, refId)
 
-        emit("update:selectedMarker", selectedMarker)
-      }
+        if (savedMarker) {
+          savedMarker.position = newPosition
+        }
+      })
     }
-    if (e.deselected.length > 0)
-      e.deselected.map((feature) => feature.setStyle(defaultMarkerStyle))
   })
 
   if (props.enableDrag) map.value.addInteraction(new Drag())

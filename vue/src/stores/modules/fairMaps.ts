@@ -111,8 +111,8 @@ export const useFairMapsStore = defineStore("fairMaps", {
                   id: fairMap.id,
                   name: fairMap.name,
                   background: fairMap.background,
-                  styling: fairMap.map_data.styling,
-                  mapGeometry: fairMap.map_data.mapGeometry,
+                  styling: fairMap.map_data.styling ?? { mapSize: [100, 100] },
+                  mapGeometry: fairMap.map_data.mapGeometry ?? [],
                 }),
               )
               res()
@@ -126,9 +126,8 @@ export const useFairMapsStore = defineStore("fairMaps", {
       })
     },
     saveFairMap(fairMapId: number) {
-      return new Promise<void>((_res, rej) => {
+      return new Promise((resolve, reject) => {
         const fairMap = this.fairMaps.get(fairMapId)
-        console.log(fairMap)
         if (fairMap) {
           const data = {
             id: fairMap.id,
@@ -139,10 +138,12 @@ export const useFairMapsStore = defineStore("fairMaps", {
               mapGeometry: fairMap.mapGeometry,
             },
           }
+          
+          const result = this.axios.put("/v2/map/", data)
 
-          return this.axios.put("/v2/map/", data).catch((err: any) => rej(err))
+          resolve(result)
         } else {
-          return rej("fairMap undefined")
+          return reject("fairMap undefined")
         }
       })
     },
