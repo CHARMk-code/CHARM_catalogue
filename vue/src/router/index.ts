@@ -198,6 +198,16 @@ router.beforeEach(async (to, from, next) => {
       })
       .catch(() => {}); // add some error here in the future?
   }
+  if (to.path.startsWith("/qr/")){
+    const qr = to.path.substring(4);
+    const companies = Array.from(useCompaniesStore().companies.values()).filter((c: Company) => c.qr_link === qr)
+
+    if (companies.length == 1) {
+      const company = companies[0];
+      next({name: "Company", params: {name: company.name}});
+    }
+  }
+
   if (to.matched.some((record) => !record.meta.noAuth)) {
     const authStore = useAuthStore();
 
