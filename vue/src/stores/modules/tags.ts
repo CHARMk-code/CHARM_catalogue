@@ -50,7 +50,6 @@ export const useTagsStore = defineStore("tags", {
       });
     },
     updateTag(tag: Tag) {
-        console.log("save tag", tag);
       return new Promise((resolve, reject) => {
         this.axios
           .put("/v2/tag/", tag)

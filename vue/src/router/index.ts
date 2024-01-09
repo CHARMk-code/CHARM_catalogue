@@ -176,6 +176,37 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  await fetchStores(from);
+
+  if (to.path.startsWith("/qr/")){
+    const qr = to.path.substring(4);
+    const companies = Array.from(useCompaniesStore().companies.values()).filter((c: Company) => c.qr_link === qr)
+
+    if (companies.length == 1) {
+      const company = companies[0];
+      next({path: "/company/"+ company.name})
+      //next({name: "Company", params: {name: company.name}});
+    } else {
+      next();
+    }
+  } else {
+    if (to.matched.some((record) => !record.meta.noAuth)) {
+      const authStore = useAuthStore();
+
+      console.log(useCompaniesStore().companies.values());
+      if (authStore.isLoggedIn) {
+        next();
+      } else {
+        next({name: "Login", params: { nextUrl: to.fullPath } });
+      }
+    } else {
+      next();
+    }
+  }
+});
+
+
+async function fetchStores(from) {
   if (from.name == null) {
     // Arriving from offsite, need to load data
     useAuthStore().setAuthorizationHeader();
@@ -194,31 +225,14 @@ router.beforeEach(async (to, from, next) => {
       useFairMapsStore().fetchMaps()
     ])
       .then(() => {
-        useFilterStore().filterCompanies();
+         useFilterStore().filterCompanies();
       })
-      .catch(() => {}); // add some error here in the future?
-  }
-  if (to.path.startsWith("/qr/")){
-    const qr = to.path.substring(4);
-    const companies = Array.from(useCompaniesStore().companies.values()).filter((c: Company) => c.qr_link === qr)
-
-    if (companies.length == 1) {
-      const company = companies[0];
-      next({name: "Company", params: {name: company.name}});
-    }
+      .catch((e) => {
+        console.log("Something went wrong will fetching data from backend, error: "+ e)
+      }); // add some error here in the future?
+      await new Promise(r => setTimeout(r, 500));
   }
 
-  if (to.matched.some((record) => !record.meta.noAuth)) {
-    const authStore = useAuthStore();
-
-    if (authStore.isLoggedIn) {
-      next();
-    } else {
-      next({ name: "Login", params: { nextUrl: to.fullPath } });
-    }
-  } else {
-    next();
-  }
-});
+}
 
 export default router;
