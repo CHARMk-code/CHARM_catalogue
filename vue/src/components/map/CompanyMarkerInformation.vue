@@ -2,9 +2,9 @@
   <q-card v-if="company == undefined" flat class="q-px-md">
     No company information to display
   </q-card>
-  <q-card v-else flat>
+  <q-card class="q-px-md" v-else flat>
+    <Logo :src="company.logo" height="100px"/>
     <Name :id="company.id" :name="company.name" />
-    <Logo :src="company.logo" />
     <Textblock title="Description" :body="company.description" />
     <q-btn class="q-mx-md" color="primary" :to="'/company/' + company.name"
       >Read More</q-btn

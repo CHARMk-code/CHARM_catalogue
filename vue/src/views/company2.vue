@@ -8,28 +8,24 @@
         }
       "
     />
-    <div v-if="company != undefined && company.active" class="row">
-      <Logo class="col-12 col-md-6" :src="company.logo" />
-      <Name :id="company.id" class="col-12 col-md-6" :name="company.name" />
-    </div>
-
-    <div
-      style="
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-auto-rows: 140px;
-      "
-    >
-      <component
-        :is="component.component"
+    <div v-if="company != undefined && company.active" class="row q-col-gutter-md items-stretch">
+      <div class="col-12 col-md-6">
+      <Logo  :src="company.logo" height="150px"/>
+      </div>
+      <div class="col-12 col-md-6">
+      <Name :id="company.id" :name="company.name" />
+      </div>
+      <div
         v-for="(component, index) in available_components"
         :key="index"
-        class="q-ma-sm"
-        :style="{
-          'grid-column': 'span ' + component.cols + ' / span ' + component.cols,
-          'grid-row': 'span ' + component.rows + ' / span ' + component.rows,
-        }"
+        :class="['col-12', 'col-md-'+component.cols*6]"
+        :style="{'min-height': component.minHeight}"
+      >
+      <component
+        :is="component.component"
+        style="height: 100%"
       />
+      </div>   
     </div>
   </q-page>
 </template>
@@ -49,6 +45,11 @@ import Name from "@/components/company/Name.vue"
 import Textblock from "@/components/company/Textblock.vue"
 import Tags from "@/components/company/Tags.vue"
 import CompanyImage from "@/components/company/CompanyImage.vue"
+import MapViewer from "@/components/map/MapViewer.vue"
+import { useFairMapsStore } from "@/stores/modules/fairMaps"
+import Contacts from "@/components/company/Contacts.vue"
+import Note from "@/components/company/Note.vue"
+import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
 
 const filterStore = useFilterStore()
 const prepagesStore = usePrepagesStore()
@@ -69,13 +70,11 @@ const available_components = computed(() => {
       name: "image_office",
       component: h(CompanyImage, { image: company.value?.image_office ?? "" }),
       cols: 1,
-      rows: 2,
     },
     {
       name: "image_product",
       component: h(CompanyImage, { image: company.value?.image_product ?? "" }),
       cols: 1,
-      rows: 2,
     },
     {
       name: "our_words",
@@ -87,7 +86,18 @@ const available_components = computed(() => {
         ),
       }),
       cols: 2,
-      rows: 1,
+    },
+    {
+      name: "desc",
+      component: h(Textblock, { body: company.value?.description ?? "", title: "Description" }),
+      cols: 1,
+    },
+    {
+      name: "map",
+      component: h(MapViewer, { fairMapId: useFairMapsStore().currentState.selectedMap ?? 1, selectedMarker: company.value?.booth_number, noSelection: true }),
+      minHeight: "min(400px,80vh)",
+      cols: 1,
+
     },
     {
       name: "divisions",
@@ -99,32 +109,6 @@ const available_components = computed(() => {
         ),
       }),
       cols: 1,
-      rows: 1,
-    },
-    {
-      name: "looking for",
-      component: h(Tags, {
-        title: "Looking For",
-        tags: tagsStore.getTagsByCategoryFromIds(
-          "Looking For",
-          company.value?.tags ?? new Set([]),
-        ),
-      }),
-      cols: 1,
-      rows: 1,
-    },
-    { name: "icons with text", component: undefined, cols: 1, rows: 2 },
-    {
-      name: "offering",
-      component: h(Tags, {
-        title: "Offering",
-        tags: tagsStore.getTagsByCategoryFromIds(
-          "Offering",
-          company.value?.tags ?? new Set([]),
-        ),
-      }),
-      cols: 1,
-      rows: 1,
     },
     {
       name: "our perks",
@@ -136,14 +120,32 @@ const available_components = computed(() => {
         ),
       }),
       cols: 1,
-      rows: 1,
     },
     {
-      name: "desc",
-      component: h(Textblock, { body: company.value?.description ?? "" }),
+      name: "looking for",
+      component: h(Tags, {
+        title: "Looking For",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Looking For",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
       cols: 1,
-      rows: 2,
     },
+    {
+      name: "offering",
+      component: h(Tags, {
+        title: "Offering",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Offering",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 1,
+    },
+      // { name: "icons with text", component: undefined, cols: 1 },
+    { name: "Contact", component: h(Contacts, { company: company.value}), cols: 1 },
+    { name: "Notes", component: h(Note, { id: company.value?.id ?? NaN }), cols: 1 },
   ]
 })
 
@@ -163,11 +165,20 @@ watch(
   },
 )
 
+const currentIndex = computed(() => {
+  if (company.value) {
+  return filterStore.filteredCompanies
+    .map((x) => x.id)
+    .indexOf(company.value.id);
+  }
+  return 0
+});
+
 onUnmounted(() => {
   window.removeEventListener("keydown", arrowKeyHandler)
 })
 
-function arrowKeyHandler(e: any) {
+function arrowKeyHandler(e: KeyboardEvent) {
   if (e.key == "ArrowRight") {
     next()
   } else if (e.key == "ArrowLeft") {
@@ -175,7 +186,7 @@ function arrowKeyHandler(e: any) {
   }
 }
 
-function handleSwipe({ direction }) {
+function handleSwipe({ direction }: { direction: string}) {
   if (direction === "right") {
     prev()
   } else if (direction === "left") {
@@ -187,7 +198,7 @@ function setNextRoute() {
   // Set next route
   if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
     settingsStore.session_settings.navigation.next =
-      "/company/" + filterStore.filteredCompanies[currentIndex.value + 1].name
+      "/company/" + filterStore.filteredCompanies[currentIndex.value + 1]!.name
   } else {
     settingsStore.session_settings.navigation.next = undefined
   }
@@ -199,19 +210,19 @@ function setPrevRoute() {
   //set prev route
   if (currentIndex.value > 0) {
     settingsStore.session_settings.navigation.prev =
-      "/company/" + filterStore.filteredCompanies[currentIndex.value - 1].name
+      "/company/" + filterStore.filteredCompanies[currentIndex.value - 1]!.name
   } else {
     if (Object.values(prepagesStore.pageGroups).length !== 0) {
       const pageGroups = Object.values(prepagesStore.pageGroups)
       let lastPageGroupIndex = pageGroups.length
 
       if ($q.screen.lt.md) {
-        let mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+        let mobilePages = pageGroups[lastPageGroupIndex - 1]!.pages.filter(
           (p: Prepage) => p.mobile,
         )
         while (mobilePages.length == 0) {
           lastPageGroupIndex -= 1
-          mobilePages = pageGroups[lastPageGroupIndex - 1].pages.filter(
+          mobilePages = pageGroups[lastPageGroupIndex - 1]!.pages.filter(
             (p: Prepage) => p.mobile,
           )
         }

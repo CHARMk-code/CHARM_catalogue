@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { RouteLocationNormalized, createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "@/stores/modules/auth";
 // import { useMapsStore } from "@/stores/modules/maps";
 import { useTagsStore } from "@/stores/modules/tags";
-import { useCompaniesStore } from "@/stores/modules/companies";
+import { Company, useCompaniesStore } from "@/stores/modules/companies";
 import { usePrepagesStore } from "@/stores/modules/prepages";
 import { useLayoutsStore } from "@/stores/modules/layouts";
 import { useShortcutsStore } from "@/stores/modules/shortcuts";
@@ -86,7 +86,7 @@ const router = createRouter({
           },
         },
         {
-          path: "/maps",
+          path: "/map",
           name: "Map",
           component: Map_view,
           meta: {
@@ -183,7 +183,7 @@ router.beforeEach(async (to, from, next) => {
     const companies = Array.from(useCompaniesStore().companies.values()).filter((c: Company) => c.qr_link === qr)
 
     if (companies.length == 1) {
-      const company = companies[0];
+      const company = companies[0]!;
       next({path: "/company/"+ company.name})
       //next({name: "Company", params: {name: company.name}});
     } else {
@@ -206,7 +206,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 
-async function fetchStores(from) {
+async function fetchStores(from: RouteLocationNormalized) {
   if (from.name == null) {
     // Arriving from offsite, need to load data
     useAuthStore().setAuthorizationHeader();
@@ -217,18 +217,15 @@ async function fetchStores(from) {
     await Promise.all([
       useTagsStore().getTags(), // This one fails if db is empty, check why
       useTagCategoriesStore().fetchTagCategories(),
-      useCompaniesStore().fetchCompanies(),
+      useCompaniesStore().fetchCompanies().then(() => { useFilterStore().filterCompanies() }),
       usePrepagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),
       useShortcutsStore().getShortcuts(),
       useSite_settingsStore().fetchSettings(),
       useFairMapsStore().fetchMaps()
     ])
-      .then(() => {
-         useFilterStore().filterCompanies();
-      })
       .catch((e) => {
-        console.log("Something went wrong will fetching data from backend, error: "+ e)
+        console.error("Something went wrong while fetching data from backend, error: "+ e)
       }); // add some error here in the future?
       await new Promise(r => setTimeout(r, 500));
   }
