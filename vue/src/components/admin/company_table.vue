@@ -339,5 +339,42 @@ const colMeta: TableColMeta[] = [
     hint: "Which Fair Area is the company on",
     meta: true,
   },
+  {
+    type: "number",
+    model: "founded",
+    label: "Founded yaer",
+  },
+  {
+    type: "text",
+    model: "office_localation",
+    label: "Office Localation",
+  },
+  {
+    type: "image",
+    model: "image_office",
+    label: "Image Office",
+  },
+  {
+    type: "image",
+    model: "image_product",
+    label: "Image Product",
+  },
+  {
+    type: "number",
+    model: "male_board_share",
+    label: "Male share of board",
+  },
+  {
+    type: "number",
+    model: "female_board_share",
+    label: "Female share of board",
+  },
+  {
+    type: "number",
+    model: "nonbinary_board_share",
+    label: "Nonbinary share of board",
+  },
+
+
 ];
 </script>
