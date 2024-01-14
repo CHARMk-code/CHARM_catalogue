@@ -119,7 +119,6 @@ if (filterStore.filters.favorites && isVisible("favorites"))
   tmp.push("favorites");
 if (filterStore.filters.charmtalk && isVisible("charmtalk"))
   tmp.push("charmtalk");
-if (filterStore.filters.sweden && isVisible("sweden")) tmp.push("sweden");
 checkboxes.value = tmp;
 
 const expanded = ref(false);
@@ -128,7 +127,6 @@ watch(checkboxes, async (vs: string[]) => {
     ...filterStore.filters,
     favorites: false,
     charmtalk: false,
-    sweden: false,
   };
   for (const v of vs) {
     switch (v) {
@@ -138,10 +136,7 @@ watch(checkboxes, async (vs: string[]) => {
       case "charmtalk":
         tmp.charmtalk = true;
         break;
-      case "sweden":
-        tmp.sweden = true;
-        break;
-    }
+      }
   }
   filterStore.filters = tmp;
 });
@@ -152,7 +147,6 @@ const checkbox_options = computed(() => {
     tmp.push({ label: "Favorites", value: "favorites" });
   if (!isVisible("charmtalk"))
     tmp.push({ label: "Attending CHARMtalks", value: "charmtalk" });
-  if (!isVisible("sweden")) tmp.push({ label: "Sweden", value: "sweden" });
   return tmp;
 });
 

@@ -22,16 +22,6 @@
       Favorites
     </q-chip>
     <q-chip
-      v-if="filterStore.filters.sweden"
-      icon-right="mdi-close-circle"
-      size="sm"
-      class="ma-1"
-      clickable
-      @click="clearSweden()"
-    >
-      In Sweden
-    </q-chip>
-    <q-chip
       v-if="filterStore.filters.charmtalk"
       icon-right="mdi-close-circle"
       size="sm"
@@ -78,7 +68,6 @@ const showFilter = computed(
     showQuery.value ||
     tags.value.length > 0 ||
     filterStore.filters.favorites ||
-    filterStore.filters.sweden ||
     filterStore.filters.charmtalk
 );
 
@@ -116,12 +105,6 @@ function clearQuery() {
 
 function clearFavorite() {
   filterStore.filters.favorites = false;
-  filterStore.filterCompanies();
-  emit("filter-changed");
-}
-
-function clearSweden() {
-  filterStore.filters.sweden = false;
   filterStore.filterCompanies();
   emit("filter-changed");
 }

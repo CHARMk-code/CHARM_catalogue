@@ -18,7 +18,6 @@ interface Filters {
   tags: Tags;
   favorites: boolean;
   charmtalk: boolean;
-  sweden: boolean;
 }
 
 interface State {
@@ -31,7 +30,6 @@ interface Route_query {
   tags?: string;
   favorites?: string;
   charmtalk?: string;
-  sweden?: string;
   [key: string]: string | undefined;
 }
 
@@ -49,7 +47,6 @@ export const useFilterStore = defineStore("filter", {
       },
       favorites: false,
       charmtalk: false,
-      sweden: false,
     },
     filteredCompanies: [],
   }),
@@ -67,7 +64,6 @@ export const useFilterStore = defineStore("filter", {
         },
         favorites: false,
         charmtalk: false,
-        sweden: false,
       };
     },
     filterCompanies() {
@@ -113,11 +109,6 @@ export const useFilterStore = defineStore("filter", {
           );
         }
         this.filteredCompanies = filteredCompanies;
-        // Filter on in sweden (no sweden attribute left)
-        // if (state.filters.sweden) {
-        //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);
-        // }
-        // state.filteredCompanies = companies;
 
         this.sortCompanies().then(() => {
           resolve();
@@ -176,9 +167,6 @@ export const useFilterStore = defineStore("filter", {
         this.filters.charmtalk = true;
       }
 
-      if (rQuery.sweden) {
-        this.filters.sweden = true;
-      }
       this.filterCompanies();
     },
     generateSearchRouteQuery() {
@@ -209,7 +197,6 @@ export const useFilterStore = defineStore("filter", {
 
       if (filter.favorites) rQuery.favorites = "true";
       if (filter.charmtalk) rQuery.charmtalk = "true";
-      if (filter.sweden) rQuery.sweden = "true";
 
       return rQuery;
     },
