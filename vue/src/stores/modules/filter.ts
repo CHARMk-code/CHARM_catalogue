@@ -142,28 +142,29 @@ export const useFilterStore = defineStore("filter", {
         const tagsStore = useTagsStore();
         const allTags = new Set(rQuery.tags.split(",").map((s) => parseInt(s)))
 
+        console.log(allTags)
         this.filters.tags.divisions = tagsStore
-          .getTagsByCategoryFromIds("division", allTags)
+          .getTagsByCategoryFromIds("Division", allTags)
           .map((t) => t.id);
 
         this.filters.tags.looking_for = tagsStore
-          .getTagsByCategoryFromIds("looking_for",allTags)
+          .getTagsByCategoryFromIds("Looking For",allTags)
           .map((t) => t.id);
 
         this.filters.tags.business_areas = tagsStore
-          .getTagsByCategoryFromIds("business_area",allTags)
+          .getTagsByCategoryFromIds("Business Area",allTags)
           .map((t) => t.id);
 
         this.filters.tags.languages = tagsStore
-          .getTagsByCategoryFromIds("language",allTags)
+          .getTagsByCategoryFromIds("Language",allTags)
           .map((t) => t.id);
 
         this.filters.tags.offerings = tagsStore
-          .getTagsByCategoryFromIds("offering",allTags)
+          .getTagsByCategoryFromIds("Offering",allTags)
           .map((t) => t.id);
 
         this.filters.tags.fair_areas = tagsStore
-          .getTagsByCategoryFromIds("fair_area",allTags)
+          .getTagsByCategoryFromIds("Fair Area",allTags)
           .map((t) => t.id);
       }
 

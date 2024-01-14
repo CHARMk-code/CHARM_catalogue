@@ -25,13 +25,14 @@
         :is="component.component"
         style="height: 100%"
       />
-      </div>   
+      </div>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from "quasar"
+import Filter from "@/components/company/Filter.vue";
 import { onMounted, watch, onUnmounted, computed, h } from "vue"
 import { useFilterStore } from "@/stores/modules/filter"
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages"
