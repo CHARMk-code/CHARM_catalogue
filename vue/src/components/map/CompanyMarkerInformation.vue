@@ -2,7 +2,7 @@
   <q-card v-if="company == undefined" flat class="q-px-md">
     No company information to display
   </q-card>
-  <q-card class="q-px-md" v-else flat>
+  <q-card v-else class="q-px-md" flat>
     <Logo :src="company.logo" height="100px"/>
     <Name :id="company.id" :name="company.name" />
     <Textblock title="Description" :body="company.description" />

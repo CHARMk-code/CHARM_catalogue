@@ -40,14 +40,15 @@ import { useCompaniesStore } from "@/stores/modules/companies"
 import { useTagsStore } from "@/stores/modules/tags"
 import { useSite_settingsStore } from "@/stores/modules/site_settings"
 import { useRoute, useRouter } from "vue-router"
+import { useFairMapsStore } from "@/stores/modules/fairMaps"
 
+import Trivia from "@/components/company/Trivia.vue"
 import Logo from "@/components/company/Logo.vue"
 import Name from "@/components/company/Name.vue"
 import Textblock from "@/components/company/Textblock.vue"
 import Tags from "@/components/company/Tags.vue"
 import CompanyImage from "@/components/company/CompanyImage.vue"
 import MapViewer from "@/components/map/MapViewer.vue"
-import { useFairMapsStore } from "@/stores/modules/fairMaps"
 import Contacts from "@/components/company/Contacts.vue"
 import Note from "@/components/company/Note.vue"
 import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
@@ -144,8 +145,8 @@ const available_components = computed(() => {
       }),
       cols: 1,
     },
-      // { name: "icons with text", component: undefined, cols: 1 },
     { name: "Contact", component: h(Contacts, { company: company.value}), cols: 1 },
+    { name: "Trivia", component: h(Trivia, {company: company.value}), cols: 1},
     { name: "Notes", component: h(Note, { id: company.value?.id ?? NaN }), cols: 1 },
   ]
 })
