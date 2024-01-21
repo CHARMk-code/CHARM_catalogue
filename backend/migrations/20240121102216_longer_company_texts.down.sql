@@ -1,0 +1,6 @@
+ALTER TABLE companies
+  ALTER COLUMN name TYPE VARCHAR(200),
+  ALTER COLUMN description TYPE varchar(2000),
+  ALTER COLUMN unique_selling_point TYPE VARCHAR(1000),
+  ALTER COLUMN contacts TYPE VARCHAR(100),
+  ALTER COLUMN talk_to_us_about TYPE VARCHAR(1000);
