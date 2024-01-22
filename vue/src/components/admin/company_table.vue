@@ -168,6 +168,8 @@ type metaRow = {
   offering: selectedTag[];
   language: selectedTag[];
   fair_area: selectedTag[];
+  perk: selectedTag[];
+  value_word: selectedTag[];
 };
 
 const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
@@ -191,6 +193,12 @@ const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
       fair_area: tagsStore
         .getTagsByCategoryFromIds("Fair Area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
+      perk: tagsStore
+        .getTagsByCategoryFromIds("Perk",row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      value_word: tagsStore
+        .getTagsByCategoryFromIds("Value Word",row.tags)
+        .map((t) => ({ value: t.id, label: t })),
     });
   }
 );
@@ -201,13 +209,16 @@ type selectedTag = {
 };
 
 function updateWithMetaModels(meta: metaRow, row: Company) {
-  var allTags: number[] = [];
+  let allTags: number[] = [];
   if (
     meta.divisions ||
     meta.looking_for ||
     meta.business_areas ||
     meta.offering ||
-    meta.language
+    meta.language ||
+    meta.fair_area||
+    meta.perk ||
+    meta.value_word
   ) {
     if (meta.divisions) {
       allTags = allTags.concat(meta.divisions.map((v) => v.value));
@@ -226,6 +237,12 @@ function updateWithMetaModels(meta: metaRow, row: Company) {
     }
     if (meta.fair_area) {
       allTags = allTags.concat(meta.fair_area.map((v) => v.value));
+    }
+    if (meta.perk) {
+      allTags = allTags.concat(meta.perk.map((v) => v.value));
+    }
+    if (meta.value_word) {
+      allTags = allTags.concat(meta.value_word.map((v) => v.value));
     }
     row.tags = new Set(allTags);
   }
@@ -337,6 +354,22 @@ const colMeta: TableColMeta[] = [
     items: tagsStore.getTagsInCategory("Fair Area").map((t) => ({ value: t.id, label: t })),
     label: "Fair Area",
     hint: "Which Fair Area is the company on",
+    meta: true,
+  },
+  {
+    type: "multiple-select",
+    model: "perk",
+    items: tagsStore.getTagsInCategory("Perk").map((t) => ({ value: t.id, label: t })),
+    label: "Perk",
+    hint: "Which Perks does the company offer",
+    meta: true,
+  },
+  {
+    type: "multiple-select",
+    model: "value_word",
+    items: tagsStore.getTagsInCategory("Value Word").map((t) => ({ value: t.id, label: t })),
+    label: "Value Word",
+    hint: "Which Value words represent the company",
     meta: true,
   },
   {
