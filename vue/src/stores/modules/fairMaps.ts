@@ -92,9 +92,9 @@ const example: FairMap = {
 
 export const useFairMapsStore = defineStore("fairMaps", {
   state: (): State => ({
-    fairMaps: new Map([[example.id, example]]),
+    fairMaps: new Map(),
     currentState: {
-      selectedMap: 1,
+      selectedMap: undefined,
       selectedMarker: undefined,
     },
     last_load: 0,
@@ -106,15 +106,18 @@ export const useFairMapsStore = defineStore("fairMaps", {
           this.axios
             .get("/v2/map/")
             .then((resp: any) => {
-              resp.data.map((fairMap: any) =>
+              resp.data.map((fairMap: any) => {
                 this.fairMaps.set(fairMap.id, {
                   id: fairMap.id,
                   name: fairMap.name,
                   background: fairMap.background,
                   styling: fairMap.map_data.styling ?? { mapSize: [100, 100] },
                   mapGeometry: fairMap.map_data.mapGeometry ?? [],
-                }),
-              )
+                })
+
+              })
+
+              this.currentState.selectedMap = Math.min(...this.fairMaps.keys())
               res()
             })
             .catch((err: any) => {

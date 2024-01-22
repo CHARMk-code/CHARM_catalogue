@@ -33,7 +33,7 @@
 
       <q-page-container >
           <q-page style="height: calc(100vh - 100px)">
-              <MapViewer :fair-map-id="1" style="height: 100%" @marker-clicked="markerClicked"/>
+              <MapViewer :fair-map-id="fairMapId" style="height: 100%" @marker-clicked="markerClicked"/>
         </q-page>
       </q-page-container>
     </q-layout>
@@ -43,9 +43,11 @@
 <script lang="ts" setup>
 import CompanyMarkerInformation from "@/components/map/CompanyMarkerInformation.vue";
 import MapViewer from "@/components/map/MapViewer.vue";
-import type { GeometryTypes } from "@/stores/modules/fairMaps";
+import { useFairMapsStore, type GeometryTypes } from "@/stores/modules/fairMaps";
 import type Feature from "ol/Feature";
 import { ref, type Ref } from "vue";
+
+const fairMapId = useFairMapsStore().currentState.selectedMap ?? 1
 
 const markerInformationSlider = ref(false);
 

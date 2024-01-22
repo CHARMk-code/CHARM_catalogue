@@ -7,7 +7,7 @@
       style="height: calc(100vh - 100px); border-right: 1px solid lightgray"
     >
       <AdminMapViewer
-        :fair-map-id="1"
+        :fair-map-id="fairMapId"
         style="height: 100%"
         :selected-marker="selectedMarker"
         enable-drag
@@ -115,7 +115,7 @@ import { computed, ref, watch } from "vue"
 const companiesStore = useCompaniesStore()
 const fairMapsStore = useFairMapsStore()
 
-const fairMapId = fairMapsStore.currentState.selectedMap ?? 0
+const fairMapId = fairMapsStore.currentState.selectedMap ?? 1
 
 ////////////////////////bin/
 // Global settings logic
@@ -244,7 +244,7 @@ function removeSelectedMarker() {
 }
 
 async function saveMapChanges() {
-  const fairMapId = fairMapsStore.currentState.selectedMap ?? 0
+  const fairMapId = fairMapsStore.currentState.selectedMap ?? 1
   const selectedMarker = fairMapsStore.currentState.selectedMarker
   if (selectedMarker) {
     const savedMarker = fairMapsStore.findMarker(
