@@ -167,12 +167,14 @@ const companyOptions = [...companiesStore.companies.values()]
     label: company.name,
     value: company.id,
   }))
-  .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0))
+  .sort((a, b) => (a.label.toLowerCase() < b.label.toLowerCase() ? -1 : a.label.toLowerCase() > b.label.toLowerCase() ? 1 : 0))
 const filteredCompanies = ref(
-  [...companiesStore.companies.values()].map((company) => ({
+  [...companiesStore.companies.values()]
+  .map((company) => ({
     label: company.name,
     value: company.id,
-  })),
+  }))
+
 )
 function filterCompanies(
   val: string,
