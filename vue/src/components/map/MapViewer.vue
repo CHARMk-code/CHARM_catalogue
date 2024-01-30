@@ -224,7 +224,7 @@ const fairMap = computed(() => {
 const emptyMap = ref(true)
 const map = ref<Map>(setupMap())
 
-watch(() => [fairMap.value, fairMap.value?.mapGeometry, fairMap.value?.styling], ([newFairMap, _newGeom, _newStyling]) => {
+watch(() => [fairMap.value, fairMap.value?.mapGeometry, fairMap.value?.styling, props.selectedMarker], ([newFairMap, _newGeom, _newStyling, newSelectedMarker]) => {
   console.log("updating", newFairMap, _newGeom, _newStyling)
   if(newFairMap) updateMap(newFairMap as FairMap) 
 })
