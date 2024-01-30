@@ -165,9 +165,9 @@ function selectedMarkerStyle(feature: FeatureLike, resolution: number): Style {
         backgroundColorClicked = styling.backgroundColorClicked;
       } else if (styling.backgroundColor) {
         backgroundColorClicked = [
-          Math.max(styling.backgroundColor[0] - 80, 0),
-          Math.max(styling.backgroundColor[1] - 80, 0),
-          Math.max(styling.backgroundColor[2] - 80, 0),
+          Math.max(styling.backgroundColor[0] - 160, 0),
+          Math.max(styling.backgroundColor[1] - 160, 0),
+          Math.max(styling.backgroundColor[2] - 160, 0),
           styling.backgroundColor[3],
         ];
       } else {
