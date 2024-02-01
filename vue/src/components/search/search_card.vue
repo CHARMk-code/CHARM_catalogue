@@ -37,13 +37,6 @@
             :max-shown="8"
           />
           <tagSelector
-            v-if="isVisible('tag_business_areas')"
-            v-model:selectedTags="selectedBusiness_areas"
-            :tags="tagsStore.getTagsInCategory('Business Area')"
-            label="Business areas"
-            :max-shown="3"
-          />
-          <tagSelector
             v-if="isVisible('tag_looking_for')"
             v-model:selectedTags="selectedLooking_for"
             :tags="tagsStore.getTagsInCategory('Looking For')"
