@@ -8,7 +8,7 @@
       <q-card-section>
         <span class="block text-h6">Results</span>
         <q-table
-          v-model:pagination="searchPagination"
+          :pagination="searchPagination"
           flat
           :rows="filterStore.filteredCompanies"
           :columns="columns"

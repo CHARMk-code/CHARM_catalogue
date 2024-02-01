@@ -1,6 +1,6 @@
 <template>
   <q-table
-    v-model:pagination="tablePagination"
+    :pagination="tablePagination"
     flat
     :rows="rows"
     :columns="editable || $slots.actions ? tableColumnsWAction : tableColumns"
