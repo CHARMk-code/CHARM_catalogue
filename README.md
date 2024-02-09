@@ -25,6 +25,9 @@ Or you can make use of the package `charm_catalogue-backend` and `charm_catalogu
 
 A system configured with `Docker`, `cargo` and `yarn`
 
+For the backend to properly compile you need to add the `linux-musl` target to your toolchain
+```rustup target add x86_64-unknown-linux-musl```
+
 ### Running 
 The database is started by running 
 ```
