@@ -1,5 +1,5 @@
 use actix_web::{
-    get, post, put,
+    post, put,
     web::{self, Json},
     HttpResponse, Responder, Result,
 };

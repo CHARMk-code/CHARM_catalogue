@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod batch;
 pub mod company;
+pub mod database;
 pub mod feedback;
 pub mod file;
 pub mod image;

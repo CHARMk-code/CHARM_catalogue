@@ -5,6 +5,7 @@ use sqlx::PgPool;
 use crate::models::tag::TagWeb;
 use crate::services;
 use crate::services::auth::AuthedUser;
+use crate::services::database::Tenant;
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -18,8 +19,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/")]
-async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let tags = services::tag::get_all(&db).await?;
+async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
+    let tags = services::tag::get_all(&tenant.db).await?;
 
     Ok(HttpResponse::Ok().json(tags))
 }
