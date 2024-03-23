@@ -1,11 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
 
-use crate::models::tag::TagWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
-use crate::services::database::Tenant;
+use crate::{
+    models::tag::TagWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -26,9 +25,9 @@ async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(tenant: Tenant, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let tag = services::tag::get_by_id(&db, id).await?;
+    let tag = services::tag::get_by_id(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(tag))
 }
@@ -36,7 +35,7 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<TagWeb>,
 ) -> Result<impl Responder> {
     let input_tag = data.into_inner();
@@ -47,19 +46,15 @@ async fn update_handler(
             let icon = input_tag.icon.as_ref();
             let category = input_tag.category.as_ref();
 
-            if name
-                .and(icon)
-                .and(category)
-                .is_none()
-            {
+            if name.and(icon).and(category).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let tag = services::tag::update(&db, input_tag).await?;
+                let tag = services::tag::update(&tenant.db, input_tag).await?;
                 HttpResponse::Ok().json(tag)
             }
         }
         None => {
-            let tag = services::tag::create(&db, &input_tag).await?;
+            let tag = services::tag::create(&tenant.db, &input_tag).await?;
             HttpResponse::Created().json(tag)
         }
     };
@@ -70,11 +65,11 @@ async fn update_handler(
 #[post("/")] // TODO Deprecatea in favor of put
 async fn create_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<TagWeb>,
 ) -> Result<impl Responder> {
     let input_tag = data.into_inner();
-    let affected_rows = services::tag::create(&db, &input_tag).await?;
+    let affected_rows = services::tag::create(&tenant.db, &input_tag).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -82,11 +77,11 @@ async fn create_handler(
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::tag::delete(&db, id).await?;
+    let affected_rows = services::tag::delete(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

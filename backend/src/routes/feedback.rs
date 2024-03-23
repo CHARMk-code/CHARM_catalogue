@@ -1,11 +1,10 @@
 use actix_web::web::Json;
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
+use actix_web::{delete, get, put, web, HttpResponse, Responder, Result};
 
-use crate::models::feedback::FeedbackWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
-use crate::services::database::Tenant;
+use crate::{
+    models::feedback::FeedbackWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -60,14 +59,12 @@ async fn update_admin_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let feedback =
-                    services::feedback::update(tenant.db, input_feedback).await?;
+                let feedback = services::feedback::update(tenant.db, input_feedback).await?;
                 HttpResponse::Ok().json(feedback)
             }
         }
         None => {
-            let feedback =
-                services::feedback::create(tenant.db, input_feedback).await?;
+            let feedback = services::feedback::create(tenant.db, input_feedback).await?;
             HttpResponse::Created().json(feedback)
         }
     };
@@ -76,13 +73,9 @@ async fn update_admin_handler(
 }
 
 #[put("/user")]
-async fn create_user_handler(
-    tenant: Tenant,
-    data: Json<FeedbackWeb>,
-) -> Result<impl Responder> {
+async fn create_user_handler(tenant: Tenant, data: Json<FeedbackWeb>) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
-    let feedback =
-        services::feedback::create(tenant.db, input_feedback).await?;
+    let feedback = services::feedback::create(tenant.db, input_feedback).await?;
     Ok(HttpResponse::Created().json(feedback))
 }
 

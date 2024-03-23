@@ -7,30 +7,30 @@ use actix_web::{
     web::{self, Json},
     HttpResponse, Responder, Result,
 };
-use sqlx::{types::Uuid, PgPool};
+use sqlx::types::Uuid;
 
 use crate::{
     config::Config,
     models::file::FileWeb,
-    services::{self, auth::AuthedUser, file::save_files},
+    services::{self, auth::AuthedUser, database::Tenant, file::save_files},
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/image")
             .service(get_by_name_handler)
-            .service(create_handler)
+            .service(create_handler),
     );
 }
 
 #[get("/{name}")]
 async fn get_by_name_handler(
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     config: web::Data<Config>,
     path: web::Path<String>,
 ) -> Result<impl Responder> {
     let name = path.into_inner();
-    let image_meta = services::image::get_by_name(&db, &name).await?;
+    let image_meta = services::image::get_by_name(&tenant.db, &name).await?;
 
     let image_path = Path::new(&config.storage_path).join(image_meta.id.to_string());
 
@@ -46,7 +46,7 @@ async fn get_by_name_handler(
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<FileWeb>,
 ) -> Result<impl Responder> {
     let input_file = data.into_inner();
@@ -60,7 +60,7 @@ async fn update_handler(
             if name.and(namespace).and(image).is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let map = services::image::update(&db, &input_file).await?;
+                let map = services::image::update(&tenant.db, &input_file).await?;
                 HttpResponse::Ok().json(map)
             }
         }
@@ -73,7 +73,7 @@ async fn update_handler(
 #[post("/")]
 async fn create_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     config: web::Data<Config>,
     payload: Multipart,
 ) -> Result<impl Responder> {
@@ -82,8 +82,14 @@ async fn create_handler(
 
     let saved_files = save_files(payload, &upload_path).await?;
 
-    let uuids =
-        services::image::create(&db, "images", saved_files, &upload_path, &storage_path).await?;
+    let uuids = services::image::create(
+        &tenant.db,
+        "images",
+        saved_files,
+        &upload_path,
+        &storage_path,
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().json(uuids))
 }
@@ -91,13 +97,14 @@ async fn create_handler(
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     config: web::Data<Config>,
     path: web::Path<Uuid>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
 
-    let affected_rows = services::image::delete(&db, &id, Path::new(&config.storage_path)).await?;
+    let affected_rows =
+        services::image::delete(&tenant.db, &id, Path::new(&config.storage_path)).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

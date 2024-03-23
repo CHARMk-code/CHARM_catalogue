@@ -1,10 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
 
-use crate::models::tag_category::TagCategoryWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
+use crate::{
+    models::tag_category::TagCategoryWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -18,16 +18,16 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/")]
-async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let tag_categories = services::tag_category::get_all(&db).await?;
+async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
+    let tag_categories = services::tag_category::get_all(&tenant.db).await?;
 
     Ok(HttpResponse::Ok().json(tag_categories))
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(tenant: Tenant, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let tag_category= services::tag_category::get_by_id(&db, id).await?;
+    let tag_category = services::tag_category::get_by_id(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(tag_category))
 }
@@ -35,26 +35,26 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<TagCategoryWeb>,
 ) -> Result<impl Responder> {
     let input_tag_category = data.into_inner();
 
-    let response = match input_tag_category .id {
+    let response = match input_tag_category.id {
         Some(_) => {
             let name = input_tag_category.name.as_ref();
 
-            if name
-                .is_none()
-            {
+            if name.is_none() {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let tag_category = services::tag_category::update(&db, input_tag_category).await?;
+                let tag_category =
+                    services::tag_category::update(&tenant.db, input_tag_category).await?;
                 HttpResponse::Ok().json(tag_category)
             }
         }
         None => {
-            let tag_category = services::tag_category::create(&db, &input_tag_category).await?;
+            let tag_category =
+                services::tag_category::create(&tenant.db, &input_tag_category).await?;
             HttpResponse::Created().json(tag_category)
         }
     };
@@ -65,11 +65,11 @@ async fn update_handler(
 #[post("/")] // TODO Deprecatea in favor of put
 async fn create_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<TagCategoryWeb>,
 ) -> Result<impl Responder> {
     let input_tag_category = data.into_inner();
-    let affected_rows = services::tag_category::create(&db, &input_tag_category).await?;
+    let affected_rows = services::tag_category::create(&tenant.db, &input_tag_category).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -77,11 +77,11 @@ async fn create_handler(
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::tag_category::delete(&db, id).await?;
+    let affected_rows = services::tag_category::delete(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

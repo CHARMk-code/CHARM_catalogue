@@ -12,43 +12,44 @@ use crate::{
     models::user::{UserLoginWeb, UserWeb},
     services::{
         self,
-        auth::{create_user,update_user, AuthedUser},
+        auth::{create_user, update_user, AuthedUser},
+        database::Tenant,
     },
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/auth")
-        .service(get_token)                                
-        .service(update_password_handler),
+            .service(get_token)
+            .service(update_password_handler),
     );
 }
 
 #[post("/")]
 async fn get_token(
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     keypair: web::Data<Ed25519KeyPair>,
     config: web::Data<Config>,
     data: Json<UserLoginWeb>,
 ) -> Result<impl Responder> {
     let salt: &[u8] = config.password_salt.as_bytes();
 
-    let possible_user = services::auth::get_user(db.as_ref()).await;
+    let possible_user = services::auth::get_user(&tenant.db).await;
 
     // HACK: This should be fixed when a proper authorization system is set up. Currently creates a
-    // password "password" if the db returns an error (most likely, no password has previously been set)
+    // password "password" if the tenant.db returns an error (most likely, no password has previously been set)
     let user = match possible_user {
         Ok(user) => user,
         Err(..) => {
             create_user(
-                &db,
+                &tenant.db,
                 UserWeb {
                     password: "password".to_string(),
                 },
                 salt,
             )
             .await?;
-            services::auth::get_user(db.as_ref()).await?
+            services::auth::get_user(&tenant.db).await?
         }
     };
 
@@ -64,38 +65,36 @@ async fn get_token(
     Ok(HttpResponse::Unauthorized().into())
 }
 
- #[put("/")]
- async fn update_password_handler(
-     db: web::Data<PgPool>,
-     user: AuthedUser,
-     config: web::Data<Config>,
-     data: Json<UserWeb>
- ) -> Result<impl Responder> {
+#[put("/")]
+async fn update_password_handler(
+    tenant: Tenant,
+    user: AuthedUser,
+    config: web::Data<Config>,
+    data: Json<UserWeb>,
+) -> Result<impl Responder> {
     let salt: &[u8] = config.password_salt.as_bytes();
 
-    let possible_user = services::auth::get_user(db.as_ref()).await;
+    let possible_user = services::auth::get_user(&tenant.db).await;
 
     match possible_user {
-        Ok(user) => {
-         Ok(HttpResponse::Ok().json(
+        Ok(user) => Ok(HttpResponse::Ok().json(
             update_user(
-                &db,
-                UserWeb{
-                    password: data.password.clone()
+                &tenant.db,
+                UserWeb {
+                    password: data.password.clone(),
                 },
                 salt,
             )
-            .await?
-        ))
-        },
-        Err(..) => Ok(HttpResponse::NotFound().into())
+            .await?,
+        )),
+        Err(..) => Ok(HttpResponse::NotFound().into()),
     }
- }
+}
 
- /*#[get("/")]
- async fn register_handler(_user: AuthedUser, db: web::Data<PgPool>, config: web::Data<Config>, data: Json<UserWeb>) -> Result<impl Responder> {
+/*#[get("/")]
+ async fn register_handler(_user: AuthedUser, tenant: Tenant, config: web::Data<Config>, data: Json<UserWeb>) -> Result<impl Responder> {
 
-     let user_id = services::auth::create_user(&db, data.into_inner(), salt).await?;
+     let user_id = services::auth::create_user(&tenant.db, data.into_inner(), salt).await?;
 
      Ok(HttpResponse::Ok().json(user_id))
  }
