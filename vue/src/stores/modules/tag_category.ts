@@ -1,46 +1,38 @@
 import { defineStore } from "pinia";
-
 const NUMBER_OF_MS_BEFORE_RELOAD = 60000; // Don't reload more often then ones an hour.
 
-export interface Company_Map {
+export interface Tag_category {
   id: number;
   name: string;
-  image: string;
-  ref: number;
 }
-
 interface State {
-  maps: Map<number, Company_Map>;
+  tag_categories: Map<number, Tag_category>;
   load_wait: number;
 }
-
-export const useMapsStore = defineStore("maps", {
+export const useTagCategoriesStore = defineStore("tagCategories", {
   state: (): State => ({
-    maps: new Map(),
+    tag_categories: new Map(),
     load_wait: 0,
   }),
   actions: {
-    setAllMaps(company_maps: Company_Map[]) {
-      this.maps = new Map(company_maps.map((m) => [m.id, m]));
+    setAllTagCategories(tag_categories: Tag_category[]) {
+      this.tag_categories = new Map(tag_categories.map((t) => [t.id, t]));
     },
-    removeMapById(id: number) {
-      this.maps.delete(id);
+    removeTagCategoryById(id: number) {
+      this.tag_categories.delete(id);
     },
-    removeAllMaps() {
-      this.maps = new Map();
+    removeAllTagCategories() {
+      this.tag_categories = new Map();
     },
-    getMaps() {
+    fetchTagCategories() {
       return new Promise<void>((resolve, reject) => {
         if (this.load_wait < Date.now()) {
           this.load_wait = Date.now() + NUMBER_OF_MS_BEFORE_RELOAD;
           this.axios
-            .get("/v2/map/")
+            .get("/v2/tag_category/")
             .then((resp: any) => {
-              this.removeAllMaps();
-              const maps = resp.data;
-              if (maps.length > 0) {
-                this.setAllMaps(maps);
-              }
+              const tag_categories = resp.data;
+              if (tag_categories.length > 0) this.setAllTagCategories(tag_categories);
               resolve(resp);
             })
             .catch((err: any) => {
@@ -51,12 +43,12 @@ export const useMapsStore = defineStore("maps", {
         }
       });
     },
-    updateMap(map: Company_Map) {
+    updateTagCategory(tag_category: Tag_category) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/v2/map/", map)
+          .put("/v2/tag_category/", tag_category)
           .then((resp: any) => {
-            this.maps.set(map.id, map);
+            this.tag_categories.set(tag_category.id, tag_category);
             resolve(resp);
           })
           .catch((err: any) => {
@@ -64,23 +56,18 @@ export const useMapsStore = defineStore("maps", {
           });
       });
     },
-    removeMap(map: Company_Map) {
+    removeTagCategory(tag_category: Tag_category) {
       return new Promise((resolve, reject) => {
         this.axios
-          .delete("/v2/map/" + map.id)
+          .delete("/v2/tag_category/" + tag_category.id)
           .then((resp: any) => {
-            this.removeMapById(map.id);
+            this.removeTagCategoryById(tag_category.id);
             resolve(resp);
           })
           .catch((err: any) => {
             reject(err);
           });
       });
-    },
-  },
-  getters: {
-    getMapFromId: (state) => (id: number) => {
-      return state.maps.get(id);
     },
   },
 });

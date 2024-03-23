@@ -6,8 +6,10 @@
         name="Tags"
         :table-columns="headers"
         :rows="Array.from(tagsStore.tags.values())"
+        :meta-rows="metaRows"
         :col-meta="colMeta"
         :editable="true"
+        :meta-model-callback="updateWithMetaModels"
         @save-row="(t) => tagsStore.updateTag(t)"
         @delete-row="(t) => tagsStore.removeTag(t)"
       >
@@ -28,12 +30,19 @@
 </template>
 
 <script lang="ts" setup>
-import Table from "@/components/table.vue";
-import Tags from "@/components/Tag_group.vue";
-import { useTagsStore, type Tag } from "@/stores/modules/tags";
-import type { TableColMeta } from "./table_edit_dialog.vue";
+import Table from "@/components/table.vue"
+import Tags from "@/components/Tag_group.vue"
+import { useTagsStore, type Tag } from "@/stores/modules/tags"
+import type { TableColMeta } from "./table_edit_dialog.vue"
+import { useTagCategoriesStore } from "@/stores/modules/tag_category"
+import { reactive } from "vue"
 
-const tagsStore = useTagsStore();
+const tagsStore = useTagsStore()
+const tagCategoriesStore = useTagCategoriesStore()
+
+interface metaRow {
+  category: { label: { name: string}, value: number}
+}
 
 const headers = [
   { name: "Icon", label: "Icon", field: (row: any) => row, align: "left" },
@@ -41,29 +50,45 @@ const headers = [
   {
     name: "Categories",
     label: "Categories",
-    field: (row: Tag) => {
-      const categories = [];
-      if (row.business_area) categories.push("Business Area");
-      if (row.division) categories.push("Program");
-      if (row.looking_for) categories.push("Looking for");
-      if (row.offering) categories.push("Offering");
-      if (row.language) categories.push("Language");
-      if (row.fair_area) categories.push("Fair Area");
-      return categories.join(", ");
-    },
+    field: (row: Tag) =>
+      tagCategoriesStore.tag_categories.get(row.category)?.name,
     align: "left",
     sortable: true,
   },
-];
+]
 
+const metaRows: metaRow[] = Array.from(tagsStore.tags.values()).map((row) => {
+  const category = tagCategoriesStore.tag_categories.get(row.category)
+
+  return reactive({
+    category: category
+      ? { label: { name: category.name }, value: category.id }
+      : { label: { name: "ERROR!!!!" }, value: -1 },
+  })
+})
+
+function updateWithMetaModels(meta: metaRow, row: Tag) {
+  row.category = meta.category.value
+}
+
+console.log(
+  [...tagCategoriesStore.tag_categories.values()].map((category) => ({
+    label: category.name,
+    value: category.id,
+  })),
+)
 const colMeta: TableColMeta[] = [
-  { type: "image", model: "icon", label: "tag icon" },
-  { type: "text", model: "name", label: "Tag name" },
-  { type: "checkbox", model: "business_area", label: "Business area" },
-  { type: "checkbox", model: "division", label: "Division" },
-  { type: "checkbox", model: "looking_for", label: "Looking for" },
-  { type: "checkbox", model: "offering", label: "Offering" },
-  { type: "checkbox", model: "language", label: "Language" },
-  { type: "checkbox", model: "fair_area", label: "Fair Area" },
-];
+  { type: "image", model: "icon", label: "Tag Icon" },
+  { type: "text", model: "name", label: "Tag Name" },
+  {
+    type: "single-select",
+    model: "category",
+    label: "Tag Category",
+    items: [...tagCategoriesStore.tag_categories.values()].map((category) => ({
+      label: { name: category.name },
+      value: category.id,
+    })),
+    meta: true,
+  },
+]
 </script>

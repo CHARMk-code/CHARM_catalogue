@@ -1,0 +1,264 @@
+<template>
+  <q-page v-touch-swipe.left.right="handleSwipe" padding>
+    <Filter
+      @filter-changed="
+        () => {
+          setNextRoute()
+          setPrevRoute()
+        }
+      "
+    />
+    <div v-if="company != undefined && company.active" class="row q-col-gutter-md items-stretch">
+      <div class="col-12 col-md-6">
+      <Logo  :src="company.logo" height="150px"/>
+      </div>
+      <div class="col-12 col-md-6">
+      <Name :id="company.id" :name="company.name" />
+      </div>
+      <div
+        v-for="(component, index) in available_components"
+        :key="index"
+        :class="['col-12', 'col-md-'+component.cols*6]"
+        :style="{'min-height': component.minHeight}"
+      >
+      <component
+        :is="component.component"
+        style="height: 100%"
+      />
+      </div>
+    </div>
+  </q-page>
+</template>
+
+<script setup lang="ts">
+import { useQuasar } from "quasar"
+import Filter from "@/components/company/Filter.vue";
+import { onMounted, watch, onUnmounted, computed, h } from "vue"
+import { useFilterStore } from "@/stores/modules/filter"
+import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages"
+import { useCompaniesStore } from "@/stores/modules/companies"
+import { useTagsStore } from "@/stores/modules/tags"
+import { useSite_settingsStore } from "@/stores/modules/site_settings"
+import { useRoute, useRouter } from "vue-router"
+import { useFairMapsStore } from "@/stores/modules/fairMaps"
+
+import Trivia from "@/components/company/Trivia.vue"
+import Logo from "@/components/company/Logo.vue"
+import Name from "@/components/company/Name.vue"
+import Textblock from "@/components/company/Textblock.vue"
+import Tags from "@/components/company/Tags.vue"
+import CompanyImage from "@/components/company/CompanyImage.vue"
+import MapViewer from "@/components/map/MapViewer.vue"
+import Contacts from "@/components/company/Contacts.vue"
+import Note from "@/components/company/Note.vue"
+import SwipeOverlay from "@/components/company/SwipeOverlay.vue";
+
+const filterStore = useFilterStore()
+const prepagesStore = usePrepagesStore()
+const companiesStore = useCompaniesStore()
+const tagsStore = useTagsStore()
+const settingsStore = useSite_settingsStore()
+
+const route = useRoute()
+const router = useRouter()
+
+const company = computed(() => {
+  return companiesStore.companyByName((route.params.name as string) ?? "")
+})
+
+const available_components = computed(() => {
+  return [
+    {
+      name: "image_office",
+      component: h(CompanyImage, { image: company.value?.image_office ?? "" }),
+      cols: 1,
+    },
+    {
+      name: "image_product",
+      component: h(CompanyImage, { image: company.value?.image_product ?? "" }),
+      cols: 1,
+    },
+    {
+      name: "our_words",
+      component: h(Tags, {
+        title: "Our words",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Value Word",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 2,
+    },
+    {
+      name: "desc",
+      component: h(Textblock, { body: company.value?.description ?? "", title: "Description" }),
+      cols: 1,
+    },
+    {
+      name: "map",
+      component: h(MapViewer, { fairMapId: useFairMapsStore().currentState.selectedMap ?? 1, selectedMarker: company.value?.booth_number, noSelection: true }),
+      minHeight: "min(400px,80vh)",
+      cols: 1,
+
+    },
+    {
+      name: "divisions",
+      component: h(Tags, {
+        title: "Division",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Division",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 1,
+    },
+    {
+      name: "our perks",
+      component: h(Tags, {
+        title: "Our Perks",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Perk",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 1,
+    },
+    {
+      name: "looking for",
+      component: h(Tags, {
+        title: "Looking For",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Looking For",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 1,
+    },
+    {
+      name: "offering",
+      component: h(Tags, {
+        title: "Offering",
+        tags: tagsStore.getTagsByCategoryFromIds(
+          "Offering",
+          company.value?.tags ?? new Set([]),
+        ),
+      }),
+      cols: 1,
+    },
+    { name: "Contact", component: h(Contacts, { company: company.value}), cols: 1 },
+    { name: "Trivia", component: h(Trivia, {company: company.value}), cols: 1},
+    { name: "Notes", component: h(Note, { id: company.value?.id ?? NaN }), cols: 1 },
+  ]
+})
+
+onMounted(() => {
+  window.addEventListener("keydown", arrowKeyHandler)
+  setNextRoute()
+  setPrevRoute()
+})
+
+watch(
+  () => route.params.name,
+  (name) => {
+    if (name) {
+      setNextRoute()
+      setPrevRoute()
+    }
+  },
+)
+
+const currentIndex = computed(() => {
+  if (company.value) {
+  return filterStore.filteredCompanies
+    .map((x) => x.id)
+    .indexOf(company.value.id);
+  }
+  return 0
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", arrowKeyHandler)
+})
+
+function arrowKeyHandler(e: KeyboardEvent) {
+  if (e.key == "ArrowRight") {
+    next()
+  } else if (e.key == "ArrowLeft") {
+    prev()
+  }
+}
+
+function handleSwipe({ direction }: { direction: string}) {
+  if (direction === "right") {
+    prev()
+  } else if (direction === "left") {
+    next()
+  }
+}
+
+function setNextRoute() {
+  // Set next route
+  if (currentIndex.value + 1 < filterStore.filteredCompanies.length) {
+    settingsStore.session_settings.navigation.next =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value + 1]!.name
+  } else {
+    settingsStore.session_settings.navigation.next = undefined
+  }
+}
+
+const $q = useQuasar()
+
+function setPrevRoute() {
+  //set prev route
+  if (currentIndex.value > 0) {
+    settingsStore.session_settings.navigation.prev =
+      "/company/" + filterStore.filteredCompanies[currentIndex.value - 1]!.name
+  } else {
+    if (Object.values(prepagesStore.pageGroups).length !== 0) {
+      const pageGroups = Object.values(prepagesStore.pageGroups)
+      let lastPageGroupIndex = pageGroups.length
+
+      if ($q.screen.lt.md) {
+        let mobilePages = pageGroups[lastPageGroupIndex - 1]!.pages.filter(
+          (p: Prepage) => p.mobile,
+        )
+        while (mobilePages.length == 0) {
+          lastPageGroupIndex -= 1
+          mobilePages = pageGroups[lastPageGroupIndex - 1]!.pages.filter(
+            (p: Prepage) => p.mobile,
+          )
+        }
+        if (mobilePages.length > 1) {
+          settingsStore.session_settings.navigation.prev =
+            "/prepage/" + lastPageGroupIndex + "?p=" + (mobilePages.length - 1)
+          return
+        }
+      }
+      settingsStore.session_settings.navigation.prev =
+        "/prepage/" + pageGroups.length
+    } else {
+      settingsStore.session_settings.navigation.prev = undefined
+    }
+  }
+}
+
+function next() {
+  const maybeNext: string | undefined = settingsStore.consumeNext()
+  if (maybeNext) {
+    router.push(maybeNext)
+  }
+}
+
+function prev() {
+  const maybePrev: string | undefined = settingsStore.consumePrev()
+  if (maybePrev) {
+    router.push(maybePrev)
+  }
+}
+
+// Logic for swipe instructions on mobile
+// has saved thing in localStorage
+if ($q.screen.lt.md && !(localStorage.getItem("swipeInstructions") || false)) {
+  $q.dialog({ component: SwipeOverlay })
+}
+</script>

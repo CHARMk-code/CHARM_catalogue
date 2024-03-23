@@ -256,7 +256,7 @@ async function save() {
       }
     }
     if (props.metaModelCallback) props.metaModelCallback(rawRow, props.row);
-
+  
     emit("save-row", rawRow);
   });
 }

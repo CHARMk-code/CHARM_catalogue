@@ -11,9 +11,6 @@ export interface Company {
   name: string;
   description: string;
   unique_selling_point: string;
-  summer_job_description: string;
-  summer_job_link: string;
-  summer_job_deadline: string; //Should maybe be date
   contacts: string;
   contact_email: string;
   employees_world: number;
@@ -24,6 +21,14 @@ export interface Company {
   map_image: number;
   booth_number: number;
   tags: Set<number>;
+  image_office: string,
+  image_product: string,
+  founded: number,
+  office_location: string,
+  male_board_share: number,
+  female_board_share: number,
+  nonbinary_board_share: number,
+  qr_link: string,
 }
 
 interface State {
@@ -57,13 +62,7 @@ export const useCompaniesStore = defineStore("companies", {
               this.removeAllCompanies();
               const companies: Company[] = resp.data;
 
-              // Work around to get summer job deadline in correct format
               companies.forEach((comp) => {
-                comp.summer_job_deadline = dayjs(
-                  comp.summer_job_deadline,
-                  "DD MMM YYYY HH:mm:ss",
-                  false
-                ).format("YYYY-MM-DD");
                 comp.tags = new Set(comp.tags);
               });
 

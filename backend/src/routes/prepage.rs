@@ -1,10 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
 
-use crate::models::prepage::PrepageWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
+use crate::{
+    models::prepage::PrepageWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -18,16 +18,16 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/")]
-async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let prepages = services::prepage::get_all(&db).await?;
+async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
+    let prepages = services::prepage::get_all(&tenant.db).await?;
 
     Ok(HttpResponse::Ok().json(prepages))
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(tenant: Tenant, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let prepage = services::prepage::get_by_id(&db, id).await?;
+    let prepage = services::prepage::get_by_id(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(prepage))
 }
@@ -35,7 +35,7 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<PrepageWeb>,
 ) -> Result<impl Responder> {
     let input_prepage = data.into_inner();
@@ -59,12 +59,12 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let prepage = services::prepage::update(&db, &input_prepage).await?;
+                let prepage = services::prepage::update(&tenant.db, &input_prepage).await?;
                 HttpResponse::Ok().json(prepage)
             }
         }
         None => {
-            let prepage = services::prepage::create(&db, &input_prepage).await?;
+            let prepage = services::prepage::create(&tenant.db, &input_prepage).await?;
             HttpResponse::Created().json(prepage)
         }
     };
@@ -75,11 +75,11 @@ async fn update_handler(
 #[post("/")] // TODO: Deprecatea in favor of put
 async fn create_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<PrepageWeb>,
 ) -> Result<impl Responder> {
     let input_prepage = data.into_inner();
-    let affected_rows = services::prepage::create(&db, &input_prepage).await?;
+    let affected_rows = services::prepage::create(&tenant.db, &input_prepage).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -87,11 +87,11 @@ async fn create_handler(
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::prepage::delete(&db, id).await?;
+    let affected_rows = services::prepage::delete(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

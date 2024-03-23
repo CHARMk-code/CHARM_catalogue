@@ -7,12 +7,13 @@ mod services;
 
 use std::fs;
 
+use crate::services::database::initialize_tenant_pools;
+
 use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::HttpServer;
 use actix_web::{middleware::Logger, App};
 use actix_web_httpauth::extractors::bearer;
-use sqlx::postgres::PgPoolOptions;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -25,16 +26,9 @@ async fn main() -> std::io::Result<()> {
     fs::create_dir_all(&config.storage_path)?;
 
     // DB setup
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&config.database_url)
+    let tenants = initialize_tenant_pools(config.database_url.clone())
         .await
-        .expect("Failed to initialize Database pool");
-
-    sqlx::migrate!()
-        .run(&pool)
-        .await
-        .expect("Migrations failed");
+        .expect("Database initialization failed");
 
     //Auth cryptography setup
     let key_pair = jwt_simple::prelude::Ed25519KeyPair::generate();
@@ -55,8 +49,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .wrap(cors)
-            .app_data(Data::new(pool.clone()))
             .app_data(Data::new(config.clone()))
+            .app_data(tenants.clone())
             .app_data(bearer_config.clone())
             // HACK: Key_pair copied and put both as data and "not"
             // Since it needs to be used both as extractor
@@ -79,7 +73,7 @@ mod errors {
     pub enum MyError {
         NotFound,
         SQLxError(sqlx::Error),
-        FileDeletionError
+        FileDeletionError,
     }
 
     impl std::error::Error for MyError {}
@@ -90,10 +84,8 @@ mod errors {
                 MyError::NotFound => HttpResponse::NotFound().finish(),
                 MyError::SQLxError(ref err) => {
                     HttpResponse::InternalServerError().body(err.to_string())
-                }, 
-                MyError::FileDeletionError => {
-                    HttpResponse::InternalServerError().finish()
-                },
+                }
+                MyError::FileDeletionError => HttpResponse::InternalServerError().finish(),
                 //_ => HttpResponse::InternalServerError().finish(),
             }
         }

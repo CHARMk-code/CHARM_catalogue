@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { RouteLocationNormalized, createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "@/stores/modules/auth";
-import { useMapsStore } from "@/stores/modules/maps";
+// import { useMapsStore } from "@/stores/modules/maps";
 import { useTagsStore } from "@/stores/modules/tags";
-import { useCompaniesStore } from "@/stores/modules/companies";
+import { Company, useCompaniesStore } from "@/stores/modules/companies";
 import { usePrepagesStore } from "@/stores/modules/prepages";
 import { useLayoutsStore } from "@/stores/modules/layouts";
 import { useShortcutsStore } from "@/stores/modules/shortcuts";
@@ -11,21 +11,22 @@ import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useFilterStore } from "@/stores/modules/filter";
 import { useFavoritesStore } from "@/stores/modules/favorites";
 import { useFeedbackStore } from "@/stores/modules/feedback";
+import { useFairMapsStore } from "@/stores/modules/fairMaps";
+import { useTagCategoriesStore } from "@/stores/modules/tag_category";
 
 const UserLayout = () => import("@/views/userLayout.vue");
-const Company_view = () => import("@/views/company.vue");
+const Company_view = () => import("@/views/company2.vue");
 const Search_view = () => import("@/views/search.vue");
 const Login_view = () => import("@/views/login.vue");
 const Landing_view = () => import("@/views/Landing.vue");
 const Map_view = () => import("@/views/Map.vue");
 const Prepage_view = () => import("@/views/Prepage.vue");
-
 const Admin_view = () => import("@/views/Administration.vue");
 const Companies_admin = () => import("@/views/admin/Companies.vue");
 const Prepage_admin = () => import("@/views/admin/Prepage.vue");
 const Tags_admin = () => import("@/views/admin/Tags.vue");
 const Account_admin = () => import("@/components/admin/Account.vue");
-const Map_admin = () => import("@/views/admin/Map.vue");
+const Map_admin = () => import("@/views/admin/AdminMap.vue");
 const Layout_admin = () => import("@/views/admin/Layout.vue");
 const Shortcuts_admin = () => import("@/views/admin/Shortcuts.vue");
 const Upload_admin = () => import("@/components/admin/Upload.vue");
@@ -85,7 +86,7 @@ const router = createRouter({
           },
         },
         {
-          path: "/maps",
+          path: "/map",
           name: "Map",
           component: Map_view,
           meta: {
@@ -175,38 +176,60 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  await fetchStores(from);
+
+  if (to.path.startsWith("/qr/")){
+    const qr = to.path.substring(4);
+    const companies = Array.from(useCompaniesStore().companies.values()).filter((c: Company) => c.qr_link === qr)
+
+    if (companies.length == 1) {
+      const company = companies[0]!;
+      next({path: "/company/"+ company.name})
+      //next({name: "Company", params: {name: company.name}});
+    } else {
+      next();
+    }
+  } else {
+    if (to.matched.some((record) => !record.meta.noAuth)) {
+      const authStore = useAuthStore();
+
+      console.log(useCompaniesStore().companies.values());
+      if (authStore.isLoggedIn) {
+        next();
+      } else {
+        next({name: "Login", params: { nextUrl: to.fullPath } });
+      }
+    } else {
+      next();
+    }
+  }
+});
+
+
+async function fetchStores(from: RouteLocationNormalized) {
   if (from.name == null) {
     // Arriving from offsite, need to load data
     useAuthStore().setAuthorizationHeader();
     useFavoritesStore().loadFromStorage();
 
-    const mapsStore = useMapsStore();
+//    const mapsStore = useMapsStore();
 
     await Promise.all([
-      mapsStore.getMaps(),
       useTagsStore().getTags(), // This one fails if db is empty, check why
-      useCompaniesStore().fetchCompanies(),
+      useTagCategoriesStore().fetchTagCategories(),
+      useCompaniesStore().fetchCompanies().then(() => { useFilterStore().filterCompanies() }),
       usePrepagesStore().getPrepages(),
       useLayoutsStore().getLayouts(),
       useShortcutsStore().getShortcuts(),
       useSite_settingsStore().fetchSettings(),
+      useFairMapsStore().fetchMaps()
     ])
-      .then(() => {
-        useFilterStore().filterCompanies();
-      })
-      .catch(() => {}); // add some error here in the future?
+      .catch((e) => {
+        console.error("Something went wrong while fetching data from backend, error: "+ e)
+      }); // add some error here in the future?
+      await new Promise(r => setTimeout(r, 500));
   }
-  if (to.matched.some((record) => !record.meta.noAuth)) {
-    const authStore = useAuthStore();
 
-    if (authStore.isLoggedIn) {
-      next();
-    } else {
-      next({ name: "Login", params: { nextUrl: to.fullPath } });
-    }
-  } else {
-    next();
-  }
-});
+}
 
 export default router;

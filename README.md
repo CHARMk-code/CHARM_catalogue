@@ -25,6 +25,15 @@ Or you can make use of the package `charm_catalogue-backend` and `charm_catalogu
 
 A system configured with `Docker`, `cargo` and `yarn`
 
+For the backend to properly compile you need to add the `linux-musl` target to your toolchain
+```rustup target add x86_64-unknown-linux-musl```
+
+In order for the backend to compile, sqlx needs the database to be online and properly initiated. To achieve this, 
+first install the sqlx cli commands `cargo install sqlx-cli`, followed by setting the `DATABASE_URL` environment variable with `export DATABASE_URL=postgres://catalogue:password@localhost:5432/catalogue` finally run the migrations with  `cargo sqlx prepare` 
+
+Note: the environment variable needs to be set every time the backend is compiled, since sqlx statically "type-checks" all the sql queries against the database making sure no invalid sql commands are in the source code.
+
+
 ### Running 
 The database is started by running 
 ```

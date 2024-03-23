@@ -8,7 +8,7 @@ use crate::{
     services,
 };
 
-#[sqlx::test(fixtures("Companies", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     // Setup
     let initial_company = CompanyDB {
@@ -21,11 +21,6 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         name: "FrennFjord Consulting".to_string(),
         description: "The company creating this catalogue".to_string(),
         unique_selling_point: "They are old CHARM people".to_string(),
-        summer_job_description: "No summerjobs".to_string(),
-        summer_job_link: "".to_string(),
-        summer_job_deadline: DateTime::parse_from_str("2024-01-01 10:00:00+02", "%F %T%#z")
-            .unwrap()
-            .into(),
         contacts: "Lucas Glimfjord".to_string(),
         contact_email: "redacted".to_string(),
         employees_world: 2,
@@ -33,9 +28,17 @@ async fn get_by_id_should_return_matching_row_in_db(db: Pool<Postgres>) -> Resul
         website: "frennfjord.se".to_string(),
         talk_to_us_about: "CHARM and this Catalogue".to_string(),
         logo: "logo.png".to_string(),
-        map_image: 0,
+        map_image: 1,
         booth_number: 15,
         tags: Some(vec![1, 2]),
+        image_office: "aimage.png".to_string(),
+        image_product: "ascreenshot.png".to_string(),
+        founded: 2022,
+        office_location: "Gothenburg".to_string(),
+        male_board_share: 100,
+        female_board_share: 0,
+        nonbinary_board_share: 0,
+        qr_link: "a qr link".to_string(),
     };
 
     // What's tested
@@ -63,7 +66,7 @@ async fn get_by_id_when_no_matching_company_should_fail(db: Pool<Postgres>) -> R
 
     Ok(())
 }
-#[sqlx::test(fixtures("Companies", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) -> Result<(), Error> {
     #[derive(Debug, PartialEq, Eq, Clone)]
     struct CompanyTagRel {
@@ -84,13 +87,6 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         name: Some("New company".to_string()),
         description: Some("A new company description".to_string()),
         unique_selling_point: Some("Nothing".to_string()),
-        summer_job_description: Some("No summerjobs".to_string()),
-        summer_job_link: Some("".to_string()),
-        summer_job_deadline: Some(
-            DateTime::parse_from_str("2029-01-01 10:00:00+02", "%F %T%#z")
-                .unwrap()
-                .into(),
-        ),
         contacts: Some("No one".to_string()),
         contact_email: Some("redacted".to_string()),
         employees_world: Some(2),
@@ -98,9 +94,17 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         website: Some("null.se".to_string()),
         talk_to_us_about: Some("New things".to_string()),
         logo: Some("new_logo.png".to_string()),
-        map_image: Some(4),
+        map_image: Some(2),
         booth_number: Some(42),
         tags: Some([1, 2].to_vec()),
+        image_office: Some("aimage.png".to_string()),
+        image_product: Some("ascreenshot.png".to_string()),
+        founded: Some(1920),
+        office_location: Some("New York".to_string()),
+        male_board_share: Some(40),
+        female_board_share: Some(30),
+        nonbinary_board_share: Some(30),
+        qr_link: Some("a qr".to_string()),
     };
 
     // What's tested
@@ -131,11 +135,6 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         name: "New company".to_string(),
         description: "A new company description".to_string(),
         unique_selling_point: "Nothing".to_string(),
-        summer_job_description: "No summerjobs".to_string(),
-        summer_job_link: "".to_string(),
-        summer_job_deadline: DateTime::parse_from_str("2029-01-01 10:00:00+02", "%F %T%#z")
-            .unwrap()
-            .into(),
         contacts: "No one".to_string(),
         contact_email: "redacted".to_string(),
         employees_world: 2,
@@ -143,9 +142,17 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
         website: "null.se".to_string(),
         talk_to_us_about: "New things".to_string(),
         logo: "new_logo.png".to_string(),
-        map_image: 4,
+        map_image: 2,
         booth_number: 42,
         tags: Some([1, 2].to_vec()),
+        image_office: "aimage.png".to_string(),
+        image_product: "ascreenshot.png".to_string(),
+        founded: 1920,
+        office_location: "New York".to_string(),
+        male_board_share: 40,
+        female_board_share: 30,
+        nonbinary_board_share: 30,
+        qr_link: "a qr".to_string(),
     };
 
     assert_eq!(
@@ -195,7 +202,7 @@ async fn creating_a_valid_company_should_create_row_in_db(db: Pool<Postgres>) ->
     Ok(())
 }
 
-#[sqlx::test(fixtures("Companies", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn valid_update_on_existing_company_should_update_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {
@@ -224,9 +231,6 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         name: None,
         description: None,
         unique_selling_point: None,
-        summer_job_description: None,
-        summer_job_link: None,
-        summer_job_deadline: None,
         contacts: None,
         contact_email: None,
         employees_world: None,
@@ -237,6 +241,14 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
         map_image: None,
         booth_number: None,
         tags: Some(vec![3]),
+        image_office: None,
+        image_product: None,
+        founded: Some(1920),
+        office_location: None,
+        male_board_share: Some(40),
+        female_board_share: Some(30),
+        nonbinary_board_share: Some(30),
+        qr_link: None,
     };
 
     // What's tested
@@ -275,11 +287,6 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
             name: "FrennFjord Consulting".to_string(),
             description: "The company creating this catalogue".to_string(),
             unique_selling_point: "They are old CHARM people".to_string(),
-            summer_job_description: "No summerjobs".to_string(),
-            summer_job_link: "".to_string(),
-            summer_job_deadline: DateTime::parse_from_str("2024-01-01 10:00:00+02", "%F %T%#z")
-                .unwrap()
-                .into(),
             contacts: "Lucas Glimfjord".to_string(),
             contact_email: "redacted".to_string(),
             employees_world: 2,
@@ -287,9 +294,17 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
             website: "frennfjord.se".to_string(),
             talk_to_us_about: "CHARM and this Catalogue".to_string(),
             logo: "logo.png".to_string(),
-            map_image: 0,
+            map_image: 1,
             booth_number: 15,
-            tags: Some(vec![3])
+            tags: Some(vec![3]),
+            image_office: "aimage.png".to_string(),
+            image_product: "ascreenshot.png".to_string(),
+            founded: 1920,
+            office_location: "Gothenburg".to_string(),
+            male_board_share: 40,
+            female_board_share: 30,
+            nonbinary_board_share: 30,
+            qr_link: "a qr link".to_string(),
         },
         "The updated sure the company has been properly updated in the database"
     );
@@ -337,7 +352,7 @@ async fn valid_update_on_existing_company_should_update_row_in_db(
     Ok(())
 }
 
-#[sqlx::test(fixtures("Companies", "Tags", "Companies_tags"))]
+#[sqlx::test(fixtures("Fair_maps", "Tag_categories", "Companies", "Tags", "Companies_tags"))]
 async fn delete_on_existing_id_should_remove_correct_row_in_db(
     db: Pool<Postgres>,
 ) -> Result<(), Error> {

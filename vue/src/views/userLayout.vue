@@ -168,6 +168,7 @@ const leftDrawerOpen = ref(false);
 const links = [
   { name: "Home", route: "/", icon: "mdi-home" },
   { name: "Search", route: "/search", icon: "mdi-magnify" },
+  { name: "Map", route: "/map", icon: "mdi-map" },
 ];
 
 const leftLayout = computed(() => layoutsStore.getSide("left"));

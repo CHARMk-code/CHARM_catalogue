@@ -9,4 +9,5 @@ pub mod map;
 pub mod prepage;
 pub mod shortcut;
 pub mod tag;
+pub mod tag_category;
 pub mod user;

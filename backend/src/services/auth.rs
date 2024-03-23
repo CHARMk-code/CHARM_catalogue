@@ -74,6 +74,24 @@ pub async fn create_user(
     Ok(user.id)
 }
 
+pub async fn update_user(
+    db: &Pool<Postgres>,
+    user: UserWeb,
+    salt: &[u8],
+) -> Result<i32, actix_web::Error> {
+    let hash =
+        hash_password(&user.password, salt).map_err(actix_web::error::ErrorInternalServerError)?;
+    let user = query!(
+        "UPDATE users set password= $1 returning id",
+        hash
+    )
+    .fetch_one(db)
+    .await
+    .map_err(MyError::SQLxError)?;
+
+    Ok(user.id)
+}
+
 pub fn hash_password(password_to_hash: &String, salt: &[u8]) -> Result<String, argon2::Error> {
     let config = Config::default();
 

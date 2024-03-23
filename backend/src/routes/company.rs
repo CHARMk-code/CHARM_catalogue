@@ -1,10 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
 
-use crate::models::company::CompanyWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
+use crate::{
+    models::company::CompanyWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -18,16 +18,16 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/")]
-async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let companies = services::company::get_all(&db).await?;
+async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
+    let companies = services::company::get_all(&tenant.db).await?;
 
     Ok(HttpResponse::Ok().json(companies))
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(tenant: Tenant, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let company = services::company::get_by_id(&db, id).await?;
+    let company = services::company::get_by_id(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(company))
 }
@@ -35,7 +35,7 @@ async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Resul
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<CompanyWeb>,
 ) -> Result<impl Responder> {
     let input_company = data.into_inner();
@@ -47,9 +47,6 @@ async fn update_handler(
             let name = input_company.name.as_ref();
             let description = input_company.description.as_ref();
             let unique_selling_point = input_company.unique_selling_point.as_ref();
-            let summer_job_description = input_company.summer_job_description.as_ref();
-            let summer_job_link = input_company.summer_job_link.as_ref();
-            let summer_job_deadline = input_company.summer_job_deadline.as_ref();
             let contacts = input_company.contacts.as_ref();
             let contact_email = input_company.contact_email.as_ref();
             let employees_world = input_company.employees_world.as_ref();
@@ -65,9 +62,6 @@ async fn update_handler(
                 .and(name)
                 .and(description)
                 .and(unique_selling_point)
-                .and(summer_job_description)
-                .and(summer_job_link)
-                .and(summer_job_deadline)
                 .and(contacts)
                 .and(contact_email)
                 .and(employees_world)
@@ -81,12 +75,12 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let company = services::company::update(&db, input_company).await?;
+                let company = services::company::update(&tenant.db, input_company).await?;
                 HttpResponse::Ok().json(company)
             }
         }
         None => {
-            let company = services::company::create(&db, &input_company).await?;
+            let company = services::company::create(&tenant.db, &input_company).await?;
             HttpResponse::Created().json(company)
         }
     };
@@ -97,11 +91,11 @@ async fn update_handler(
 #[post("/")] // TODO Deprecatea in favor of put
 async fn create_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<CompanyWeb>,
 ) -> Result<impl Responder> {
     let input_company = data.into_inner();
-    let affected_rows = services::company::create(&db, &input_company).await?;
+    let affected_rows = services::company::create(&tenant.db, &input_company).await?;
 
     Ok(HttpResponse::Created().json(affected_rows))
 }
@@ -109,11 +103,11 @@ async fn create_handler(
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::company::delete(&db, id).await?;
+    let affected_rows = services::company::delete(&tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

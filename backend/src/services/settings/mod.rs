@@ -28,7 +28,7 @@ pub(crate) async fn reset_database(
     std::fs::create_dir(storage_path)?;
 
     // Empty database
-    let rows_affected = query!("TRUNCATE blobs, companies, companies_tags, company_cards, files, layouts, maps, prepages, shortcuts, tags")
+    let rows_affected = query!("TRUNCATE blobs, companies, companies_tags, company_cards, files, layouts, fair_maps, prepages, shortcuts, tags, tag_category")
         .execute(db)
         .await
         .map_err(MyError::SQLxError)?;

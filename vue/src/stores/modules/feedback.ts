@@ -64,7 +64,7 @@ export const useFeedbackStore = defineStore("feedback", {
     sendUserFeedback(feedback: Feedback) {
       return new Promise((resolve, reject) => {
         this.axios
-          .put("/v2/feedback", feedback)
+          .put("/v2/feedback/user", feedback)
           .then((resp: any) => {
             resolve(resp);
           })
@@ -76,7 +76,7 @@ export const useFeedbackStore = defineStore("feedback", {
     sendAdminFeedback(feedback) {
       return new Promise((resolve, reject) => {
         this.axios
-          .post("/v2/feedback", feedback)
+          .put("/v2/feedback/admin", feedback)
           .then((resp: any) => {
             resolve(resp);
           })

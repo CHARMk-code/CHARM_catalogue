@@ -32,42 +32,35 @@
           <tagSelector
             v-if="isVisible('tag_divisions')"
             v-model:selectedTags="selectedDivisions"
-            :tags="tagsStore.divisions"
+            :tags="tagsStore.getTagsInCategory('Division')"
             label="Programs"
             :max-shown="8"
           />
           <tagSelector
-            v-if="isVisible('tag_business_areas')"
-            v-model:selectedTags="selectedBusiness_areas"
-            :tags="tagsStore.business_areas"
-            label="Business areas"
-            :max-shown="3"
-          />
-          <tagSelector
             v-if="isVisible('tag_looking_for')"
             v-model:selectedTags="selectedLooking_for"
-            :tags="tagsStore.looking_for"
+            :tags="tagsStore.getTagsInCategory('Looking For')"
             label="Looking for"
             :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('tag_offering')"
             v-model:selectedTags="selectedOfferings"
-            :tags="tagsStore.offering"
+            :tags="tagsStore.getTagsInCategory('Offering')"
             label="Offering"
             :max-shown="3"
           />
           <tagSelector
             v-if="isVisible('language')"
             v-model:selectedTags="selectedLanguages"
-            :tags="tagsStore.languages"
+            :tags="tagsStore.getTagsInCategory('Language')"
             label="Language"
             :max-shown="2"
           />
           <tagSelector
             v-if="isVisible('fair_area')"
             v-model:selectedTags="selectedFairAreas"
-            :tags="tagsStore.fair_areas"
+            :tags="tagsStore.getTagsInCategory('Fair Area')"
             label="Fair Areas"
             :max-shown="2"
           />
@@ -119,7 +112,6 @@ if (filterStore.filters.favorites && isVisible("favorites"))
   tmp.push("favorites");
 if (filterStore.filters.charmtalk && isVisible("charmtalk"))
   tmp.push("charmtalk");
-if (filterStore.filters.sweden && isVisible("sweden")) tmp.push("sweden");
 checkboxes.value = tmp;
 
 const expanded = ref(false);
@@ -128,7 +120,6 @@ watch(checkboxes, async (vs: string[]) => {
     ...filterStore.filters,
     favorites: false,
     charmtalk: false,
-    sweden: false,
   };
   for (const v of vs) {
     switch (v) {
@@ -138,10 +129,7 @@ watch(checkboxes, async (vs: string[]) => {
       case "charmtalk":
         tmp.charmtalk = true;
         break;
-      case "sweden":
-        tmp.sweden = true;
-        break;
-    }
+      }
   }
   filterStore.filters = tmp;
 });
@@ -152,7 +140,6 @@ const checkbox_options = computed(() => {
     tmp.push({ label: "Favorites", value: "favorites" });
   if (!isVisible("charmtalk"))
     tmp.push({ label: "Attending CHARMtalks", value: "charmtalk" });
-  if (!isVisible("sweden")) tmp.push({ label: "Sweden", value: "sweden" });
   return tmp;
 });
 
@@ -172,7 +159,7 @@ const visibleCards = site_settingsStore.server_settings.company_view.cards.filte
 
 const selectedDivisions = computed({
   get() {
-    return tagsStore.getDivisionsFromIds(filterStore.filters.tags.divisions);
+    return tagsStore.getTagsByCategoryFromIds("Division", new Set(filterStore.filters.tags.divisions));
   },
   set(v) {
     if (v) {
@@ -184,9 +171,7 @@ const selectedDivisions = computed({
 });
 const selectedBusiness_areas = computed({
   get() {
-    return tagsStore.getBusinessAreasFromIds(
-      filterStore.filters.tags.business_areas
-    );
+    return tagsStore.getTagsByCategoryFromIds("Business Area", new Set(filterStore.filters.tags.business_areas));
   },
   set(v) {
     if (v) {
@@ -198,7 +183,7 @@ const selectedBusiness_areas = computed({
 });
 const selectedLooking_for = computed({
   get() {
-    return tagsStore.getLookingForFromIds(filterStore.filters.tags.looking_for);
+    return tagsStore.getTagsByCategoryFromIds("Looking For", new Set(filterStore.filters.tags.looking_for))
   },
   set(v) {
     if (v) {
@@ -210,7 +195,7 @@ const selectedLooking_for = computed({
 });
 const selectedOfferings = computed({
   get() {
-    return tagsStore.getOfferingsFromIds(filterStore.filters.tags.offerings);
+    return tagsStore.getTagsByCategoryFromIds("Offering", new Set(filterStore.filters.tags.offerings));
   },
   set(v) {
     if (v) {
@@ -222,7 +207,7 @@ const selectedOfferings = computed({
 });
 const selectedLanguages = computed({
   get() {
-    return tagsStore.getLanguagesFromIds(filterStore.filters.tags.languages);
+    return tagsStore.getTagsByCategoryFromIds("Language", new Set(filterStore.filters.tags.languages));
   },
   set(v) {
     if (v) {
@@ -234,7 +219,7 @@ const selectedLanguages = computed({
 });
 const selectedFairAreas = computed({
   get() {
-    return tagsStore.getFairAreasFromIds(filterStore.filters.tags.fair_areas);
+    return tagsStore.getTagsByCategoryFromIds("fair_area", new Set(filterStore.filters.tags.fair_areas));
   },
   set(v) {
     if (v) {

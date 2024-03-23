@@ -35,14 +35,14 @@
             <template
               v-if="
                 !props.value ||
-                tagsStore.getDivisionsFromIds(props.value).length < 1
+                tagsStore.getTagsByCategoryFromIds('Division',props.value).length < 1
               "
             >
               None
             </template>
             <template v-else>
               <TagGroup
-                :tags="tagsStore.getDivisionsFromIds(props.value)"
+                :tags="tagsStore.getTagsByCategoryFromIds('Division',props.value)"
               ></TagGroup>
             </template>
           </q-td>
@@ -104,7 +104,7 @@ import TagGroup from "@/components/Tag_group.vue";
 import { reactive } from "vue";
 import { useTagsStore, type Tag } from "@/stores/modules/tags";
 import { useCompaniesStore, type Company } from "@/stores/modules/companies";
-import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
+// import { useMapsStore, type Company_Map } from "@/stores/modules/maps";
 import type { TableColMeta } from "./table_edit_dialog.vue";
 
 const headers = [
@@ -141,7 +141,7 @@ const headers = [
 
 const tagsStore = useTagsStore();
 const companiesStore = useCompaniesStore();
-const mapsStore = useMapsStore();
+// const mapsStore = useMapsStore();
 
 // const hasNonValidValue = (value: any): boolean => {
 //   return value === null || value === "" || value.length === 0 || value === -1;
@@ -168,34 +168,36 @@ type metaRow = {
   offering: selectedTag[];
   language: selectedTag[];
   fair_area: selectedTag[];
-  meta_map_image: { label: Company_Map; value: number };
+  perk: selectedTag[];
+  value_word: selectedTag[];
 };
 
 const metaRows: metaRow[] = Array.from(companiesStore.companies.values()).map(
   (row) => {
-    const map_image_obj = mapsStore.getMapFromId(row.map_image);
-    const meta_map_image = map_image_obj
-      ? { label: map_image_obj, value: map_image_obj.id }
-      : { label: { name: "None" }, value: -1 };
     return reactive({
-      meta_map_image,
       divisions: tagsStore
-        .getDivisionsFromIds(row.tags)
+        .getTagsByCategoryFromIds("Division",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       looking_for: tagsStore
-        .getLookingForFromIds(row.tags)
+        .getTagsByCategoryFromIds("Looking For",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       business_areas: tagsStore
-        .getBusinessAreasFromIds(row.tags)
+        .getTagsByCategoryFromIds("Business Area",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       offering: tagsStore
-        .getOfferingsFromIds(row.tags)
+        .getTagsByCategoryFromIds("Offering",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       language: tagsStore
-        .getLanguagesFromIds(row.tags)
+        .getTagsByCategoryFromIds("Language",row.tags)
         .map((t) => ({ value: t.id, label: t })),
       fair_area: tagsStore
-        .getFairAreasFromIds(row.tags)
+        .getTagsByCategoryFromIds("Fair Area",row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      perk: tagsStore
+        .getTagsByCategoryFromIds("Perk",row.tags)
+        .map((t) => ({ value: t.id, label: t })),
+      value_word: tagsStore
+        .getTagsByCategoryFromIds("Value Word",row.tags)
         .map((t) => ({ value: t.id, label: t })),
     });
   }
@@ -207,35 +209,43 @@ type selectedTag = {
 };
 
 function updateWithMetaModels(meta: metaRow, row: Company) {
-  var allTags: number[] = [];
+  let allTags: number[] = [];
   if (
     meta.divisions ||
     meta.looking_for ||
     meta.business_areas ||
     meta.offering ||
-    meta.language
+    meta.language ||
+    meta.fair_area||
+    meta.perk ||
+    meta.value_word
   ) {
     if (meta.divisions) {
-      var allTags = allTags.concat(meta.divisions.map((v) => v.value));
+      allTags = allTags.concat(meta.divisions.map((v) => v.value));
     }
     if (meta.looking_for) {
-      var allTags = allTags.concat(meta.looking_for.map((v) => v.value));
+      allTags = allTags.concat(meta.looking_for.map((v) => v.value));
     }
     if (meta.business_areas) {
-      var allTags = allTags.concat(meta.business_areas.map((v) => v.value));
+      allTags = allTags.concat(meta.business_areas.map((v) => v.value));
     }
     if (meta.offering) {
-      var allTags = allTags.concat(meta.offering.map((v) => v.value));
+      allTags = allTags.concat(meta.offering.map((v) => v.value));
     }
     if (meta.language) {
-      var allTags = allTags.concat(meta.language.map((v) => v.value));
+      allTags = allTags.concat(meta.language.map((v) => v.value));
     }
     if (meta.fair_area) {
-      var allTags = allTags.concat(meta.fair_area.map((v) => v.value));
+      allTags = allTags.concat(meta.fair_area.map((v) => v.value));
+    }
+    if (meta.perk) {
+      allTags = allTags.concat(meta.perk.map((v) => v.value));
+    }
+    if (meta.value_word) {
+      allTags = allTags.concat(meta.value_word.map((v) => v.value));
     }
     row.tags = new Set(allTags);
   }
-  row.map_image = meta.meta_map_image.value;
 }
 
 const colMeta: TableColMeta[] = [
@@ -278,16 +288,6 @@ const colMeta: TableColMeta[] = [
   },
   {
     type: "textarea",
-    model: "summer_job_description",
-    label: "Description of summer job",
-  },
-  {
-    type: "external-link",
-    model: "summer_job_link",
-    label: "Link to summer job application",
-  },
-  {
-    type: "textarea",
     model: "talk_to_us_about",
     label: "Talk to us about",
   },
@@ -309,22 +309,9 @@ const colMeta: TableColMeta[] = [
     label: "Number of Employees in Sweden",
   },
   {
-    type: "single-select",
-    model: "meta_map_image",
-    items: [{ label: { name: "None" }, value: -1 }].concat(
-      Array.from(mapsStore.maps.values()).map((m) => ({
-        label: m,
-        value: m.id,
-      }))
-    ),
-    label: "Map",
-    hint: "Map for company location",
-    meta: true,
-  },
-  {
     type: "multiple-select",
     model: "divisions",
-    items: tagsStore.divisions.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Division").map((t) => ({ value: t.id, label: t })),
     label: "Programs",
     hint: "Programs the company are interested in",
     meta: true,
@@ -332,7 +319,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "looking_for",
-    items: tagsStore.looking_for.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Looking For").map((t) => ({ value: t.id, label: t })),
     label: "Looking For",
     hint: "Which level of education the company is looking for",
     meta: true,
@@ -340,7 +327,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "business_areas",
-    items: tagsStore.business_areas.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Business Area").map((t) => ({ value: t.id, label: t })),
     label: "Business areas",
     hint: "The company's business areas",
     meta: true,
@@ -348,7 +335,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "offering",
-    items: tagsStore.offering.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Offering").map((t) => ({ value: t.id, label: t })),
     label: "Offering",
     hint: "Which type of jobs the company is offering",
     meta: true,
@@ -356,7 +343,7 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "language",
-    items: tagsStore.languages.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Language").map((t) => ({ value: t.id, label: t })),
     label: "Languages",
     hint: "Which languages does the company want",
     meta: true,
@@ -364,10 +351,63 @@ const colMeta: TableColMeta[] = [
   {
     type: "multiple-select",
     model: "fair_area",
-    items: tagsStore.fair_areas.map((t) => ({ value: t.id, label: t })),
+    items: tagsStore.getTagsInCategory("Fair Area").map((t) => ({ value: t.id, label: t })),
     label: "Fair Area",
     hint: "Which Fair Area is the company on",
     meta: true,
   },
+  {
+    type: "multiple-select",
+    model: "perk",
+    items: tagsStore.getTagsInCategory("Perk").map((t) => ({ value: t.id, label: t })),
+    label: "Perk",
+    hint: "Which Perks does the company offer",
+    meta: true,
+  },
+  {
+    type: "multiple-select",
+    model: "value_word",
+    items: tagsStore.getTagsInCategory("Value Word").map((t) => ({ value: t.id, label: t })),
+    label: "Value Word",
+    hint: "Which Value words represent the company",
+    meta: true,
+  },
+  {
+    type: "number",
+    model: "founded",
+    label: "Founded yaer",
+  },
+  {
+    type: "text",
+    model: "office_localation",
+    label: "Office Localation",
+  },
+  {
+    type: "image",
+    model: "image_office",
+    label: "Image Office",
+  },
+  {
+    type: "image",
+    model: "image_product",
+    label: "Image Product",
+  },
+  {
+    type: "number",
+    model: "male_board_share",
+    label: "Male share of board",
+  },
+  {
+    type: "number",
+    model: "female_board_share",
+    label: "Female share of board",
+  },
+  {
+    type: "number",
+    model: "nonbinary_board_share",
+    label: "Nonbinary share of board",
+  },
+
+
 ];
 </script>

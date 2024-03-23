@@ -1,41 +1,41 @@
 use actix_web::web::Json;
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
+use actix_web::{delete, get, put, web, HttpResponse, Responder, Result};
 
-use crate::models::feedback::FeedbackWeb;
-use crate::services;
-use crate::services::auth::AuthedUser;
+use crate::{
+    models::feedback::FeedbackWeb,
+    services::{self, auth::AuthedUser, database::Tenant},
+};
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/feedback")
             .service(get_all_handler)
             .service(get_by_id_handler)
-            .service(update_handler)
-            .service(create_handler)
+            .service(create_user_handler)
+            .service(update_admin_handler)
             .service(delete_handler),
     );
 }
 
 #[get("/")]
-async fn get_all_handler(db: web::Data<PgPool>) -> Result<impl Responder> {
-    let feedback = services::feedback::get_all((*db).as_ref().clone()).await?;
+async fn get_all_handler(tenant: Tenant) -> Result<impl Responder> {
+    let feedback = services::feedback::get_all(tenant.db).await?;
 
     Ok(HttpResponse::Ok().json(feedback))
 }
 
 #[get("/{id}")]
-async fn get_by_id_handler(db: web::Data<PgPool>, path: web::Path<i32>) -> Result<impl Responder> {
+async fn get_by_id_handler(tenant: Tenant, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let feedback = services::feedback::get_by_id((*db).as_ref().clone(), id).await?;
+    let feedback = services::feedback::get_by_id(tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(feedback))
 }
 
-#[put("/")]
-async fn update_handler(
+#[put("/admin")]
+async fn update_admin_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<FeedbackWeb>,
 ) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
@@ -59,14 +59,12 @@ async fn update_handler(
             {
                 HttpResponse::UnprocessableEntity().finish()
             } else {
-                let feedback =
-                    services::feedback::update((*db).as_ref().clone(), input_feedback).await?;
+                let feedback = services::feedback::update(tenant.db, input_feedback).await?;
                 HttpResponse::Ok().json(feedback)
             }
         }
         None => {
-            let feedback =
-                services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
+            let feedback = services::feedback::create(tenant.db, input_feedback).await?;
             HttpResponse::Created().json(feedback)
         }
     };
@@ -74,26 +72,21 @@ async fn update_handler(
     Ok(response)
 }
 
-#[post("/")] // TODO Deprecatea in favor of put
-async fn create_handler(
-    _user: AuthedUser,
-    db: web::Data<PgPool>,
-    data: Json<FeedbackWeb>,
-) -> Result<impl Responder> {
+#[put("/user")]
+async fn create_user_handler(tenant: Tenant, data: Json<FeedbackWeb>) -> Result<impl Responder> {
     let input_feedback = data.into_inner();
-    let affected_rows = services::feedback::create((*db).as_ref().clone(), input_feedback).await?;
-
-    Ok(HttpResponse::Created().json(affected_rows))
+    let feedback = services::feedback::create(tenant.db, input_feedback).await?;
+    Ok(HttpResponse::Created().json(feedback))
 }
 
 #[delete("/{id}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<i32>,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let affected_rows = services::feedback::delete((*db).as_ref().clone(), id).await?;
+    let affected_rows = services::feedback::delete(tenant.db, id).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

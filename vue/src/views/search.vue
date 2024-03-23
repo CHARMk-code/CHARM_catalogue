@@ -8,7 +8,7 @@
       <q-card-section>
         <span class="block text-h6">Results</span>
         <q-table
-          v-model:pagination="searchPagination"
+          :pagination="searchPagination"
           flat
           :rows="filterStore.filteredCompanies"
           :columns="columns"
@@ -118,25 +118,25 @@ const columns = computed(() => {
     {
       name: "Programs",
       label: "Programs",
-      field: (row: Company) => tagsStore.getDivisionsFromIds(row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Division", row.tags),
       align: "left",
     },
     {
       name: "Looking_for",
       label: "Looking for",
-      field: (row: Company) => tagsStore.getLookingForFromIds(row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Looking For", row.tags),
       align: "left",
     },
     {
       name: "Offering",
       label: "Offering",
-      field: (row: Company) => tagsStore.getOfferingsFromIds(row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Offering", row.tags),
       align: "left",
     },
     {
       name: "Fair_area",
       label: "Fair Area",
-      field: (row: Company) => tagsStore.getFairAreasFromIds(row.tags),
+      field: (row: Company) => tagsStore.getTagsByCategoryFromIds("Fair Area", row.tags),
       align: "left",
     },
     {

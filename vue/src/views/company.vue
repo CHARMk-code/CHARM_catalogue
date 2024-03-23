@@ -55,7 +55,6 @@ import { useRoute, useRouter } from "vue-router";
 import { usePrepagesStore, type Prepage } from "@/stores/modules/prepages";
 import { useCompaniesStore } from "@/stores/modules/companies";
 import { useTagsStore } from "@/stores/modules/tags";
-import { useMapsStore } from "@/stores/modules/maps";
 import { useSite_settingsStore } from "@/stores/modules/site_settings";
 import { useQuasar } from "quasar";
 
@@ -63,7 +62,6 @@ const filterStore = useFilterStore();
 const prepagesStore = usePrepagesStore();
 const companiesStore = useCompaniesStore();
 const tagsStore = useTagsStore();
-const mapsStore = useMapsStore();
 const settingsStore = useSite_settingsStore();
 
 const route = useRoute();
@@ -108,7 +106,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Divisions",
         name: "tag_divisions",
-        tags: tagsStore.getDivisionsFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("division",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -117,7 +115,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Looking For",
         name: "tag_looking_for",
-        tags: tagsStore.getLookingForFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("looking_for",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -126,7 +124,7 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Offering",
         name: "tag_offering",
-        tags: tagsStore.getOfferingsFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("offering",company.value.tags),
       });
       addComponent("left", vnode);
     }
@@ -135,34 +133,23 @@ function renderCompanyCards() {
       const vnode = h(Tags, {
         title: "Business areas",
         name: "tag_business_areas",
-        tags: tagsStore.getBusinessAreasFromIds(company.value.tags),
+        tags: tagsStore.getTagsByCategoryFromIds("business_area",company.value.tags),
       });
       addComponent("left", vnode);
     }
 
     // Map
-    if (isVisible("map")) {
-      const vnode = h(Map, {
-        map: mapsStore.getMapFromId(company.value.map_image),
-        boothNumber: company.value.booth_number,
-      });
-      addComponent("right", vnode);
-    }
+    // if (isVisible("map")) {
+    //   const vnode = h(Map, {
+    //     boothNumber: company.value.booth_number
+    //   });
+    //   addComponent("right", vnode);
+    // }
     // What makes us special
     if (isVisible("desc")) {
       const vnode = h(Textblock, {
         title: "What Makes Us Special",
         body: company.value.unique_selling_point,
-      });
-      addComponent("right", vnode);
-    }
-    // Summerjob
-    if (isVisible("summerjob")) {
-      const vnode = h(Summerjob, {
-        name: "summerjob",
-        desc: company.value.summer_job_description,
-        link: company.value.summer_job_link,
-        deadline: company.value.summer_job_deadline,
       });
       addComponent("right", vnode);
     }
@@ -282,7 +269,8 @@ function setPrevRoute() {
           return;
         }
       }
-      settingsStore.session_settings.navigation.prev = "/prepage/" + pageGroups.length;
+      settingsStore.session_settings.navigation.prev =
+        "/prepage/" + pageGroups.length;
     } else {
       settingsStore.session_settings.navigation.prev = undefined;
     }

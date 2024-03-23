@@ -3,11 +3,10 @@ use actix_web::{
     web::{self, Json},
     HttpResponse, Responder, Result,
 };
-use sqlx::PgPool;
 
 use crate::{
     models::blob::JSONBlobWeb,
-    services::{self, auth::AuthedUser},
+    services::{self, auth::AuthedUser, database::Tenant},
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -20,12 +19,9 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/{name}")]
-async fn get_by_name_handler(
-    db: web::Data<PgPool>,
-    path: web::Path<String>,
-) -> Result<impl Responder> {
+async fn get_by_name_handler(tenant: Tenant, path: web::Path<String>) -> Result<impl Responder> {
     let name = path.into_inner();
-    let prepage = services::settings::blob::get_by_name(&db, &name).await?;
+    let prepage = services::settings::blob::get_by_name(&tenant.db, &name).await?;
 
     Ok(HttpResponse::Ok().json(prepage))
 }
@@ -33,10 +29,10 @@ async fn get_by_name_handler(
 #[put("/")]
 async fn update_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     data: Json<JSONBlobWeb>,
 ) -> Result<impl Responder> {
-    let jsonblob_id = services::settings::blob::update(&db, &data.into_inner()).await?;
+    let jsonblob_id = services::settings::blob::update(&tenant.db, &data.into_inner()).await?;
 
     Ok(HttpResponse::Ok().json(jsonblob_id))
 }
@@ -44,11 +40,11 @@ async fn update_handler(
 #[delete("/{name}")]
 async fn delete_handler(
     _user: AuthedUser,
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     path: web::Path<String>,
 ) -> Result<impl Responder> {
     let name = path.into_inner();
-    let affected_rows = services::settings::blob::delete_by_name(&db, &name).await?;
+    let affected_rows = services::settings::blob::delete_by_name(&tenant.db, &name).await?;
 
     Ok(HttpResponse::Ok().json(affected_rows))
 }

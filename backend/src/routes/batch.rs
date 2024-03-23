@@ -2,11 +2,10 @@ use std::path::PathBuf;
 
 use actix_multipart::Multipart;
 use actix_web::{post, web, HttpResponse, Responder, Result};
-use sqlx::PgPool;
 
 use crate::{
     config::Config,
-    services::{self, auth::AuthedUser},
+    services::{self, auth::AuthedUser, database::Tenant},
 };
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -15,9 +14,9 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 #[post("/")]
 async fn upload_batchfile(
-    db: web::Data<PgPool>,
+    tenant: Tenant,
     config: web::Data<Config>,
-    // _user: AuthedUser,
+    _user: AuthedUser,
     payload: Multipart,
 ) -> Result<impl Responder> {
     // TODO: Don't allow files to be saved if they have the wrong file_type
@@ -29,7 +28,7 @@ async fn upload_batchfile(
     for file_path in file_paths.into_iter() {
         if file_path.extension().unwrap().to_str() == Some("zip") {
             let process_res =
-                services::batch::process_batch_zip(&db, &file_path, &upload_path, &storage_path)
+                services::batch::process_batch_zip(&tenant.db, &file_path, &upload_path, &storage_path)
                     .await;
             process_res?;
         }

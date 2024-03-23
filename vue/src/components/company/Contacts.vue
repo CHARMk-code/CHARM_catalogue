@@ -1,20 +1,24 @@
 <template>
-  <company_card_wrapper v-if="contacts != ''" name="contacts">
+  <q-card>
     <q-card-section>
-      <div class="text-h6">Contact information</div>
-      <div v-if="contacts.includes('https://')">
-        <a :href="contacts"> {{ contacts }} </a>
-      </div>
-      <div v-else>{{ contacts }} ({{ contactEmail }})</div>
+        <div class="text-h6">Contact</div>
+          
+        <div v-if="!company.contacts.includes('https://')">
+            {{ company.contacts }} ({{ company.contact_email }})
+        </div>
     </q-card-section>
-  </company_card_wrapper>
+    <q-card-actions>
+      <q-btn color="primary" target="_blank" :href="company.website">
+        Visit their Website
+      </q-btn>
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
-import company_card_wrapper from "@/components/company/card_wrapper.vue";
+import { Company } from "@/stores/modules/companies";
 
 defineProps<{
-  contacts: string;
-  contactEmail: string;
+  company?: Company
 }>();
 </script>

@@ -11,9 +11,6 @@ pub struct CompanyWeb {
     pub name: Option<String>,
     pub description: Option<String>,
     pub unique_selling_point: Option<String>,
-    pub summer_job_description: Option<String>, // TODO: Allow publishing of generic job listings on the
-    pub summer_job_link: Option<String>,        // company page
-    pub summer_job_deadline: Option<DateTime<Utc>>,
     pub contacts: Option<String>,
     pub contact_email: Option<String>,
     pub employees_world: Option<i32>,
@@ -24,6 +21,14 @@ pub struct CompanyWeb {
     pub map_image: Option<i32>,
     pub booth_number: Option<i32>,
     pub tags: Option<Vec<i32>>,
+    pub image_office: Option<String>,
+    pub image_product: Option<String>,
+    pub founded: Option<i32>,
+    pub office_location: Option<String>,
+    pub male_board_share: Option<i32>,
+    pub female_board_share: Option<i32>,
+    pub nonbinary_board_share: Option<i32>,
+    pub qr_link: Option<String>,
 }
 
 impl Default for CompanyWeb {
@@ -36,9 +41,6 @@ impl Default for CompanyWeb {
             name: Default::default(),
             description: Default::default(),
             unique_selling_point: Default::default(),
-            summer_job_description: Default::default(),
-            summer_job_link: Default::default(),
-            summer_job_deadline: Default::default(),
             contacts: Default::default(),
             contact_email: Default::default(),
             employees_world: Default::default(),
@@ -49,9 +51,18 @@ impl Default for CompanyWeb {
             map_image: Default::default(),
             booth_number: Default::default(),
             tags: Default::default(),
+            image_office: Default::default(),
+            image_product: Default::default(),
+            founded: Default::default(),
+            office_location: Default::default(),
+            male_board_share: Default::default(),
+            female_board_share: Default::default(),
+            nonbinary_board_share: Default::default(),
+            qr_link: Default::default(),
         }
     }
 }
+
 
 #[derive(EnumIter, EnumString, Display, Debug, PartialEq, Eq, Hash)]
 pub enum RequiredField {
@@ -61,9 +72,6 @@ pub enum RequiredField {
     Name,
     Description,
     Uniquesellingpoint,
-    Summerjobdescription,
-    Summerjoblink,
-    Summerjobdeadline,
     Contacts,
     Contactemail,
     Employeesworld,
@@ -74,6 +82,14 @@ pub enum RequiredField {
     Mapimage,
     Boothnumber,
     Tags,
+    Imageoffice,
+    Imageproduct,
+    Founded,
+    Officelocation,
+    Maleboardshare,
+    Femaleboardshare,
+    Nonbinaryboardshare,
+    Qrlink
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -85,9 +101,6 @@ pub struct CompanyDB {
     pub name: String,
     pub description: String,
     pub unique_selling_point: String,
-    pub summer_job_description: String, // Allow publishing of generic job listings on the
-    pub summer_job_link: String,        // company page
-    pub summer_job_deadline: DateTime<Utc>,
     pub contacts: String,
     pub contact_email: String,
     pub employees_world: i32,
@@ -98,4 +111,12 @@ pub struct CompanyDB {
     pub map_image: i32,
     pub booth_number: i32,
     pub tags: Option<Vec<i32>>,
+    pub image_office: String,
+    pub image_product: String,
+    pub founded: i32,
+    pub office_location: String,
+    pub male_board_share: i32,
+    pub female_board_share: i32,
+    pub nonbinary_board_share: i32,
+    pub qr_link: String,
 }

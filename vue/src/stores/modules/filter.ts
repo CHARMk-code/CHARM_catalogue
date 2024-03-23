@@ -18,7 +18,6 @@ interface Filters {
   tags: Tags;
   favorites: boolean;
   charmtalk: boolean;
-  sweden: boolean;
 }
 
 interface State {
@@ -31,7 +30,6 @@ interface Route_query {
   tags?: string;
   favorites?: string;
   charmtalk?: string;
-  sweden?: string;
   [key: string]: string | undefined;
 }
 
@@ -49,7 +47,6 @@ export const useFilterStore = defineStore("filter", {
       },
       favorites: false,
       charmtalk: false,
-      sweden: false,
     },
     filteredCompanies: [],
   }),
@@ -67,7 +64,6 @@ export const useFilterStore = defineStore("filter", {
         },
         favorites: false,
         charmtalk: false,
-        sweden: false,
       };
     },
     filterCompanies() {
@@ -113,11 +109,6 @@ export const useFilterStore = defineStore("filter", {
           );
         }
         this.filteredCompanies = filteredCompanies;
-        // Filter on in sweden (no sweden attribute left)
-        // if (state.filters.sweden) {
-        //   filteredCompanies = filteredCompanies.filter((t: Company) => t.sweden);
-        // }
-        // state.filteredCompanies = companies;
 
         this.sortCompanies().then(() => {
           resolve();
@@ -140,30 +131,31 @@ export const useFilterStore = defineStore("filter", {
       }
       if (rQuery.tags && typeof rQuery.tags == "string") {
         const tagsStore = useTagsStore();
-        const allTags = rQuery.tags.split(",").map((s) => parseInt(s));
+        const allTags = new Set(rQuery.tags.split(",").map((s) => parseInt(s)))
 
+        console.log(allTags)
         this.filters.tags.divisions = tagsStore
-          .getDivisionsFromIds(allTags)
+          .getTagsByCategoryFromIds("Division", allTags)
           .map((t) => t.id);
 
         this.filters.tags.looking_for = tagsStore
-          .getLookingForFromIds(allTags)
+          .getTagsByCategoryFromIds("Looking For",allTags)
           .map((t) => t.id);
 
         this.filters.tags.business_areas = tagsStore
-          .getBusinessAreasFromIds(allTags)
+          .getTagsByCategoryFromIds("Business Area",allTags)
           .map((t) => t.id);
 
         this.filters.tags.languages = tagsStore
-          .getLanguagesFromIds(allTags)
+          .getTagsByCategoryFromIds("Language",allTags)
           .map((t) => t.id);
 
         this.filters.tags.offerings = tagsStore
-          .getOfferingsFromIds(allTags)
+          .getTagsByCategoryFromIds("Offering",allTags)
           .map((t) => t.id);
 
         this.filters.tags.fair_areas = tagsStore
-          .getFairAreasFromIds(allTags)
+          .getTagsByCategoryFromIds("Fair Area",allTags)
           .map((t) => t.id);
       }
 
@@ -175,9 +167,6 @@ export const useFilterStore = defineStore("filter", {
         this.filters.charmtalk = true;
       }
 
-      if (rQuery.sweden) {
-        this.filters.sweden = true;
-      }
       this.filterCompanies();
     },
     generateSearchRouteQuery() {
@@ -208,7 +197,6 @@ export const useFilterStore = defineStore("filter", {
 
       if (filter.favorites) rQuery.favorites = "true";
       if (filter.charmtalk) rQuery.charmtalk = "true";
-      if (filter.sweden) rQuery.sweden = "true";
 
       return rQuery;
     },
